@@ -1,0 +1,206 @@
+# SAL Formal Grammar — Semantic Assembly Language
+# OSMP Protocol v1.0
+# EBNF Notation
+
+# ─────────────────────────────────────────────
+# TOP-LEVEL INSTRUCTION
+# ─────────────────────────────────────────────
+
+instruction         ::= simple_instruction
+                      | compound_instruction
+                      | broadcast_instruction
+                      | parallel_instruction
+                      | sequence_instruction
+
+compound_instruction ::= instruction operator instruction
+parallel_instruction ::= instruction "∥" "[" instruction ("∧" instruction)* "]"
+sequence_instruction ::= instruction ";" instruction
+broadcast_instruction ::= namespace_prefix ":" opcode "@" wildcard "!" opcode
+
+# ─────────────────────────────────────────────
+# SIMPLE INSTRUCTION
+# ─────────────────────────────────────────────
+
+simple_instruction  ::= frame_id
+                        [target]
+                        [query]
+                        [slot_list]
+                        [consequence_class]
+
+frame_id            ::= namespace_prefix ":" opcode
+                      | opcode                        # short form for well-known frames
+
+target              ::= "@" node_id
+                      | "@" wildcard
+
+query               ::= "?" slot_name [":" default_value]
+
+slot_list           ::= slot ("∧" slot)*
+
+slot                ::= slot_name ":" slot_value
+
+consequence_class   ::= "⚠" | "↺" | "⊘"             # R namespace mandatory
+
+# ─────────────────────────────────────────────
+# NAMESPACE AND OPCODE
+# ─────────────────────────────────────────────
+
+namespace_prefix    ::= standard_prefix | sovereign_prefix
+
+standard_prefix     ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H"
+                      | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P"
+                      | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X"
+                      | "Y" | "Z"
+
+sovereign_prefix    ::= "Ω" ":"  # U+03A9 OMEGA — 2 UTF-8 bytes
+                      | uppercase_alpha uppercase_alpha ":"  # legacy two-char form
+                      # Two-character prefix followed by colon
+                      # Must not conflict with standard prefixes
+
+opcode              ::= uppercase_alpha (uppercase_alpha | digit)*
+                      # 1–8 characters, uppercase alphanumeric
+
+# ─────────────────────────────────────────────
+# OPERATORS
+# ─────────────────────────────────────────────
+
+operator            ::= "∧"    # AND           U+2227
+                      | "∨"    # OR            U+2228
+                      | "¬"    # NOT           U+00AC
+                      | "→"    # THEN          U+2192
+                      | "↔"    # IFF           U+2194
+                      | "∀"    # FOR-ALL       U+2200
+                      | "∃"    # EXISTS        U+2203
+                      | ">"    # PRIORITY      U+003E
+                      | "~"    # APPROX        U+007E
+                      | "¬→"   # UNLESS        U+00AC U+2192
+                      | "⟳"    # REPEAT-EVERY  U+27F3  — interval/recurrence composition
+                      | "≠"    # NOT-EQUAL     U+2260  — slot value exclusion filter
+                      | "⊕"    # PRIORITY-ORDER U+2295 — strict ranked execution under resource constraint
+
+# ─────────────────────────────────────────────
+# SLOT VALUES AND TYPES
+# ─────────────────────────────────────────────
+
+slot_name           ::= uppercase_alpha (uppercase_alpha | digit)*
+
+slot_value          ::= numeric_value
+                      | string_value
+                      | glyph_value
+                      | nested_instruction
+                      | list_value
+
+numeric_value       ::= ["-"] digit+ ["." digit+]
+string_value        ::= "[" printable_char* "]"
+glyph_value         ::= outcome_state | parameter_designator
+list_value          ::= "[" slot_value ("," slot_value)* "]"
+
+outcome_state       ::= "⊤" | "⊥"               # PASS / FAIL   U+22A4 / U+22A5
+
+parameter_designator ::= "Δ"                     # DELTA         U+0394
+                       | "⌂"                     # HOME          U+2302
+                       | "⊗"                     # ABORT/CANCEL  U+2297
+                       | "τ"                     # TIMEOUT       U+03C4
+                       | "∈"                     # SCOPE/WITHIN  U+2208
+                       | "∖"                     # MISSING       U+2216
+
+# ─────────────────────────────────────────────
+# NODE ADDRESSING
+# ─────────────────────────────────────────────
+
+node_id             ::= alphanumeric+             # e.g. 4A, NODE1, SENSOR-7
+wildcard            ::= "*"                       # broadcast to all nodes
+capability_query    ::= "[" "?" "CAP" ":" capability_name "]"
+capability_name     ::= uppercase_alpha (uppercase_alpha | digit)*
+
+# ─────────────────────────────────────────────
+# FRAGMENT HEADER (Overflow Protocol Tier 2 / Tier 3)
+# ─────────────────────────────────────────────
+
+fragment_header     ::= msg_id frag_idx frag_ct flags dep
+msg_id              ::= 2-byte-unsigned-integer
+frag_idx            ::= 1-byte-unsigned-integer
+frag_ct             ::= 1-byte-unsigned-integer
+flags               ::= 1-byte-bitfield
+                      # bit 0: T — Terminal (final fragment)
+                      # bit 1: C — Criticality override
+dep                 ::= 1-byte-unsigned-integer   # dependency pointer
+
+# ─────────────────────────────────────────────
+# NACK PAYLOAD
+# ─────────────────────────────────────────────
+
+nack_payload        ::= "A:NACK[MSG:" msg_id "∖" "[" frag_idx ("," frag_idx)* "]" "]"
+
+# ─────────────────────────────────────────────
+# LOSS TOLERANCE POLICY CONFIG
+# ─────────────────────────────────────────────
+
+policy_config       ::= "N:CFG@" node_id ":" policy_spec
+
+policy_spec         ::= "FRAG[Φ]:τ[" integer "]"                            # Fail-Safe
+                      | "FRAG[Γ]:τ[" integer "]"                            # Graceful Degradation (default)
+                      | "NS[" namespace_list "]:FRAG[Λ]:τ[" integer "]"    # Atomic
+
+# ─────────────────────────────────────────────
+# CONFORMANCE RULES — PARSER DISAMBIGUATION
+# ─────────────────────────────────────────────
+
+# COLON DISAMBIGUATION RULE (FAIL-03):
+# The first colon after a namespace-valid uppercase character is the namespace
+# separator. All subsequent colons within the same instruction unit are slot
+# assignment operators. The parser processes left-to-right; once a namespace
+# separator has been consumed, subsequent colons are ASSIGN operators.
+# Example: N:CFG@NODE1:FRAG[Φ]:τ[60]
+#   N:    = namespace separator
+#   CFG   = opcode
+#   :FRAG = slot assignment (ASSIGN operator)
+#   :τ    = slot assignment (ASSIGN operator)
+
+# SLOT VALUE TERMINATION RULE (FAIL-05):
+# A slot value is terminated by any of: a glyph operator from the operator
+# production, the @ TARGET operator, a closing bracket ], or end of instruction
+# payload. A colon following a single-character slot value immediately followed
+# by a namespace-valid uppercase character is unambiguously a new namespace
+# separator, not a slot assignment operator.
+# Example: O:MODE:N:CFG@NODE is parsed as:
+#   O:MODE:N  — O namespace, opcode MODE, slot value N
+#   :CFG@NODE — new instruction beginning with C namespace... INVALID.
+#   Correct encoding: O:MODE:N∧N:CFG@NODE (explicit AND operator separating instructions)
+
+namespace_list      ::= namespace_prefix ("," namespace_prefix)*
+
+# ─────────────────────────────────────────────
+# CDSAFE CONFIG
+# ─────────────────────────────────────────────
+
+cdsafe_config       ::= "N:CFG@" node_id ":COMMS[⊗]:τ[" integer "]:EXEC[" instruction "]"
+
+# ─────────────────────────────────────────────
+# TERMINALS
+# ─────────────────────────────────────────────
+
+uppercase_alpha     ::= [A-Z]
+lowercase_alpha     ::= [a-z]
+digit               ::= [0-9]
+alphanumeric        ::= uppercase_alpha | lowercase_alpha | digit | "-" | "_"
+integer             ::= digit+
+printable_char      ::= any Unicode character except "]"
+
+# ─────────────────────────────────────────────
+# ENCODING NOTES
+# ─────────────────────────────────────────────
+
+# All glyph operators are Unicode. Implementations MUST handle multi-byte
+# UTF-8 encoding correctly. Byte counts referenced in compression claims
+# use UTF-8 encoding: len(s.encode('utf-8')) in Python.
+#
+# Glyph byte costs:
+#   ∧ ∨ ¬ → ↔ ∀ ∃ ∥ ∈ ∖     3 bytes each (U+2xxx range)
+#   @ > ~ * : ; ?             1 byte each  (ASCII)
+#   ⚠ ↺ ⊘ ⊤ ⊥ ⌂ ⊗ ∈ ∖       3 bytes each (U+2xxx range)
+#   § τ Δ                     2 bytes each (U+00A7, U+03C4, U+0394)
+#
+# The 51-byte LoRa floor is the minimum constraint floor at SF12 BW125kHz.
+# Standard Meshtastic LongFast deployment supports 255 bytes per packet.
+# Overflow Protocol Tier 2/3 handles instructions exceeding channel capacity.

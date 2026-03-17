@@ -1,0 +1,546 @@
+OSMP SEMANTIC DICTIONARY v12.0
+Source of Truth: OSMP-001-UTIL-v17 + OSMP-001-CIP-v12 | Docket: OSMP-001-UTIL (patent pending)
+Inventor: Clay Holberg | Entity: Merx Assets LLC | Filing Date: March 16, 2026
+Standard namespaces: 26 (A-Z) | Tier 2: 351 order-invariant double-Latin slots (AB=BA canonical)
+Sovereign extension: Ω: (U+03A9) | Floor version: 1.0 | All entries floor_version=1.0
+
+SECTION 1: GLYPH OPERATORS — SIX-CATEGORY ARCHITECTURE (UTIL Section X-C)
+All glyphs have pre-existing formal definitions predating and independent of OSMP.
+
+CATEGORY 1 — LOGICAL AND COMPOSITIONAL OPERATORS (18 total)
+Glyph,Unicode,Name,UTF8_Bytes,Natural_Language_Equivalents,floor_version
+∧,U+2227,AND,3,"and | & | also",1.0
+∨,U+2228,OR,3,"or | either | alternatively",1.0
+¬,U+00AC,NOT,2,"not | except | excluding | without",1.0
+→,U+2192,THEN,3,"if...then | when...then | provided that | therefore | because",1.0
+↔,U+2194,IFF,3,"if and only if | iff | exactly when",1.0
+∀,U+2200,FOR-ALL,3,"for all | every | each | all",1.0
+∃,U+2203,EXISTS,3,"any | there exists | at least one | some",1.0
+∥,U+2225,PARALLEL,3,"simultaneously | in parallel | concurrently",1.0
+>,U+003E,PRIORITY,1,"first | prefer | prioritize | greater than",1.0
+~,U+007E,APPROX,1,"approximately | about | roughly",1.0
+*,U+002A,WILDCARD,1,"all | any value | broadcast",1.0
+:,U+003A,ASSIGN,1,"equals | is set to | value is | namespace-separator (positional)",1.0
+;,U+003B,SEQUENCE,1,"then next | followed by | in sequence",1.0
+?,U+003F,QUERY,1,"what is | query | report",1.0
+@,U+0040,TARGET,1,"at | on | directed to",1.0
+⟳,U+27F3,REPEAT-EVERY,3,"every | repeat every | recurring interval",1.0
+≠,U+2260,NOT-EQUAL,3,"not equal to | excluding value | except value",1.0
+⊕,U+2295,PRIORITY-ORDER,3,"in priority order | ranked | strict ranked execution",1.0
+
+CATEGORY 2 — CONSEQUENCE CLASS DESIGNATORS (UTIL Section X-C Cat.2; Claims 25 and X-B)
+Mandatory structural element in R namespace instruction frames. An R namespace instruction without a valid Cat.2 designator is malformed and non-executable.
+Glyph,Unicode,Name,UTF8_Bytes,Semantic,floor_version
+⚠,U+26A0,HAZARDOUS,3,Physical instruction with potential for irreversible harm; requires I:§ human operator confirmation as structural precondition to execution,1.0
+↺,U+21BA,REVERSIBLE,3,Physical instruction whose execution can be undone or corrected; I:§ not required,1.0
+⊘,U+2298,IRREVERSIBLE,3,Physical instruction producing permanent physical change; requires I:§ human operator confirmation as structural precondition to execution,1.0
+§,U+00A7,HUMAN-AUTHORIZED,2,Human operator confirmation opcode in I namespace (I:§); encodes a human operator confirmation token comprising signature hash + timestamp + TTL; required as precondition for R:⚠ and R:⊘ instructions; 2 UTF-8 bytes,1.0
+
+CATEGORY 3 — OUTCOME STATE DESIGNATORS (UTIL Section X-C Cat.3)
+Formal logical constants predating OSMP; adopted for pre-existing definitions. Used as Q namespace result values and I namespace verification outcomes.
+Glyph,Unicode,Name,UTF8_Bytes,Semantic,floor_version
+⊤,U+22A4,PASS-TRUE,3,Logical pass state; outcome of successful I namespace verification workflow,1.0
+⊥,U+22A5,FAIL-FALSE,3,Logical fail state; outcome of failed I namespace verification workflow,1.0
+
+CATEGORY 4 — PARAMETER AND SLOT DESIGNATORS (UTIL Section X-C Cat.4)
+Pre-existing mathematical meanings; adopted without OSMP-specific definition.
+Glyph,Unicode,Name,UTF8_Bytes,Semantic,floor_version
+Δ,U+0394,DELTA,2,Difference / spacing / offset parameter; replaces word DELTA in slot names,1.0
+⌂,U+2302,HOME,3,Origin or home position reference; replaces word HOME,1.0
+⊗,U+2297,ABORT-CANCEL,3,Abort condition trigger or comms-denial state designator,1.0
+τ,U+03C4,TIMEOUT,2,Time constant or timeout duration; used in N:CFG and Overflow Protocol config syntax; lowercase Greek,1.0
+∈,U+2208,SCOPE-WITHIN,3,Set membership; scope or permission boundary declaration,1.0
+∖,U+2216,MISSING,3,Set minus; missing fragment indicator in A:NACK payloads,1.0
+
+CATEGORY 5 — LOSS TOLERANCE POLICY DESIGNATORS (UTIL Section X-C Cat.5; replaces legacy codes FS/GD/AT)
+Greek uppercase letters whose pre-existing mathematical meanings map directly to Overflow Protocol policy semantics.
+Glyph,Unicode,Name,UTF8_Bytes,Legacy_Code,Config_Syntax,Semantic,floor_version
+Φ,U+03A6,FAIL-SAFE,2,FS,N:CFG@[nodeID]:FRAG[Φ]:τ[n],Fundamental invariant — silent discard on incomplete receipt; policy holds regardless of what arrives,1.0
+Γ,U+0393,GRACEFUL-DEGRADATION,2,GD,N:CFG@[nodeID]:FRAG[Γ]:τ[n],Graduated threshold response — execute maximum satisfiable subset of received fragments; default policy,1.0
+Λ,U+039B,ATOMIC,2,AT,N:CFG@[nodeID]:NS[namespace_list]:FRAG[Λ]:τ[n],Indivisible function — no fragment executes unless all fragments received within timeout window; on incomplete receipt transmit A:NACK,1.0
+
+CATEGORY 6 — DICTIONARY UPDATE MODE DESIGNATORS (UTIL Section X-C Cat.6; replaces words ADDITIVE/REPLACE/DEPRECATE)
+Pre-existing standard typography and arithmetic meanings; used exclusively in dictionary delta payload mode fields.
+Glyph,Unicode,Name,UTF8_Bytes,Semantic,floor_version
++,U+002B,ADDITIVE,1,New entry appended; existing entries preserved; version pointer incremented; graceful degradation transmission class,1.0
+←,U+2190,REPLACE,3,New entry supersedes existing; prior entry retired; mandatory retransmit on packet loss (FLAGS[C]); mandatory retransmission transmission class,1.0
+†,U+2020,DEPRECATE,3,Entry marked retired; semantic resolution preserved for backward compatibility; graceful degradation transmission class,1.0
+
+SECTION 2: SLOT VALUE ENCODING TABLE (UTIL Single-Character Conformance Rule)
+Rule: All OSMP-defined enumerated slot value sets with finite protocol-specified cardinality MUST be encoded as a single uppercase Latin letter (A-Z) or single decimal digit (0-9). Slot values drawn from external open-ended domain registries (ICD-10 codes, GPS coordinates, timestamps, model identifiers) are encoded as their native representation within slot brackets — exempt from this rule.
+Slot,Code,Meaning,Bytes,floor_version
+C:STAT,A,active,1,1.0
+C:STAT,D,degraded,1,1.0
+C:STAT,E,error,1,1.0
+C:STAT,I,idle,1,1.0
+C:STAT,O,offline,1,1.0
+H:TRIAGE,B,black,1,1.0
+H:TRIAGE,D,delayed,1,1.0
+H:TRIAGE,I,immediate,1,1.0
+H:TRIAGE,M,minor,1,1.0
+H:TRIAGE,X,expectant,1,1.0
+J:STATUS,A,active,1,1.0
+J:STATUS,B,blocked,1,1.0
+J:STATUS,C,complete,1,1.0
+J:STATUS,F,failed,1,1.0
+J:STATUS,P,paused,1,1.0
+L:SEV,0,emergency,1,1.0
+L:SEV,1,alert,1,1.0
+L:SEV,2,critical,1,1.0
+L:SEV,3,error,1,1.0
+L:SEV,4,warning,1,1.0
+L:SEV,5,notice,1,1.0
+L:SEV,6,informational,1,1.0
+L:SEV,7,debug,1,1.0
+O:AUTH,A,ADCON,1,1.0
+O:AUTH,O,OPCON,1,1.0
+O:AUTH,S,support,1,1.0
+O:AUTH,T,TACON,1,1.0
+O:BW_CLASS,1,51_bytes_SF12,1,1.0
+O:BW_CLASS,2,127_bytes_SF11,1,1.0
+O:BW_CLASS,3,255_bytes_LongFast,1,1.0
+O:BW_CLASS,4,1500_bytes_BLE,1,1.0
+O:BW_CLASS,5,unlimited,1,1.0
+O:CHAN,B,BLE,1,1.0
+O:CHAN,C,cellular,1,1.0
+O:CHAN,L,LoRa,1,1.0
+O:CHAN,M,mesh_mixed,1,1.0
+O:CHAN,T,satellite,1,1.0
+O:CHAN,W,WiFi,1,1.0
+O:CHAN,X,wired,1,1.0
+O:EMCON,F,full_emissions,1,1.0
+O:EMCON,R,reduced,1,1.0
+O:EMCON,S,silent,1,1.0
+O:LATENCY,1,realtime_10ms,1,1.0
+O:LATENCY,2,low_100ms,1,1.0
+O:LATENCY,3,normal_1s,1,1.0
+O:LATENCY,4,high_10s,1,1.0
+O:LATENCY,5,store_forward,1,1.0
+O:LINK,0,none,1,1.0
+O:LINK,1,critical,1,1.0
+O:LINK,2,degraded,1,1.0
+O:LINK,3,marginal,1,1.0
+O:LINK,4,good,1,1.0
+O:LINK,5,nominal,1,1.0
+O:MESH,B,bridged,1,1.0
+O:MESH,F,full,1,1.0
+O:MESH,I,isolated,1,1.0
+O:MESH,P,partial,1,1.0
+O:MODE,D,degraded,1,1.0
+O:MODE,E,emergency,1,1.0
+O:MODE,M,maintenance,1,1.0
+O:MODE,N,normal,1,1.0
+O:MODE,R,recovery,1,1.0
+O:PHASE,M,mitigate,1,1.0
+O:PHASE,P,prepare,1,1.0
+O:PHASE,R,respond,1,1.0
+O:PHASE,V,recover,1,1.0
+O:POSTURE,D,defensive,1,1.0
+O:POSTURE,N,neutral,1,1.0
+O:POSTURE,O,offensive,1,1.0
+O:POSTURE,S,standby,1,1.0
+O:READY,1,maximum_readiness,1,1.0
+O:READY,2,next_step_nuclear_war,1,1.0
+O:READY,3,round_the_clock,1,1.0
+O:READY,4,increased_watch,1,1.0
+O:READY,5,peacetime,1,1.0
+O:SCOPE,G,global,1,1.0
+O:SCOPE,L,local,1,1.0
+O:SCOPE,N,national,1,1.0
+O:SCOPE,R,regional,1,1.0
+O:TEMPO,1,routine,1,1.0
+O:TEMPO,2,elevated,1,1.0
+O:TEMPO,3,urgent,1,1.0
+O:TEMPO,4,critical,1,1.0
+O:TYPE,1,national,1,1.0
+O:TYPE,2,regional_major,1,1.0
+O:TYPE,3,regional,1,1.0
+O:TYPE,4,local_extended,1,1.0
+O:TYPE,5,minor_local,1,1.0
+O:UPLINK,A,available,1,1.0
+O:UPLINK,I,intermittent,1,1.0
+O:UPLINK,U,unavailable,1,1.0
+P:STAT,C,complete,1,1.0
+P:STAT,F,failed,1,1.0
+P:STAT,P,pending,1,1.0
+P:STAT,S,skipped,1,1.0
+R:COLLAB,A,active,1,1.0
+R:COLLAB,O,off,1,1.0
+R:COLLAB,S,standby,1,1.0
+R:STAT,A,active,1,1.0
+R:STAT,D,degraded,1,1.0
+R:STAT,E,emergency,1,1.0
+R:STAT,I,idle,1,1.0
+R:STAT,O,offline,1,1.0
+V:STATUS,A,active,1,1.0
+V:STATUS,D,degraded,1,1.0
+V:STATUS,E,emergency,1,1.0
+V:STATUS,I,idle,1,1.0
+V:STATUS,M,moored,1,1.0
+V:STATUS,O,offline,1,1.0
+V:STATUS,U,underway,1,1.0
+Y:STORE_TIER,E,episodic,1,1.0
+Y:STORE_TIER,L,long_term,1,1.0
+Y:STORE_TIER,S,semantic,1,1.0
+Y:STORE_TIER,W,working,1,1.0
+Z:FINISH,C,cancelled,1,1.0
+Z:FINISH,E,error,1,1.0
+Z:FINISH,L,length,1,1.0
+Z:FINISH,S,stop,1,1.0
+Z:FINISH,T,tool_use,1,1.0
+K:DIR,-$,debit_payment_sent_negative_currency,2,1.0
+K:DIR,+$,credit_payment_received_positive_currency,2,1.0
+
+SECTION 3: NAMESPACES AND OPCODES
+Source columns: Namespace | Prefix | Domain | Opcode | Definition | Layer | Authoritative_Source | UTIL_Claim_Ref | floor_version
+Note: Layer 1 = OSMP-defined semantic primitive (resolves by ASD lookup). Layer 2 = accessor pattern into external open-ended registry (slot value drawn from external standard; exempt from single-character slot value rule).
+
+Namespace,Prefix,Domain,Opcode,Definition,Layer,Authoritative_Source,UTIL_Claim_Ref,floor_version
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,ACCEPT,accept_proposed_action — inter-agent negotiation primitive,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,ACK,positive_acknowledgment — complement to NACK; used in Atomic policy confirmation for K and H namespace instructions,1,OSMP-defined,Claim 12,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,AR,agentic_request,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,AUTH,authorization_assertion,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,CMP,compress_compare — context compression and comparison utility (see Dataset C example),1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,COMP,compliance_gate_assertion — compliance check precondition in cross-namespace authorization chain I:KYC∧I:AML→I:⊤→A:COMP→K:TRD→R:⚠MOV,1,OSMP-defined,Claims 24-27; FIG.13,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,CMPR,structured_comparison_returning_result — agent output or state comparison producing a returnable result value,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,DA,delegate_to_agent,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,ERR,error_handler,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,MEM,memory_operation,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,NACK,negative_acknowledgment — used in Atomic policy; payload encodes missing fragment indices as A:NACK[MSG:[id]∖[missing_indices]],1,OSMP-defined,Claim 12,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,PING,liveness_check,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,PONG,liveness_response,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,PROPOSE,propose_action_for_negotiation — coordination primitive decoded by ASD lookup; NOT a FIPA-ACL performative; communicative structure carried by glyph operators not by opcode type,1,OSMP-defined; Section X-D-1,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,REJECT,reject_proposed_action — inter-agent negotiation primitive,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,SUM,summarize,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,TRUST,trust_assertion_about_agent_output,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,TXN,transaction_gate,1,OSMP-defined,Claims 24-27,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,VERIFY,request_output_verification,1,OSMP-defined,Claim 3,1.0
+Building / Construction,B,Building / Construction,AP,access_point,1,IBC | NFPA,Claim 3,1.0
+Building / Construction,B,Building / Construction,BA,building_alert,1,IBC | NFPA,Claim 3,1.0
+Building / Construction,B,Building / Construction,BS,building_sector,1,IBC | NFPA,Claim 3,1.0
+Building / Construction,B,Building / Construction,HVAC,hvac_system,1,IBC | NFPA,Claim 3,1.0
+Building / Construction,B,Building / Construction,L,life_safety,1,IBC | NFPA,Claim 3,1.0
+Building / Construction,B,Building / Construction,X,structural,1,IBC | NFPA,Claim 3,1.0
+Compute / Resource Management,C,Compute / Resource Management,ALLOC,resource_allocation,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,CHKPT,checkpoint_state,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,FREE,release_resource,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,KILL,terminate_process,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,LIMIT,resource_limit_enforcement,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,MIGRT,migrate_workload,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,PAUSE,pause_execution,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,PRTY,execution_priority,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,QUOTA,resource_quota,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,RESUME,resume_execution,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,RSTRT,restart,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,SCALE,scale_replicas,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,SPAWN,spawn_process_or_agent,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Compute / Resource Management,C,Compute / Resource Management,STAT,resource_status,1,POSIX.1-2017 | Kubernetes ResourceQuota API | cgroups v2 | OCI Runtime Spec,Claim 14,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,ABORT,abort_transfer,1,OSMP-defined | RFC 1350 | QUIC STREAM frames (RFC 9000),Claim 3,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,CHUNK,file_chunk_payload,1,OSMP-defined | RFC 1350 | QUIC STREAM frames (RFC 9000),Claim 3,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,CSUM,checksum_verification,1,OSMP-defined | RFC 1350 | QUIC STREAM frames (RFC 9000),Claim 3,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,FEED,data_feed,1,OSMP-defined | RFC 1350 | QUIC STREAM frames (RFC 9000),Claim 3,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,LOG,log_entry,1,OSMP-defined | RFC 1350 | QUIC STREAM frames (RFC 9000),Claim 3,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,PACK,apply_OSMP_two-tier_encoding_to_knowledge_corpus_for_compressed_at-rest_storage — Tier 1 SAL symbolic encoding followed by Tier 2 lossless compression; zero-unpack semantic resolution property preserved: MDR entries and instruction calls share symbolic notation enabling per-query resolution without full decompression,1,OSMP-defined; Section IX Two-Tier Architecture,Claims 23 (UTIL) | CIP-25,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,PULL,request_payload_from_node,1,OSMP-defined | RFC 1350 | QUIC STREAM frames (RFC 9000),Claim 3,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,PUSH,push_payload_to_node,1,OSMP-defined | RFC 1350 | QUIC STREAM frames (RFC 9000),Claim 3,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,Q,query,1,OSMP-defined | RFC 1350 | QUIC STREAM frames (RFC 9000),Claim 3,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,RESUME,resume_interrupted_transfer,1,OSMP-defined | RFC 1350 | QUIC STREAM frames (RFC 9000),Claim 3,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,RT,return_transmit,1,OSMP-defined | RFC 1350 | QUIC STREAM frames (RFC 9000),Claim 3,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,STAT,transfer_status_query,1,OSMP-defined | RFC 1350 | QUIC STREAM frames (RFC 9000),Claim 3,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,UNPACK,recover_semantic_content_from_OSMP-encoded_knowledge_corpus_by_ASD_lookup — inference-free; no full LZMA decompression required for individual semantic query resolution due to zero-unpack symbolic resolution property,1,OSMP-defined; Section IX Two-Tier Architecture,Claims 23 (UTIL) | CIP-25,1.0
+Data / Query / File Transfer,D,Data / Query / File Transfer,XFER,initiate_file_transfer,1,OSMP-defined | RFC 1350 | QUIC STREAM frames (RFC 9000),Claim 3,1.0
+Environmental / Sensor,E,Environmental / Sensor,EQ,environmental_query,1,IEEE 1451 | NMEA 0183,Claim 1,1.0
+Environmental / Sensor,E,Environmental / Sensor,GPS,gps_coordinates — replaces former G[lat,lon] notation; now E:GPS[lat,lon] throughout,1,IEEE 1451 | NMEA 0183,Claim 1,1.0
+Environmental / Sensor,E,Environmental / Sensor,HU,humidity,1,IEEE 1451 | NMEA 0183,Claim 1,1.0
+Environmental / Sensor,E,Environmental / Sensor,OBS,obstacle,1,IEEE 1451 | NMEA 0183,Claim 1,1.0
+Environmental / Sensor,E,Environmental / Sensor,PU,pressure,1,IEEE 1451 | NMEA 0183,Claim 1,1.0
+Environmental / Sensor,E,Environmental / Sensor,TH,temperature_humidity_composite,1,IEEE 1451 | NMEA 0183,Claim 1,1.0
+Environmental / Sensor,E,Environmental / Sensor,UV,ultraviolet,1,IEEE 1451 | NMEA 0183,Claim 1,1.0
+Federal / Regulatory,F,Federal / Regulatory,AV,authorization,1,CFR titles,Claim 3,1.0
+Federal / Regulatory,F,Federal / Regulatory,PRO,proceed_protocol,1,CFR titles,Claim 3,1.0
+Federal / Regulatory,F,Federal / Regulatory,Q,query_request,1,CFR titles,Claim 3,1.0
+Federal / Regulatory,F,Federal / Regulatory,W,wait,1,CFR titles,Claim 3,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,BEARING,heading_bearing,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,CONF,position_confidence_rating,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,DR,dead_reckoning_state,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,ELEV,elevation_query,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,POS,position_coordinates — G:POS[lat,lon,alt],1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,RANGE,distance_calculation,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,ROUT,routing_query,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,TRAIL,trail_segment_reference,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,WPT,waypoint_reference,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
+Health / Clinical,H,Health / Clinical,ALERT,threshold_crossing_event,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15,1.0
+Health / Clinical,H,Health / Clinical,BP,blood_pressure,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15,1.0
+Health / Clinical,H,Health / Clinical,CASREP,casualty_report,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15; CIP-29,1.0
+Health / Clinical,H,Health / Clinical,CPT,CPT_procedure_code_accessor — Layer 2: slot value is the external CPT code e.g. H:CPT[99213]; slot value exempt from single-character encoding rule,2,CPT (Current Procedural Terminology),Claims 19 | 23; CIP-25,1.0
+Health / Clinical,H,Health / Clinical,ECG,electrocardiogram,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15,1.0
+Health / Clinical,H,Health / Clinical,GLUC,glucose,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15,1.0
+Health / Clinical,H,Health / Clinical,HR,heart_rate,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15; CIP-29,1.0
+Health / Clinical,H,Health / Clinical,ICD,ICD-10_diagnosis_code_accessor — Layer 2: slot value is the external ICD-10 code e.g. H:ICD[R00.1]; slot value exempt from single-character encoding rule; enables threshold rules such as H:HR<60→H:ALERT[BRADYCARDIA]∧H:ICD[R00.1],2,ICD-10 (International Classification of Diseases 10th revision),Claims 19 | 23; CIP-25,1.0
+Health / Clinical,H,Health / Clinical,MEDREC,medical_record_log_entry,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15,1.0
+Health / Clinical,H,Health / Clinical,RR,respiratory_rate,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15,1.0
+Health / Clinical,H,Health / Clinical,SNOMED,SNOMED_CT_concept_identifier_accessor — Layer 2: slot value is the external SNOMED CT concept ID; slot value exempt from single-character encoding rule,2,SNOMED CT (Systematized Nomenclature of Medicine Clinical Terms),Claims 19 | 23; CIP-25,1.0
+Health / Clinical,H,Health / Clinical,SPO2,oxygen_saturation,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15; CIP-29,1.0
+Health / Clinical,H,Health / Clinical,TEMP,body_temperature,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15,1.0
+Health / Clinical,H,Health / Clinical,TRIAGE,triage_classification — slot values: I=immediate D=delayed M=minor B=black X=expectant (see Section 2 slot value table),1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15; CIP-29,1.0
+Health / Clinical,H,Health / Clinical,VITALS,composite_vitals_status,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15,1.0
+Identity / Permissioning,I,Identity / Permissioning,AML,anti_money_laundering_check,1,W3C DID | OAuth 2.0 | NIST SP 800-63 | FinCEN CIP,Claims 24-27; CIP-27 | CIP-28,1.0
+Identity / Permissioning,I,Identity / Permissioning,BIO,biometric_result — transmits authentication result without transmitting raw biometric data,1,W3C DID | OAuth 2.0 | NIST SP 800-63 | FinCEN CIP,Claim 7; CIP-28,1.0
+Identity / Permissioning,I,Identity / Permissioning,CONS,consent_and_scope_management — W3C DID and OAuth 2.0 scope registries,1,W3C DID | OAuth 2.0 | NIST SP 800-63 | FinCEN CIP,CIP-28,1.0
+Identity / Permissioning,I,Identity / Permissioning,ID,identity_assertion — structured agent identifier,1,W3C DID | OAuth 2.0 | NIST SP 800-63 | FinCEN CIP,Claims 24-27; CIP-27 | CIP-28,1.0
+Identity / Permissioning,I,Identity / Permissioning,KYC,know_your_customer_check,1,W3C DID | OAuth 2.0 | NIST SP 800-63 | FinCEN CIP,Claims 24-27; CIP-27 | CIP-28,1.0
+Identity / Permissioning,I,Identity / Permissioning,PERM,permission_grant,1,W3C DID | OAuth 2.0 | NIST SP 800-63 | FinCEN CIP,CIP-28,1.0
+Identity / Permissioning,I,Identity / Permissioning,§,human_operator_confirmation — HUMAN-AUTHORIZED; encodes a human operator confirmation token comprising signature hash + timestamp + TTL; I:§ is mandatory structural precondition for R namespace instructions carrying ⚠ HAZARDOUS or ⊘ IRREVERSIBLE consequence class designators; parser note: I namespace prefix is uppercase I U+0049; conforming parsers MUST validate by byte value not font rendering,1,W3C DID | NIST SP 800-63 | Claim 25 architecture,Claims 25 | 7; CIP-27 | CIP-28 | CIP-29,1.0
+Cognitive Execution State,J,Cognitive Execution State,ABANDON,abandon_plan,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,BELIEF,assert_belief_state,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,BLOCK,blocked_on_dependency,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,COMMIT,commit_to_plan,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,DECOMP,task_decomposition,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,DONE,goal_achieved,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,GOAL,declare_goal,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,HANDOFF,transfer_execution_with_full_state_context,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,INTENT,assert_intention,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,PLAN,transmit_plan_state,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,REPLAN,trigger_replanning_from_current_state,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,STATUS,execution_status — slot values: A=active B=blocked C=complete F=failed P=paused (see Section 2),1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,STEP,current_plan_step,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Cognitive Execution State,J,Cognitive Execution State,SUBGOAL,declare_subgoal,1,BDI (Rao & Georgeff 1995) | AgentSpeak | PDDL | HTN | ReAct,Claim 30; CIP-33,1.0
+Financial / Transaction,K,Financial / Transaction,DIG,digital_asset_operation,1,ISO 20022 | FIX | SWIFT,Claims 24-27; CIP-27 | CIP-34,1.0
+Financial / Transaction,K,Financial / Transaction,ORD,order_entry,1,ISO 20022 | FIX | SWIFT,Claims 24-27; CIP-27 | CIP-34,1.0
+Financial / Transaction,K,Financial / Transaction,PAY,payment_execution,1,ISO 20022 | FIX | SWIFT,Claims 24-27; CIP-27 | CIP-34,1.0
+Financial / Transaction,K,Financial / Transaction,TRD,trade_instruction,1,ISO 20022 | FIX | SWIFT,Claims 24-27; CIP-27 | CIP-34,1.0
+Financial / Transaction,K,Financial / Transaction,XFR,asset_transfer,1,ISO 20022 | FIX | SWIFT,Claims 24-27; CIP-27 | CIP-34,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,ALERT,compliance_alert,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,ATTEST,compliance_attestation,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,AUDIT,audit_log_entry — formerly L:LOG in some references; canonical opcode is AUDIT,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,CHAIN,chain_of_custody,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,EXPORT,log_export,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,FORENS,forensic_capture,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,LOG,write_audit_record — also referenced as L:LOG in UTIL body; alias to AUDIT,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,LSIGN,log_signature,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,PURGE,log_purge,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,QUERY,audit_trail_query,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,REPORT,compliance_report,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,RETAIN,log_retention_policy,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,SEV,severity_level — RFC 5424 integers 0-7 are canonical encoding; slot values defined in Section 2,1,RFC 5424 syslog severity levels,Claim 14,1.0
+Logging / Audit / Compliance,L,Logging / Audit / Compliance,TRAIL,audit_trail_query,1,RFC 5424 | NIST SP 800-92 | OCSF 1.0 | HIPAA 45 CFR 164.312(b) | PCI DSS Req.10,Claim 14,1.0
+Municipal Operations,M,Municipal Operations,A,alert_alarm,1,FEMA ICS | NIMS,Claim 3,1.0
+Municipal Operations,M,Municipal Operations,EVA,evacuation,1,FEMA ICS | NIMS,Claim 3,1.0
+Municipal Operations,M,Municipal Operations,IT,incident_type,1,FEMA ICS | NIMS,Claim 3,1.0
+Municipal Operations,M,Municipal Operations,MA,municipal_alert,1,FEMA ICS | NIMS,Claim 3,1.0
+Municipal Operations,M,Municipal Operations,RT,route,1,FEMA ICS | NIMS,Claim 3,1.0
+Network / Routing,N,Network / Routing,BK,backup_node,1,OSMP-defined,Claim 3,1.0
+Network / Routing,N,Network / Routing,CFG,configure — used in Overflow Protocol config syntax: N:CFG@[nodeID]:FRAG[Φ|Γ|Λ]:τ[n],1,OSMP-defined,Claims 12 | 22,1.0
+Network / Routing,N,Network / Routing,CMD,command_node,1,OSMP-defined,Claim 3,1.0
+Network / Routing,N,Network / Routing,INET,internet_uplink_capability_query — e.g. ∃N:INET for capability-addressed routing to any node with internet access,1,OSMP-defined,Claim 2,1.0
+Network / Routing,N,Network / Routing,PR,primary_relay,1,OSMP-defined,Claim 3,1.0
+Network / Routing,N,Network / Routing,Q,query_discovery,1,OSMP-defined,Claim 3,1.0
+Network / Routing,N,Network / Routing,S,status,1,OSMP-defined,Claim 3,1.0
+Operational Context / Environment,O,Operational Context / Environment,AUTH,authority_level — slot values defined in Section 2,1,FEMA ICS/NIMS | DEFCON/FPCON | EMCON (NATO) | OPCON/TACON (JP 1) | MIL-STD-2525D | Semtech SX127x | 3GPP,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,BW,available_bandwidth,1,FEMA ICS/NIMS | Semtech SX127x | 3GPP,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,CHAN,active_channel_type — slot values defined in Section 2; O:CHAN is the explicit machine-readable channel declaration read by the BAEL to select encoding mode,1,Semtech SX127x | IEEE 802.11 | 3GPP | Meshtastic presets,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,CONOPS,concept_of_operations,1,FEMA ICS/NIMS | MIL-STD-2525D,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,CONSTRAINT,active_constraint_declaration,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,DESC,operational_deescalation,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,EMCON,emission_control_level — slot values: F=full R=reduced S=silent,1,EMCON (NATO),Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,ESC,operational_escalation,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,FLOOR,payload_floor_bytes — explicit machine-readable declaration of current LoRa payload constraint; O:FLOOR:51 at SF12/BW125kHz; O:FLOOR:255 at LongFast; read by BAEL for mode selection,1,Semtech SX127x | Meshtastic channel presets,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,IAP,incident_action_plan,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,LATENCY,link_latency_class — slot values 1-5 defined in Section 2,1,3GPP signal quality indicators,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,LINK,link_quality — numeric 0-5 scale; slot values defined in Section 2,1,Semtech SX127x | 3GPP,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,MESH,mesh_topology_status — slot values defined in Section 2,1,OSMP-defined,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,MODE,operational_mode — slot values: N=normal D=degraded E=emergency R=recovery M=maintenance,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,PERIOD,operational_period,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,PHASE,operational_phase — slot values: P=prepare R=respond M=mitigate V=recover,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,POSTURE,operational_posture — slot values: D=defensive N=neutral S=standby O=offensive,1,DEFCON/FPCON | MIL-STD-2525D,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,READY,readiness_condition — DEFCON-mapped 1-5 numeric scale; slot values defined in Section 2,1,DEFCON/FPCON (DoD),Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,SCOPE,operational_scope — slot values: G=global N=national R=regional L=local,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,TEMPO,operational_tempo — 1=routine 2=elevated 3=urgent 4=critical,1,FEMA ICS/NIMS | MIL-STD-2525D,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,TYPE,incident_type — 1-5 NIMS incident complexity scale,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,UPLINK,uplink_availability — slot values: A=available U=unavailable I=intermittent,1,OSMP-defined,Claim 31; CIP-26,1.0
+Procedural / Maintenance,P,Procedural / Maintenance,CODE,maintenance_code_reference_for_compliance_logging,1,iFixit | CPT-adjacent codes,Claim 14,1.0
+Procedural / Maintenance,P,Procedural / Maintenance,DEVICE,device_class_being_maintained,1,iFixit | CPT-adjacent codes,Claim 14,1.0
+Procedural / Maintenance,P,Procedural / Maintenance,GUIDE,procedure_guide_reference,1,iFixit | CPT-adjacent codes,Claim 14,1.0
+Procedural / Maintenance,P,Procedural / Maintenance,PART,part_reference,1,iFixit | CPT-adjacent codes,Claim 14,1.0
+Procedural / Maintenance,P,Procedural / Maintenance,STAT,completion_status — slot values: C=complete P=pending F=failed S=skipped (see Section 2),1,iFixit | CPT-adjacent codes,Claim 14,1.0
+Procedural / Maintenance,P,Procedural / Maintenance,STEP,step_index_within_guide,1,iFixit | CPT-adjacent codes,Claim 14,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,BENCH,benchmark_assertion,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,CITE,cite_source_for_claim,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,CONF,confidence_interval_assertion,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,CORRECT,correction_directive,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,CRIT,structured_critique_of_agent_output,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,EVAL,evaluation_result — outcome state designators ⊤ (PASS) and ⊥ (FAIL) are used as Q namespace result values,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,FAIL,quality_gate_fail — distinct from ⊥ which is identity verification failure,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,FLAG,flag_output_unreliable,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,GROUND,grounding_assertion_against_source_document,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,HALLU,hallucination_detection_flag,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,PASS,quality_gate_pass,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,REFLECT,self_reflection_on_output_quality,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,REVISE,request_revision_based_on_critique,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,SCORE,quality_score_assertion,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,VERIFY,request_verification_of_claim_by_another_agent,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,COLLAB,collaborative_mode — slot values: A=active S=standby O=off,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,DPTH,depth_control,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,DRVE,drive,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,ESTOP,emergency_stop — sole OSMP instruction that overrides ALL execution policies including Λ Atomic; executes on receipt of any single fragment carrying ESTOP opcode without waiting for complete fragment receipt without I:§ verification and without policy check; asymmetric harm justification: unnecessary stop is recoverable; failure to stop is unbounded harm,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claim 25; CIP-26 | CIP-29,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,FORM,swarm_formation — swarm coordination using R:FORM with formation type and spacing parameters; addresses multiple vehicle identifiers with ∧ operator,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claim 25; CIP-26,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,HANDOFF,authority_handoff,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,HDNG,heading,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,LAND,landing,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,MOV,move,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claim 25,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,RTH,return_to_home_origin,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,SRFC,surface_command_UUV,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,STAT,status — slot values: A=active D=degraded E=emergency I=idle O=offline (see Section 2),1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,STOP,stop,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claim 25,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,TKOF,takeoff,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,WPT,waypoint,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,ZONE,safety_zone_declaration,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claim 25,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,ACCEL,accelerometer_data_stream — backed by Claim 7 hardware capability enumeration (accelerometer listed),1,ISO 10218-1:2025 | Android API | iOS API,Claim 7; CIP-11 | CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,BT,bluetooth_state,1,ISO 10218-1:2025 | Android API | iOS API,Claim 7; CIP-11 | CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,CAM,camera_activation — consequence class ⚠ mandatory per Claim 7 architecture,1,ISO 10218-1:2025 | Android camera2 | iOS AVCaptureDevice,Claim 7; CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,DISP,display_brightness_or_state,1,ISO 10218-1:2025 | Android API | iOS API,Claim 7; CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,GPS,gps_acquisition,1,Android API | iOS CoreLocation,Claim 7; CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,HAPTIC,haptic_feedback_pattern — backed by Claim 7 (haptic actuator listed),1,Android API | iOS API,Claim 7; CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,MIC,microphone_activation — consequence class ⚠ mandatory per Claim 7 architecture,1,Android API | iOS AVCaptureDevice,Claim 7; CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,NFC,nfc_read_write — backed by Claim 7 (NFC reader/transmitter listed),1,Android API | iOS CoreNFC,Claim 7; CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,NOTIF,push_notification_to_device,1,Android API | iOS API,Claim 7; CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,SCRN,screen_capture — consequence class ⚠ mandatory,1,Android API | iOS API,Claim 7; CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,SPKR,speaker_audio_output — backed by Claim 7 (speaker listed),1,Android API | iOS API,Claim 7; CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,TORCH,flashlight_on_off — backed by Claim 7 (flash/flashlight listed); prototype Show HN demo: mesh-coordinated flashlight signaling without cloud,1,Android API | iOS API,Claim 7; CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,VIBE,vibration_pattern,1,Android API | iOS API,Claim 7; CIP-12,1.0
+Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,WIFI,wifi_state,1,Android API | iOS API,Claim 7; CIP-12,1.0
+Security / Cryptographic,S,Security / Cryptographic,ATST,attest,1,FIPS 140-3 | RFC 8446 (TLS 1.3) | RFC 8017 (RSA) | RFC 7748 (X25519) | RFC 9580 (OpenPGP) | NIST SP 800-131A,Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,CERT,certificate_operation,1,FIPS 140-3 | RFC 8446 (TLS 1.3) | RFC 8017 (RSA) | RFC 7748 (X25519) | RFC 9580 (OpenPGP) | NIST SP 800-131A,Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,DEC,decrypt — UTIL spec: S:DECRYPT,1,FIPS 140-3 | RFC 8446,Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,ENC,encrypt — UTIL spec: S:ENCRYPT,1,FIPS 140-3 | RFC 8446,Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,HASH,hash,1,FIPS 140-3 | NIST SP 800-131A,Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,HMAC,hmac,1,FIPS 140-3 | RFC 8446,Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,KEYEX,key_exchange,1,RFC 7748 (Curve25519/X25519),Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,KEYGEN,key_generation,1,FIPS 140-3 | NIST SP 800-131A,Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,OPEN,open_sealed_payload,1,RFC 9580 (OpenPGP),Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,REVOK,revoke,1,RFC 9580 (OpenPGP) | NIST SP 800-131A,Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,ROTATE,key_rotation — UTIL spec: S:ROTATE,1,FIPS 140-3 | NIST SP 800-131A,Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,SEAL,seal_payload,1,RFC 9580 (OpenPGP),Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,SIGN,sign — UTIL spec: S:SIGN,1,FIPS 140-3 | RFC 8446,Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,TRUST,trust_assertion,1,FIPS 140-3 | RFC 8446,Claim 14,1.0
+Security / Cryptographic,S,Security / Cryptographic,VFY,verify_signature — UTIL spec: S:VERIFY,1,FIPS 140-3 | RFC 8446,Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,AFTER,execute_after_condition,1,ISO 8601:2019 | RFC 5545 (iCalendar) | RFC 3339 | NTP RFC 5905 | IEEE 1588 (PTP),Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,ALARM,time_alarm,1,ISO 8601:2019 | RFC 5545 (iCalendar) | RFC 3339 | NTP RFC 5905 | IEEE 1588 (PTP),Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,BEFORE,execute_before_deadline,1,ISO 8601:2019 | RFC 5545 (iCalendar) | RFC 3339 | NTP RFC 5905 | IEEE 1588 (PTP),Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,CRON,cron_expression,1,ISO 8601:2019 | RFC 5545 (iCalendar) | RFC 3339 | NTP RFC 5905 | IEEE 1588 (PTP),Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,DELAY,delay_execution,1,ISO 8601:2019 | RFC 5545 (iCalendar) | RFC 3339 | NTP RFC 5905 | IEEE 1588 (PTP),Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,DUR,duration_constraint,1,ISO 8601:2019 | RFC 5545 (iCalendar) | RFC 3339 | NTP RFC 5905 | IEEE 1588 (PTP),Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,EPOCH,unix_epoch_reference,1,ISO 8601:2019 | RFC 5545 (iCalendar) | RFC 3339 | NTP RFC 5905 | IEEE 1588 (PTP),Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,EXP,expiration,1,ISO 8601:2019 | RFC 5545 (iCalendar) | RFC 3339 | NTP RFC 5905 | IEEE 1588 (PTP),Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,NOW,current_timestamp_query — UTIL spec: T:NOW,1,ISO 8601:2019 | RFC 3339 | NTP RFC 5905,Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,REPEAT,recurring_schedule,1,ISO 8601:2019 | RFC 5545 (iCalendar) | RFC 3339 | NTP RFC 5905 | IEEE 1588 (PTP),Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,SCHED,schedule_event — UTIL spec: T:SCHED,1,ISO 8601:2019 | RFC 5545 (iCalendar),Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,SYNC,time_synchronization,1,NTP RFC 5905 | IEEE 1588 (PTP),Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,UNTIL,execute_until_condition,1,ISO 8601:2019 | RFC 5545 (iCalendar),Claim 14,1.0
+Time / Scheduling,T,Time / Scheduling,WIN,time_window,1,ISO 8601:2019 | RFC 5545 (iCalendar),Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,ACK,human_acknowledgment — distinct from A:ACK which is protocol-level machine acknowledgment,1,OSMP-defined; Section X-D-1 non-performative architecture; U namespace instructions decoded by ASD lookup not by FIPA-ACL performative inference,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,ALERT,urgent_operator_alert — UTIL spec: U:ALERT,1,OSMP-defined,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,APPROVE,request_human_approval,1,OSMP-defined,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,ASSIGN,assign_task_to_human_operator,1,OSMP-defined,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,CONFIRM,request_human_confirmation — UTIL spec: U:CONFIRM,1,OSMP-defined,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,DELEGATE,delegate_to_human,1,OSMP-defined,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,DISPLAY,display_information_to_operator — UTIL spec: U:DISPLAY,1,OSMP-defined,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,ESCALATE,escalate_to_human_decision_maker,1,OSMP-defined,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,FEEDBACK,request_human_feedback,1,OSMP-defined,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,INPUT,request_operator_input — UTIL spec: U:INPUT,1,OSMP-defined,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,NOTIFY,surface_message_to_operator — UTIL spec: U:NOTIFY,1,OSMP-defined,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,OVERRIDE,human_override_instruction,1,OSMP-defined,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,REJECT,human_rejection,1,OSMP-defined,Claim 14,1.0
+User / Human Interaction,U,User / Human Interaction,REVIEW,request_human_review,1,OSMP-defined,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,AIS,ais_position_report,1,ITU-R M.1371-5 | NMEA 0183/IEC 61162-1 | NMEA 2000/IEC 61162-3 | SAE J1939 | ICAO Doc 9684,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,CARGO,cargo_manifest,1,ITU-R M.1371-5 | NMEA 0183 | SAE J1939,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,COURSE,course_over_ground,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,DOCK,docking_operation,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,ETA,estimated_time_arrival,1,ITU-R M.1371-5 | NMEA 0183 | ICAO Doc 9684,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,ETD,estimated_time_departure,1,ITU-R M.1371-5 | NMEA 0183 | ICAO Doc 9684,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,FLEET,fleet_coordination,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,HDG,heading — UTIL spec: V:HDG,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,MAYDAY,distress_signal,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,MMSI,maritime_mobile_service_identity,1,ITU-R M.1371-5,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,PANPAN,urgency_signal,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,PORT,port_of_call,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,POS,vehicle_position,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,ROUTE,routing_instruction — UTIL spec: V:ROUTE,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,SPEED,speed_over_ground — UTIL spec: V:SPEED,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,STATUS,vessel_status — slot values: A=active U=underway M=moored D=degraded E=emergency I=idle O=offline (see Section 2),1,ITU-R M.1371-5,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,UNDOCK,undocking_operation,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,ALERT,weather_alert — CAP emergency alert broadcast; structurally distinct from E namespace (local sensor telemetry) and H:ALERT (clinical threshold crossing),1,WMO No.306 (BUFR/GRIB) | NOAA CAP/OASIS CAP 1.2 | ICAO METAR/TAF | NWS,Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,FCST,forecast_product — UTIL spec: W:FCST,1,WMO No.306 | NOAA CAP | ICAO METAR/TAF | NWS,Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,FIRE,fire_weather_data,1,WMO No.306 | NOAA CAP | NWS,Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,FLOOD,flood_data,1,WMO No.306 | NOAA CAP | NWS,Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,HURR,hurricane_data,1,WMO No.306 | NOAA CAP | NWS,Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,METAR,aviation_weather_observation — UTIL spec: W:METAR,1,ICAO METAR/TAF (Doc 8896),Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,PRECIP,precipitation,1,WMO No.306 | NWS,Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,PRESS,barometric_pressure,1,WMO No.306 | NWS,Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,TAF,terminal_area_forecast,1,ICAO METAR/TAF (Doc 8896),Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,TEMP,ambient_temperature — distinct from H:TEMP (body temperature) and E:TH (local sensor composite),1,WMO No.306 | NWS,Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,VIS,visibility_report — UTIL spec: W:VIS,1,ICAO METAR/TAF | NWS,Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,WARN,weather_warning,1,WMO No.306 | NOAA CAP | NWS,Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,WATCH,weather_watch,1,WMO No.306 | NOAA CAP | NWS,Claim 14,1.0
+Weather / Environmental External,W,Weather / Environmental External,WIND,wind_speed_and_direction — UTIL spec: W:WIND,1,WMO No.306 | ICAO METAR/TAF | NWS,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,DR,demand_response_signal,1,IEC 61850 | IEC 61970-301 (CIM) | IEC 61968 | OpenADR 2.0 | IEEE 1547 | DNP3,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,EV,ev_charging_state,1,IEC 61850 | OpenADR 2.0 | IEEE 1547,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,FAULT,fault_event,1,IEC 61850 | DNP3,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,FREQ,grid_frequency,1,IEC 61850 | IEEE 1547 | DNP3,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,GEN,generation_output,1,IEC 61850 | IEC 61970-301 (CIM) | DNP3,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,GRID,grid_connection_status,1,IEC 61850 | IEC 61970-301 (CIM) | DNP3,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,ISLND,islanding_operation,1,IEC 61850 | IEEE 1547,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,LOAD,load_reading,1,IEC 61850 | IEC 61970-301 (CIM) | DNP3,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,METER,meter_reading,1,IEC 61850 | IEC 61970-301 (CIM) | DNP3,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,PRICE,energy_price_signal,1,OpenADR 2.0 | IEC 61968,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,RESTORE,grid_restoration,1,IEC 61850 | DNP3,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,SHED,load_shedding_instruction,1,IEC 61850 | OpenADR 2.0 | DNP3,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,SOLAR,solar_generation,1,IEC 61850 | IEC 61970-301 (CIM) | IEEE 1547,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,STORE,storage_state,1,IEC 61850 | IEC 61970-301 (CIM) | DNP3,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,VOLT,voltage_level,1,IEC 61850 | IEEE 1547 | DNP3,Claim 14,1.0
+Energy / Power Systems,X,Energy / Power Systems,WIND,wind_generation — distinct from W:WIND (meteorological wind advisory),1,IEC 61850 | IEC 61970-301 (CIM) | DNP3,Claim 14,1.0
+Memory + Retrieval,Y,Memory + Retrieval,CLEAR,clear_memory_tier — UTIL spec: Y:CLEAR,1,MemGPT | Voyager | RAG (Lewis et al. NeurIPS 2020) | FAISS | Mem0 | LangChain,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,EMBED,generate_embedding_for_storage,1,MemGPT | Voyager | FAISS | LangChain,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,FETCH,retrieve_by_key,1,MemGPT | Voyager | RAG | FAISS | Mem0 | LangChain,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,FORGET,delete_from_memory,1,MemGPT | Mem0,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,INDEX,index_document_for_retrieval,1,FAISS | LangChain,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,PAGE,page_out_working_memory_to_external_store,1,MemGPT,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,PROMOTE,promote_working_to_long_term_memory,1,MemGPT,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,RECALL,retrieve_episodic_memory_by_context,1,MemGPT | Voyager,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,RETRIEVE,retrieve_from_LCS — UTIL spec: Y:RETRIEVE,1,MemGPT | RAG | FAISS | LangChain,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,SEARCH,semantic_vector_search — UTIL spec: Y:SEARCH,1,FAISS | RAG | LangChain,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,SHARE,share_memory_segment_with_another_agent,1,MemGPT | Mem0,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,STAT,report_memory_utilization,1,MemGPT,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,STORE,store_to_memory — UTIL spec: Y:STORE; storage tier declared via Y:STORE_TIER slot values (see Section 2),1,MemGPT | Mem0 | LangChain,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,SUMM,summarize_and_compress_memory_segment,1,MemGPT,Claim 30; CIP-33,1.0
+Memory + Retrieval,Y,Memory + Retrieval,SYNC,synchronize_memory_state_with_peer — UTIL spec: Y:SYNC,1,MemGPT | Mem0,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,BATCH,batch_inference_request,1,OpenAI API | Anthropic API | Google Vertex AI | vLLM | Ollama,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,CACHE,kv_cache_utilization_instruction,1,vLLM | Ollama,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,CAP,capability_query — does target model support X,1,OpenAI API | Anthropic API | Google Vertex AI,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,CONF,agent_reported_confidence,1,OpenAI API | Anthropic API,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,COST,inference_cost_report,1,OpenAI API | Anthropic API | Google Vertex AI,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,CTX,context_window_utilization,1,OpenAI API | Anthropic API | Google Vertex AI,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,EMBED,embedding_generation_request — distinct from Y:EMBED which stores; Z:EMBED generates,1,OpenAI API | Anthropic API | Hugging Face Inference API,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,FINISH,finish_reason — slot values: S=stop L=length T=tool_use E=error C=cancelled (see Section 2),1,OpenAI API | Anthropic API,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,INF,invoke_inference — UTIL spec: Z:INF,1,OpenAI API | Anthropic API | Google Vertex AI | vLLM | Ollama,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,LATENCY,inference_latency_measurement — UTIL spec: Z:LATENCY,1,OpenAI API | Anthropic API | vLLM,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,MAXT,max_tokens_parameter — UTIL spec: Z:MAXT,1,OpenAI API | Anthropic API | Google Vertex AI,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,MDLUSED,actual_model_used_in_inference_response,1,OpenAI API | Anthropic API | Google Vertex AI,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,MODEL,specify_model_by_identifier — UTIL spec: Z:MODEL,1,OpenAI API | Anthropic API | Google Vertex AI | Hugging Face | vLLM | Ollama,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,RESP,inference_response_payload_envelope — UTIL spec: Z:RESP; closes the Z:INF half-circuit; response frame is protocol-defined,1,OpenAI API | Anthropic API,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,ROUTE,route_to_model_with_specified_capability — UTIL spec: Z:ROUTE,1,OpenAI API | Anthropic API | Google Vertex AI,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,STOP,stop_sequence,1,OpenAI API | Anthropic API | Google Vertex AI,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,STREAM,streaming_response_flag,1,OpenAI API | Anthropic API | Google Vertex AI,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,TEMP,temperature_parameter — UTIL spec: Z:TEMP,1,OpenAI API | Anthropic API | Google Vertex AI,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,TOKENS,token_count_report — UTIL spec: Z:TOKENS,1,OpenAI API | Anthropic API | Google Vertex AI,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,TOPK,top_k_sampling_parameter,1,OpenAI API | Anthropic API | Google Vertex AI | Hugging Face,Claim 30; CIP-33,1.0
+Model / Inference Operations,Z,Model / Inference Operations,TOPP,top_p_nucleus_sampling_parameter,1,OpenAI API | Anthropic API | Google Vertex AI | Hugging Face,Claim 30; CIP-33,1.0
+Sovereign Extension,Ω:,Implementer-defined,<sovereign-opcode>,<sovereign-definition> — Tier 3; implementing party defines without registration or central approval; Ω selected because Omega is the last character of the Greek alphabet: the beyond-the-defined-set space,1,Implementing party authority,Claims 14 | 32; CIP-35,1.0
+
+SECTION 4: TIER 2 NAMESPACE ADDRESS SPACE
+Architecture: 351 order-invariant double-Latin prefix slots. Canonical form: alphabetically earlier character first. AB: and BA: are structurally identical addresses resolving to the same codebook. All Tier 2 slots are UNASSIGNED in v1.0 and reserved for future MDR-registered standardization as adoption warrants.
+Slot_Count,Composition,Canonical_Form_Rule,v1.0_Status
+325,C(26-2)_unordered_pairs_of_distinct_letters,alphabetically_earlier_character_first,unassigned
+26,doubled-letter_pairs_AA-through-ZZ,self-canonical,unassigned
+351,total,AB_equals_BA,all_unassigned_v1.0
+Claim_Reference: Claim 32 (UTIL) | CIP-35
