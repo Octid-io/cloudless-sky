@@ -10,6 +10,8 @@ The protocol specification at `protocol/spec/OSMP-SPEC-v1.md` is the source of t
 
 If there is a conflict between an SDK implementation and the spec, the spec wins. If there is a conflict between the spec and intuition, open an issue — do not resolve it by changing the implementation.
 
+If you are building a new SDK or parser implementation, the EBNF grammar file is the complete and sufficient specification for SAL syntax. You do not need to read the prose spec to implement a conformant parser — the grammar file is machine-readable and can be used directly with standard EBNF parser generators.
+
 ---
 
 ## What We Need Most
