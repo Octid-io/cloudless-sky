@@ -152,7 +152,7 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 | MCP (Anthropic) | HTTP/JSON | ✗ | ✗ | ✗ |
 | A2A (Google/Linux Foundation) | HTTPS/JSON | ✗ | ✗ | ✗ |
 | ACP (IBM) | REST/HTTP | ✗ | ✗ | ✗ |
-| **OSMP** | **Any channel** | **✓** | **60–87%** | **✓** |
+| **OSMP** | **Any channel** | **✓** | **60.8% mean** | **✓** |
 
 MCP, A2A, and ACP are framework-layer protocols. OSMP is an encoding-layer protocol. It operates beneath any of them. Two agents using different frameworks that share the OSMP grammar and dictionary can communicate with no modification to either framework.
 

@@ -12,7 +12,7 @@
 
 The Octid Semantic Mesh Protocol (OSMP) is a bandwidth-agnostic application-layer wire protocol for semantic instruction encoding in agentic AI systems. OSMP enables AI-to-AI and human-to-AI instruction exchange across any communication channel — from 51-byte LoRa radio payloads to high-bandwidth cloud infrastructure — using a composable domain-specific symbolic instruction format (Semantic Assembly Language, or SAL), an adaptive shared compression dictionary (Adaptive Shared Dictionary, or ASD), and a capability negotiation and session handshake protocol (Frame Negotiation Protocol, or FNP).
 
-OSMP achieves 68.3%–87.5% UTF-8 byte reduction relative to natural language equivalents across representative agentic instruction types. Decode is a table lookup operation requiring no neural inference at the receiving node. Any device capable of string processing can participate as a sovereign OSMP node.
+OSMP achieves mean 60.8% UTF-8 byte reduction relative to natural language equivalents across the 55-vector canonical test suite (range varies by instruction complexity; up to 82.1% on short imperative instructions). Decode is a table lookup operation requiring no neural inference at the receiving node. Any device capable of string processing can participate as a sovereign OSMP node.
 
 ---
 
@@ -96,9 +96,9 @@ Glyph operators are single Unicode characters with formal logical equivalences. 
 
 ### 3.4 Compression Properties
 
-TCL glyph substitution alone reduces character count 5–25% depending on instruction type prior to opcode encoding. Combined with full OSMP encoding: **68.3%–87.5% UTF-8 byte reduction** across 20 representative instruction types.
+TCL glyph substitution alone reduces character count 5-25% depending on instruction type prior to opcode encoding. Combined with full OSMP encoding: **mean 60.8% UTF-8 byte reduction** across the 55-vector canonical test suite (range 0.0% to 82.1%). On the 20 representative instruction types in the provisional filing Datasets A-D (longer, more complex instructions averaging 115 bytes NL), the range is 68.3%-87.5%.
 
-Measurement basis: UTF-8 byte count (`len(s.encode('utf-8'))` in Python).
+Measurement basis: UTF-8 byte count (`len(s.encode('utf-8'))` in Python). All numbers are independently reproducible by running the benchmark against the canonical test vectors.
 
 Two-tier corpus compression (D:PACK): SAL first tier + LZMA second tier. On a 5,000-byte partial medical domain corpus, this architecture achieved 72.7% total reduction and 3.7x compression multiplier versus natural language + LZMA baseline, with the SAL tier contributing a larger proportion on the small sample. At full scale across two complete domain registries: CMS FY2026 ICD-10-CM (74,719 clinical descriptions, 5.6MB raw) achieved 94.9% total reduction in a 505KB binary; ISO 20022 eRepository (66,956 financial definitions, 8.7MB raw) achieved 90.8% total reduction in a 1.14MB binary. LZMA dominates the compression contribution at scale while the SAL first tier contributes 8-16% depending on corpus repetitiveness. The primary value of the two-tier architecture at full scale is edge-local deployment: entire domain code libraries in microcontroller flash for infrastructure-denied operations without network dependency.
 
@@ -159,6 +159,8 @@ The OSMP glyph system comprises six functionally distinct symbol categories. Cat
 | Y | Memory + Retrieval *(AI-native)* | MemGPT (Packer et al. 2023), Voyager (Wang et al. 2023), RAG (Lewis et al. NeurIPS 2020), FAISS, Mem0, LangChain |
 | Z | Model / Inference Operations *(AI-native)* | OpenAI Chat Completions API, Anthropic Messages API, Google Vertex AI API, vLLM, Ollama |
 | Ω: | Sovereign Extension | Any implementing party may define additional namespaces without central authority approval. Ω (U+03A9, OMEGA, 2 UTF-8 bytes) — the glyph for the beyond-standard sovereign space. |
+
+Namespace addressing operates in three tiers: Tier 1 comprises the 26 single-letter standard prefixes (A-Z) defined above. Tier 2 comprises 351 order-invariant two-character MDR-registered prefixes (AB=BA canonical form, AA-ZZ all valid), providing domain-specific extension capacity without Ω sovereign scope. Tier 3 is the unlimited Ω sovereign extension space, available to any implementing party without registration.
 
 The four AI-native namespaces — J, Q, Y, Z — have no analog in any prior agent communication protocol. They encode the complete AI agent cognitive processing pipeline. The J→Y→Z→Q chain composes the full pipeline as a single transmissible SAL instruction sequence decodable by ASD lookup without neural inference.
 
@@ -338,12 +340,12 @@ Both opcodes are defined in the D namespace of the ASD floor vocabulary and are 
 
 | ID | Description | Encoded | Natural Language | NL Bytes | OSMP Bytes | Reduction |
 |---|---|---|---|---|---|---|
-| EQ | Environmental query | `EQ@4A?TH:0` | Node 4A, report temperature at offset zero. | 47 | 10 | 78.7% |
-| BA | Building alert broadcast | `BA@BS!` | Alert all building sector nodes. | 32 | 6 | 81.3% |
-| AR | Agentic request | `AR@EP:1` | Request emergency protocol, priority 1. | 38 | 7 | 81.6% |
-| MEDEVAC | Biometric threshold alert | `H:HR@NODE1>120→H:CASREP∧M:EVA@*` | If heart rate at node 1 exceeds 120, assemble casualty report and broadcast evacuation to all nodes. | 103 | 24 | 76.7% |
-| PARALLEL | Multi-query | `A∥[?WEA∧?NEWS∧?CAL]` | Simultaneously query weather, news, and calendar. | 52 | 22 | 57.7% |
-| FINANCIAL | Atomic payment | `K:PAY@RECV:I:§↔K:XFR[amount]` | Execute payment to receiver if and only if human confirmation received, then transfer asset. | 94 | 31 | 67.0% |
+| EQ | Environmental query | `EQ@4A?TH:0` | Node 4A, report temperature at offset zero. | 43 | 10 | 76.7% |
+| BA | Building alert broadcast | `BA@BS!` | Alert all building sector nodes. | 32 | 6 | 81.2% |
+| AR | Agentic request | `AR@EP:1` | Request emergency protocol, priority 1. | 39 | 7 | 82.1% |
+| MEDEVAC | Biometric threshold alert | `H:HR@NODE1>120→H:CASREP∧M:EVA@*` | If heart rate at node 1 exceeds 120, assemble casualty report and broadcast evacuation to all nodes. | 100 | 35 | 65.0% |
+| PARALLEL | Multi-query | `A∥[?WEA∧?NEWS∧?CAL]` | Simultaneously query weather, news, and calendar. | 49 | 25 | 49.0% |
+| FINANCIAL | Atomic payment | `K:PAY@RECV↔I:§→K:XFR[AMT]` | Execute payment to receiver if and only if human operator confirmation received, then transfer asset. | 101 | 30 | 70.3% |
 
 ---
 
@@ -351,8 +353,10 @@ Both opcodes are defined in the D namespace of the ASD floor vocabulary and are 
 
 | Metric | Value | Basis |
 |---|---|---|
-| UTF-8 compression range | 68.3% – 87.5% | 20 representative instruction types, Spec §II.D / Exhibit A |
-| Token compression range | 55.2% – 79.2% | cl100k approximation |
+| UTF-8 compression range (provisional) | 68.3% – 87.5% | 20 instruction types in provisional filing Datasets A-D |
+| UTF-8 compression range (55-vector suite) | 0.0% – 82.1% | 55 canonical test vectors, full range |
+| Mean UTF-8 reduction (55-vector suite) | 60.8% | Conformance benchmark, independently reproducible |
+| Token compression range | 55.2% – 79.2% | cl100k approximation, provisional Datasets A-D |
 | LoRa floor | 51 bytes | SF12 BW125kHz maximum-range spreading factor |
 | Standard deployment | 255 bytes | SF11 BW250kHz / Meshtastic LongFast |
 | Two-tier corpus reduction (partial) | 72.7% | 5,000-byte partial medical corpus, SAL + LZMA |
