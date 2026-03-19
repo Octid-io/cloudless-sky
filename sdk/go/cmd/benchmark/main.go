@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"github.com/octid/cloudless-sky/sdk/go/osmp"
+	"github.com/octid-io/cloudless-sky/sdk/go/osmp"
 )
 
 func main() {

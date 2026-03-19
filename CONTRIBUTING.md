@@ -14,42 +14,64 @@ If you are building a new SDK or parser implementation, the EBNF grammar file is
 
 ---
 
+## SDK Status
+
+The following SDKs are shipped and conformant against the 55-vector canonical test suite:
+
+| SDK | Package | Conformance | Notes |
+|---|---|---|---|
+| **Python** | `pip install osmp-protocol` | CONFORMANT ✓ 60.8% | Reference implementation. Single source of truth for all SDK behavior. |
+| **TypeScript** | `npm install osmp-protocol` | CONFORMANT ✓ 60.8% | OpenClaw / web agent integrations. |
+| **Go** | `github.com/octid-io/cloudless-sky/sdk/go` | CONFORMANT ✓ 60.8% | PicoClaw / constrained hardware. ASD compiled-in; no filesystem or network dependency. |
+
+---
+
+## Meshtastic Integration
+
+OSMP integration with Meshtastic operates at two levels. Understanding the distinction determines which language you need.
+
+### Companion Device Integration (Python -- operational today)
+
+A companion device (phone, laptop, Raspberry Pi, server) runs the OSMP Python SDK and connects to a Meshtastic radio over serial, TCP, or BLE using the Meshtastic Python library (`pip install meshtastic`). The companion device encodes OSMP instructions, sends them through `interface.sendText()` or `interface.sendData()`, and decodes received payloads on arrival. The Meshtastic radio is a dumb transport. OSMP handles the payload. Meshtastic handles the RF and mesh routing. No new code required.
+
+```python
+import meshtastic, meshtastic.serial_interface
+from osmp import SALEncoder, SALDecoder
+
+interface = meshtastic.serial_interface.SerialInterface()
+encoded = "H:HR@NODE1>120→H:CASREP∧M:EVA@*"
+interface.sendText(encoded)  # Meshtastic carries the OSMP payload
+```
+
+This path works today with existing SDKs and existing Meshtastic hardware.
+
+### Firmware-Level Sovereign Node (C++ -- contribution target)
+
+A Meshtastic device (ESP32 or nRF52) running OSMP encode/decode natively in firmware, operating as a sovereign OSMP node without a companion device. The microcontroller maintains its own ASD, encodes and decodes SAL instructions on-chip, and participates in the mesh as an autonomous agent node.
+
+This is a different and more advanced deployment scenario. It requires a C++ OSMP encoder/decoder that compiles for ESP32 and nRF52 targets, with the ASD basis compiled into flash. The C++ implementation does not modify Meshtastic firmware; it produces payloads compatible with the Meshtastic SDK message API.
+
+**Target:** Meshtastic module API compatible. ESP32 and nRF52 compatible. ASD compiled into flash as a constant table.
+
+---
+
 ## What We Need Most
 
-### TypeScript SDK — highest priority
+### C++ Firmware-Level Encoder/Decoder -- highest priority
 
-An OSMP TypeScript SDK for OpenClaw and web integrations.
+See Meshtastic Integration above. The companion device path is operational. The firmware-level sovereign node path requires a C++ SDK.
 
-**Target package:** `osmp-protocol` on npm  
-**Reference:** The Python SDK at `sdk/python/src/osmp.py` is the complete reference implementation. All behavior is specified there. The TypeScript SDK should expose the same API surface in idiomatic TypeScript.
+### Kotlin (Android) and Swift (iOS) -- second priority
 
-**What to build:**
-- `OSMPEncoder` class with `encodeFrame()`, `encodeCompound()`, `encodeParallel()`, `encodeSequence()`
-- `OSMPDecoder` class with `decodeFrame()` returning a typed `DecodedInstruction` object
-- `AdaptiveSharedDictionary` class with `lookup()`, `applyDelta()`, `fingerprint()`
-- `OverflowProtocol` class with `fragment()` and `receive()`
-- Benchmark runner that executes against the canonical test vectors and reports conformance
+Mobile SDK implementations enabling phones to function as sovereign OSMP nodes. Relevant for both the Meshtastic mobile apps and standalone OSMP mesh participation.
 
-**Conformance requirement:** Mean UTF-8 byte reduction ≥60% across all test vectors, zero decode errors.
+### Tier 3 DAG Fragmentation -- contribution target
 
-**How to measure:** `Buffer.byteLength(str, 'utf8')` — same measurement basis as Python `len(s.encode('utf-8'))`.
+Overflow Protocol Tier 3: DAG decomposition for instructions with conditional branches and dependency chains. Spec-defined (§8.1) and patent-covered. The Python reference implements Tier 1 and Tier 2; Tier 3 is architecturally specified but not yet implemented.
 
-### Go SDK — second priority
+### FNP Handshake State Machine -- contribution target
 
-An OSMP Go SDK for PicoClaw and constrained hardware deployments.
-
-**Target module:** `github.com/octid-io/cloudless-sky/sdk/go`  
-**Key constraint:** The Go implementation should produce a self-contained binary with minimal external dependencies. The ASD basis set should be embeddable as a compiled-in constant, not a runtime file load, for constrained hardware targets.
-
-### C++ Meshtastic Integration — third priority
-
-Not firmware. An OSMP encoder/decoder that produces payloads compatible with the Meshtastic SDK message API. The Meshtastic transport layer is unchanged — OSMP encodes the payload that Meshtastic carries.
-
-**Target:** Meshtastic module API compatible. ESP32 and nRF52 compatible.
-
-### Kotlin (Android) and Swift (iOS) — community contribution
-
-Mobile SDK implementations for the Meshtastic Android and iOS apps.
+The two-message capability advertisement + acknowledgment protocol (40 bytes each, within LoRa MTU). FNP fingerprint computation (SHA-256) is implemented in all three SDKs; the handshake state machine managing the negotiation lifecycle is a contribution target.
 
 ---
 
@@ -120,11 +142,10 @@ This is intentional. If a fragment payload contains R:ESTOP, execute immediately
 
 **Multi-byte glyph byte counting**  
 UTF-8 byte counts for glyphs vary. Do not assume one character = one byte.  
-3-byte glyphs: ∧ ∨ → ↔ ∀ ∃ ∥ ⚠ ↺ ⊘ ⊤ ⊥ ⌂ ⊗ ∈ ∖  
-2-byte glyphs: § τ Δ ¬  
+3-byte glyphs: ∧ ∨ → ↔ ∀ ∃ ∥ ⚠ ↺ ⊘ ⊤ ⊥ ⌂ ⊗ ∈ ∖ ⟳ ≠ ⊕  
+2-byte glyphs: § τ Δ ¬ Φ Γ Λ  
 Note: ¬ (U+00AC NOT SIGN) is 2 UTF-8 bytes (0xC2 0xAC). Earlier versions of this document incorrectly listed it as 3-byte.
-2-byte glyphs: § τ Δ  
-1-byte glyphs: @ > ~ * : ; ?  
+1-byte glyphs: @ > ~ * : ; ? +  
 Use `Buffer.byteLength(str, 'utf8')` in TypeScript, `len(str.encode('utf-8'))` in Python.
 
 ---

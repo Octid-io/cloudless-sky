@@ -2,15 +2,23 @@
 
 ## Patent Status
 
-The Octid Semantic Mesh Protocol (OSMP) architecture is covered by pending United States patent application:
+The Octid Semantic Mesh Protocol (OSMP) architecture is covered by pending United States patent applications:
 
-**Docket:** OSMP-001-UTIL  
-**Title:** Octid Semantic Mesh Protocol (OSMP): A Bandwidth-Agnostic Composable Semantic Assembly Language for Agentic Mesh Networks with Sovereign Node Architecture and Adaptive Dictionary Infrastructure  
-**Inventor:** Clay Holberg, Texas, United States of America  
-**Priority Date:** March 17, 2026  
-**Status:** Pending
+**Utility Application**
+- **Docket:** OSMP-001-UTIL
+- **Title:** Bandwidth-Agnostic Semantic Assembly Language and Adaptive Shared Dictionary Infrastructure for Inference-Free Agentic Instruction Encoding
+- **Inventor:** Clay Holberg, Texas, United States of America
+- **Priority Date:** March 17, 2026
+- **Status:** Pending
 
-A continuation-in-part application (OSMP-001-CIP) extending coverage to cloud-scale AI orchestration, non-RF channels, and mobile sovereign node architectures is also pending.
+**Continuation-in-Part**
+- **Docket:** OSMP-001-CIP
+- **Scope:** Extends coverage to cloud-scale AI orchestration, non-RF channel encoding, mobile sovereign node architectures, AI-native cognitive pipeline encoding (J/Q/Y/Z namespaces), four-mode communication architecture, and cross-namespace authorization composition
+- **Inventor:** Clay Holberg, Texas, United States of America
+- **Priority Date:** March 17, 2026
+- **Status:** Pending
+
+The inventor asserts a conception date of August 7, 2025 for certain claim elements as documented in the provisional application.
 
 ---
 
@@ -30,12 +38,20 @@ If you initiate patent litigation against any entity (including a cross-claim or
 
 ---
 
+## Sovereign Extension Namespace Scope
+
+The patent grant covers implementations of the published OSMP specification. Sovereign namespace extensions defined by third parties under the reserved extension prefix are outside the scope of the patent grant and are neither covered by nor restricted by the OSMP patent claims, provided they do not practice the claimed OSMP architecture itself. Third-party sovereign extensions are the intellectual property of their respective authors.
+
+---
+
 ## MDR Certification (Separate from Patent)
 
-The Managed Dictionary Registry (MDR) is a certification layer for compliant enterprise namespace implementations. MDR certification is a commercial service and is separate from the Apache 2.0 patent grant. Use of the OSMP protocol does not require MDR certification. MDR certification may be required for specific regulated-industry deployments where authoritative namespace mapping is mandated.
+The Managed Dictionary Registry (MDR) is a certification layer for compliant enterprise namespace implementations. MDR certification is a commercial service and is separate from the Apache 2.0 patent grant. Use of the OSMP protocol does not require MDR certification. MDR certification may be required for specific regulated-industry deployments where authoritative namespace mapping is operationally required.
 
 ---
 
 ## Questions
 
-Patent and licensing inquiries: contact through the GitHub repository at https://github.com/octid-io/cloudless-sky
+Patent and licensing inquiries: [octid.io](https://octid.io)
+
+General protocol questions: open an issue at [github.com/octid-io/cloudless-sky](https://github.com/octid-io/cloudless-sky)

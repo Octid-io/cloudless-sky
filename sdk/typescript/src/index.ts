@@ -9,7 +9,8 @@ export { OverflowProtocol, packFragment, unpackFragment, isTerminal, isCritical 
 export { BAELEncoder, utf8Bytes } from "./bael.js";
 export { runBenchmark } from "./benchmark.js";
 export { ASD_BASIS, ASD_FLOOR_VERSION, GLYPH_OPERATORS, COMPOUND_OPERATORS,
-         CONSEQUENCE_CLASSES, OUTCOME_STATES, PARAMETER_DESIGNATORS } from "./glyphs.js";
+         CONSEQUENCE_CLASSES, OUTCOME_STATES, PARAMETER_DESIGNATORS,
+         LOSS_POLICIES, DICT_UPDATE_MODES } from "./glyphs.js";
 export type { DecodedInstruction, Fragment, BenchmarkReport, VectorResult,
               DeltaLogEntry, BAELResult } from "./types.js";
 export { LossPolicy, BAELMode, DictUpdateMode, FLAG_TERMINAL, FLAG_CRITICAL,

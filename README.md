@@ -48,8 +48,8 @@ SDK: Python (reference)
   ✓ TV-015        101         30      70.3%
   ...
 
-  Mean reduction: 60.6%
-  CONFORMANT ✓  (mean 60.6% vs 60.0% threshold)
+  Mean reduction: 60.8%
+  CONFORMANT ✓  (mean 60.8% vs 60.0% threshold)
 ```
 
 Run it yourself. The numbers are real and independently reproducible across all three SDKs.
@@ -85,13 +85,13 @@ import "github.com/octid-io/cloudless-sky/sdk/go/osmp"
 
 ## SDK Status
 
-All three SDKs are independently verified against the same 48-vector canonical test suite. Wire compatibility is confirmed: Python, TypeScript, and Go produce field-for-field identical decode results on 86 test instructions covering every namespace, every operator, and every edge case documented in the spec.
+All three SDKs are independently verified against the same 55-vector canonical test suite. Wire compatibility is confirmed: Python, TypeScript, and Go produce field-for-field identical decode results on 86 test instructions covering every namespace, every operator, and every edge case documented in the spec.
 
 | SDK | Target | Conformance | Notes |
 |---|---|---|---|
-| **Python** | Reference implementation | CONFORMANT ✓ 60.6% | Single source of truth for all SDK behavior |
-| **TypeScript** | OpenClaw / web agent integrations | CONFORMANT ✓ 60.6% | `npm install osmp-protocol` |
-| **Go** | PicoClaw / constrained hardware | CONFORMANT ✓ 60.7% | ASD compiled-in; no filesystem or network dependency |
+| **Python** | Reference implementation | CONFORMANT ✓ 60.8% | Single source of truth for all SDK behavior |
+| **TypeScript** | OpenClaw / web agent integrations | CONFORMANT ✓ 60.8% | `npm install osmp-protocol` |
+| **Go** | PicoClaw / constrained hardware | CONFORMANT ✓ 60.8% | ASD compiled-in; no filesystem or network dependency |
 
 ---
 
@@ -127,7 +127,7 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 
 **FNP full handshake** — the two-message capability advertisement + acknowledgment protocol (≤40 bytes each, within LoRa MTU). Fingerprint computation is implemented; the handshake state machine is a contribution target.
 
-**C++ Meshtastic integration** — encoder/decoder producing payloads compatible with the Meshtastic SDK message API. Not firmware. Contribution target.
+**C++ firmware-level OSMP nodes** — OSMP integration with Meshtastic via the Python SDK and Meshtastic Python library is operational today (see CONTRIBUTING.md). The C++ contribution target is a firmware-level encoder/decoder enabling ESP32 and nRF52 Meshtastic devices to operate as sovereign OSMP nodes without a companion device, with the ASD compiled into flash.
 
 ---
 
@@ -243,7 +243,7 @@ cloudless-sky/
   protocol/
     spec/           ← OSMP-SPEC-v1.md — authoritative protocol specification
     grammar/        ← SAL-grammar.ebnf — formal grammar (EBNF)
-    test-vectors/   ← canonical-test-vectors.json — 48-vector conformance suite
+    test-vectors/   ← canonical-test-vectors.json — 55-vector conformance suite
   sdk/
     python/         ← Reference implementation (pip: osmp-protocol)
     typescript/     ← OpenClaw/web SDK (npm: osmp-protocol)
@@ -261,7 +261,9 @@ cloudless-sky/
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md). The spec is authoritative. All SDK implementations are validated against the canonical test vectors. A conformant implementation must achieve ≥60% mean UTF-8 byte reduction with zero decode errors.
 
-Wanted: Tier 3 DAG fragmentation, FNP handshake state machine, C++ Meshtastic integration, Kotlin/Swift mobile SDKs.
+Meshtastic integration via the Python SDK and Meshtastic Python library is operational today with no additional code required. See CONTRIBUTING.md for details.
+
+Wanted: C++ firmware-level encoder/decoder (ESP32/nRF52 sovereign nodes), Kotlin/Swift mobile SDKs, Tier 3 DAG fragmentation, FNP handshake state machine.
 
 ---
 

@@ -84,6 +84,9 @@ Glyph operators are single Unicode characters with formal logical equivalences. 
 | : | U+003A | ASSIGN | Slot value assignment | equals, is set to, assign |
 | ; | U+003B | SEQUENCE | Ordered sequential execution | then next, followed by, in sequence |
 | ? | U+003F | QUERY | Request for value or status | what is, query, retrieve |
+| ⟳ | U+27F3 | REPEAT-EVERY | Interval and recurrence composition | every, repeat at interval, recur |
+| ≠ | U+2260 | NOT-EQUAL | Slot value exclusion filter | not equal to, excluding, other than |
+| ⊕ | U+2295 | PRIORITY-ORDER | Strict ranked execution across parallel instructions when resources are constrained | prioritize, ranked order, prefer |
 
 ### 3.3 Compound Operator
 
@@ -98,6 +101,28 @@ TCL glyph substitution alone reduces character count 5–25% depending on instru
 Measurement basis: UTF-8 byte count (`len(s.encode('utf-8'))` in Python).
 
 Two-tier corpus compression: SAL first tier + LZMA second tier achieves **72.7% total reduction** and **3.7x compression multiplier** versus natural language + LZMA baseline on a partial medical domain dictionary. This is a conservative lower bound; a complete domain MDR achieves higher substitution density.
+
+### 3.5 Six-Category Typed Symbol Architecture
+
+The OSMP glyph system comprises six functionally distinct symbol categories. Categories 2 through 6 may not be substituted for Category 1 operators within instruction grammar; cross-category substitution produces a grammatically invalid, non-executable instruction.
+
+**Category 1 -- Logical and Compositional Operators (18 total):**
+∧ ∨ ¬ → ↔ ∀ ∃ @ ∥ > ~ * : ; ? ⟳ ≠ ⊕ (plus compound ¬→). These bind, negate, sequence, quantify, and compose instruction elements across all namespaces.
+
+**Category 2 -- Consequence Class Designators:**
+⚠ (U+26A0, HAZARDOUS), ↺ (U+21BA, REVERSIBLE), ⊘ (U+2298, IRREVERSIBLE), § (U+00A7, HUMAN-AUTHORIZED in I namespace). These classify the physical-world impact of R namespace instructions and occupy the mandatory consequence class slot in R namespace instruction frames. An R namespace instruction without a valid Category 2 designator in the required frame position is malformed and non-executable.
+
+**Category 3 -- Outcome State Designators:**
+⊤ (U+22A4, PASS/TRUE), ⊥ (U+22A5, FAIL/FALSE). Formal logical constants predating OSMP; adopted for pre-existing definitions, not arbitrary assignment.
+
+**Category 4 -- Parameter and Slot Designators:**
+Δ (U+0394, DELTA), ⌂ (U+2302, HOME), ⊗ (U+2297, ABORT/CANCEL), τ (U+03C4, TIMEOUT), ∈ (U+2208, SCOPE/WITHIN), ∖ (U+2216, MISSING -- set minus, for NACK fragment identification).
+
+**Category 5 -- Loss Tolerance Policy Designators:**
+Φ (U+03A6, FAIL-SAFE -- fundamental invariant, silent discard on incomplete receipt), Γ (U+0393, GRACEFUL-DEGRADATION -- graduated threshold, execute satisfiable subset; default policy), Λ (U+039B, ATOMIC -- indivisible function, all-or-nothing execution). Greek uppercase letters whose pre-existing mathematical meanings map directly to their policy semantics. Configuration syntax: `N:CFG@[nodeID]:FRAG[Φ|Γ|Λ]:τ[n]`.
+
+**Category 6 -- Dictionary Update Mode Designators:**
++ (U+002B, ADDITIVE -- append entry, preserve prior), ← (U+2190, REPLACE -- supersede and retire prior, mandatory retransmit), † (U+2020, DEPRECATE -- mark retired, preserve backward compatibility). Used exclusively in dictionary delta payload mode fields. REPLACE operations require mandatory FLAGS[C] (criticality override) to ensure retransmit-on-loss; graceful degradation is not permitted for dictionary replacement operations.
 
 ---
 
@@ -243,6 +268,20 @@ Config: `N:CFG@[nodeID]:COMMS[⊗]:τ[n]:EXEC[instruction]`
 
 Example: `R:RTH@⌂` for UAV, `R:SRFC` for UUV.
 
+### 8.4 BAEL -- Bandwidth-Agnostic Efficiency Layer
+
+BAEL dynamically selects among three encoding representation modes based on minimum byte count, providing a compression floor guarantee: OSMP encoding never increases byte count over natural language input.
+
+**Mode 1 -- FULL_OSMP (FLAGS=0x00):** Namespace-prefixed opcodes connected by glyph operators, decoded by ASD lookup. Standard encoding mode.
+
+**Mode 2 -- TCL_ONLY (FLAGS=0x02):** Glyph substitution of logical operators only, without full opcode encoding. Selected when TCL-only encoding produces fewer bytes than full OSMP encoding.
+
+**Mode 3 -- NL_PASSTHROUGH (FLAGS=0x04):** Natural language transmitted as-is, signaled by bit 2 in the fragment header FLAGS field. Selected when natural language byte count is less than or equal to the byte count of any available OSMP encoding.
+
+Mode selection is governed by O namespace operational context instructions (`O:CHAN`, `O:FLOOR`) transmitted as co-equal structural elements of the instruction stream, grounding BAEL channel adaptation in explicit addressable instruction state rather than abstract layer behavior.
+
+The NL_PASSTHROUGH mode ensures that very short natural language instructions (e.g., "Stop") are never inflated by encoding overhead. A receiving node checks bit 2 of the FLAGS field; if set, the payload is interpreted as natural language without ASD lookup.
+
 ---
 
 ## 9. Frame Negotiation Protocol (FNP)
@@ -269,15 +308,29 @@ Dictionary updates are deconstructed into independently parseable delta units, e
 
 ### 10.2 Update Resolution Modes
 
-| Mode | Behavior | Criticality Flag |
-|---|---|---|
-| + | New entry appended; existing entry preserved; version pointer incremented | Standard |
-| ← | New entry supersedes existing; prior definition retired | Mandatory FLAGS[C] — retransmit on loss, no graceful degradation |
-| † | Entry marked retired; resolution preserved for backward compatibility; staleness flag logged | Standard |
+Dictionary delta operations use Category 6 glyph designators (see §3.5) as mode fields in delta payloads. Each mode has a CRDT analog governing conflict resolution in distributed dictionary synchronization.
+
+| Mode | Glyph | CRDT Analog | Behavior | Criticality Flag |
+|---|---|---|---|---|
+| ADDITIVE | + (U+002B, 1 byte) | Grow-only set (G-Set) | New entry appended; existing entry preserved; version pointer incremented | Standard |
+| REPLACE | ← (U+2190, 3 bytes) | Last-write-wins register (LWW-Register) | New entry supersedes existing; prior definition retired | Mandatory FLAGS[C] -- retransmit on loss, no graceful degradation |
+| DEPRECATE | † (U+2020, 3 bytes) | Tombstone (2P-Set) | Entry marked retired; resolution preserved for backward compatibility; staleness flag logged | Standard |
+
+REPLACE operations must use FLAGS[C] (criticality override in the fragment header). A REPLACE delta lost in transit and not retransmitted leaves the receiving node with a stale dictionary entry, which is a semantic correctness violation. Graceful degradation is not permitted for REPLACE operations; the criticality flag forces Atomic execution policy for that specific delta regardless of the node's standing loss tolerance policy.
 
 ### 10.3 Guaranteed Minimum Operational Vocabulary Floor
 
 A version-pinned subset of the ASD basis set unconditionally present on every sovereign node regardless of dictionary synchronization state, network connectivity, or duration of off-grid operation. Instructions authored exclusively against floor-version glyphs are **baseline-layer instructions** guaranteed executable at any node in any synchronization state.
+
+### 10.4 Two-Tier Corpus Compression (D:PACK / D:UNPACK)
+
+`D:PACK` applies OSMP SAL encoding as a first-tier semantic compression pass, followed by LZMA compression as a second-tier byte-level pass, for at-rest corpus storage. The result is a two-tier encoded corpus in which the semantic structure of the original content is preserved in the SAL intermediate representation.
+
+`D:UNPACK` retrieves semantic content from a two-tier encoded corpus by ASD lookup against the SAL intermediate representation without requiring full LZMA decompression of the entire corpus. This is the zero-unpack semantic resolution property: a receiving node can resolve the semantic meaning of any instruction in the compressed corpus by ASD lookup against the first-tier SAL layer, without decompressing the second-tier LZMA layer in its entirety.
+
+Empirical result on a partial medical domain corpus: 72.7% total reduction, 3.7x compression multiplier versus natural language + LZMA baseline. This is a conservative lower bound; a complete domain MDR achieves higher substitution density in the first tier.
+
+Both opcodes are defined in the D namespace of the ASD floor vocabulary and are operational today without MDR.
 
 ---
 

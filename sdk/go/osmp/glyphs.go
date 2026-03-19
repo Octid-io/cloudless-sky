@@ -4,6 +4,47 @@ package osmp
 // Compiled in — no filesystem or network dependency.
 const ASDFloorVersion = "1.0"
 
+// GlyphOperators — Category 1: Logical and Compositional Operators (18 total).
+// Source: OSMP-semantic-dictionary-v12.csv Section 1, Category 1
+var GlyphOperators = map[string]string{
+	"∧": "AND",            // U+2227 3B
+	"∨": "OR",             // U+2228 3B
+	"¬": "NOT",            // U+00AC 2B
+	"→": "THEN",           // U+2192 3B
+	"↔": "IFF",            // U+2194 3B
+	"∀": "FOR-ALL",        // U+2200 3B
+	"∃": "EXISTS",         // U+2203 3B
+	"∥": "PARALLEL",       // U+2225 3B
+	">": "PRIORITY",       // U+003E 1B
+	"~": "APPROX",         // U+007E 1B
+	"*": "WILDCARD",       // U+002A 1B
+	":": "ASSIGN",         // U+003A 1B
+	";": "SEQUENCE",       // U+003B 1B
+	"?": "QUERY",          // U+003F 1B
+	"@": "TARGET",         // U+0040 1B
+	"⟳": "REPEAT-EVERY",  // U+27F3 3B
+	"≠": "NOT-EQUAL",      // U+2260 3B
+	"⊕": "PRIORITY-ORDER", // U+2295 3B
+}
+
+// LossPolicyGlyphs — Category 5: Loss Tolerance Policy Designators.
+// Greek uppercase letters whose pre-existing mathematical meanings map to policy semantics.
+// Config: N:CFG@[nodeID]:FRAG[Φ|Γ|Λ]:τ[n]
+var LossPolicyGlyphs = map[string]string{
+	"Φ": "FAIL-SAFE",            // U+03A6 2B — fundamental invariant
+	"Γ": "GRACEFUL-DEGRADATION", // U+0393 2B — graduated threshold (default)
+	"Λ": "ATOMIC",               // U+039B 2B — indivisible function
+}
+
+// DictUpdateModeGlyphs — Category 6: Dictionary Update Mode Designators.
+// Used exclusively in dictionary delta payload mode fields.
+// REPLACE (←) requires mandatory FLAGS[C] — retransmit on loss, no graceful degradation.
+var DictUpdateModeGlyphs = map[string]string{
+	"+": "ADDITIVE",  // U+002B 1B — grow-only set
+	"←": "REPLACE",   // U+2190 3B — last-write-wins register
+	"†": "DEPRECATE", // U+2020 3B — tombstone
+}
+
 // ASDFloorBasis is the compiled-in ASD basis set.
 // Source: OSMP-semantic-dictionary-v12.csv (canonical source of truth)
 // DO NOT EDIT — regenerate via tools/gen_asd.py

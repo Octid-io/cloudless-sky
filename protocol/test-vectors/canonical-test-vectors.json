@@ -675,16 +675,135 @@
       "reduction_pct": 64.1,
       "bael_selected_bytes": 14,
       "bael_reduction_pct": 64.1
+    },
+    {
+      "id": "TV-049",
+      "description": "Approximate match conditional — exercises APPROX (~) operator",
+      "natural_language": "If temperature approximately 25, alert building sector.",
+      "encoded": "E@T~25→BA@BS!",
+      "must_pass": true,
+      "notes": "Ensures ~ (U+007E APPROX) is exercised. Structural analog to TV-005 (PRIORITY >) and TV-032 (NOT-EQUAL ≠).",
+      "nl_bytes": 55,
+      "osmp_bytes": 15,
+      "reduction_pct": 72.7,
+      "category": "environmental",
+      "namespace": "E",
+      "operators_used": [
+        "~",
+        "→"
+      ]
+    },
+    {
+      "id": "TV-050",
+      "description": "UNLESS compound operator — exercises ¬→ (negated conditional)",
+      "natural_language": "Maintain heading unless obstacle detected, then stop.",
+      "encoded": "R:HDNG@UAV1¬→E:OBS→R:STOP@UAV1↺",
+      "must_pass": true,
+      "notes": "Exercises ¬→ (UNLESS) compound. Consequence class ↺ on both R instructions.",
+      "nl_bytes": 53,
+      "osmp_bytes": 38,
+      "reduction_pct": 28.3,
+      "category": "robotic",
+      "namespace": "R",
+      "operators_used": [
+        "¬→",
+        "→"
+      ]
+    },
+    {
+      "id": "TV-051",
+      "description": "IRREVERSIBLE consequence class — exercises ⊘ with I:§ precondition",
+      "natural_language": "Deploy anchor at current position, irreversible operation, requires human confirmation.",
+      "encoded": "I:§→R:DPTH@UUV1:ANCHOR⊘",
+      "must_pass": true,
+      "notes": "Exercises ⊘ (IRREVERSIBLE). I:§ precondition required per spec §5.",
+      "nl_bytes": 87,
+      "osmp_bytes": 28,
+      "reduction_pct": 67.8,
+      "category": "identity_robotic",
+      "namespace": "I",
+      "operators_used": [
+        "→",
+        "⊘"
+      ]
+    },
+    {
+      "id": "TV-052",
+      "description": "DELTA parameter designator — exercises Δ as offset query",
+      "natural_language": "Report temperature change from baseline at node 4A.",
+      "encoded": "E:TH@4A?Δ:0",
+      "must_pass": true,
+      "notes": "Exercises Δ (U+0394 DELTA, 2 bytes) as a query parameter for difference/offset.",
+      "nl_bytes": 51,
+      "osmp_bytes": 12,
+      "reduction_pct": 76.5,
+      "category": "environmental",
+      "namespace": "E",
+      "operators_used": [
+        "?",
+        "Δ"
+      ]
+    },
+    {
+      "id": "TV-053",
+      "description": "SCOPE/WITHIN parameter designator — exercises ∈ as permission boundary",
+      "natural_language": "Agent authorized within project scope only, must not access external resources.",
+      "encoded": "A:AUTH∈[PROJ]∧¬A:AUTH[EXT]",
+      "must_pass": true,
+      "notes": "Exercises ∈ (U+2208 SCOPE/WITHIN) as a set membership scope constraint.",
+      "nl_bytes": 79,
+      "osmp_bytes": 31,
+      "reduction_pct": 60.8,
+      "category": "agentic",
+      "namespace": "A",
+      "operators_used": [
+        "∈",
+        "∧",
+        "¬"
+      ]
+    },
+    {
+      "id": "TV-054",
+      "description": "NACK with MISSING fragment indicator — exercises ∖ in NACK payload",
+      "natural_language": "Negative acknowledgment for message 42, fragments 2 and 5 missing.",
+      "encoded": "A:NACK[MSG:42∖[2,5]]",
+      "must_pass": true,
+      "notes": "Exercises ∖ (U+2216 MISSING/set-minus) per EBNF nack_payload production.",
+      "nl_bytes": 66,
+      "osmp_bytes": 22,
+      "reduction_pct": 66.7,
+      "category": "agentic",
+      "namespace": "A",
+      "operators_used": [
+        "∖"
+      ]
+    },
+    {
+      "id": "TV-055",
+      "description": "FAIL-SAFE policy configuration — exercises Φ loss tolerance designator",
+      "natural_language": "Configure node SENSOR3 with fail-safe fragmentation policy, 45 second timeout.",
+      "encoded": "N:CFG@SENSOR3:FRAG[Φ]:τ[45]",
+      "must_pass": true,
+      "notes": "Exercises Φ (U+03A6 FAIL-SAFE). Structural analog to TV-018 (Γ) and TV-019 (Λ).",
+      "nl_bytes": 78,
+      "osmp_bytes": 29,
+      "reduction_pct": 62.8,
+      "category": "network",
+      "namespace": "N",
+      "operators_used": [
+        "Φ",
+        "τ"
+      ]
     }
   ],
   "compression_summary": {
     "vectors_count": 20,
     "min_reduction_pct": 12.0,
     "max_reduction_pct": 82.1,
-    "mean_reduction_pct": 60.6,
+    "mean_reduction_pct": 60.8,
     "conformance_threshold_pct": 60.0,
     "note": "Implementations must achieve >= 60% MEAN UTF-8 byte reduction across all must_pass vectors to be listed as conformant. Individual vectors using complex multi-byte glyph combinations (PARALLEL, IFF, CDSAFE) may fall below 60% while the corpus mean exceeds the threshold.",
-    "vector_count": 48
+    "vector_count": 55
   },
   "byte_counting": {
     "method": "UTF-8 encoding",

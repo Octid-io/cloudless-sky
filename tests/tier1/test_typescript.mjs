@@ -264,7 +264,7 @@ describe("BAEL", () => {
 // ── SECTION 7: CANONICAL TEST VECTORS ────────────────────────────────────────
 describe("Canonical Test Vectors", () => {
   const data = JSON.parse(readFileSync("protocol/test-vectors/canonical-test-vectors.json","utf8"));
-  test("all 48 decode without error", () => {
+  test("all vectors decode without error", () => {
     const dec = new OSMPDecoder(); const errors = [];
     for(const v of data.vectors) {
       try { const r=dec.decodeFrame(v.encoded); if(!r.namespace||!r.opcode) errors.push(v.id); }

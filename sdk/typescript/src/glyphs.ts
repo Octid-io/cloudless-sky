@@ -52,6 +52,24 @@ export const PARAMETER_DESIGNATORS: Record<string, { unicode: string; name: stri
   "∖": { unicode: "U+2216", name: "MISSING", bytes: 3 },
 };
 
+// Category 5 — Loss Tolerance Policy Designators
+// Greek uppercase letters whose pre-existing mathematical meanings map to policy semantics.
+// Configuration syntax: N:CFG@[nodeID]:FRAG[Phi|Gamma|Lambda]:tau[n]
+export const LOSS_POLICIES: Record<string, { unicode: string; name: string; bytes: number; legacy: string }> = {
+  "Φ": { unicode: "U+03A6", name: "FAIL-SAFE", bytes: 2, legacy: "FS" },
+  "Γ": { unicode: "U+0393", name: "GRACEFUL-DEGRADATION", bytes: 2, legacy: "GD" },
+  "Λ": { unicode: "U+039B", name: "ATOMIC", bytes: 2, legacy: "AT" },
+};
+
+// Category 6 — Dictionary Update Mode Designators
+// Used exclusively in dictionary delta payload mode fields.
+// REPLACE operations require mandatory FLAGS[C] — retransmit on loss, no graceful degradation.
+export const DICT_UPDATE_MODES: Record<string, { unicode: string; name: string; bytes: number }> = {
+  "+": { unicode: "U+002B", name: "ADDITIVE", bytes: 1 },
+  "←": { unicode: "U+2190", name: "REPLACE", bytes: 3 },
+  "†": { unicode: "U+2020", name: "DEPRECATE", bytes: 3 },
+};
+
 export const ASD_BASIS: Record<string, Record<string, string>> = {
   "A": {
     "ACCEPT": "accept_proposed_action",
