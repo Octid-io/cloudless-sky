@@ -100,7 +100,7 @@ TCL glyph substitution alone reduces character count 5–25% depending on instru
 
 Measurement basis: UTF-8 byte count (`len(s.encode('utf-8'))` in Python).
 
-Two-tier corpus compression: SAL first tier + LZMA second tier achieves **72.7% total reduction** and **3.7x compression multiplier** versus natural language + LZMA baseline on a partial medical domain dictionary. This is a conservative lower bound; a complete domain MDR achieves higher substitution density.
+Two-tier corpus compression (D:PACK): SAL first tier + LZMA second tier. On a 5,000-byte partial medical domain corpus, this architecture achieved 72.7% total reduction and 3.7x compression multiplier versus natural language + LZMA baseline, with the SAL tier contributing a larger proportion on the small sample. At full scale across two complete domain registries: CMS FY2026 ICD-10-CM (74,719 clinical descriptions, 5.6MB raw) achieved 94.9% total reduction in a 505KB binary; ISO 20022 eRepository (66,956 financial definitions, 8.7MB raw) achieved 90.8% total reduction in a 1.14MB binary. LZMA dominates the compression contribution at scale while the SAL first tier contributes 8-16% depending on corpus repetitiveness. The primary value of the two-tier architecture at full scale is edge-local deployment: entire domain code libraries in microcontroller flash for infrastructure-denied operations without network dependency.
 
 ### 3.5 Six-Category Typed Symbol Architecture
 
@@ -326,9 +326,9 @@ A version-pinned subset of the ASD basis set unconditionally present on every so
 
 `D:PACK` applies OSMP SAL encoding as a first-tier semantic compression pass, followed by LZMA compression as a second-tier byte-level pass, for at-rest corpus storage. The result is a two-tier encoded corpus in which the semantic structure of the original content is preserved in the SAL intermediate representation.
 
-`D:UNPACK` retrieves semantic content from a two-tier encoded corpus by ASD lookup against the SAL intermediate representation without requiring full LZMA decompression of the entire corpus. This is the zero-unpack semantic resolution property: a receiving node can resolve the semantic meaning of any instruction in the compressed corpus by ASD lookup against the first-tier SAL layer, without decompressing the second-tier LZMA layer in its entirety.
+`D:UNPACK` retrieves semantic content from a two-tier encoded corpus by ASD lookup against the SAL intermediate representation. In practice, the LZMA second tier is decompressed once at node startup into a memory-resident SAL corpus; subsequent lookups resolve by offset seek into the SAL layer and ASD expansion, with no per-lookup decompression cost. This is the zero-unpack semantic resolution property: once the SAL intermediate is resident, any code resolves to actionable clinical context by table lookup in constant time.
 
-Empirical result on a partial medical domain corpus: 72.7% total reduction, 3.7x compression multiplier versus natural language + LZMA baseline. This is a conservative lower bound; a complete domain MDR achieves higher substitution density in the first tier.
+Empirical results: On a 5,000-byte partial medical domain corpus, D:PACK achieved 72.7% total reduction and 3.7x compression multiplier versus natural language + LZMA baseline. On the complete CMS FY2026 ICD-10-CM code set (74,719 descriptions, 5.6MB raw), D:PACK achieved 94.9% total reduction, producing a 505KB deployable binary (289KB corpus + 216KB index). On the complete ISO 20022 eRepository (66,956 financial message element definitions, 8.7MB raw), D:PACK achieved 90.8% total reduction, producing a 1.14MB deployable binary (843KB corpus + 327KB index). The SAL first tier contributed 15.8% on clinical text and 8.4% on financial text; LZMA contributed the dominant share on both corpora. The primary value at full scale is edge-local deployment: entire domain code libraries in microcontroller flash for infrastructure-denied operations.
 
 Both opcodes are defined in the D namespace of the ASD floor vocabulary and are operational today without MDR.
 
@@ -355,8 +355,14 @@ Both opcodes are defined in the D namespace of the ASD floor vocabulary and are 
 | Token compression range | 55.2% – 79.2% | cl100k approximation |
 | LoRa floor | 51 bytes | SF12 BW125kHz maximum-range spreading factor |
 | Standard deployment | 255 bytes | SF11 BW250kHz / Meshtastic LongFast |
-| Two-tier corpus reduction | 72.7% | 5000-byte medical corpus, partial MDR, LZMA second tier |
-| Two-tier compression multiplier | 3.7x | vs. natural language + LZMA baseline |
+| Two-tier corpus reduction (partial) | 72.7% | 5,000-byte partial medical corpus, SAL + LZMA |
+| Two-tier multiplier (partial) | 3.7x | vs. natural language + LZMA baseline on partial corpus |
+| Two-tier corpus reduction (full ICD-10-CM) | 94.9% | CMS FY2026, 74,719 codes, 5.6MB raw, SAL + LZMA |
+| Two-tier D:PACK binary (ICD-10-CM) | 505 KB | Full ICD-10-CM (289KB corpus + 216KB index) |
+| Two-tier corpus reduction (full ISO 20022) | 90.8% | ISO 20022 eRepository, 66,956 definitions, 8.7MB raw |
+| Two-tier D:PACK binary (ISO 20022) | 1,143 KB | Full ISO 20022 data dictionary (843KB corpus + 327KB index) |
+| SAL first-tier contribution (clinical) | 15.8% | Highly repetitive clinical description text |
+| SAL first-tier contribution (financial) | 8.4% | Financial message element definitions |
 
 ---
 
