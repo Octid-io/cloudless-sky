@@ -1,6 +1,6 @@
 {
     "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-    "name": "io.github.octid-io/osmp",
+    "name": "io.github.Octid-io/osmp",
     "description": "Agentic AI instruction encoding. 60%+ compression. Inference-free decode. Any channel.",
     "repository": {
         "url": "https://github.com/octid-io/cloudless-sky",
