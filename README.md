@@ -58,6 +58,15 @@ Run it yourself. The numbers are real and independently reproducible across all 
 
 ## Quick Start
 
+### MCP Server (any AI client)
+```bash
+pip install osmp-mcp
+osmp-mcp
+```
+
+Installs the MCP server with both domain corpora (ICD-10-CM, ISO 20022) included. Connect from Claude Code (`claude mcp add osmp -- osmp-mcp`), Claude Desktop, Cursor, or any MCP-compatible client. Listed on the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.Octid-io/osmp`.
+
+### From source
 ```bash
 git clone https://github.com/octid-io/cloudless-sky
 cd cloudless-sky
@@ -65,11 +74,6 @@ python3 sdk/python/src/osmp.py
 ```
 
 No dependencies beyond Python standard library.
-
-### pip
-```bash
-pip install osmp-protocol
-```
 
 ### npm
 ```bash
@@ -85,13 +89,14 @@ import "github.com/octid-io/cloudless-sky/sdk/go/osmp"
 
 ## SDK Status
 
-All three SDKs are independently verified against the same 55-vector canonical test suite. Wire compatibility is confirmed: Python, TypeScript, and Go produce field-for-field identical decode results on 86 test instructions covering every namespace, every operator, and every edge case documented in the spec.
+All three SDKs are independently verified against the canonical test suite. Wire compatibility is confirmed: Python, TypeScript, and Go produce field-for-field identical decode results across every namespace, every operator, and every edge case documented in the spec. D:PACK/BLK resolve is verified across all 122,554 domain codes (74,719 ICD-10-CM + 47,835 ISO 20022) in all three SDKs.
 
 | SDK | Target | Conformance | Notes |
 |---|---|---|---|
-| **Python** | Reference implementation | CONFORMANT ✓ 60.8% | Single source of truth for all SDK behavior |
-| **TypeScript** | OpenClaw / web agent integrations | CONFORMANT ✓ 60.8% | `npm install osmp-protocol` |
-| **Go** | PicoClaw / constrained hardware | CONFORMANT ✓ 60.8% | ASD compiled-in; no filesystem or network dependency |
+| **Python** | Reference implementation | CONFORMANT | Single source of truth for all SDK behavior |
+| **TypeScript** | OpenClaw / web agent integrations | CONFORMANT | `fzstd` (82KB, pure JS, zero native deps) for D:PACK/BLK |
+| **Go** | PicoClaw / constrained hardware | CONFORMANT | ASD compiled-in; D:PACK/BLK via `klauspost/compress/zstd` (3.1MB binary) |
+| **MCP Server** | Any MCP-compatible AI client | `pip install osmp-mcp` | 4 tools: encode, decode, resolve, benchmark |
 
 ---
 
@@ -119,15 +124,15 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 
 ---
 
-## What Requires MDR or Future Work
-
-**MDR (Managed Dictionary Registry)** — not yet published. When published, MDR will map ICD-10 diagnosis codes, SNOMED CT concept identifiers, ISO 20022 financial instrument identifiers, and other open-ended registry values into compact SAL tokens, increasing first-tier compression density. The SDK is structurally ready for MDR deltas via `applyDelta()`. The extended mapping tables are not yet published.
+## What Requires Future Work
 
 **Overflow Protocol Tier 3** — DAG decomposition for instructions with conditional branches and dependency chains. Spec-defined and patent-covered; implementation is a contribution target.
 
 **FNP full handshake** — the two-message capability advertisement + acknowledgment protocol (≤40 bytes each, within LoRa MTU). Fingerprint computation is implemented; the handshake state machine is a contribution target.
 
 **C++ firmware-level OSMP nodes** — OSMP integration with Meshtastic via the Python SDK and Meshtastic Python library is operational today (see CONTRIBUTING.md). The C++ contribution target is a firmware-level encoder/decoder enabling ESP32 and nRF52 Meshtastic devices to operate as sovereign OSMP nodes without a companion device, with the ASD compiled into flash.
+
+**Additional MDR namespaces** — Two domain corpora are shipped (ICD-10-CM, ISO 20022). SNOMED CT, RxNorm, LOINC, and other open registries are future namespace targets.
 
 ---
 
@@ -241,21 +246,24 @@ The LLM's existing NL→structured output capability handles the translation. Th
 ```
 cloudless-sky/
   protocol/
-    spec/           ← OSMP-SPEC-v1.md -- authoritative protocol specification
-    grammar/        ← SAL-grammar.ebnf -- formal grammar (EBNF)
-    test-vectors/   ← canonical-test-vectors.json -- 55-vector conformance suite
+    spec/           <- OSMP-SPEC-v1.md -- authoritative protocol specification
+    grammar/        <- SAL-grammar.ebnf -- formal grammar (EBNF)
+    test-vectors/   <- canonical-test-vectors.json -- conformance suite
   sdk/
-    python/         ← Reference implementation (pip: osmp-protocol)
-    typescript/     ← OpenClaw/web SDK (npm: osmp-protocol)
-    go/             ← PicoClaw/constrained hardware SDK
+    python/         <- Reference implementation
+    typescript/     <- OpenClaw/web SDK (fzstd for D:PACK/BLK)
+    go/             <- PicoClaw/constrained hardware SDK
+  mcp/
+    server.py       <- MCP server (pip install osmp-mcp)
+    server.json     <- MCP Registry descriptor
   mdr/
-    icd10cm/        ← CMS FY2026 ICD-10-CM: source CSV, LZMA and BLK binaries
-    iso20022/       ← ISO 20022 eRepository: source CSVs, LZMA and BLK binaries
+    icd10cm/        <- CMS FY2026 ICD-10-CM: LZMA and BLK dict-free binaries
+    iso20022/       <- ISO 20022 eRepository: LZMA and BLK dict-free binaries
   tests/
-    tier1/          ← Unit tests per SDK (Python 122, TypeScript 112, Go 10)
-    tier2/          ← Cross-SDK wire compatibility (86-instruction corpus)
+    tier1/          <- Unit tests per SDK + D:PACK/BLK resolve tests
+    tier2/          <- Cross-SDK wire compatibility
   docs/
-    adr/            ← Architecture Decision Records
+    adr/            <- Architecture Decision Records
 ```
 
 ---
