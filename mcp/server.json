@@ -1,0 +1,20 @@
+{
+    "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+    "name": "io.github.octid-io/osmp",
+    "description": "Agentic AI instruction encoding. 60%+ compression. Inference-free decode. Any channel.",
+    "repository": {
+        "url": "https://github.com/octid-io/cloudless-sky",
+        "source": "github"
+    },
+    "version": "1.0.0",
+    "packages": [
+        {
+            "registryType": "pip",
+            "identifier": "osmp-mcp",
+            "version": "1.0.0",
+            "transport": {
+                "type": "stdio"
+            }
+        }
+    ]
+}
