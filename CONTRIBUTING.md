@@ -61,7 +61,7 @@ D:PACK is the two-tier corpus compression system. The first tier applies SAL enc
 
 **D:PACK/LZMA** -- Full-corpus decompression at node startup. Requires multi-MB SRAM. Suitable for companion devices (phones, laptops, servers). Legacy profile.
 
-**D:PACK/BLK** -- Block-level random access using zstd with trained dictionary. Resolves a single code by decompressing one ~32KB block. Peak SRAM: ~38KB. Suitable for ESP32-class microcontrollers. Active profile.
+**D:PACK/BLK** -- Block-level random access using zstd, dict-free. Resolves a single code by decompressing one ~32KB block. Peak SRAM: ~38KB. Suitable for ESP32-class microcontrollers. Active profile. Dict-free format is universal across all three SDKs (Python, TypeScript, Go).
 
 Both profiles produce binaries stored in `mdr/` subdirectories.
 
@@ -88,7 +88,7 @@ Header (24 bytes): magic "DBLK" (4) + version u16 BE (2) + flags u16 BE (2, bit 
 
 Block table (block_count * 44 bytes): first code (32 bytes, null-padded UTF-8) + block offset u32 BE (4, relative to blocks section) + compressed size u32 BE (4) + entry count u16 BE (2) + reserved (2).
 
-Dictionary section (optional, default 32KB trained zstd dictionary).
+Dictionary section (optional, supported by format but not used in shipped binaries; dict-free is the universal format).
 
 Block data section (concatenated zstd-compressed blocks).
 
@@ -110,16 +110,16 @@ All numbers measured from source artifacts with zero round-trip errors:
 
 | Corpus | Entries | Raw | BLK Binary | Reduction |
 |---|---|---|---|---|
-| ICD-10-CM (H:ICD) | 74,719 | 5.4 MB | 473 KB | 91.5% |
-| ISO 20022 (K:ISO) | 47,835 | 8.7 MB | 1,041 KB | 88.3% |
+| ICD-10-CM (H:ICD) | 74,719 | 5.4 MB | 477 KB | 91.4% |
+| ISO 20022 (K:ISO) | 47,835 | 8.7 MB | 1,207 KB | 86.5% |
 
 ---
 
 ## What We Need Most
 
-### D:PACK/BLK Resolve for TypeScript and Go -- high priority
+### D:PACK/BLK Resolve for TypeScript and Go -- shipped
 
-Read-only DBLK binary resolution. Parse the header, binary search the block table, decompress one zstd block, return the SAL text for a given key. The Python `BlockCompressor.resolve()` method is the reference. TypeScript target: `fzstd` or WASM zstd binding. Go target: `github.com/klauspost/compress/zstd`. Pack (write) stays Python-only.
+Read-only DBLK binary resolution is implemented and verified across all 122,554 codes (74,719 ICD-10-CM + 47,835 ISO 20022) in all three SDKs. TypeScript uses `fzstd` (82KB, pure JS, zero native deps). Go uses `github.com/klauspost/compress/zstd` (decode-only, 3.1MB compiled binary). Dict-free binaries only in the TypeScript path; Go supports both. Pack (write) stays Python-only. Tier 1 unit tests: `tests/tier1/test_dpack.ts` and `tests/tier1/dpack_test.go` (14 hardcoded codes).
 
 ### C++ Firmware-Level Encoder/Decoder -- highest priority
 
