@@ -1,7 +1,5 @@
 name: Publish to MCP Registry
-        run: |
-          cp mcp/server.json server.json
-          ./mcp-publisher publish
+
 on:
   workflow_dispatch:
 
@@ -17,20 +15,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Debug - list files
-        run: |
-          pwd
-          ls -la mcp/
-
       - name: Download MCP Publisher
         run: |
           curl -L "https://github.com/modelcontextprotocol/registry/releases/download/v1.5.0/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
 
       - name: Validate server.json
-        run: ./mcp-publisher validate --file mcp/server.json
+        run: |
+          cp mcp/server.json server.json
+          ./mcp-publisher validate
 
       - name: Authenticate with MCP Registry
         run: ./mcp-publisher login github-oidc
 
       - name: Publish to MCP Registry
-        run: ./mcp-publisher publish --file mcp/server.json
+        run: ./mcp-publisher publish
