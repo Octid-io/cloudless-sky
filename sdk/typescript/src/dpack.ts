@@ -23,9 +23,7 @@ const DBLK_MAGIC = 0x44424c4b; // "DBLK"
 const DBLK_HEADER_SIZE = 24;
 const DBLK_FIRST_CODE_SIZE = 32;
 const DBLK_BTABLE_ENTRY_SIZE = 44; // 32 + 4 + 4 + 2 + 2
-// fzstd auto-sizes the output buffer when no second argument is passed.
-// Do NOT pass a pre-allocated Uint8Array — fzstd returns the full buffer
-// including trailing null bytes, which corrupts line parsing.
+const MAX_DECOMPRESS_SIZE = 40960; // 32KB target + 8KB headroom
 
 // ── types ───────────────────────────────────────────────────────────
 
