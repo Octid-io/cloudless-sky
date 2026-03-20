@@ -676,6 +676,296 @@ class AdaptiveSharedDictionary:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# FRAME NEGOTIATION PROTOCOL (FNP) — Session Handshake State Machine
+#
+# Two-message capability advertisement + acknowledgment completing within
+# 80 bytes total (40 + 38), designed for LoRa physical layer payload floor.
+#
+# Wire format:
+#
+#   FNP_ADV (Capability Advertisement, 40 bytes):
+#     msg_type           1B   0x01
+#     protocol_version   1B   0x01
+#     fingerprint        8B   first 8 bytes of SHA-256(ASD content)
+#     asd_version        u16  BE
+#     namespace_bitmap   u32  BE (bit 0=A .. bit 25=Z, bit 26=Omega)
+#     channel_capacity   1B   0x00=51B floor, 0x01=255B, 0x02=512B, 0x03=unconstrained
+#     node_id           23B   null-padded UTF-8
+#
+#   FNP_ACK (Capability Acknowledgment, 38 bytes):
+#     msg_type           1B   0x02 (ACK) or 0x03 (NACK)
+#     match_status       1B   0x00=exact, 0x01=version_mismatch,
+#                             0x02=fingerprint_mismatch
+#     echo_fingerprint   8B   fingerprint from received ADV
+#     own_fingerprint    8B   responder's own fingerprint
+#     common_namespaces  u32  BE (intersection of both bitmaps)
+#     neg_capacity       1B   negotiated capacity = min(adv, own)
+#     node_id           15B   null-padded UTF-8
+#
+# Channel capacity negotiation: the session byte budget is the minimum
+# of what both nodes declare.  BAEL selects encoding mode within this
+# budget for every subsequent instruction.  This ensures the session
+# scales within the lowest-capability link in the mesh path.
+#
+# State machine:
+#   IDLE -> initiate() -> ADV_SENT
+#   ADV_SENT -> receive ACK (match) -> ESTABLISHED
+#   ADV_SENT -> receive ACK (mismatch) -> SYNC_NEEDED
+#   ADV_SENT -> timeout -> IDLE
+#   IDLE -> receive ADV -> send ACK -> ESTABLISHED or SYNC_NEEDED
+#
+# Patent ref: OSMP-001-UTIL Section II.C, FIG. 5
+# ─────────────────────────────────────────────────────────────────────────────
+
+FNP_MSG_ADV  = 0x01
+FNP_MSG_ACK  = 0x02
+FNP_MSG_NACK = 0x03
+
+FNP_MATCH_EXACT       = 0x00
+FNP_MATCH_VERSION     = 0x01
+FNP_MATCH_FINGERPRINT = 0x02
+
+# Channel capacity classes
+FNP_CAP_FLOOR        = 0x00  # 51 bytes (LoRa SF12 BW125kHz)
+FNP_CAP_STANDARD     = 0x01  # 255 bytes (LoRa SF11 BW250kHz / Meshtastic LongFast)
+FNP_CAP_BLE          = 0x02  # 512 bytes (BLE)
+FNP_CAP_UNCONSTRAINED = 0x03  # no limit (WiFi, HTTP, cloud)
+
+FNP_CAP_BYTES = {
+    FNP_CAP_FLOOR: 51,
+    FNP_CAP_STANDARD: 255,
+    FNP_CAP_BLE: 512,
+    FNP_CAP_UNCONSTRAINED: 0,  # 0 = no limit
+}
+
+FNP_ADV_SIZE = 40
+FNP_ACK_SIZE = 38
+FNP_PROTOCOL_VERSION = 0x01
+
+# Namespace bitmap: bit position = ord(letter) - ord('A'), bit 26 = Omega
+_NS_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def _namespace_bitmap(namespaces: list[str]) -> int:
+    """Encode a list of namespace prefixes as a 32-bit bitmap."""
+    bitmap = 0
+    for ns in namespaces:
+        if len(ns) == 1 and ns in _NS_LETTERS:
+            bitmap |= 1 << (_NS_LETTERS.index(ns))
+        elif ns == "\u03A9":  # Omega
+            bitmap |= 1 << 26
+    return bitmap
+
+
+def _bitmap_to_namespaces(bitmap: int) -> list[str]:
+    """Decode a 32-bit bitmap to a sorted list of namespace prefixes."""
+    result = []
+    for i, letter in enumerate(_NS_LETTERS):
+        if bitmap & (1 << i):
+            result.append(letter)
+    if bitmap & (1 << 26):
+        result.append("\u03A9")
+    return result
+
+
+def _fingerprint_bytes(asd: AdaptiveSharedDictionary) -> bytes:
+    """Return the first 8 bytes of the ASD SHA-256 digest (binary)."""
+    content = json.dumps(asd._data, sort_keys=True).encode()
+    return hashlib.sha256(content).digest()[:8]
+
+
+class FNPSession:
+    """FNP session handshake state machine.
+
+    Manages the two-message capability advertisement and acknowledgment
+    exchange between two sovereign nodes.  After a successful handshake,
+    provides the negotiated session state: whether dictionaries match,
+    which namespaces are shared, and the remote node's identity.
+
+    Usage (initiator):
+        session = FNPSession(asd, "NODE_A")
+        adv_packet = session.initiate()
+        # ... transmit adv_packet, receive ack_packet ...
+        session.receive(ack_packet)
+        assert session.state == "ESTABLISHED"
+
+    Usage (responder):
+        session = FNPSession(asd, "NODE_B")
+        ack_packet = session.receive(adv_packet)
+        # ... transmit ack_packet ...
+        assert session.state == "ESTABLISHED"
+    """
+
+    def __init__(self, asd: AdaptiveSharedDictionary, node_id: str,
+                 asd_version: int = 1,
+                 channel_capacity: int = FNP_CAP_FLOOR):
+        self.asd = asd
+        self.node_id = node_id
+        self.asd_version = asd_version
+        self.channel_capacity = channel_capacity
+        self.state = "IDLE"
+        self.remote_node_id: str | None = None
+        self.remote_fingerprint: bytes | None = None
+        self.common_namespaces: list[str] | None = None
+        self.match_status: int | None = None
+        self.negotiated_capacity: int | None = None
+        self._own_fp = _fingerprint_bytes(asd)
+        self._own_bitmap = _namespace_bitmap(asd.namespaces())
+
+    # ── packet construction ──────────────────────────────────────────
+
+    def _build_adv(self) -> bytes:
+        """Build a 40-byte FNP_ADV packet."""
+        buf = bytearray(FNP_ADV_SIZE)
+        buf[0] = FNP_MSG_ADV
+        buf[1] = FNP_PROTOCOL_VERSION
+        buf[2:10] = self._own_fp
+        struct.pack_into(">H", buf, 10, self.asd_version)
+        struct.pack_into(">I", buf, 12, self._own_bitmap)
+        buf[16] = self.channel_capacity
+        nid = self.node_id.encode("utf-8")[:23]
+        buf[17 : 17 + len(nid)] = nid
+        return bytes(buf)
+
+    def _build_ack(self, remote_fp: bytes, match: int,
+                   common_bitmap: int, neg_cap: int) -> bytes:
+        """Build a 38-byte FNP_ACK packet."""
+        buf = bytearray(FNP_ACK_SIZE)
+        msg_type = FNP_MSG_ACK if match == FNP_MATCH_EXACT else FNP_MSG_NACK
+        buf[0] = msg_type
+        buf[1] = match
+        buf[2:10] = remote_fp
+        buf[10:18] = self._own_fp
+        struct.pack_into(">I", buf, 18, common_bitmap)
+        buf[22] = neg_cap
+        nid = self.node_id.encode("utf-8")[:15]
+        buf[23 : 23 + len(nid)] = nid
+        return bytes(buf)
+
+    # ── packet parsing ───────────────────────────────────────────────
+
+    @staticmethod
+    def _parse_adv(data: bytes) -> dict:
+        if len(data) < FNP_ADV_SIZE or data[0] != FNP_MSG_ADV:
+            raise ValueError("Invalid FNP_ADV packet")
+        return {
+            "protocol_version": data[1],
+            "fingerprint": bytes(data[2:10]),
+            "asd_version": struct.unpack(">H", data[10:12])[0],
+            "namespace_bitmap": struct.unpack(">I", data[12:16])[0],
+            "channel_capacity": data[16],
+            "node_id": data[17:40].rstrip(b"\x00").decode("utf-8"),
+        }
+
+    @staticmethod
+    def _parse_ack(data: bytes) -> dict:
+        if len(data) < FNP_ACK_SIZE or data[0] not in (FNP_MSG_ACK, FNP_MSG_NACK):
+            raise ValueError("Invalid FNP_ACK packet")
+        return {
+            "msg_type": data[0],
+            "match_status": data[1],
+            "echo_fingerprint": bytes(data[2:10]),
+            "own_fingerprint": bytes(data[10:18]),
+            "common_bitmap": struct.unpack(">I", data[18:22])[0],
+            "negotiated_capacity": data[22],
+            "node_id": data[23:38].rstrip(b"\x00").decode("utf-8"),
+        }
+
+    # ── state machine ────────────────────────────────────────────────
+
+    def initiate(self) -> bytes:
+        """Start a handshake by building and returning an FNP_ADV packet.
+
+        Transitions: IDLE -> ADV_SENT
+
+        Returns
+        -------
+        bytes : 40-byte FNP_ADV packet ready for transmission.
+        """
+        if self.state != "IDLE":
+            raise RuntimeError(f"Cannot initiate from state {self.state}")
+        self.state = "ADV_SENT"
+        return self._build_adv()
+
+    def receive(self, data: bytes) -> bytes | None:
+        """Process a received FNP packet.
+
+        If IDLE and an ADV is received, computes match status and returns
+        an ACK packet for transmission.  Transitions to ESTABLISHED or
+        SYNC_NEEDED.
+
+        If ADV_SENT and an ACK is received, reads the match result.
+        Transitions to ESTABLISHED or SYNC_NEEDED.  Returns None.
+
+        Parameters
+        ----------
+        data : bytes, received packet (40 bytes for ADV, 38 for ACK).
+
+        Returns
+        -------
+        bytes or None : ACK packet to transmit (when responding to ADV),
+                        or None (when processing a received ACK).
+        """
+        msg_type = data[0]
+
+        if msg_type == FNP_MSG_ADV and self.state == "IDLE":
+            adv = self._parse_adv(data)
+            self.remote_node_id = adv["node_id"]
+            self.remote_fingerprint = adv["fingerprint"]
+
+            # determine match status
+            if adv["fingerprint"] == self._own_fp:
+                if adv["asd_version"] == self.asd_version:
+                    match = FNP_MATCH_EXACT
+                else:
+                    match = FNP_MATCH_VERSION
+            else:
+                match = FNP_MATCH_FINGERPRINT
+
+            common = self._own_bitmap & adv["namespace_bitmap"]
+            self.common_namespaces = _bitmap_to_namespaces(common)
+            self.match_status = match
+
+            # negotiate capacity: LCD of both nodes
+            # lower class = fewer bytes = more constrained
+            neg_cap = min(adv["channel_capacity"], self.channel_capacity)
+            self.negotiated_capacity = neg_cap
+
+            self.state = "ESTABLISHED" if match == FNP_MATCH_EXACT else "SYNC_NEEDED"
+            return self._build_ack(adv["fingerprint"], match, common, neg_cap)
+
+        if msg_type in (FNP_MSG_ACK, FNP_MSG_NACK) and self.state == "ADV_SENT":
+            ack = self._parse_ack(data)
+
+            # verify echo fingerprint matches our own
+            if ack["echo_fingerprint"] != self._own_fp:
+                raise ValueError("FNP_ACK echo fingerprint mismatch")
+
+            self.remote_node_id = ack["node_id"]
+            self.remote_fingerprint = ack["own_fingerprint"]
+            self.common_namespaces = _bitmap_to_namespaces(ack["common_bitmap"])
+            self.match_status = ack["match_status"]
+            self.negotiated_capacity = ack["negotiated_capacity"]
+            self.state = ("ESTABLISHED" if ack["match_status"] == FNP_MATCH_EXACT
+                          else "SYNC_NEEDED")
+            return None
+
+        raise ValueError(
+            f"Unexpected msg_type 0x{msg_type:02x} in state {self.state}"
+        )
+
+    def timeout(self) -> None:
+        """Handle handshake timeout.  Transitions ADV_SENT -> IDLE."""
+        if self.state == "ADV_SENT":
+            self.state = "IDLE"
+            self.remote_node_id = None
+            self.remote_fingerprint = None
+            self.common_namespaces = None
+            self.match_status = None
+            self.negotiated_capacity = None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # SAL ENCODER
 # ─────────────────────────────────────────────────────────────────────────────
 
