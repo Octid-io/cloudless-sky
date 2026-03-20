@@ -241,13 +241,16 @@ The LLM's existing NL→structured output capability handles the translation. Th
 ```
 cloudless-sky/
   protocol/
-    spec/           ← OSMP-SPEC-v1.md — authoritative protocol specification
-    grammar/        ← SAL-grammar.ebnf — formal grammar (EBNF)
-    test-vectors/   ← canonical-test-vectors.json — 55-vector conformance suite
+    spec/           ← OSMP-SPEC-v1.md -- authoritative protocol specification
+    grammar/        ← SAL-grammar.ebnf -- formal grammar (EBNF)
+    test-vectors/   ← canonical-test-vectors.json -- 55-vector conformance suite
   sdk/
     python/         ← Reference implementation (pip: osmp-protocol)
     typescript/     ← OpenClaw/web SDK (npm: osmp-protocol)
     go/             ← PicoClaw/constrained hardware SDK
+  mdr/
+    icd10cm/        ← CMS FY2026 ICD-10-CM: source CSV, LZMA and BLK binaries
+    iso20022/       ← ISO 20022 eRepository: source CSVs, LZMA and BLK binaries
   tests/
     tier1/          ← Unit tests per SDK (Python 122, TypeScript 112, Go 10)
     tier2/          ← Cross-SDK wire compatibility (86-instruction corpus)

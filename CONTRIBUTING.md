@@ -55,7 +55,71 @@ This is a different and more advanced deployment scenario. It requires a C++ OSM
 
 ---
 
+## D:PACK Corpus Compression
+
+D:PACK is the two-tier corpus compression system. The first tier applies SAL encoding to domain text. The second tier applies lossless dictionary-based compression to the SAL output. Two profiles exist:
+
+**D:PACK/LZMA** -- Full-corpus decompression at node startup. Requires multi-MB SRAM. Suitable for companion devices (phones, laptops, servers). Legacy profile.
+
+**D:PACK/BLK** -- Block-level random access using zstd with trained dictionary. Resolves a single code by decompressing one ~32KB block. Peak SRAM: ~38KB. Suitable for ESP32-class microcontrollers. Active profile.
+
+Both profiles produce binaries stored in `mdr/` subdirectories.
+
+### MDR Directory Structure
+
+```
+mdr/
+  icd10cm/
+    MDR-ICD10CM-FY2026.csv            Source: CMS FY2026 code descriptions
+    MDR-ICD10CM-FY2026.dpack          LZMA profile (legacy)
+    MDR-ICD10CM-FY2026-blk.dpack      BLK profile (active)
+  iso20022/
+    MDR-ISO20022-DEFINITIONS-FULL.csv  Source: ISO 20022 eRepository extraction
+    MDR-ISO20022-MSG-FULL.csv          Source: message type catalog
+    MDR-ISO20022-K-ISO.dpack           LZMA profile (legacy)
+    MDR-ISO20022-K-ISO-blk.dpack       BLK profile (active)
+```
+
+### DBLK Binary Format (v1)
+
+The BLK profile uses the following binary layout. Implementations that read DBLK files must handle this format exactly.
+
+Header (24 bytes): magic "DBLK" (4) + version u16 BE (2) + flags u16 BE (2, bit 0 = has trained dictionary) + block count u32 BE (4) + dictionary offset u32 BE (4) + dictionary size u32 BE (4) + blocks offset u32 BE (4).
+
+Block table (block_count * 44 bytes): first code (32 bytes, null-padded UTF-8) + block offset u32 BE (4, relative to blocks section) + compressed size u32 BE (4) + entry count u16 BE (2) + reserved (2).
+
+Dictionary section (optional, default 32KB trained zstd dictionary).
+
+Block data section (concatenated zstd-compressed blocks).
+
+Each decompressed block contains sorted lines: `KEY\tVALUE\n`. Resolution path: binary search block table by first_code, decompress one block, linear scan for target key. When the first_code field truncates a long key (>32 bytes), the binary search may overshoot by one block; implementations must check the previous block as a fallback.
+
+### SDK D:PACK Status
+
+| SDK | Pack (write) | Resolve (read) | Class |
+|---|---|---|---|
+| **Python** | Yes | Yes | `BlockCompressor` in `osmp.py` |
+| **TypeScript** | No | Contribution target | -- |
+| **Go** | No | Contribution target | -- |
+
+Pack (building DBLK binaries from source CSVs) is Python-only. Resolve (reading a single code from a DBLK binary) is the useful operation for deployed nodes and should be implemented in all SDKs. The Python `BlockCompressor` class is the reference implementation.
+
+### D:PACK/BLK Verified Numbers
+
+All numbers measured from source artifacts with zero round-trip errors:
+
+| Corpus | Entries | Raw | BLK Binary | Reduction |
+|---|---|---|---|---|
+| ICD-10-CM (H:ICD) | 74,719 | 5.4 MB | 473 KB | 91.5% |
+| ISO 20022 (K:ISO) | 47,835 | 8.7 MB | 1,041 KB | 88.3% |
+
+---
+
 ## What We Need Most
+
+### D:PACK/BLK Resolve for TypeScript and Go -- high priority
+
+Read-only DBLK binary resolution. Parse the header, binary search the block table, decompress one zstd block, return the SAL text for a given key. The Python `BlockCompressor.resolve()` method is the reference. TypeScript target: `fzstd` or WASM zstd binding. Go target: `github.com/klauspost/compress/zstd`. Pack (write) stays Python-only.
 
 ### C++ Firmware-Level Encoder/Decoder -- highest priority
 
@@ -147,6 +211,9 @@ UTF-8 byte counts for glyphs vary. Do not assume one character = one byte.
 Note: ¬ (U+00AC NOT SIGN) is 2 UTF-8 bytes (0xC2 0xAC). Earlier versions of this document incorrectly listed it as 3-byte.
 1-byte glyphs: @ > ~ * : ; ? +  
 Use `Buffer.byteLength(str, 'utf8')` in TypeScript, `len(str.encode('utf-8'))` in Python.
+
+**D:PACK/BLK block table binary search truncation fallback**  
+The block table first_code field is 32 bytes. Keys longer than 32 bytes are truncated in the block table. When two adjacent blocks share a 32-byte prefix (common in ISO 20022 with long type names like `AcceptorCompletionAdviceResponse`), the binary search may land one block too far. If the target key is not found in the candidate block, check the previous block before returning not-found. The Python reference implements this in `BlockCompressor.resolve()`.
 
 ---
 
