@@ -9,7 +9,7 @@
     "version": "1.0.0",
     "packages": [
         {
-            "registryType": "pip",
+            "registryType": "pypi",
             "identifier": "osmp-mcp",
             "version": "1.0.0",
             "transport": {
