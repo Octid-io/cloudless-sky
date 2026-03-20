@@ -21,6 +21,12 @@ from enum import Enum, auto
 from pathlib import Path
 from typing import Iterator
 
+try:
+    import zstandard as zstd
+    _HAS_ZSTD = True
+except ImportError:
+    _HAS_ZSTD = False
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # GLYPH OPERATOR TABLE — Category 1 (18 operators)
@@ -987,6 +993,283 @@ class TwoTierCompressor:
     def compression_ratio(self, original: str, compressed: bytes) -> float:
         orig_b = len(original.encode("utf-8"))
         return 0.0 if orig_b == 0 else 1.0 - (len(compressed) / orig_b)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BLOCK COMPRESSOR — D:PACK/BLK profile (zstd, random-access, MCU target)
+#
+# Binary format: DBLK v1
+#   Header (24 bytes):
+#     magic         4B   "DBLK"
+#     version       u16  BE, currently 1
+#     flags         u16  BE, bit 0 = has trained dictionary
+#     block_count   u32  BE
+#     dict_offset   u32  BE, byte offset from file start
+#     dict_size     u32  BE, 0 if no dictionary
+#     blocks_offset u32  BE, byte offset to start of compressed block data
+#   Block table (block_count * 44 bytes, immediately after header):
+#     first_code    32B  null-padded UTF-8, first entry key in block
+#     block_offset  u32  BE, relative to blocks_offset
+#     block_csize   u32  BE, compressed size in bytes
+#     entry_count   u16  BE
+#     reserved      2B   zero
+#   Dictionary section (dict_size bytes)
+#   Block data section (concatenated compressed blocks)
+#
+# Each decompressed block contains sorted lines: "MDR_TOKEN\tSAL_TEXT\n"
+# Resolution path:
+#   1. Binary search block table by first_code
+#   2. Read + decompress one block from flash
+#   3. Linear scan within block for target code
+#   4. Return SAL text
+#
+# Target: ESP32 class (520KB SRAM, 4-16MB flash)
+# Peak decompression memory: ~38KB per block (one block at a time)
+# ─────────────────────────────────────────────────────────────────────────────
+
+DBLK_MAGIC = b"DBLK"
+DBLK_VERSION = 1
+DBLK_HEADER_SIZE = 24
+DBLK_BTABLE_ENTRY_SIZE = 44
+DBLK_FIRST_CODE_SIZE = 32
+DBLK_DEFAULT_BLOCK_TARGET = 32 * 1024  # 32KB decompressed target
+DBLK_ZSTD_LEVEL = 19
+DBLK_DICT_SIZE = 32768
+
+
+class BlockCompressor:
+    """D:PACK/BLK profile: zstd block-level compression with random access.
+
+    Designed for microcontroller targets where full-corpus decompression
+    (as required by the LZMA profile) exceeds available SRAM.  Each code
+    resolves by decompressing a single ~32KB block.
+    """
+
+    def __init__(
+        self,
+        block_target: int = DBLK_DEFAULT_BLOCK_TARGET,
+        zstd_level: int = DBLK_ZSTD_LEVEL,
+        dict_size: int = DBLK_DICT_SIZE,
+        use_dict: bool = True,
+    ):
+        if not _HAS_ZSTD:
+            raise ImportError(
+                "zstandard package required for D:PACK/BLK profile. "
+                "Install with: pip install zstandard"
+            )
+        self.block_target = block_target
+        self.zstd_level = zstd_level
+        self.dict_size_target = dict_size
+        self.use_dict = use_dict
+
+    # ── packing ──────────────────────────────────────────────────────────
+
+    def pack(
+        self,
+        entries: list[tuple[str, str]],
+    ) -> bytes:
+        """Pack sorted (mdr_token, sal_text) entries into a DBLK binary.
+
+        Parameters
+        ----------
+        entries : list of (mdr_token, sal_text) tuples, sorted by mdr_token.
+
+        Returns
+        -------
+        bytes : complete DBLK binary.
+        """
+        # ── partition into blocks ────────────────────────────────────────
+        blocks: list[list[tuple[str, str]]] = []
+        current: list[tuple[str, str]] = []
+        current_size = 0
+        for code, sal in entries:
+            entry_bytes = len(sal.encode("utf-8"))
+            if current_size + entry_bytes > self.block_target and current:
+                blocks.append(current[:])
+                current = []
+                current_size = 0
+            current.append((code, sal))
+            current_size += entry_bytes
+        if current:
+            blocks.append(current)
+
+        # ── build raw block payloads ─────────────────────────────────────
+        raw_payloads: list[bytes] = []
+        for block_entries in blocks:
+            lines = [f"{code}\t{sal}" for code, sal in block_entries]
+            raw_payloads.append("\n".join(lines).encode("utf-8"))
+
+        # ── train dictionary (optional) ──────────────────────────────────
+        dict_data = None
+        dict_bytes = b""
+        if self.use_dict and len(raw_payloads) > 1:
+            dict_data = zstd.train_dictionary(
+                self.dict_size_target, raw_payloads
+            )
+            dict_bytes = dict_data.as_bytes()
+
+        # ── compress blocks ──────────────────────────────────────────────
+        cctx = zstd.ZstdCompressor(
+            level=self.zstd_level,
+            dict_data=dict_data,
+        )
+        compressed_payloads: list[bytes] = []
+        for raw in raw_payloads:
+            compressed_payloads.append(cctx.compress(raw))
+
+        # ── assemble binary ──────────────────────────────────────────────
+        block_count = len(blocks)
+        btable_size = block_count * DBLK_BTABLE_ENTRY_SIZE
+        dict_offset = DBLK_HEADER_SIZE + btable_size
+        blocks_offset = dict_offset + len(dict_bytes)
+
+        # header
+        hdr = bytearray()
+        hdr += DBLK_MAGIC
+        hdr += struct.pack(">H", DBLK_VERSION)
+        hdr += struct.pack(">H", 1 if dict_bytes else 0)  # flags
+        hdr += struct.pack(">I", block_count)
+        hdr += struct.pack(">I", dict_offset)
+        hdr += struct.pack(">I", len(dict_bytes))
+        hdr += struct.pack(">I", blocks_offset)
+
+        # block table
+        btable = bytearray()
+        blk_offset = 0
+        for i, block_entries in enumerate(blocks):
+            fc = block_entries[0][0].encode("utf-8")[:DBLK_FIRST_CODE_SIZE].ljust(
+                DBLK_FIRST_CODE_SIZE, b"\x00"
+            )
+            btable += fc
+            btable += struct.pack(">I", blk_offset)
+            btable += struct.pack(">I", len(compressed_payloads[i]))
+            btable += struct.pack(">H", len(block_entries))
+            btable += b"\x00\x00"
+            blk_offset += len(compressed_payloads[i])
+
+        return bytes(hdr) + bytes(btable) + dict_bytes + b"".join(
+            compressed_payloads
+        )
+
+    # ── unpacking / single-code resolution ───────────────────────────────
+
+    @staticmethod
+    def _parse_header(data: bytes) -> dict:
+        if data[:4] != DBLK_MAGIC:
+            raise ValueError("Not a DBLK binary (bad magic)")
+        return {
+            "version": struct.unpack(">H", data[4:6])[0],
+            "flags": struct.unpack(">H", data[6:8])[0],
+            "block_count": struct.unpack(">I", data[8:12])[0],
+            "dict_offset": struct.unpack(">I", data[12:16])[0],
+            "dict_size": struct.unpack(">I", data[16:20])[0],
+            "blocks_offset": struct.unpack(">I", data[20:24])[0],
+        }
+
+    @staticmethod
+    def _find_block(data: bytes, hdr: dict, code: str) -> int:
+        """Binary search block table, return block index."""
+        code_b = code.encode("utf-8")
+        lo, hi = 0, hdr["block_count"] - 1
+        result = 0
+        while lo <= hi:
+            mid = (lo + hi) // 2
+            off = DBLK_HEADER_SIZE + mid * DBLK_BTABLE_ENTRY_SIZE
+            fc = data[off : off + DBLK_FIRST_CODE_SIZE].rstrip(b"\x00")
+            if fc <= code_b:
+                result = mid
+                lo = mid + 1
+            else:
+                hi = mid - 1
+        return result
+
+    def _decompress_block(self, data: bytes, hdr: dict, blk_idx: int) -> bytes:
+        """Decompress a single block by index."""
+        entry_off = DBLK_HEADER_SIZE + blk_idx * DBLK_BTABLE_ENTRY_SIZE
+        fc_end = DBLK_FIRST_CODE_SIZE
+        blk_offset = struct.unpack(">I", data[entry_off + fc_end : entry_off + fc_end + 4])[0]
+        blk_csize = struct.unpack(">I", data[entry_off + fc_end + 4 : entry_off + fc_end + 8])[0]
+
+        dict_data = None
+        if hdr["flags"] & 1 and hdr["dict_size"] > 0:
+            db = data[hdr["dict_offset"] : hdr["dict_offset"] + hdr["dict_size"]]
+            dict_data = zstd.ZstdCompressionDict(db)
+
+        dctx = zstd.ZstdDecompressor(dict_data=dict_data)
+        start = hdr["blocks_offset"] + blk_offset
+        return dctx.decompress(
+            data[start : start + blk_csize],
+            max_output_size=self.block_target + 8192,
+        )
+
+    @staticmethod
+    def _search_block(raw: bytes, code: str) -> str | None:
+        """Linear scan a decompressed block for a code."""
+        for line in raw.decode("utf-8").split("\n"):
+            parts = line.split("\t", 1)
+            if len(parts) == 2 and parts[0] == code:
+                return parts[1]
+        return None
+
+    def resolve(self, data: bytes, code: str) -> str | None:
+        """Resolve a single MDR token to SAL text from a DBLK binary.
+
+        Decompresses only the block containing the target code.
+        When the block table first_code field truncates a long key,
+        the binary search may overshoot by one block; if the code
+        is not found in the candidate block, the previous block is
+        checked before returning None.
+
+        Parameters
+        ----------
+        data : bytes, the complete DBLK binary (or a memoryview/mmap).
+        code : str, the MDR token to look up.
+
+        Returns
+        -------
+        str or None : SAL description text, or None if not found.
+        """
+        hdr = self._parse_header(data)
+        blk_idx = self._find_block(data, hdr, code)
+
+        raw = self._decompress_block(data, hdr, blk_idx)
+        result = self._search_block(raw, code)
+        if result is not None:
+            return result
+
+        # Truncation fallback: try previous block
+        if blk_idx > 0:
+            raw = self._decompress_block(data, hdr, blk_idx - 1)
+            return self._search_block(raw, code)
+        return None
+
+    def unpack_all(self, data: bytes) -> dict[str, str]:
+        """Decompress all blocks and return full {mdr_token: sal_text} dict."""
+        hdr = self._parse_header(data)
+        result: dict[str, str] = {}
+
+        for i in range(hdr["block_count"]):
+            raw = self._decompress_block(data, hdr, i)
+            for line in raw.decode("utf-8").split("\n"):
+                parts = line.split("\t", 1)
+                if len(parts) == 2:
+                    result[parts[0]] = parts[1]
+        return result
+
+    def stats(self, data: bytes) -> dict:
+        """Return structural statistics for a DBLK binary."""
+        hdr = self._parse_header(data)
+        btable_bytes = hdr["block_count"] * DBLK_BTABLE_ENTRY_SIZE
+        block_data_size = len(data) - hdr["blocks_offset"]
+        return {
+            "total_bytes": len(data),
+            "header_bytes": DBLK_HEADER_SIZE,
+            "btable_bytes": btable_bytes,
+            "dict_bytes": hdr["dict_size"],
+            "block_data_bytes": block_data_size,
+            "block_count": hdr["block_count"],
+            "block_target": self.block_target,
+        }
 
 
 # ─────────────────────────────────────────────────────────────────────────────
