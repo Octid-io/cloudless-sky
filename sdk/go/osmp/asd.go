@@ -2,7 +2,6 @@ package osmp
 
 import (
 	"crypto/sha256"
-	"encoding/json"
 	"fmt"
 	"sort"
 )
@@ -77,15 +76,63 @@ func (d *AdaptiveSharedDictionary) ApplyDelta(ns, op, def string, mode DictUpdat
 }
 
 func (d *AdaptiveSharedDictionary) Fingerprint() string {
-	type kv struct{ K string; V map[string]string }
-	keys := make([]string, 0, len(d.data))
-	for k := range d.data { keys = append(keys, k) }
-	sort.Strings(keys)
-	rows := make([]kv, len(keys))
-	for i, k := range keys { rows[i] = kv{K: k, V: d.data[k]} }
-	b, _ := json.Marshal(rows)
+	b := d.CanonicalJSON()
 	sum := sha256.Sum256(b)
 	return fmt.Sprintf("%x", sum[:8])
+}
+
+// CanonicalJSON returns the ASD serialized to match Python's
+// json.dumps(data, sort_keys=True, ensure_ascii=True).
+// Uses ", " and ": " separators; escapes non-ASCII to \uXXXX.
+// Required for cross-SDK FNP fingerprint wire compatibility.
+func (d *AdaptiveSharedDictionary) CanonicalJSON() []byte {
+	nsList := d.Namespaces()
+	var buf []byte
+	buf = append(buf, '{')
+	for i, ns := range nsList {
+		if i > 0 {
+			buf = append(buf, ',', ' ')
+		}
+		buf = pyQuoteGo(ns, &buf)
+		buf = append(buf, ':', ' ')
+		ops := make([]string, 0, len(d.data[ns]))
+		for op := range d.data[ns] {
+			ops = append(ops, op)
+		}
+		sort.Strings(ops)
+		buf = append(buf, '{')
+		for j, op := range ops {
+			if j > 0 {
+				buf = append(buf, ',', ' ')
+			}
+			buf = pyQuoteGo(op, &buf)
+			buf = append(buf, ':', ' ')
+			buf = pyQuoteGo(d.data[ns][op], &buf)
+		}
+		buf = append(buf, '}')
+	}
+	buf = append(buf, '}')
+	return buf
+}
+
+func pyQuoteGo(s string, buf *[]byte) []byte {
+	*buf = append(*buf, '"')
+	for _, c := range s {
+		switch {
+		case c == '"':
+			*buf = append(*buf, '\\', '"')
+		case c == '\\':
+			*buf = append(*buf, '\\', '\\')
+		case c < 0x20:
+			*buf = append(*buf, []byte(fmt.Sprintf("\\u%04x", c))...)
+		case c > 0x7e:
+			*buf = append(*buf, []byte(fmt.Sprintf("\\u%04x", c))...)
+		default:
+			*buf = append(*buf, byte(c))
+		}
+	}
+	*buf = append(*buf, '"')
+	return *buf
 }
 
 func (d *AdaptiveSharedDictionary) Namespaces() []string {
