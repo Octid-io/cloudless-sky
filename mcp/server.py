@@ -27,6 +27,7 @@ Usage (stdio transport):
 from __future__ import annotations
 
 import json
+import re
 import sys
 from dataclasses import asdict
 from pathlib import Path
@@ -90,9 +91,13 @@ mcp = FastMCP(
         "OSMP (Octid Semantic Mesh Protocol) encodes agentic AI instructions "
         "as compact, human-readable symbolic strings (SAL). Any node with the "
         "Adaptive Shared Dictionary decodes by table lookup. No inference. "
-        "No cloud. Use osmp_encode to produce SAL, osmp_decode to parse SAL, "
-        "osmp_resolve to look up domain codes (ICD-10-CM clinical, ISO 20022 "
-        "financial), and osmp_benchmark to run the conformance suite."
+        "No cloud. Use osmp_translate to convert natural language to SAL, "
+        "osmp_encode for structured field encoding, osmp_decode to parse SAL "
+        "(including compound multi-frame instructions), osmp_resolve to look "
+        "up domain codes (ICD-10-CM clinical, ISO 20022 financial), and "
+        "osmp_benchmark to run the conformance suite. Read osmp://system_prompt "
+        "to learn how to generate SAL natively, osmp://examples for annotated "
+        "instruction samples, and osmp://dictionary for the full opcode reference."
     ),
 )
 
@@ -136,19 +141,231 @@ def osmp_decode(sal: str) -> str:
     Decode is pure table lookup. No inference. No model. Any device
     capable of string processing can decode SAL.
 
+    Handles compound instructions: splits on operators (→ ∧ ∨ ; ∥)
+    and decodes each frame independently, returning the full chain
+    as a structured execution plan.
+
     Args:
-        sal: SAL-encoded instruction (e.g. "H:HR@NODE1>120")
+        sal: SAL-encoded instruction (e.g. "H:HR@NODE1>120" or
+             "H:HR@NODE1>120→H:CASREP∧M:EVA@*")
 
     Returns:
-        JSON with parsed fields: namespace, opcode, opcode_meaning,
-        target, query_slot, slots, consequence_class, raw
+        JSON with parsed fields for each frame in the instruction chain.
     """
-    decoded = _decoder.decode_frame(sal)
-    result = asdict(decoded)
-    nl = _decoder.decode_natural_language(sal)
-    result["natural_language"] = nl
-    result["byte_count"] = len(sal.encode("utf-8"))
-    return json.dumps(result, indent=2, ensure_ascii=False)
+    import re
+    # Split on SAL operators while preserving them
+    split_pattern = r'([→∧∨;])'
+    parts = re.split(split_pattern, sal.strip())
+
+    frames = []
+    for part in parts:
+        part = part.strip()
+        if not part or part in '→∧∨;':
+            if part in '→∧∨;':
+                frames.append({"operator": part, "meaning": {
+                    "→": "THEN (sequential)",
+                    "∧": "AND (concurrent)",
+                    "∨": "OR (alternative)",
+                    ";": "SEQUENCE (ordered)"
+                }.get(part, part)})
+            continue
+        try:
+            decoded = _decoder.decode_frame(part)
+            result = asdict(decoded)
+            nl = _decoder.decode_natural_language(part)
+            result["natural_language"] = nl
+            result["byte_count"] = len(part.encode("utf-8"))
+            frames.append(result)
+        except Exception:
+            frames.append({"raw": part, "error": "could not decode frame"})
+
+    total_bytes = len(sal.encode("utf-8"))
+    output = {
+        "instruction": sal,
+        "total_bytes": total_bytes,
+        "fits_lora": total_bytes <= 51,
+        "frames": frames,
+    }
+    return json.dumps(output, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def osmp_translate(natural_language: str) -> str:
+    """Translate natural language into an OSMP/SAL instruction.
+
+    This is the primary tool for agents that want to speak SAL.
+    Describe what you want in plain English. The translator maps it
+    to the closest SAL encoding using the Adaptive Shared Dictionary.
+
+    The translator performs keyword and intent matching against the
+    339-opcode dictionary. It does not use inference. If no match is
+    found, it returns the closest candidates.
+
+    Args:
+        natural_language: Plain English instruction
+                          (e.g. "check heart rate at node 1 above 120")
+
+    Returns:
+        SAL instruction with explanation, or candidate matches if ambiguous.
+    """
+    nl = natural_language.lower().strip()
+    asd = AdaptiveSharedDictionary()
+
+    # Build reverse index: keyword -> (namespace, opcode, definition)
+    _index: list[tuple[str, str, str, list[str]]] = []
+    for ns, ops in asd._data.items():
+        for op, defn in ops.items():
+            defn_words = defn.replace("_", " ").lower().split()
+            _index.append((ns, op, defn, defn_words))
+
+    # Score each opcode against the NL input
+    nl_words = set(re.sub(r'[^a-z0-9 ]', ' ', nl).split())
+    # Remove stop words
+    nl_words -= {"the", "a", "an", "to", "at", "on", "in", "of", "and", "or",
+                 "is", "it", "if", "then", "all", "this", "that", "for", "from",
+                 "with", "up", "look", "check", "get", "set", "do", "run",
+                 "immediately", "now", "please", "just", "nodes", "my"}
+
+    # Synonym map: common NL terms -> opcode-matching terms
+    _synonyms = {
+        "evacuate": "evacuation", "encrypt": "enc", "decrypt": "dec",
+        "diagnosis": "icd", "diagnose": "icd", "clinical": "icd",
+        "heartbeat": "hr", "vital": "vitals", "vitals": "vitals",
+        "gps": "gps", "location": "position", "navigate": "routing",
+        "pay": "pay", "payment": "pay", "transfer": "xfr",
+        "stop": "stop", "halt": "stop", "kill": "kill",
+        "sign": "sign", "verify": "vfy", "approve": "approve",
+        "emergency": "estop", "urgent": "alert",
+    }
+
+    # Expand NL words with synonyms
+    expanded = set(nl_words)
+    for w in nl_words:
+        if w in _synonyms:
+            expanded.add(_synonyms[w])
+
+    scored = []
+    for ns, op, defn, defn_words in _index:
+        score = 0.0
+        matched = set()
+
+        for nl_w in expanded:
+            # Exact match on opcode name (highest weight)
+            if nl_w == op.lower():
+                score += 5.0
+                matched.add(nl_w)
+            # Exact match on definition word
+            elif nl_w in defn_words:
+                # Single-word definitions are direct semantic matches (boost)
+                score += 4.0 if len(defn_words) == 1 else 2.0
+                matched.add(nl_w)
+            # Stem match: shared root of 5+ characters
+            elif len(nl_w) >= 4:
+                for dw in defn_words:
+                    # Find shared prefix length
+                    shared = 0
+                    for a, b in zip(nl_w, dw):
+                        if a == b:
+                            shared += 1
+                        else:
+                            break
+                    if shared >= 5:
+                        score += 1.5
+                        matched.add(nl_w)
+                        break
+
+        if score > 0:
+            scored.append((score, ns, op, defn, matched))
+
+    scored.sort(key=lambda x: -x[0])
+
+    if not scored:
+        return (
+            "No matching opcodes found for this input. "
+            "Try using domain-specific terms like: heart rate, evacuation, "
+            "encrypt, waypoint, inference, audit, transfer, triage, "
+            "or check osmp://dictionary for the full opcode list."
+        )
+
+    # Detect multi-opcode intent: if 2+ top matches have similar high
+    # scores from different NL words, chain them with ->
+    # Require chain entries to have either opcode-level match (5.0+)
+    # or 2+ matched words to avoid false chaining on generic terms
+    top_score = scored[0][0]
+    chain = [scored[0]]
+    used_words = set(scored[0][4])
+    for s in scored[1:5]:
+        new_words = s[4] - used_words
+        if not new_words:
+            continue
+        strong = s[0] >= 5.0 or len(s[4]) >= 2
+        if strong and s[0] >= top_score * 0.35:
+            chain.append(s)
+            used_words |= s[4]
+    if len(chain) > 3:
+        chain = chain[:3]
+
+    # Extract target if present (look for @-style addressing or "node X")
+    target = None
+    node_match = re.search(r'(?:node|@)\s*([A-Za-z0-9_]+)', nl)
+    if node_match:
+        target = node_match.group(1).upper()
+
+    # Extract threshold if present
+    threshold = None
+    thresh_match = re.search(r'(?:above|below|exceed|over|under|>|<|=)\s*(\d+)', nl)
+    if thresh_match:
+        threshold = thresh_match.group(0).replace("above", ">").replace(
+            "exceed", ">").replace("over", ">").replace(
+            "below", "<").replace("under", "<")
+        threshold = re.sub(r'\s+', '', threshold)
+
+    # Build SAL from chain
+    sal_parts = []
+    for i, entry in enumerate(chain):
+        ns, op, defn = entry[1], entry[2], entry[3]
+        part = f"{ns}:{op}"
+        if i == 0:
+            # Only first frame gets target and threshold
+            if target:
+                part += f"@{target}"
+                if threshold:
+                    part += threshold
+            elif threshold:
+                part += threshold
+        sal_parts.append(part)
+
+    sal = "\u2192".join(sal_parts)  # join with THEN operator
+    byte_count = len(sal.encode("utf-8"))
+
+    # Show matches
+    match_lines = []
+    for entry in chain:
+        match_lines.append(f"  {entry[1]}:{entry[2]} = {entry[3]}")
+
+    # Show alternatives (opcodes not in chain)
+    chain_ops = {(e[1], e[2]) for e in chain}
+    alternatives = []
+    for score, ans, aop, adefn, overlap in scored[:8]:
+        if (ans, aop) not in chain_ops:
+            alternatives.append(f"  {ans}:{aop} ({adefn})")
+        if len(alternatives) >= 3:
+            break
+
+    lines = [
+        sal,
+        "",
+        f"({byte_count} bytes, fits LoRa: {'yes' if byte_count <= 51 else 'no'})",
+        "",
+        "Matched:" if len(chain) == 1 else "Matched (chained with THEN):",
+    ]
+    lines.extend(match_lines)
+    if alternatives:
+        lines.append("")
+        lines.append("Other candidates:")
+        lines.extend(alternatives)
+
+    return "\n".join(lines)
 
 
 @mcp.tool()
@@ -161,9 +378,9 @@ def osmp_resolve(code: str, corpus: str = "icd") -> str:
 
     Args:
         code: MDR token to look up (e.g. "A000" for ICD, "ACH" for ISO 20022)
-        corpus: Which domain registry to query.
-                "icd" or "icd10cm" for CMS FY2026 ICD-10-CM (74,719 codes).
-                "iso" or "iso20022" for ISO 20022 eRepository (47,835 codes).
+        corpus: Domain registry to query. One of:
+                "icd" -- CMS FY2026 ICD-10-CM, 74,719 clinical codes
+                "iso" -- ISO 20022 eRepository, 47,835 financial codes
 
     Returns:
         SAL description text for the code, or an error message if not found.
@@ -233,7 +450,7 @@ def get_dictionary() -> str:
     """The Adaptive Shared Dictionary (ASD) -- all namespace:opcode mappings."""
     asd = AdaptiveSharedDictionary()
     lines = ["OSMP Adaptive Shared Dictionary (ASD)", "=" * 50, ""]
-    for ns, ops in sorted(asd.basis.items()):
+    for ns, ops in sorted(asd._data.items()):
         lines.append(f"[{ns}] {len(ops)} opcodes")
         for op, meaning in sorted(ops.items()):
             lines.append(f"  {ns}:{op} -- {meaning}")
@@ -272,6 +489,161 @@ def get_corpora() -> str:
         else:
             lines.append(f"{key}: NOT FOUND at {path}")
     return "\n".join(lines)
+
+
+@mcp.resource("osmp://examples")
+def get_examples() -> str:
+    """Annotated SAL examples with natural language equivalents.
+
+    Use this to learn how SAL works. Each example shows the natural
+    language intent, the SAL encoding, and why those opcodes were chosen.
+    """
+    return """OSMP/SAL Examples -- Learn by Reading
+==========================================
+
+1. SIMPLE: Single sensor query
+   NL:  "Node 4A, report temperature at offset zero."
+   SAL: EQ@4A?TH:0
+   Why: E namespace (environment). EQ = environmental_query. Short form
+        (no "E:" prefix) because EQ is unambiguous. @4A = target node.
+        ?TH:0 = query temperature_humidity_composite, default 0.
+   10 bytes. Fits LoRa floor.
+
+2. CONDITIONAL: Threshold trigger
+   NL:  "If temperature exceeds 38, trigger building alert."
+   SAL: E@T>38->BA@BS!
+   Why: E namespace environmental, T = temperature reading, >38 = threshold.
+        -> (THEN operator) chains to B:BA (building_alert) at BS (building_sector).
+        ! = broadcast.
+   15 bytes. Fits LoRa floor.
+
+3. COMPOUND: Multi-step medical instruction
+   NL:  "If heart rate at node 1 exceeds 120, assemble casualty report
+        and broadcast evacuation to all nodes."
+   SAL: H:HR@NODE1>120->H:CASREP^M:EVA@*
+   Why: H namespace (health). HR = heart_rate. @NODE1 = target.
+        >120 = threshold. -> = THEN. H:CASREP = casualty_report.
+        ^ = AND. M:EVA@* = evacuation broadcast to all (*).
+   35 bytes. Fits LoRa floor.
+
+4. FINANCIAL: Payment with human confirmation gate
+   NL:  "Execute payment to receiver if and only if a human operator
+        confirms, then transfer the amount."
+   SAL: K:PAY@RECV<->I:section->K:XFR[AMT]
+   Why: K namespace (financial). PAY = payment_execution.
+        <-> = IFF (if and only if). I:section = human_operator_confirmation.
+        -> = THEN. K:XFR[AMT] = asset_transfer with amount parameter.
+   26 bytes. Fits LoRa floor.
+
+5. ROBOTICS: Reversible physical action
+   NL:  "Turn on flashlight on phone 1. This is reversible."
+   SAL: R:TORCH@PHONE1:ON(reversible)
+   Why: R namespace (regulatory/robotics). TORCH = flashlight_on_off.
+        @PHONE1 = target device. :ON = parameter.
+        (reversible) = consequence class glyph indicating undo is possible.
+   22 bytes. Fits LoRa floor.
+
+6. HAZARDOUS: Camera with human gate
+   NL:  "Require human approval, then activate camera on phone 2.
+        Mark as hazardous."
+   SAL: I:section->R:CAM@PHONE2:ON(hazardous)
+   Why: I:section = human_operator_confirmation gate. Must execute first.
+        -> = THEN. R:CAM = camera_activation. @PHONE2 = target.
+        (hazardous) = consequence class.
+   25 bytes. Fits LoRa floor.
+
+7. OPERATIONAL: Emergency mode declaration
+   NL:  "Set operational mode to emergency, incident type 1."
+   SAL: O:MODE:E^O:TYPE:1
+   Why: O namespace (operational). MODE = operational_mode, value E (emergency).
+        ^ = AND. TYPE = incident_type, value 1.
+   17 bytes. Fits LoRa floor.
+
+8. INFERENCE: Route to model with parameters
+   NL:  "Invoke inference, report token count 847, latency 230ms."
+   SAL: Z:INF^Z:TOKENS:847^Z:LATENCY:230
+   Why: Z namespace (inference). INF = invoke_inference.
+        ^ = AND chains to TOKENS and LATENCY reports.
+   33 bytes. Fits LoRa floor.
+
+9. DOMAIN CODE RESOLUTION:
+   NL:  "Look up ICD-10 code A000."
+   SAL: H:ICD[A000]
+   Why: H namespace (health). ICD = ICD-10_diagnosis_code_accessor.
+        [A000] = the code to resolve. D:PACK/BLK resolves to:
+        "Cholera d/t Vibrio cholerae 01, biovar cholerae"
+   10 bytes for the instruction. 477KB corpus in flash.
+
+10. COGNITIVE: Agent goal declaration and handoff
+    NL:  "Declare goal quarterly report, hand off execution to agent Beta."
+    SAL: J:GOAL[QTR_RPT]->J:HANDOFF@BETA
+    Why: J namespace (cognitive/planning). GOAL = declare_goal.
+         [QTR_RPT] = parameter. -> = THEN. HANDOFF = transfer execution
+         with full state context. @BETA = target agent.
+    30 bytes. Fits LoRa floor.
+
+KEY: Operators
+  ->  THEN (sequential execution)
+  ^   AND (concurrent execution)
+  v   OR (alternative paths)
+  ;   SEQUENCE (ordered)
+  @   target node
+  ?   query
+  *   broadcast to all
+  !   alert/broadcast
+  []  parameter block
+"""
+
+
+@mcp.resource("osmp://system_prompt")
+def get_system_prompt() -> str:
+    """Ready-to-use system prompt fragment for OSMP/SAL generation.
+
+    Inject this into an LLM's system prompt to make it generate SAL
+    natively. Includes the grammar, operator reference, and examples.
+    This is the viral adoption vector for OSMP.
+    """
+    asd = AdaptiveSharedDictionary()
+    ns_summary = []
+    for ns, ops in sorted(asd._data.items()):
+        op_list = ", ".join(sorted(ops.keys())[:8])
+        more = f" (+{len(ops)-8} more)" if len(ops) > 8 else ""
+        ns_summary.append(f"  {ns}: {op_list}{more}")
+
+    return f"""You are an OSMP-capable agent. When transmitting instructions to other agents
+or edge devices, encode them in SAL (Semantic Assembly Language).
+
+SAL is a compact, human-readable symbolic instruction format. Any node
+with the Adaptive Shared Dictionary (ASD) decodes SAL by table lookup.
+No inference required at the receiving end.
+
+GRAMMAR (simplified):
+  instruction = [namespace ":"] opcode ["@" target] [operator instruction]
+  operators: -> (THEN), ^ (AND), v (OR), ; (SEQUENCE)
+  target: @NODE_ID or @* (broadcast)
+  query: ?SLOT[:default]
+  parameter: [value]
+
+NAMESPACES ({sum(len(ops) for ops in asd._data.values())} opcodes across {len(asd._data)} domains):
+{chr(10).join(ns_summary)}
+
+EXAMPLES:
+  "Check heart rate at node 1 above 120" -> H:HR@NODE1>120
+  "Evacuate all nodes"                   -> M:EVA@*
+  "Encrypt then sign"                    -> S:ENC->S:SIGN
+  "Human approval then camera on"        -> I:section->R:CAM@PHONE1:ON
+  "Set emergency mode"                   -> O:MODE:E
+  "Invoke inference, 0.1 temp"           -> Z:INF^Z:TEMP:0.1
+  "Look up ICD code A000"               -> H:ICD[A000]
+  "Declare goal, hand off to Beta"       -> J:GOAL[QTR]->J:HANDOFF@BETA
+
+RULES:
+- Prefer SAL over natural language when the instruction maps cleanly to opcodes.
+- If SAL is longer than the NL, send the NL (BAEL passthrough).
+- Every SAL instruction decodes by table lookup. No ambiguity.
+- The floor is 51 bytes (LoRa SF12). Design for it.
+- Domain codes (ICD-10, ISO 20022) resolve via D:PACK: H:ICD[A000], K:ISO[ACH].
+"""
 
 
 # -- Entry point ----------------------------------------------------------

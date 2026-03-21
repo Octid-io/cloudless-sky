@@ -1,97 +1,83 @@
 # OSMP MCP Server
 
-MCP server that gives any MCP-compatible AI client native OSMP capability. The client doesn't need to "know" OSMP. It calls the tools. The protocol spreads through the tool ecosystem rather than through training data or prompt engineering.
+MCP server for the [Octid Semantic Mesh Protocol (OSMP)](https://octid.io). Gives any MCP-compatible AI client native OSMP capability: encode, decode, translate, and resolve agentic instructions by table lookup. No inference at decode.
 
-## Tools
-
-| Tool | Description |
-|---|---|
-| `osmp_encode` | Structured fields to SAL instruction string |
-| `osmp_decode` | SAL instruction string to structured fields (table lookup, no inference) |
-| `osmp_resolve` | Single domain code to SAL description from D:PACK/BLK binary (ICD-10-CM, ISO 20022) |
-| `osmp_benchmark` | Run the canonical conformance suite against the Python SDK |
-
-## Resources
-
-| URI | Description |
-|---|---|
-| `osmp://dictionary` | Full Adaptive Shared Dictionary (all namespace:opcode mappings) |
-| `osmp://grammar` | SAL grammar specification (EBNF) |
-| `osmp://corpora` | Available D:PACK/BLK domain corpora with stats |
-
-## Setup
-
-Requires Python 3.10+ and the `mcp` package.
+## Install
 
 ```bash
-cd cloudless-sky
-pip install -r mcp/requirements.txt
+pip install osmp-mcp
 ```
 
-Dependencies: `mcp[cli]>=1.2.0`, `zstandard>=0.22.0`. Total install is lightweight. The OSMP Python SDK (`sdk/python/src/osmp.py`) is imported directly from the repo; no separate install needed.
-
-## Usage
+## Connect
 
 ### Claude Code
-
 ```bash
-claude mcp add osmp -- python mcp/server.py
+claude mcp add osmp -- osmp-mcp
 ```
-
-Run Claude Code from the `cloudless-sky` repo root.
 
 ### Claude Desktop
 
 Add to `claude_desktop_config.json`:
-
 ```json
 {
     "mcpServers": {
         "osmp": {
-            "command": "python",
-            "args": ["mcp/server.py"],
-            "cwd": "/path/to/cloudless-sky"
+            "command": "osmp-mcp"
         }
     }
 }
 ```
 
-### Cursor / Other MCP Clients
-
-Any client supporting stdio transport can connect. The command is `python mcp/server.py` with the working directory set to the repo root.
-
-### MCP Inspector (testing)
-
-```bash
-cd cloudless-sky
-npx @modelcontextprotocol/inspector python mcp/server.py
+### Cursor / VS Code / Any MCP Client
+```json
+{
+    "servers": {
+        "osmp": {
+            "command": "osmp-mcp",
+            "transport": "stdio"
+        }
+    }
+}
 ```
 
-## How It Propagates
+## Tools
 
-An AI client connected to this MCP server can:
+| Tool | What it does |
+|---|---|
+| `osmp_translate` | Natural language to SAL instruction. The primary tool for agents learning to speak OSMP. |
+| `osmp_encode` | Structured fields to SAL instruction (`H:HR@NODE1>120`) |
+| `osmp_decode` | SAL string to structured fields. Handles compound multi-frame instructions. |
+| `osmp_resolve` | Domain code to SAL description from D:PACK/BLK binary (74,719 ICD-10-CM, 47,835 ISO 20022) |
+| `osmp_benchmark` | Run the canonical conformance suite |
 
-1. **Encode** natural language instructions as SAL (`osmp_encode`)
-2. **Decode** SAL instructions received from other agents (`osmp_decode`)
-3. **Resolve** domain codes from compressed corpora in flash-sized binaries (`osmp_resolve`)
-4. **Verify** protocol conformance against the canonical test vectors (`osmp_benchmark`)
+## Resources
 
-The client doesn't need OSMP in its training data. It doesn't need the grammar in its system prompt. It calls `osmp_encode` with structured fields and gets SAL back. The protocol becomes a tool the agent uses, not a language the agent learns.
+| URI | What it provides |
+|---|---|
+| `osmp://system_prompt` | Ready-to-use system prompt fragment. Inject into any LLM to enable native SAL generation. |
+| `osmp://examples` | 10 annotated SAL examples with NL equivalents and explanations. |
+| `osmp://dictionary` | Full Adaptive Shared Dictionary (339 opcodes across 26 namespaces). |
+| `osmp://grammar` | SAL formal grammar (EBNF). |
+| `osmp://corpora` | Available D:PACK/BLK domain corpus stats. |
 
-## Architecture
+## Agent Quickstart
 
-```
-AI Client (Claude, GPT, Cursor, etc.)
-    |
-    | MCP stdio
-    |
-OSMP MCP Server (this file, ~280 lines)
-    |
-    |-- SALEncoder / SALDecoder (sdk/python/src/osmp.py)
-    |-- BlockCompressor.resolve() (D:PACK/BLK random access)
-    |-- MDR binaries (mdr/*.dpack, 477KB ICD + 1.2MB ISO)
-    |-- Test vectors (protocol/test-vectors/)
-    |-- ASD (339 opcodes, compiled into SDK)
-```
+1. Connect the MCP server
+2. Read `osmp://system_prompt` and inject it into your context
+3. Use `osmp_translate` to convert natural language to SAL
+4. Use `osmp_decode` to parse SAL instructions you receive
+5. Use `osmp_resolve` to look up domain codes (ICD-10, ISO 20022)
 
-The server is a thin wrapper. All protocol logic lives in the Python SDK. The MCP layer adds tool definitions, input validation, and human-readable output formatting. No protocol logic is duplicated.
+## What ships in the package
+
+The 1.7MB package includes the full Python SDK, the Adaptive Shared Dictionary (339 opcodes across 26 namespaces), and two D:PACK/BLK domain corpora (ICD-10-CM and ISO 20022) compressed for edge deployment. No additional downloads required.
+
+## Links
+
+- [octid.io](https://octid.io)
+- [GitHub](https://github.com/octid-io/cloudless-sky)
+- [OSMP Spec](https://github.com/octid-io/cloudless-sky/blob/main/protocol/spec/OSMP-SPEC-v1.md)
+
+## License
+
+Apache 2.0 with express patent grant.
