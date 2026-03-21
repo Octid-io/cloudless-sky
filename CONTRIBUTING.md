@@ -133,9 +133,9 @@ Mobile SDK implementations enabling phones to function as sovereign OSMP nodes. 
 
 Overflow Protocol Tier 3: DAG decomposition for instructions with conditional branches and dependency chains. Spec-defined (§8.1) and patent-covered. The Python reference implements Tier 1 and Tier 2; Tier 3 is architecturally specified but not yet implemented.
 
-### FNP Handshake State Machine -- contribution target
+### FNP Handshake State Machine -- shipped
 
-The two-message capability advertisement + acknowledgment protocol (40 bytes each, within LoRa MTU). FNP fingerprint computation (SHA-256) is implemented in all three SDKs; the handshake state machine managing the negotiation lifecycle is a contribution target.
+Two-message capability advertisement + acknowledgment (40B ADV + 38B ACK = 78 bytes). Negotiates dictionary alignment, namespace intersection, and channel capacity. Implemented in all three SDKs (Python, TypeScript, Go) with byte-identical wire format verified against Python reference packets. See spec section 9 for wire format and state machine.
 
 ---
 
@@ -195,8 +195,8 @@ Analog: QUIC stream receive buffer (RFC 9000 §2.2). Execute maximal resolvable 
 **Dictionary delta additive vs replace under partial sync**  
 Analog: CRDT primitives (Shapiro et al., INRIA-00555588). ADDITIVE = grow-only set. REPLACE = last-write-wins register with mandatory criticality flag. DEPRECATE = tombstone record. REPLACE operations must use FLAGS[C] — retransmit on loss, never graceful degrade.
 
-**FNP handshake completion within 80-byte total budget**  
-Analog: CoAP option encoding (RFC 7252 §3.1). Two messages, fixed field positions, no dynamic allocation. Capability advertisement and acknowledgment must each fit within available channel MTU.
+**FNP handshake completion within 78 bytes (40B ADV + 38B ACK)**  
+Analog: CoAP option encoding (RFC 7252 §3.1). Two messages, fixed field positions, no dynamic allocation. Capability advertisement and acknowledgment each fit within LoRa floor MTU. Implemented in all three SDKs.
 
 **Guaranteed minimum vocabulary floor under extended off-grid operation**  
 Analog: Nix derivation pinning. The floor version is compiled in. It does not depend on filesystem state, network state, or synchronization state. Every glyph in the floor version resolves correctly at any time.

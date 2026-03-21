@@ -288,17 +288,62 @@ The NL_PASSTHROUGH mode ensures that very short natural language instructions (e
 
 ## 9. Frame Negotiation Protocol (FNP)
 
-FNP enables dynamic vocabulary expansion within constrained-bandwidth channel limits. Complete vocabulary negotiation within LoRa payload constraints across two messages.
+FNP establishes session state between two sovereign nodes in two packets totaling 78 bytes. It negotiates three properties: dictionary alignment, namespace intersection, and channel capacity.
 
-**Message 1 — Capability Advertisement (≤40 bytes):**
-Transmitting node declares current ASD version, supported namespace prefixes, and available capability slots.
+### 9.1 Message 1: Capability Advertisement (40 bytes)
 
-**Message 2 — Capability Acknowledgment (≤40 bytes):**
-Receiving node confirms shared vocabulary intersection, negotiated ASD version, and session parameters.
+| Offset | Size | Field | Description |
+|---|---|---|---|
+| 0 | 1B | msg_type | 0x01 (ADV) |
+| 1 | 1B | protocol_version | 0x01 |
+| 2 | 8B | fingerprint | First 8 bytes of SHA-256(canonical ASD JSON) |
+| 10 | 2B | asd_version | ASD version, big-endian u16 |
+| 12 | 4B | namespace_bitmap | Bit 0=A, bit 1=B, ..., bit 25=Z, bit 26=Omega. Big-endian u32 |
+| 16 | 1B | channel_capacity | 0x00=51B (LoRa floor), 0x01=255B, 0x02=512B (BLE), 0x03=unconstrained |
+| 17 | 23B | node_id | UTF-8, null-padded |
 
-Post-handshake: both nodes operate against the negotiated ASD version for the session duration.
+### 9.2 Message 2: Capability Acknowledgment (38 bytes)
 
-**Gossip propagation:** Negotiated session parameters propagate to adjacent nodes via gossip protocol, extending vocabulary expansion without per-pair handshake overhead.
+| Offset | Size | Field | Description |
+|---|---|---|---|
+| 0 | 1B | msg_type | 0x02 (ACK) or 0x03 (NACK) |
+| 1 | 1B | match_status | 0x00=exact, 0x01=version mismatch, 0x02=fingerprint mismatch |
+| 2 | 8B | echo_fingerprint | Fingerprint from received ADV (echo for verification) |
+| 10 | 8B | own_fingerprint | Responder's own ASD fingerprint |
+| 18 | 4B | common_namespaces | Intersection of both namespace bitmaps. Big-endian u32 |
+| 22 | 1B | neg_capacity | Negotiated capacity = min(adv, own). LCD of the link. |
+| 23 | 15B | node_id | UTF-8, null-padded |
+
+### 9.3 Fingerprint Computation
+
+The ASD fingerprint is the first 8 bytes of SHA-256 over the canonical JSON serialization of the ASD data. Canonical JSON matches Python `json.dumps(data, sort_keys=True)`: keys sorted alphabetically, separators `", "` and `": "`, non-ASCII escaped to `\uXXXX`. All three SDKs (Python, TypeScript, Go) produce identical fingerprints for identical dictionary state.
+
+### 9.4 Channel Capacity Negotiation
+
+The session byte budget is the minimum of what both nodes declare. An ESP32 on LoRa (0x00, 51B) meeting a phone on BLE (0x02, 512B) negotiates down to 51B. BAEL selects encoding mode within this budget for every subsequent instruction. The mesh scales within the most constrained link, not the most capable one.
+
+| Class | Value | Bytes | Channel |
+|---|---|---|---|
+| FLOOR | 0x00 | 51 | LoRa SF12 BW125kHz |
+| STANDARD | 0x01 | 255 | LoRa SF11 BW250kHz / Meshtastic LongFast |
+| BLE | 0x02 | 512 | Bluetooth Low Energy |
+| UNCONSTRAINED | 0x03 | 0 (no limit) | WiFi, HTTP, cloud |
+
+### 9.5 State Machine
+
+```
+IDLE -> initiate() -> ADV_SENT
+ADV_SENT -> receive ACK (match) -> ESTABLISHED
+ADV_SENT -> receive ACK (mismatch) -> SYNC_NEEDED
+ADV_SENT -> timeout -> IDLE
+IDLE -> receive ADV -> send ACK -> ESTABLISHED or SYNC_NEEDED
+```
+
+ESTABLISHED: dictionaries match, session active. SYNC_NEEDED: fingerprint or version mismatch detected, delta synchronization required (see section 10).
+
+### 9.6 Gossip Propagation
+
+Negotiated session parameters propagate to adjacent nodes via gossip protocol, extending vocabulary expansion without per-pair handshake overhead.
 
 ---
 

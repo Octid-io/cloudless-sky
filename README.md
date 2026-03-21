@@ -118,7 +118,7 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 
 **BAEL floor guarantee** — the protocol never makes an instruction longer than its natural language input. When the encoded form exceeds the natural language form, BAEL selects NL_PASSTHROUGH and transmits the original with a flags bit. Compression is never negative.
 
-**FNP fingerprinting** — SHA-256 dictionary fingerprint for session handshake verification. Two nodes with matching fingerprints share identical ASD state.
+**FNP handshake** — Two-message capability advertisement + acknowledgment (40B + 38B = 78 bytes total). Negotiates dictionary alignment, namespace intersection, and channel capacity in two LoRa packets. Implemented in all three SDKs with byte-identical wire format. Channel capacity negotiation selects the LCD of both nodes, so the mesh scales within the most constrained link.
 
 **Sovereign namespace extension** — `Ω:` (U+03A9) allows any implementing party to define proprietary namespace extensions without central approval or registration.
 
@@ -127,8 +127,6 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 ## What Requires Future Work
 
 **Overflow Protocol Tier 3** — DAG decomposition for instructions with conditional branches and dependency chains. Spec-defined and patent-covered; implementation is a contribution target.
-
-**FNP full handshake** — the two-message capability advertisement + acknowledgment protocol (≤40 bytes each, within LoRa MTU). Fingerprint computation is implemented; the handshake state machine is a contribution target.
 
 **C++ firmware-level OSMP nodes** — OSMP integration with Meshtastic via the Python SDK and Meshtastic Python library is operational today (see CONTRIBUTING.md). The C++ contribution target is a firmware-level encoder/decoder enabling ESP32 and nRF52 Meshtastic devices to operate as sovereign OSMP nodes without a companion device, with the ASD compiled into flash.
 
@@ -274,7 +272,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md). The spec is authoritative. All SDK imp
 
 Meshtastic integration via the Python SDK and Meshtastic Python library is operational today with no additional code required. See CONTRIBUTING.md for details.
 
-Wanted: C++ firmware-level encoder/decoder (ESP32/nRF52 sovereign nodes), Kotlin/Swift mobile SDKs, Tier 3 DAG fragmentation, FNP handshake state machine.
+Wanted: C++ firmware-level encoder/decoder (ESP32/nRF52 sovereign nodes), Kotlin/Swift mobile SDKs, Tier 3 DAG fragmentation.
 
 ---
 
