@@ -114,7 +114,7 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 
 **R:ESTOP hard exception** — executes immediately on receipt of any single fragment, regardless of loss tolerance policy, fragment completeness, or I:§ authorization state. Asymmetric harm: unnecessary stop is recoverable; failure to stop a physical agent in emergency is not. This is intentional and documented in spec §8.2. Do not modify.
 
-**Overflow Protocol** — Tier 1 (single packet, ≤51 bytes at LoRa SF12) and Tier 2 (sequential burst). Three loss tolerance policies: Φ (Fail-Safe), Γ (Graceful Degradation, default), Λ (Atomic — required for K and H namespace instructions with irreversible consequences).
+**Overflow Protocol** — Tier 1 (single packet, ≤51 bytes at LoRa SF12), Tier 2 (sequential burst), and Tier 3 (DAG decomposition for conditional branches and dependency chains). Three loss tolerance policies: Φ (Fail-Safe), Γ (Graceful Degradation, default), Λ (Atomic -- required for K and H namespace instructions with irreversible consequences). Tier 3 decomposes compound SAL instructions into a directed acyclic graph of executable units with dependency pointers, resolves execution order via topological sort, and applies loss tolerance to the maximal resolvable subgraph under partial receipt. Multi-parent dependencies (diamond joins) use a FLAGS bit 3 extended dependency bitmap. Fragment header stays at 6 bytes across all three tiers.
 
 **BAEL floor guarantee** — the protocol never makes an instruction longer than its natural language input. When the encoded form exceeds the natural language form, BAEL selects NL_PASSTHROUGH and transmits the original with a flags bit. Compression is never negative.
 
@@ -125,8 +125,6 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 ---
 
 ## What Requires Future Work
-
-**Overflow Protocol Tier 3** — DAG decomposition for instructions with conditional branches and dependency chains. Spec-defined and patent-covered; implementation is a contribution target.
 
 **C++ firmware-level OSMP nodes** — OSMP integration with Meshtastic via the Python SDK and Meshtastic Python library is operational today (see CONTRIBUTING.md). The C++ contribution target is a firmware-level encoder/decoder enabling ESP32 and nRF52 Meshtastic devices to operate as sovereign OSMP nodes without a companion device, with the ASD compiled into flash.
 
@@ -272,7 +270,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md). The spec is authoritative. All SDK imp
 
 Meshtastic integration via the Python SDK and Meshtastic Python library is operational today with no additional code required. See CONTRIBUTING.md for details.
 
-Wanted: C++ firmware-level encoder/decoder (ESP32/nRF52 sovereign nodes), Kotlin/Swift mobile SDKs, Tier 3 DAG fragmentation.
+Wanted: C++ firmware-level encoder/decoder (ESP32/nRF52 sovereign nodes), Kotlin/Swift mobile SDKs.
 
 ---
 

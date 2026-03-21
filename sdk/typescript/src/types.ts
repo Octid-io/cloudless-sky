@@ -15,6 +15,7 @@ export interface Fragment {
 }
 export const FLAG_TERMINAL      = 0b00000001;
 export const FLAG_CRITICAL      = 0b00000010;
+export const FLAG_EXTENDED_DEP  = 0b00001000;
 export const FLAG_NL_PASSTHROUGH = 0x04;
 export const FRAGMENT_HEADER_BYTES = 6;
 export const LORA_FLOOR_BYTES   = 51;

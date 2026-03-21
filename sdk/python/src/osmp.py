@@ -159,6 +159,7 @@ LORA_STANDARD_BYTES   = 255
 FRAGMENT_HEADER_BYTES = 6
 FLAG_TERMINAL         = 0b00000001
 FLAG_CRITICAL         = 0b00000010
+FLAG_EXTENDED_DEP     = 0b00001000   # Tier 3: payload prefix is u32 dependency bitmap
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1187,7 +1188,7 @@ class OverflowProtocol:
 
     Tier 1: Single packet
     Tier 2: Sequential burst
-    Tier 3: DAG decomposition (spec-defined, implementation pending)
+    Tier 3: DAG decomposition
 
     Analog: QUIC receive buffer (RFC 9000 §2.2)
     """
@@ -1200,6 +1201,7 @@ class OverflowProtocol:
         self.timeout = timeout
         self._msg_counter = 0
         self._buffer: dict[int, dict[int, Fragment]] = {}
+        self._dag_reassembler = DAGReassembler(policy=policy)
 
     def _next_msg_id(self) -> int:
         self._msg_counter = (self._msg_counter + 1) % 65536
@@ -1222,6 +1224,18 @@ class OverflowProtocol:
             frags.append(Fragment(msg_id=msg_id, frag_idx=idx, frag_ct=len(chunks),
                                   flags=flags, dep=0, payload=chunk))
         return frags
+
+    def fragment_dag(self, compound_sal: str,
+                     critical: bool = False) -> list[Fragment]:
+        """Tier 3: decompose a compound SAL instruction into a DAG of fragments.
+
+        Use when the instruction contains conditional branches (→),
+        parallel forks (∧, ∥), or sequential dependencies (;) that
+        require dependency-aware execution order on the receiver.
+        """
+        fragmenter = DAGFragmenter(mtu=self.mtu)
+        msg_id = self._next_msg_id()
+        return fragmenter.fragmentize(compound_sal, msg_id, critical=critical)
 
     def receive(self, frag: Fragment) -> bytes | None:
         # R:ESTOP hard exception — execute immediately regardless of policy
@@ -1262,7 +1276,352 @@ class OverflowProtocol:
             result += received[i].payload
         return result
 
+    def receive_dag(self, frag: Fragment) -> list[bytes] | None:
+        """Tier 3 receive: buffer fragment and attempt DAG resolution.
+
+        Returns ordered list of payloads in dependency-resolved execution
+        order, or None if the message is not yet resolvable under the
+        current loss tolerance policy.
+        """
+        return self._dag_reassembler.receive(frag)
+
     def nack(self, msg_id: int, expected_ct: int) -> str:
+        have = set(self._buffer.get(msg_id, {}).keys())
+        missing = sorted(set(range(expected_ct)) - have)
+        return f"A:NACK[MSG:{msg_id}∖[{','.join(str(i) for i in missing)}]]"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIER 3 — DAG DECOMPOSITION
+# Overflow Protocol Tier 3: directed acyclic graph fragmentation for
+# instructions with conditional branches and dependency chains.
+# Analog: Kahn's algorithm (1962) applied to lossy radio fragment streams.
+#
+# Patent: OSMP-001-UTIL claims, spec §8.1 Tier 3 definition.
+# ─────────────────────────────────────────────────────────────────────────────
+
+@dataclass
+class DAGNode:
+    """Single executable unit in a Tier 3 DAG."""
+    index:   int            # fragment index (position in fragment list)
+    payload: bytes          # SAL instruction bytes for this unit
+    parents: list[int]      # indices of parent nodes (dependencies)
+
+
+class DAGFragmenter:
+    """
+    Transmit-side Tier 3: decompose a compound SAL instruction into a DAG
+    of executable units with dependency pointers.
+
+    The SAL compound operators define the DAG structure:
+      ;  (SEQUENCE)  — linear chain: right depends on left
+      →  (THEN)      — conditional: right depends on left
+      ∧  (AND)       — parallel: both depend on same parent (fork)
+      ∥  (PARALLEL)  — parallel execution block
+
+    Single-parent dependencies use the DEP header byte directly.
+    Multi-parent dependencies (e.g., diamond join) set FLAGS bit 3
+    (FLAG_EXTENDED_DEP) and prefix the payload with a 4-byte u32 bitmap
+    where bit N = dependency on fragment N.
+
+    Fragment header remains 6 bytes. Backward compatible: Tier 1/2
+    fragments with DEP=0x00 and FLAGS bit 3 clear are unchanged.
+    """
+
+    def __init__(self, mtu: int = LORA_STANDARD_BYTES):
+        self.mtu = mtu
+
+    def parse(self, compound_sal: str) -> list[DAGNode]:
+        """Parse a compound SAL string into DAGNodes.
+
+        Recognizes ; → ∧ ∥ as structural operators.
+        Atomic SAL frames become leaf nodes.
+        """
+        nodes: list[DAGNode] = []
+        self._parse_expr(compound_sal.strip(), nodes, parent_indices=[])
+        return nodes
+
+    def _parse_expr(self, expr: str, nodes: list[DAGNode],
+                    parent_indices: list[int]) -> list[int]:
+        """Recursively parse SAL expression into DAG nodes.
+        Returns list of tail node indices (nodes with no dependents yet)."""
+
+        # Try splitting on ; (SEQUENCE) first — lowest precedence
+        parts = self._split_top_level(expr, ";")
+        if len(parts) > 1:
+            tails = parent_indices
+            for part in parts:
+                tails = self._parse_expr(part.strip(), nodes, tails)
+            return tails
+
+        # Try → (THEN) — conditional chain
+        parts = self._split_top_level(expr, "→")
+        if len(parts) > 1:
+            tails = parent_indices
+            for part in parts:
+                tails = self._parse_expr(part.strip(), nodes, tails)
+            return tails
+
+        # Try ∧ (AND) — parallel fork
+        parts = self._split_top_level(expr, "∧")
+        if len(parts) > 1:
+            all_tails: list[int] = []
+            for part in parts:
+                branch_tails = self._parse_expr(part.strip(), nodes, parent_indices)
+                all_tails.extend(branch_tails)
+            return all_tails
+
+        # Try ∥ inside A∥[...] — parallel execution block
+        if expr.startswith("A∥[") and expr.endswith("]"):
+            inner = expr[len("A∥["):-1]
+            parts = self._split_top_level(inner, "∧")
+            if len(parts) <= 1:
+                # Single item in parallel block, treat as leaf
+                parts = [inner]
+            all_tails = []
+            for part in parts:
+                clean = part.strip()
+                if clean.startswith("?"):
+                    clean = clean[1:]
+                branch_tails = self._parse_expr(clean, nodes, parent_indices)
+                all_tails.extend(branch_tails)
+            return all_tails
+
+        # Atomic leaf node
+        idx = len(nodes)
+        nodes.append(DAGNode(
+            index=idx,
+            payload=expr.encode("utf-8"),
+            parents=list(parent_indices),
+        ))
+        return [idx]
+
+    @staticmethod
+    def _split_top_level(expr: str, sep: str) -> list[str]:
+        """Split expression on separator, respecting bracket depth."""
+        parts: list[str] = []
+        depth = 0
+        current: list[str] = []
+        i = 0
+        chars = list(expr)
+        sep_chars = list(sep)
+        sep_len = len(sep_chars)
+
+        while i < len(chars):
+            ch = chars[i]
+            if ch in ("[", "("):
+                depth += 1
+                current.append(ch)
+                i += 1
+            elif ch in ("]", ")"):
+                depth -= 1
+                current.append(ch)
+                i += 1
+            elif depth == 0 and chars[i:i + sep_len] == sep_chars:
+                parts.append("".join(current))
+                current = []
+                i += sep_len
+            else:
+                current.append(ch)
+                i += 1
+        if current:
+            parts.append("".join(current))
+        return parts
+
+    def fragmentize(self, compound_sal: str, msg_id: int,
+                    critical: bool = False) -> list[Fragment]:
+        """Full Tier 3 pipeline: parse → assign DEP → emit Fragments."""
+        nodes = self.parse(compound_sal)
+        if not nodes:
+            return []
+
+        frag_ct = len(nodes)
+        frags: list[Fragment] = []
+
+        for node in nodes:
+            is_last = node.index == frag_ct - 1
+            flags = (FLAG_TERMINAL if is_last else 0) | \
+                    (FLAG_CRITICAL if critical else 0)
+
+            if len(node.parents) == 0:
+                # Root node: self-reference signals no dependency
+                # DEP == frag_idx is unambiguous (cannot depend on self)
+                dep = node.index
+                payload = node.payload
+            elif len(node.parents) == 1:
+                # Single parent: use DEP byte directly
+                dep = node.parents[0]
+                payload = node.payload
+            else:
+                # Multi-parent: set extended dep flag, prefix with bitmap
+                flags |= FLAG_EXTENDED_DEP
+                dep = node.parents[0]  # primary dep in header for legacy readers
+                bitmap = 0
+                for p in node.parents:
+                    bitmap |= (1 << p)
+                payload = struct.pack(">I", bitmap) + node.payload
+
+            frags.append(Fragment(
+                msg_id=msg_id, frag_idx=node.index, frag_ct=frag_ct,
+                flags=flags, dep=dep, payload=payload,
+            ))
+
+        return frags
+
+
+class DAGReassembler:
+    """
+    Receive-side Tier 3: buffer fragments, resolve dependency DAG,
+    execute in topological order under loss tolerance policy.
+
+    Execution semantics:
+      - Topological sort of received fragments whose full ancestor
+        chains are present.
+      - Under Gamma: execute maximal resolvable subgraph.
+      - Under Lambda: execute nothing unless all fragments received.
+      - Under Phi: discard everything if any fragment missing.
+      - R:ESTOP overrides everything: executes immediately on receipt.
+    """
+
+    def __init__(self, policy: LossPolicy = LossPolicy.GRACEFUL_DEGRADATION):
+        self.policy = policy
+        self._buffer: dict[int, dict[int, Fragment]] = {}  # msg_id -> {frag_idx: Fragment}
+
+    def receive(self, frag: Fragment) -> list[bytes] | None:
+        """Buffer a fragment and attempt DAG resolution.
+
+        Returns ordered list of payloads in execution order, or None if
+        the message is not yet resolvable.
+        """
+        # R:ESTOP hard exception — immediate execution, no DAG resolution
+        if b"R:ESTOP" in frag.payload:
+            return [frag.payload]
+
+        mid = frag.msg_id
+        if mid not in self._buffer:
+            self._buffer[mid] = {}
+        self._buffer[mid][frag.frag_idx] = frag
+        received = self._buffer[mid]
+        expected = frag.frag_ct
+
+        # Check completeness based on policy
+        if self.policy == LossPolicy.FAIL_SAFE:
+            if len(received) == expected:
+                return self._resolve_dag(received, expected)
+            return None
+
+        elif self.policy == LossPolicy.ATOMIC:
+            if len(received) == expected:
+                return self._resolve_dag(received, expected)
+            return None
+
+        else:  # GRACEFUL_DEGRADATION
+            if frag.is_terminal and len(received) == expected:
+                return self._resolve_dag(received, expected)
+            if frag.is_terminal:
+                return self._resolve_dag_partial(received, expected)
+            return None
+
+    def _get_parents(self, frag: Fragment) -> list[int]:
+        """Extract parent dependencies from a fragment.
+
+        Root convention: DEP == frag_idx (self-reference) means no dependency.
+        This is unambiguous because a fragment cannot depend on itself.
+        """
+        if frag.flags & FLAG_EXTENDED_DEP:
+            # Multi-parent: first 4 bytes of payload are u32 bitmap
+            if len(frag.payload) < 4:
+                return []
+            bitmap = struct.unpack(">I", frag.payload[:4])[0]
+            return [i for i in range(32) if bitmap & (1 << i)]
+        else:
+            # Self-reference = root node (no dependency)
+            if frag.dep == frag.frag_idx:
+                return []
+            return [frag.dep]
+
+    def _get_payload(self, frag: Fragment) -> bytes:
+        """Extract the actual payload, stripping dependency bitmap if present."""
+        if frag.flags & FLAG_EXTENDED_DEP:
+            return frag.payload[4:]
+        return frag.payload
+
+    def _resolve_dag(self, received: dict[int, Fragment],
+                     expected: int) -> list[bytes]:
+        """Full DAG resolution: all fragments present. Topological sort."""
+        # Build adjacency: parent -> children
+        order = self._topo_sort(received, set(received.keys()))
+        return [self._get_payload(received[i]) for i in order]
+
+    def _resolve_dag_partial(self, received: dict[int, Fragment],
+                             expected: int) -> list[bytes]:
+        """Graceful Degradation: execute maximal resolvable subgraph.
+
+        A fragment is executable iff ALL its ancestors in the DAG
+        have been received.
+        """
+        present = set(received.keys())
+        # Find executable set: fragments whose full ancestor chain is present
+        executable: set[int] = set()
+        for idx in present:
+            if self._ancestors_satisfied(received, idx, present):
+                executable.add(idx)
+
+        if not executable:
+            return []
+
+        order = self._topo_sort(received, executable)
+        return [self._get_payload(received[i]) for i in order]
+
+    def _ancestors_satisfied(self, received: dict[int, Fragment],
+                             idx: int, present: set[int]) -> bool:
+        """Check if all ancestors of fragment idx are in present set."""
+        visited: set[int] = set()
+        stack = [idx]
+        while stack:
+            current = stack.pop()
+            if current in visited:
+                continue
+            visited.add(current)
+            if current not in present:
+                return False
+            if current in received:
+                parents = self._get_parents(received[current])
+                for p in parents:
+                    if p not in visited:
+                        stack.append(p)
+        return True
+
+    def _topo_sort(self, received: dict[int, Fragment],
+                   node_set: set[int]) -> list[int]:
+        """Kahn's algorithm over the executable node set."""
+        # Build in-degree map restricted to node_set
+        in_degree: dict[int, int] = {i: 0 for i in node_set}
+        children: dict[int, list[int]] = {i: [] for i in node_set}
+
+        for idx in node_set:
+            parents = self._get_parents(received[idx])
+            for p in parents:
+                if p in node_set:
+                    in_degree[idx] += 1
+                    children[p].append(idx)
+
+        # Seed with zero in-degree (root nodes)
+        queue = sorted(i for i in node_set if in_degree[i] == 0)
+        order: list[int] = []
+
+        while queue:
+            node = queue.pop(0)
+            order.append(node)
+            for child in sorted(children.get(node, [])):
+                in_degree[child] -= 1
+                if in_degree[child] == 0:
+                    queue.append(child)
+
+        return order
+
+    def nack(self, msg_id: int, expected_ct: int) -> str:
+        """Generate NACK for missing fragments in a DAG message."""
         have = set(self._buffer.get(msg_id, {}).keys())
         missing = sorted(set(range(expected_ct)) - have)
         return f"A:NACK[MSG:{msg_id}∖[{','.join(str(i) for i in missing)}]]"

@@ -248,7 +248,18 @@ Fragment header fields:
 
 **Tier 3 — DAG Decomposition**
 Condition: Instruction set contains conditional branches or dependency chains.
-Behavior: Instruction tree decomposed into a directed acyclic graph (DAG) of executable units. Each unit carries dependency pointer. Receiving node uses dependency-resolution buffer to reconstruct execution order. Executes maximal subset resolvable under received fragments.
+Behavior: Instruction tree decomposed into a directed acyclic graph (DAG) of executable units. Each unit carries dependency pointer. Receiving node uses dependency-resolution buffer to reconstruct execution order via topological sort (Kahn's algorithm). Executes maximal subset resolvable under received fragments.
+
+Fragment header remains 6 bytes (shared with Tier 2). The DEP byte encodes single-parent dependencies directly. Root convention: DEP == FRAG_IDX (self-reference) signals no dependency; this is unambiguous because a fragment cannot depend on itself. Tier 2 fragments (DEP=0x00 on fragment 0) remain valid under this convention.
+
+Multi-parent dependencies (diamond joins): FLAGS bit 3 (0x08, EXTENDED_DEP) signals that the first 4 bytes of payload are a big-endian u32 dependency bitmap, where bit N indicates dependency on fragment N. The DEP header byte carries the primary parent for legacy readers. The 32-bit bitmap supports up to 32 fragments per message; practical DAG depth is 3-8 nodes.
+
+Execution order under loss tolerance:
+- **Φ (Fail-Safe):** All fragments required; discard on incomplete receipt.
+- **Γ (Graceful Degradation):** Execute the maximal subgraph whose full ancestor chains are present (topological sort of resolvable subset).
+- **Λ (Atomic):** All fragments required; NACK on incomplete receipt.
+
+R:ESTOP exception: Any fragment containing R:ESTOP executes immediately on receipt, regardless of DAG position, dependency state, or loss tolerance policy.
 
 ### 8.2 Loss Tolerance Policies
 

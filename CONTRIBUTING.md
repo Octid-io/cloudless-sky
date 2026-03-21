@@ -129,9 +129,9 @@ See Meshtastic Integration above. The companion device path is operational. The 
 
 Mobile SDK implementations enabling phones to function as sovereign OSMP nodes. Relevant for both the Meshtastic mobile apps and standalone OSMP mesh participation.
 
-### Tier 3 DAG Fragmentation -- contribution target
+### Tier 3 DAG Fragmentation -- shipped (Python, TypeScript, Go)
 
-Overflow Protocol Tier 3: DAG decomposition for instructions with conditional branches and dependency chains. Spec-defined (§8.1) and patent-covered. The Python reference implements Tier 1 and Tier 2; Tier 3 is architecturally specified but not yet implemented.
+Overflow Protocol Tier 3: DAG decomposition for instructions with conditional branches and dependency chains. Spec-defined (§8.1) and patent-covered. All three SDKs implement DAGFragmenter and DAGReassembler. DAGFragmenter decomposes compound SAL into a directed acyclic graph, assigns DEP pointers (self-reference for roots, direct pointer for single-parent, FLAGS bit 3 extended bitmap for multi-parent). DAGReassembler resolves execution order via topological sort under all three loss tolerance policies. R:ESTOP hard exception fires immediately regardless of DAG state. Python: 45 tests. TypeScript: 52 assertions. Go: 12 tests. Fragment header format is byte-identical across all three SDKs.
 
 ### FNP Handshake State Machine -- shipped
 
