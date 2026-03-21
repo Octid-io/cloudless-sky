@@ -1,6 +1,6 @@
 # OSMP MCP Server
 
-MCP server for the [Octid Semantic Mesh Protocol (OSMP)](https://octid.io). Gives any MCP-compatible AI client native OSMP capability: encode, decode, translate, and resolve agentic instructions by table lookup. No inference at decode.
+MCP server for the [Octid Semantic Mesh Protocol (OSMP)](https://octid.io). Deterministic encode/decode of agentic AI instructions by table lookup. No inference at decode.
 
 ## Install
 
@@ -40,39 +40,43 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
-## Tools
+## Tools (8)
 
 | Tool | What it does |
 |---|---|
-| `osmp_translate` | Natural language to SAL instruction. The primary tool for agents learning to speak OSMP. |
-| `osmp_encode` | Structured fields to SAL instruction (`H:HR@NODE1>120`) |
-| `osmp_decode` | SAL string to structured fields. Handles compound multi-frame instructions. |
-| `osmp_compound_decode` | DAG topology analysis of compound instructions. Shows dependency chains, wire format, and what executes under each loss policy if fragments are lost. |
-| `osmp_resolve` | Domain code to SAL description from D:PACK/BLK binary (74,719 ICD-10-CM, 47,835 ISO 20022) |
-| `osmp_benchmark` | Run the canonical conformance suite |
+| `osmp_encode` | Structured fields to SAL instruction |
+| `osmp_decode` | SAL to structured fields (handles compound instructions) |
+| `osmp_compound_decode` | DAG topology and loss tolerance analysis |
+| `osmp_lookup` | Search the opcode dictionary by namespace and/or keyword |
+| `osmp_discover` | Search domain corpora by keyword and/or code prefix (ICD-10-CM, ISO 20022) |
+| `osmp_resolve` | Single domain code lookup (exact code required) |
+| `osmp_batch_resolve` | Multiple exact domain codes in one call |
+| `osmp_benchmark` | Canonical conformance suite |
 
-## Resources
+## Resources (6)
 
-| URI | What it provides |
+| URI | Content |
 |---|---|
-| `osmp://system_prompt` | Ready-to-use system prompt fragment. Inject into any LLM to enable native SAL generation. |
-| `osmp://examples` | 10 annotated SAL examples with NL equivalents and explanations. |
-| `osmp://dictionary` | Full Adaptive Shared Dictionary (339 opcodes across 26 namespaces). |
-| `osmp://grammar` | SAL formal grammar (EBNF). |
-| `osmp://corpora` | Available D:PACK/BLK domain corpus stats. |
+| `osmp://system_prompt` | SAL grammar and composition reference (~185 tokens) |
+| `osmp://about` | Protocol design philosophy |
+| `osmp://dictionary` | Full ASD (339 opcodes, 26 namespaces) |
+| `osmp://grammar` | SAL formal grammar (EBNF) |
+| `osmp://corpora` | Available D:PACK/BLK domain corpus stats |
+| `osmp://examples` | 10 annotated SAL examples |
 
 ## Agent Quickstart
 
-1. Connect the MCP server
-2. Read `osmp://system_prompt` and inject it into your context
-3. Use `osmp_translate` to convert natural language to SAL
-4. Use `osmp_compound_decode` to analyze DAG topology before transmitting compound instructions
-5. Use `osmp_decode` to parse SAL instructions you receive
-6. Use `osmp_resolve` to look up domain codes (ICD-10, ISO 20022)
+1. Read `osmp://system_prompt`
+2. Use `osmp_lookup` to find opcodes by namespace or keyword
+3. Compose SAL directly from the dictionary
+4. Use `osmp_discover` to find domain codes you don't know (keyword + optional prefix)
+5. Use `osmp_resolve` for exact code lookup once you have the code
+6. Use `osmp_compound_decode` to check DAG topology before transmitting
+7. Use `osmp_decode` to parse received instructions
 
-## What ships in the package
+## Context Window Footprint
 
-The 1.7MB package includes the full Python SDK, the Adaptive Shared Dictionary (339 opcodes across 26 namespaces), and two D:PACK/BLK domain corpora (ICD-10-CM and ISO 20022) compressed for edge deployment. No additional downloads required.
+~124 tokens on connect (server instructions + tool schemas + resource listings). ~308 tokens total after reading the system prompt. Designed to minimize the context overhead that the research shows consumes 30-72% of agent context windows across existing MCP servers.
 
 ## Links
 

@@ -96,7 +96,7 @@ All three SDKs are independently verified against the canonical test suite. Wire
 | **Python** | Reference implementation | CONFORMANT | Single source of truth for all SDK behavior |
 | **TypeScript** | OpenClaw / web agent integrations | CONFORMANT | `fzstd` (82KB, pure JS, zero native deps) for D:PACK/BLK |
 | **Go** | PicoClaw / constrained hardware | CONFORMANT | ASD compiled-in; D:PACK/BLK via `klauspost/compress/zstd` (3.1MB binary) |
-| **MCP Server** | Any MCP-compatible AI client | `pip install osmp-mcp` | 6 tools: encode, decode, translate, compound_decode, resolve, benchmark |
+| **MCP Server** | Any MCP-compatible AI client | `pip install osmp-mcp` | 8 tools: encode, decode, compound_decode, lookup, discover, resolve, batch_resolve, benchmark |
 
 ---
 
