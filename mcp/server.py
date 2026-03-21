@@ -44,6 +44,9 @@ from osmp import (  # noqa: E402
     SALDecoder,
     BlockCompressor,
     AdaptiveSharedDictionary,
+    DAGFragmenter,
+    DAGReassembler,
+    LossPolicy,
     run_benchmark,
 )
 
@@ -442,6 +445,162 @@ def osmp_benchmark() -> str:
         )
 
     return "\n".join(summary_lines)
+
+
+@mcp.tool()
+def osmp_compound_decode(sal: str) -> str:
+    """Analyze the DAG topology of a compound SAL instruction.
+
+    Shows how the instruction decomposes into executable units
+    with dependency chains, and what executes under each loss
+    tolerance policy if specific fragments are lost in transit.
+
+    Use this BEFORE transmitting a compound instruction to understand
+    the structural consequences of packet loss on execution.
+
+    The Overflow Protocol fragments compound instructions into a
+    directed acyclic graph (DAG) of executable units. Each unit
+    carries a dependency pointer. The receiving node resolves
+    execution order via topological sort and applies the active
+    loss tolerance policy to determine what runs.
+
+    This tool answers: "If I send this instruction over a lossy
+    radio link, what actually executes on the other end?"
+
+    Args:
+        sal: Compound SAL instruction containing structural operators
+             (→ ∧ ∨ ; ∥). Single-frame instructions work but produce
+             trivial single-node output.
+
+    Returns:
+        JSON with DAG topology, per-node dependencies, fragment wire
+        format details, and execution analysis under all three loss
+        tolerance policies (Phi/Gamma/Lambda).
+    """
+    fragmenter = DAGFragmenter()
+    nodes = fragmenter.parse(sal)
+
+    # -- DAG topology --
+    dag_nodes = []
+    for node in nodes:
+        decoded_frames = []
+        payload_str = node.payload.decode("utf-8", errors="replace")
+        try:
+            d = _decoder.decode_frame(payload_str)
+            decoded_frames.append({
+                "namespace": d.namespace,
+                "opcode": d.opcode,
+                "meaning": d.opcode_meaning,
+                "target": d.target,
+                "natural_language": _decoder.decode_natural_language(payload_str),
+            })
+        except Exception:
+            decoded_frames.append({"raw": payload_str})
+
+        dag_nodes.append({
+            "index": node.index,
+            "payload": payload_str,
+            "payload_bytes": len(node.payload),
+            "parents": node.parents,
+            "is_root": len(node.parents) == 0,
+            "decoded": decoded_frames[0] if decoded_frames else None,
+        })
+
+    # -- Fragment wire format --
+    frags = fragmenter.fragmentize(sal, msg_id=0)
+    wire_fragments = []
+    for f in frags:
+        wire_fragments.append({
+            "frag_idx": f.frag_idx,
+            "frag_ct": f.frag_ct,
+            "dep_byte": f.dep,
+            "flags": f.flags,
+            "extended_dep": bool(f.flags & 0x08),
+            "packed_bytes": len(f.pack()),
+            "fits_lora_floor": len(f.pack()) <= 51,
+            "fits_lora_standard": len(f.pack()) <= 255,
+        })
+
+    # -- Loss analysis per policy --
+    loss_analysis = {}
+    all_indices = set(range(len(nodes)))
+
+    for policy_name, policy_enum in [
+        ("Phi (Fail-Safe)", LossPolicy.FAIL_SAFE),
+        ("Gamma (Graceful Degradation)", LossPolicy.GRACEFUL_DEGRADATION),
+        ("Lambda (Atomic)", LossPolicy.ATOMIC),
+    ]:
+        # Full receipt
+        reasm = DAGReassembler(policy=policy_enum)
+        full_frags = fragmenter.fragmentize(sal, msg_id=1)
+        result = None
+        for f in full_frags:
+            result = reasm.receive(f)
+        full_exec = []
+        if result:
+            full_exec = [p.decode("utf-8", errors="replace") for p in result]
+
+        # Per-node drop analysis (what happens if each node is lost)
+        drop_scenarios = []
+        if len(nodes) > 1:
+            for drop_idx in range(len(nodes)):
+                reasm_drop = DAGReassembler(policy=policy_enum)
+                drop_frags = fragmenter.fragmentize(sal, msg_id=100 + drop_idx)
+                partial_result = None
+                for f in drop_frags:
+                    if f.frag_idx == drop_idx:
+                        continue
+                    partial_result = reasm_drop.receive(f)
+
+                # If no terminal was delivered, force resolution for GD
+                if partial_result is None and policy_enum == LossPolicy.GRACEFUL_DEGRADATION:
+                    # Terminal was the dropped fragment; simulate timeout
+                    # by delivering a synthetic terminal to trigger resolution
+                    remaining = [f for f in drop_frags if f.frag_idx != drop_idx]
+                    if remaining:
+                        reasm_drop2 = DAGReassembler(policy=policy_enum)
+                        for f in remaining[:-1]:
+                            reasm_drop2.receive(f)
+                        # Mark last remaining as terminal
+                        from copy import copy
+                        last = copy(remaining[-1])
+                        last.flags |= 0x01  # FLAG_TERMINAL
+                        partial_result = reasm_drop2.receive(last)
+
+                survived = []
+                if partial_result:
+                    survived = [p.decode("utf-8", errors="replace") for p in partial_result]
+
+                dropped_payload = nodes[drop_idx].payload.decode("utf-8", errors="replace")
+                drop_scenarios.append({
+                    "dropped_fragment": drop_idx,
+                    "dropped_instruction": dropped_payload,
+                    "executes": survived,
+                    "blocked": [n.payload.decode("utf-8", errors="replace")
+                                for n in nodes
+                                if n.payload.decode("utf-8", errors="replace")
+                                not in survived
+                                and n.index != drop_idx],
+                })
+
+        loss_analysis[policy_name] = {
+            "full_receipt_execution_order": full_exec,
+            "drop_scenarios": drop_scenarios,
+        }
+
+    # -- Build output --
+    output = {
+        "instruction": sal,
+        "total_bytes": len(sal.encode("utf-8")),
+        "node_count": len(nodes),
+        "has_conditional_branches": any(len(n.parents) > 0 for n in nodes),
+        "has_multi_parent_joins": any(len(n.parents) > 1 for n in nodes),
+        "dag": dag_nodes,
+        "wire_fragments": wire_fragments,
+        "loss_tolerance_analysis": loss_analysis,
+    }
+
+    return json.dumps(output, indent=2, ensure_ascii=False)
 
 
 # -- Resources: expose the ASD and grammar as readable context ------------

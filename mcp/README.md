@@ -47,6 +47,7 @@ Add to `claude_desktop_config.json`:
 | `osmp_translate` | Natural language to SAL instruction. The primary tool for agents learning to speak OSMP. |
 | `osmp_encode` | Structured fields to SAL instruction (`H:HR@NODE1>120`) |
 | `osmp_decode` | SAL string to structured fields. Handles compound multi-frame instructions. |
+| `osmp_compound_decode` | DAG topology analysis of compound instructions. Shows dependency chains, wire format, and what executes under each loss policy if fragments are lost. |
 | `osmp_resolve` | Domain code to SAL description from D:PACK/BLK binary (74,719 ICD-10-CM, 47,835 ISO 20022) |
 | `osmp_benchmark` | Run the canonical conformance suite |
 
@@ -65,8 +66,9 @@ Add to `claude_desktop_config.json`:
 1. Connect the MCP server
 2. Read `osmp://system_prompt` and inject it into your context
 3. Use `osmp_translate` to convert natural language to SAL
-4. Use `osmp_decode` to parse SAL instructions you receive
-5. Use `osmp_resolve` to look up domain codes (ICD-10, ISO 20022)
+4. Use `osmp_compound_decode` to analyze DAG topology before transmitting compound instructions
+5. Use `osmp_decode` to parse SAL instructions you receive
+6. Use `osmp_resolve` to look up domain codes (ICD-10, ISO 20022)
 
 ## What ships in the package
 
