@@ -297,13 +297,27 @@ GRAMMAR: [NS:]OPCODE[@TARGET][OPERATOR INSTRUCTION]
 OPERATORS: -> THEN  ^ AND  v OR  ; SEQUENCE  || PARALLEL
 TARGET: @NODE_ID or @* (broadcast)  QUERY: ?SLOT  PARAM: [value]
 
+COMPOSITION RULES:
+- @ takes a node ID or * (broadcast). Never another opcode or namespace.
+  Valid: M:EVA@MEDEVAC, M:EVA@*. Invalid: H:ALERT@H:ICD[J083].
+- [] carries values: domain codes, parameters, thresholds.
+  H:ICD[J083], K:XFR[AMT], Z:TOKENS[847].
+- Layer 2 accessors (H:ICD, H:SNOMED, H:CPT) are H namespace, not D.
+  They are standalone frames in a chain, not target parameters.
+  Correct: H:ICD[J083]->H:CASREP->M:EVA@MEDEVAC (38 bytes, 3 frames).
+  Wrong: H:CASREP@H:ICD[J083] (ICD is not a target, it is its own frame).
+- / is not a SAL operator. Never use slashes.
+- One declaration per frame. Chain frames with operators.
+- Always call osmp_lookup before composing. Never guess opcodes.
+- Always call osmp_discover when you don't know a domain code.
+
 EXAMPLE: H:HR@NODE1>120->H:CASREP^M:EVA@*
   "If heart rate >120, casualty report AND evacuate all." 35 bytes.
 
 {sum(len(ops) for ops in asd._data.values())} opcodes, {len(asd._data)} namespaces. Use osmp_lookup to search.
 {chr(10).join(ns_lines)}
 
-Compose from the dictionary. osmp_compound_decode shows DAG topology.
+osmp_compound_decode shows DAG topology and loss tolerance behavior.
 osmp_discover searches domain corpora by keyword (use when you don't know the code).
 osmp_resolve / osmp_batch_resolve for exact code lookup (ICD-10, ISO 20022).
 If SAL is longer than the NL, send the NL. Floor: 51 bytes.
@@ -377,6 +391,7 @@ def get_examples() -> str:
 8. Z:INF^Z:TOKENS:847    "Invoke inference, report tokens"           33B
 9. H:ICD[A000]           "Look up ICD-10 cholera code"               10B
 10. J:GOAL[QTR]->J:HANDOFF@BETA  "Declare goal, hand off to Beta"   30B
+11. H:ICD[J083]->H:CASREP->M:EVA@MEDEVAC  "Pneumothorax: report + MEDEVAC"  38B
 
 Operators: -> THEN  ^ AND  v OR  ; SEQUENCE  @ target  ? query  * broadcast  [] param"""
 

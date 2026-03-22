@@ -57,12 +57,12 @@ Add to `claude_desktop_config.json`:
 
 | URI | Content |
 |---|---|
-| `osmp://system_prompt` | SAL grammar and composition reference (~185 tokens) |
+| `osmp://system_prompt` | SAL grammar, composition rules, and reference (~390 tokens) |
 | `osmp://about` | Protocol design philosophy |
 | `osmp://dictionary` | Full ASD (339 opcodes, 26 namespaces) |
 | `osmp://grammar` | SAL formal grammar (EBNF) |
 | `osmp://corpora` | Available D:PACK/BLK domain corpus stats |
-| `osmp://examples` | 10 annotated SAL examples |
+| `osmp://examples` | 11 annotated SAL examples |
 
 ## Agent Quickstart
 
@@ -76,7 +76,7 @@ Add to `claude_desktop_config.json`:
 
 ## Context Window Footprint
 
-~124 tokens on connect (server instructions + tool schemas + resource listings). ~308 tokens total after reading the system prompt. Designed to minimize the context overhead that the research shows consumes 30-72% of agent context windows across existing MCP servers.
+~124 tokens on connect (server instructions + tool schemas + resource listings). ~514 tokens total after reading the system prompt. Composition rules added to prevent common grammar errors observed during agent testing. Still under 0.3% of a 200K context window.
 
 ## Links
 
