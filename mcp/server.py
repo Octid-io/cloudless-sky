@@ -271,7 +271,13 @@ def osmp_benchmark() -> str:
     """Run the canonical conformance suite."""
     if not VECTORS_PATH.exists():
         return f"Test vectors not found at {VECTORS_PATH}"
-    result = run_benchmark(str(VECTORS_PATH))
+    import io, os
+    old_stdout = sys.stdout
+    sys.stdout = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
+    try:
+        result = run_benchmark(str(VECTORS_PATH))
+    finally:
+        sys.stdout = old_stdout
     lines = [
         f"Vectors: {len(result['vectors'])}  Mean: {result['mean_reduction_pct']}%  "
         f"Errors: {result['decode_errors']}  Conformant: {'YES' if result['conformant'] else 'NO'}",
