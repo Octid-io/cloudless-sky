@@ -87,3 +87,5 @@ Add to `claude_desktop_config.json`:
 ## License
 
 Apache 2.0 with express patent grant.
+
+<!-- mcp-name: io.github.Octid-io/osmp -->
