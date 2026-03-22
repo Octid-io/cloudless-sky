@@ -1939,7 +1939,7 @@ def run_benchmark(vectors_path: str | None = None) -> dict:
             Path(__file__).parent.parent.parent /
             "protocol" / "test-vectors" / "canonical-test-vectors.json"
         )
-    with open(vectors_path) as f:
+    with open(vectors_path, encoding="utf-8") as f:
         data = json.load(f)
 
     decoder   = SALDecoder()
