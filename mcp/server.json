@@ -6,12 +6,12 @@
         "url": "https://github.com/octid-io/cloudless-sky",
         "source": "github"
     },
-    "version": "1.0.6",
+    "version": "1.0.7",
     "packages": [
         {
             "registryType": "pypi",
             "identifier": "osmp-mcp",
-            "version": "1.0.7",
+            "version": "1.0.8",
             "transport": {
                 "type": "stdio"
             }

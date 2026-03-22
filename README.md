@@ -64,7 +64,7 @@ pip install osmp-mcp
 osmp-mcp
 ```
 
-Installs the MCP server with both domain corpora (ICD-10-CM, ISO 20022) included. Connect from Claude Code (`claude mcp add osmp -- osmp-mcp`), Claude Desktop, Cursor, or any MCP-compatible client. Listed on the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.Octid-io/osmp`.
+Installs the MCP server with three domain corpora (ICD-10-CM, ISO 20022, MITRE ATT&CK) included. Connect from Claude Code (`claude mcp add osmp -- osmp-mcp`), Claude Desktop, Cursor, or any MCP-compatible client. Listed on the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.Octid-io/osmp`.
 
 ### From source
 ```bash
@@ -108,7 +108,7 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 
 **Four AI-native namespaces** — J (Cognitive Execution State), Q (Quality/Evaluation/Grounding), Y (Memory + Retrieval), Z (Model/Inference Operations). No prior agent communication protocol defines these. They encode what agents do internally, not just what they communicate between themselves. The J→Y→Z→Q chain encodes the full AI cognitive pipeline as a single transmissible SAL instruction sequence, decodable by ASD lookup without neural inference.
 
-**Two-tier corpus compression** -- `D:PACK` applies OSMP encoding followed by lossless dictionary-based compression for at-rest storage. Two profiles: D:PACK/LZMA (full-corpus, companion device) and D:PACK/BLK (zstd block-level, microcontroller target with single-code random access in 38KB SRAM). `D:UNPACK` retrieves semantic content by ASD lookup against the SAL intermediate representation. Two complete D:PACK/BLK dict-free builds demonstrate the architecture at scale: the CMS FY2026 ICD-10-CM code set (74,719 clinical descriptions, 5.4MB raw) produces a 477KB binary (91.4% total reduction), and the ISO 20022 eRepository (66,956 financial message element definitions, 8.7MB raw) produces a 1.21MB binary (86.5% total reduction). Both artifacts fit in ESP32 flash and enable edge-local domain code resolution without network access.
+**Two-tier corpus compression** -- `D:PACK` applies OSMP encoding followed by lossless dictionary-based compression for at-rest storage. Two profiles: D:PACK/LZMA (full-corpus, companion device) and D:PACK/BLK (zstd block-level, microcontroller target with single-code random access in 38KB SRAM). `D:UNPACK` retrieves semantic content by ASD lookup against the SAL intermediate representation. Three complete D:PACK/BLK dict-free builds demonstrate the architecture at scale: the CMS FY2026 ICD-10-CM code set (74,719 clinical descriptions, 5.4MB raw) produces a 477KB binary (91.4% total reduction), the ISO 20022 eRepository (66,956 financial message element definitions, 8.7MB raw) produces a 1.21MB binary (86.5% total reduction), and the MITRE ATT&CK Enterprise v18.1 knowledge base (1,661 techniques, malware, tools, and threat groups, 82KB raw) produces a 20KB binary (75.3% reduction). All artifacts fit in ESP32 flash and enable edge-local domain code resolution without network access.
 
 **H namespace Layer 2 accessors** — `H:ICD[R00.1]`, `H:SNOMED[concept_id]`, `H:CPT[99213]` are fully functional today with native code values in brackets. Slot values from open-ended external registries are exempt from the single-character encoding rule. MDR increases compression density of these codes; it does not gate functionality.
 
@@ -128,7 +128,7 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 
 **C++ firmware-level OSMP nodes** — OSMP integration with Meshtastic via the Python SDK and Meshtastic Python library is operational today (see CONTRIBUTING.md). The C++ contribution target is a firmware-level encoder/decoder enabling ESP32 and nRF52 Meshtastic devices to operate as sovereign OSMP nodes without a companion device, with the ASD compiled into flash.
 
-**Additional MDR namespaces** — Two domain corpora are shipped (ICD-10-CM, ISO 20022). SNOMED CT, RxNorm, LOINC, and other open registries are future namespace targets.
+**Additional MDR namespaces** — Three domain corpora are shipped (ICD-10-CM, ISO 20022, MITRE ATT&CK Enterprise). SNOMED CT, RxNorm, LOINC, and other open registries are future namespace targets.
 
 ---
 

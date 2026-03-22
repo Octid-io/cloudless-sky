@@ -39,6 +39,8 @@ MDR_CORPORA = {
     "icd10cm": MDR_DIR / "icd10cm" / "MDR-ICD10CM-FY2026-blk.dpack",
     "iso": MDR_DIR / "iso20022" / "MDR-ISO20022-K-ISO-blk.dpack",
     "iso20022": MDR_DIR / "iso20022" / "MDR-ISO20022-K-ISO-blk.dpack",
+    "attack": MDR_DIR / "mitre-attack" / "MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack",
+    "mitre": MDR_DIR / "mitre-attack" / "MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack",
 }
 
 # -- Singleton instances --------------------------------------------------
@@ -63,7 +65,7 @@ def _load_mdr(corpus: str) -> bytes:
 # -- MCP Server -----------------------------------------------------------
 mcp = FastMCP(
     "osmp",
-    instructions="Use when encoding agent instructions, reducing inter-agent token spend, or resolving domain codes (ICD-10, ISO 20022). 60%+ byte reduction over JSON. Deterministic decode by table lookup.",
+    instructions="Use when encoding agent instructions, reducing inter-agent token spend, or resolving domain codes (ICD-10, ISO 20022, MITRE ATT&CK). 60%+ byte reduction over JSON. Deterministic decode by table lookup.",
 )
 
 
@@ -203,7 +205,7 @@ def osmp_lookup(namespace: str = "", keyword: str = "") -> str:
 
 @mcp.tool()
 def osmp_resolve(code: str, corpus: str = "icd") -> str:
-    """Resolve a domain code from D:PACK/BLK. Corpora: icd (74,719), iso (47,835)."""
+    """Resolve a domain code from D:PACK/BLK. Corpora: icd (74,719), iso (47,835), attack (1,661)."""
     try:
         data = _load_mdr(corpus)
     except (ValueError, FileNotFoundError) as e:
@@ -319,7 +321,7 @@ EXAMPLE: H:HR@NODE1>120->H:CASREP^M:EVA@*
 
 osmp_compound_decode shows DAG topology and loss tolerance behavior.
 osmp_discover searches domain corpora by keyword (use when you don't know the code).
-osmp_resolve / osmp_batch_resolve for exact code lookup (ICD-10, ISO 20022).
+osmp_resolve / osmp_batch_resolve for exact code lookup (ICD-10, ISO 20022, MITRE ATT&CK).
 If SAL is longer than the NL, send the NL. Floor: 51 bytes.
 """
 

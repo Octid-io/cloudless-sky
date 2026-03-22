@@ -48,7 +48,7 @@ Add to `claude_desktop_config.json`:
 | `osmp_decode` | SAL to structured fields (handles compound instructions) |
 | `osmp_compound_decode` | DAG topology and loss tolerance analysis |
 | `osmp_lookup` | Search the opcode dictionary by namespace and/or keyword |
-| `osmp_discover` | Search domain corpora by keyword and/or code prefix (ICD-10-CM, ISO 20022) |
+| `osmp_discover` | Search domain corpora by keyword and/or code prefix (ICD-10-CM, ISO 20022, MITRE ATT&CK) |
 | `osmp_resolve` | Single domain code lookup (exact code required) |
 | `osmp_batch_resolve` | Multiple exact domain codes in one call |
 | `osmp_benchmark` | Canonical conformance suite |
