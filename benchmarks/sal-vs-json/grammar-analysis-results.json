@@ -1,0 +1,1421 @@
+{
+  "analysis": "OSMP Grammar-Level Structural Analysis",
+  "data_points": 1000,
+  "sweep_stats": {
+    "mean_structural_advantage_pct": 92.85361326211661,
+    "min_structural_advantage_pct": 91.85534591194968,
+    "max_structural_advantage_pct": 95.38461538461537,
+    "mean_json_overhead_ratio": 0.7509419133847279,
+    "mean_sal_overhead_ratio": 0.19270862185385904
+  },
+  "methodology": {
+    "content_bytes_per_param": 8,
+    "avg_key_length": 6,
+    "json_envelope_bytes": 79,
+    "param_range": "1-20",
+    "chain_range": "1-10",
+    "nesting_range": "1-5"
+  },
+  "slice_data": [
+    {
+      "n": 1,
+      "k": 1,
+      "json_s": 90,
+      "sal_s": 6,
+      "advantage": 93.33
+    },
+    {
+      "n": 1,
+      "k": 2,
+      "json_s": 180,
+      "sal_s": 13,
+      "advantage": 92.78
+    },
+    {
+      "n": 1,
+      "k": 3,
+      "json_s": 270,
+      "sal_s": 20,
+      "advantage": 92.59
+    },
+    {
+      "n": 1,
+      "k": 4,
+      "json_s": 360,
+      "sal_s": 27,
+      "advantage": 92.5
+    },
+    {
+      "n": 1,
+      "k": 5,
+      "json_s": 450,
+      "sal_s": 34,
+      "advantage": 92.44
+    },
+    {
+      "n": 1,
+      "k": 6,
+      "json_s": 540,
+      "sal_s": 41,
+      "advantage": 92.41
+    },
+    {
+      "n": 1,
+      "k": 7,
+      "json_s": 630,
+      "sal_s": 48,
+      "advantage": 92.38
+    },
+    {
+      "n": 1,
+      "k": 8,
+      "json_s": 720,
+      "sal_s": 55,
+      "advantage": 92.36
+    },
+    {
+      "n": 1,
+      "k": 9,
+      "json_s": 810,
+      "sal_s": 62,
+      "advantage": 92.35
+    },
+    {
+      "n": 1,
+      "k": 10,
+      "json_s": 900,
+      "sal_s": 69,
+      "advantage": 92.33
+    },
+    {
+      "n": 2,
+      "k": 1,
+      "json_s": 102,
+      "sal_s": 7,
+      "advantage": 93.14
+    },
+    {
+      "n": 2,
+      "k": 2,
+      "json_s": 204,
+      "sal_s": 15,
+      "advantage": 92.65
+    },
+    {
+      "n": 2,
+      "k": 3,
+      "json_s": 306,
+      "sal_s": 23,
+      "advantage": 92.48
+    },
+    {
+      "n": 2,
+      "k": 4,
+      "json_s": 408,
+      "sal_s": 31,
+      "advantage": 92.4
+    },
+    {
+      "n": 2,
+      "k": 5,
+      "json_s": 510,
+      "sal_s": 39,
+      "advantage": 92.35
+    },
+    {
+      "n": 2,
+      "k": 6,
+      "json_s": 612,
+      "sal_s": 47,
+      "advantage": 92.32
+    },
+    {
+      "n": 2,
+      "k": 7,
+      "json_s": 714,
+      "sal_s": 55,
+      "advantage": 92.3
+    },
+    {
+      "n": 2,
+      "k": 8,
+      "json_s": 816,
+      "sal_s": 63,
+      "advantage": 92.28
+    },
+    {
+      "n": 2,
+      "k": 9,
+      "json_s": 918,
+      "sal_s": 71,
+      "advantage": 92.27
+    },
+    {
+      "n": 2,
+      "k": 10,
+      "json_s": 1020,
+      "sal_s": 79,
+      "advantage": 92.25
+    },
+    {
+      "n": 3,
+      "k": 1,
+      "json_s": 114,
+      "sal_s": 8,
+      "advantage": 92.98
+    },
+    {
+      "n": 3,
+      "k": 2,
+      "json_s": 228,
+      "sal_s": 17,
+      "advantage": 92.54
+    },
+    {
+      "n": 3,
+      "k": 3,
+      "json_s": 342,
+      "sal_s": 26,
+      "advantage": 92.4
+    },
+    {
+      "n": 3,
+      "k": 4,
+      "json_s": 456,
+      "sal_s": 35,
+      "advantage": 92.32
+    },
+    {
+      "n": 3,
+      "k": 5,
+      "json_s": 570,
+      "sal_s": 44,
+      "advantage": 92.28
+    },
+    {
+      "n": 3,
+      "k": 6,
+      "json_s": 684,
+      "sal_s": 53,
+      "advantage": 92.25
+    },
+    {
+      "n": 3,
+      "k": 7,
+      "json_s": 798,
+      "sal_s": 62,
+      "advantage": 92.23
+    },
+    {
+      "n": 3,
+      "k": 8,
+      "json_s": 912,
+      "sal_s": 71,
+      "advantage": 92.21
+    },
+    {
+      "n": 3,
+      "k": 9,
+      "json_s": 1026,
+      "sal_s": 80,
+      "advantage": 92.2
+    },
+    {
+      "n": 3,
+      "k": 10,
+      "json_s": 1140,
+      "sal_s": 89,
+      "advantage": 92.19
+    },
+    {
+      "n": 4,
+      "k": 1,
+      "json_s": 126,
+      "sal_s": 9,
+      "advantage": 92.86
+    },
+    {
+      "n": 4,
+      "k": 2,
+      "json_s": 252,
+      "sal_s": 19,
+      "advantage": 92.46
+    },
+    {
+      "n": 4,
+      "k": 3,
+      "json_s": 378,
+      "sal_s": 29,
+      "advantage": 92.33
+    },
+    {
+      "n": 4,
+      "k": 4,
+      "json_s": 504,
+      "sal_s": 39,
+      "advantage": 92.26
+    },
+    {
+      "n": 4,
+      "k": 5,
+      "json_s": 630,
+      "sal_s": 49,
+      "advantage": 92.22
+    },
+    {
+      "n": 4,
+      "k": 6,
+      "json_s": 756,
+      "sal_s": 59,
+      "advantage": 92.2
+    },
+    {
+      "n": 4,
+      "k": 7,
+      "json_s": 882,
+      "sal_s": 69,
+      "advantage": 92.18
+    },
+    {
+      "n": 4,
+      "k": 8,
+      "json_s": 1008,
+      "sal_s": 79,
+      "advantage": 92.16
+    },
+    {
+      "n": 4,
+      "k": 9,
+      "json_s": 1134,
+      "sal_s": 89,
+      "advantage": 92.15
+    },
+    {
+      "n": 4,
+      "k": 10,
+      "json_s": 1260,
+      "sal_s": 99,
+      "advantage": 92.14
+    },
+    {
+      "n": 5,
+      "k": 1,
+      "json_s": 138,
+      "sal_s": 10,
+      "advantage": 92.75
+    },
+    {
+      "n": 5,
+      "k": 2,
+      "json_s": 276,
+      "sal_s": 21,
+      "advantage": 92.39
+    },
+    {
+      "n": 5,
+      "k": 3,
+      "json_s": 414,
+      "sal_s": 32,
+      "advantage": 92.27
+    },
+    {
+      "n": 5,
+      "k": 4,
+      "json_s": 552,
+      "sal_s": 43,
+      "advantage": 92.21
+    },
+    {
+      "n": 5,
+      "k": 5,
+      "json_s": 690,
+      "sal_s": 54,
+      "advantage": 92.17
+    },
+    {
+      "n": 5,
+      "k": 6,
+      "json_s": 828,
+      "sal_s": 65,
+      "advantage": 92.15
+    },
+    {
+      "n": 5,
+      "k": 7,
+      "json_s": 966,
+      "sal_s": 76,
+      "advantage": 92.13
+    },
+    {
+      "n": 5,
+      "k": 8,
+      "json_s": 1104,
+      "sal_s": 87,
+      "advantage": 92.12
+    },
+    {
+      "n": 5,
+      "k": 9,
+      "json_s": 1242,
+      "sal_s": 98,
+      "advantage": 92.11
+    },
+    {
+      "n": 5,
+      "k": 10,
+      "json_s": 1380,
+      "sal_s": 109,
+      "advantage": 92.1
+    },
+    {
+      "n": 6,
+      "k": 1,
+      "json_s": 150,
+      "sal_s": 11,
+      "advantage": 92.67
+    },
+    {
+      "n": 6,
+      "k": 2,
+      "json_s": 300,
+      "sal_s": 23,
+      "advantage": 92.33
+    },
+    {
+      "n": 6,
+      "k": 3,
+      "json_s": 450,
+      "sal_s": 35,
+      "advantage": 92.22
+    },
+    {
+      "n": 6,
+      "k": 4,
+      "json_s": 600,
+      "sal_s": 47,
+      "advantage": 92.17
+    },
+    {
+      "n": 6,
+      "k": 5,
+      "json_s": 750,
+      "sal_s": 59,
+      "advantage": 92.13
+    },
+    {
+      "n": 6,
+      "k": 6,
+      "json_s": 900,
+      "sal_s": 71,
+      "advantage": 92.11
+    },
+    {
+      "n": 6,
+      "k": 7,
+      "json_s": 1050,
+      "sal_s": 83,
+      "advantage": 92.1
+    },
+    {
+      "n": 6,
+      "k": 8,
+      "json_s": 1200,
+      "sal_s": 95,
+      "advantage": 92.08
+    },
+    {
+      "n": 6,
+      "k": 9,
+      "json_s": 1350,
+      "sal_s": 107,
+      "advantage": 92.07
+    },
+    {
+      "n": 6,
+      "k": 10,
+      "json_s": 1500,
+      "sal_s": 119,
+      "advantage": 92.07
+    },
+    {
+      "n": 7,
+      "k": 1,
+      "json_s": 162,
+      "sal_s": 12,
+      "advantage": 92.59
+    },
+    {
+      "n": 7,
+      "k": 2,
+      "json_s": 324,
+      "sal_s": 25,
+      "advantage": 92.28
+    },
+    {
+      "n": 7,
+      "k": 3,
+      "json_s": 486,
+      "sal_s": 38,
+      "advantage": 92.18
+    },
+    {
+      "n": 7,
+      "k": 4,
+      "json_s": 648,
+      "sal_s": 51,
+      "advantage": 92.13
+    },
+    {
+      "n": 7,
+      "k": 5,
+      "json_s": 810,
+      "sal_s": 64,
+      "advantage": 92.1
+    },
+    {
+      "n": 7,
+      "k": 6,
+      "json_s": 972,
+      "sal_s": 77,
+      "advantage": 92.08
+    },
+    {
+      "n": 7,
+      "k": 7,
+      "json_s": 1134,
+      "sal_s": 90,
+      "advantage": 92.06
+    },
+    {
+      "n": 7,
+      "k": 8,
+      "json_s": 1296,
+      "sal_s": 103,
+      "advantage": 92.05
+    },
+    {
+      "n": 7,
+      "k": 9,
+      "json_s": 1458,
+      "sal_s": 116,
+      "advantage": 92.04
+    },
+    {
+      "n": 7,
+      "k": 10,
+      "json_s": 1620,
+      "sal_s": 129,
+      "advantage": 92.04
+    },
+    {
+      "n": 8,
+      "k": 1,
+      "json_s": 174,
+      "sal_s": 13,
+      "advantage": 92.53
+    },
+    {
+      "n": 8,
+      "k": 2,
+      "json_s": 348,
+      "sal_s": 27,
+      "advantage": 92.24
+    },
+    {
+      "n": 8,
+      "k": 3,
+      "json_s": 522,
+      "sal_s": 41,
+      "advantage": 92.15
+    },
+    {
+      "n": 8,
+      "k": 4,
+      "json_s": 696,
+      "sal_s": 55,
+      "advantage": 92.1
+    },
+    {
+      "n": 8,
+      "k": 5,
+      "json_s": 870,
+      "sal_s": 69,
+      "advantage": 92.07
+    },
+    {
+      "n": 8,
+      "k": 6,
+      "json_s": 1044,
+      "sal_s": 83,
+      "advantage": 92.05
+    },
+    {
+      "n": 8,
+      "k": 7,
+      "json_s": 1218,
+      "sal_s": 97,
+      "advantage": 92.04
+    },
+    {
+      "n": 8,
+      "k": 8,
+      "json_s": 1392,
+      "sal_s": 111,
+      "advantage": 92.03
+    },
+    {
+      "n": 8,
+      "k": 9,
+      "json_s": 1566,
+      "sal_s": 125,
+      "advantage": 92.02
+    },
+    {
+      "n": 8,
+      "k": 10,
+      "json_s": 1740,
+      "sal_s": 139,
+      "advantage": 92.01
+    },
+    {
+      "n": 9,
+      "k": 1,
+      "json_s": 186,
+      "sal_s": 14,
+      "advantage": 92.47
+    },
+    {
+      "n": 9,
+      "k": 2,
+      "json_s": 372,
+      "sal_s": 29,
+      "advantage": 92.2
+    },
+    {
+      "n": 9,
+      "k": 3,
+      "json_s": 558,
+      "sal_s": 44,
+      "advantage": 92.11
+    },
+    {
+      "n": 9,
+      "k": 4,
+      "json_s": 744,
+      "sal_s": 59,
+      "advantage": 92.07
+    },
+    {
+      "n": 9,
+      "k": 5,
+      "json_s": 930,
+      "sal_s": 74,
+      "advantage": 92.04
+    },
+    {
+      "n": 9,
+      "k": 6,
+      "json_s": 1116,
+      "sal_s": 89,
+      "advantage": 92.03
+    },
+    {
+      "n": 9,
+      "k": 7,
+      "json_s": 1302,
+      "sal_s": 104,
+      "advantage": 92.01
+    },
+    {
+      "n": 9,
+      "k": 8,
+      "json_s": 1488,
+      "sal_s": 119,
+      "advantage": 92.0
+    },
+    {
+      "n": 9,
+      "k": 9,
+      "json_s": 1674,
+      "sal_s": 134,
+      "advantage": 92.0
+    },
+    {
+      "n": 9,
+      "k": 10,
+      "json_s": 1860,
+      "sal_s": 149,
+      "advantage": 91.99
+    },
+    {
+      "n": 10,
+      "k": 1,
+      "json_s": 198,
+      "sal_s": 15,
+      "advantage": 92.42
+    },
+    {
+      "n": 10,
+      "k": 2,
+      "json_s": 396,
+      "sal_s": 31,
+      "advantage": 92.17
+    },
+    {
+      "n": 10,
+      "k": 3,
+      "json_s": 594,
+      "sal_s": 47,
+      "advantage": 92.09
+    },
+    {
+      "n": 10,
+      "k": 4,
+      "json_s": 792,
+      "sal_s": 63,
+      "advantage": 92.05
+    },
+    {
+      "n": 10,
+      "k": 5,
+      "json_s": 990,
+      "sal_s": 79,
+      "advantage": 92.02
+    },
+    {
+      "n": 10,
+      "k": 6,
+      "json_s": 1188,
+      "sal_s": 95,
+      "advantage": 92.0
+    },
+    {
+      "n": 10,
+      "k": 7,
+      "json_s": 1386,
+      "sal_s": 111,
+      "advantage": 91.99
+    },
+    {
+      "n": 10,
+      "k": 8,
+      "json_s": 1584,
+      "sal_s": 127,
+      "advantage": 91.98
+    },
+    {
+      "n": 10,
+      "k": 9,
+      "json_s": 1782,
+      "sal_s": 143,
+      "advantage": 91.98
+    },
+    {
+      "n": 10,
+      "k": 10,
+      "json_s": 1980,
+      "sal_s": 159,
+      "advantage": 91.97
+    },
+    {
+      "n": 11,
+      "k": 1,
+      "json_s": 210,
+      "sal_s": 16,
+      "advantage": 92.38
+    },
+    {
+      "n": 11,
+      "k": 2,
+      "json_s": 420,
+      "sal_s": 33,
+      "advantage": 92.14
+    },
+    {
+      "n": 11,
+      "k": 3,
+      "json_s": 630,
+      "sal_s": 50,
+      "advantage": 92.06
+    },
+    {
+      "n": 11,
+      "k": 4,
+      "json_s": 840,
+      "sal_s": 67,
+      "advantage": 92.02
+    },
+    {
+      "n": 11,
+      "k": 5,
+      "json_s": 1050,
+      "sal_s": 84,
+      "advantage": 92.0
+    },
+    {
+      "n": 11,
+      "k": 6,
+      "json_s": 1260,
+      "sal_s": 101,
+      "advantage": 91.98
+    },
+    {
+      "n": 11,
+      "k": 7,
+      "json_s": 1470,
+      "sal_s": 118,
+      "advantage": 91.97
+    },
+    {
+      "n": 11,
+      "k": 8,
+      "json_s": 1680,
+      "sal_s": 135,
+      "advantage": 91.96
+    },
+    {
+      "n": 11,
+      "k": 9,
+      "json_s": 1890,
+      "sal_s": 152,
+      "advantage": 91.96
+    },
+    {
+      "n": 11,
+      "k": 10,
+      "json_s": 2100,
+      "sal_s": 169,
+      "advantage": 91.95
+    },
+    {
+      "n": 12,
+      "k": 1,
+      "json_s": 222,
+      "sal_s": 17,
+      "advantage": 92.34
+    },
+    {
+      "n": 12,
+      "k": 2,
+      "json_s": 444,
+      "sal_s": 35,
+      "advantage": 92.12
+    },
+    {
+      "n": 12,
+      "k": 3,
+      "json_s": 666,
+      "sal_s": 53,
+      "advantage": 92.04
+    },
+    {
+      "n": 12,
+      "k": 4,
+      "json_s": 888,
+      "sal_s": 71,
+      "advantage": 92.0
+    },
+    {
+      "n": 12,
+      "k": 5,
+      "json_s": 1110,
+      "sal_s": 89,
+      "advantage": 91.98
+    },
+    {
+      "n": 12,
+      "k": 6,
+      "json_s": 1332,
+      "sal_s": 107,
+      "advantage": 91.97
+    },
+    {
+      "n": 12,
+      "k": 7,
+      "json_s": 1554,
+      "sal_s": 125,
+      "advantage": 91.96
+    },
+    {
+      "n": 12,
+      "k": 8,
+      "json_s": 1776,
+      "sal_s": 143,
+      "advantage": 91.95
+    },
+    {
+      "n": 12,
+      "k": 9,
+      "json_s": 1998,
+      "sal_s": 161,
+      "advantage": 91.94
+    },
+    {
+      "n": 12,
+      "k": 10,
+      "json_s": 2220,
+      "sal_s": 179,
+      "advantage": 91.94
+    },
+    {
+      "n": 13,
+      "k": 1,
+      "json_s": 234,
+      "sal_s": 18,
+      "advantage": 92.31
+    },
+    {
+      "n": 13,
+      "k": 2,
+      "json_s": 468,
+      "sal_s": 37,
+      "advantage": 92.09
+    },
+    {
+      "n": 13,
+      "k": 3,
+      "json_s": 702,
+      "sal_s": 56,
+      "advantage": 92.02
+    },
+    {
+      "n": 13,
+      "k": 4,
+      "json_s": 936,
+      "sal_s": 75,
+      "advantage": 91.99
+    },
+    {
+      "n": 13,
+      "k": 5,
+      "json_s": 1170,
+      "sal_s": 94,
+      "advantage": 91.97
+    },
+    {
+      "n": 13,
+      "k": 6,
+      "json_s": 1404,
+      "sal_s": 113,
+      "advantage": 91.95
+    },
+    {
+      "n": 13,
+      "k": 7,
+      "json_s": 1638,
+      "sal_s": 132,
+      "advantage": 91.94
+    },
+    {
+      "n": 13,
+      "k": 8,
+      "json_s": 1872,
+      "sal_s": 151,
+      "advantage": 91.93
+    },
+    {
+      "n": 13,
+      "k": 9,
+      "json_s": 2106,
+      "sal_s": 170,
+      "advantage": 91.93
+    },
+    {
+      "n": 13,
+      "k": 10,
+      "json_s": 2340,
+      "sal_s": 189,
+      "advantage": 91.92
+    },
+    {
+      "n": 14,
+      "k": 1,
+      "json_s": 246,
+      "sal_s": 19,
+      "advantage": 92.28
+    },
+    {
+      "n": 14,
+      "k": 2,
+      "json_s": 492,
+      "sal_s": 39,
+      "advantage": 92.07
+    },
+    {
+      "n": 14,
+      "k": 3,
+      "json_s": 738,
+      "sal_s": 59,
+      "advantage": 92.01
+    },
+    {
+      "n": 14,
+      "k": 4,
+      "json_s": 984,
+      "sal_s": 79,
+      "advantage": 91.97
+    },
+    {
+      "n": 14,
+      "k": 5,
+      "json_s": 1230,
+      "sal_s": 99,
+      "advantage": 91.95
+    },
+    {
+      "n": 14,
+      "k": 6,
+      "json_s": 1476,
+      "sal_s": 119,
+      "advantage": 91.94
+    },
+    {
+      "n": 14,
+      "k": 7,
+      "json_s": 1722,
+      "sal_s": 139,
+      "advantage": 91.93
+    },
+    {
+      "n": 14,
+      "k": 8,
+      "json_s": 1968,
+      "sal_s": 159,
+      "advantage": 91.92
+    },
+    {
+      "n": 14,
+      "k": 9,
+      "json_s": 2214,
+      "sal_s": 179,
+      "advantage": 91.92
+    },
+    {
+      "n": 14,
+      "k": 10,
+      "json_s": 2460,
+      "sal_s": 199,
+      "advantage": 91.91
+    },
+    {
+      "n": 15,
+      "k": 1,
+      "json_s": 258,
+      "sal_s": 20,
+      "advantage": 92.25
+    },
+    {
+      "n": 15,
+      "k": 2,
+      "json_s": 516,
+      "sal_s": 41,
+      "advantage": 92.05
+    },
+    {
+      "n": 15,
+      "k": 3,
+      "json_s": 774,
+      "sal_s": 62,
+      "advantage": 91.99
+    },
+    {
+      "n": 15,
+      "k": 4,
+      "json_s": 1032,
+      "sal_s": 83,
+      "advantage": 91.96
+    },
+    {
+      "n": 15,
+      "k": 5,
+      "json_s": 1290,
+      "sal_s": 104,
+      "advantage": 91.94
+    },
+    {
+      "n": 15,
+      "k": 6,
+      "json_s": 1548,
+      "sal_s": 125,
+      "advantage": 91.93
+    },
+    {
+      "n": 15,
+      "k": 7,
+      "json_s": 1806,
+      "sal_s": 146,
+      "advantage": 91.92
+    },
+    {
+      "n": 15,
+      "k": 8,
+      "json_s": 2064,
+      "sal_s": 167,
+      "advantage": 91.91
+    },
+    {
+      "n": 15,
+      "k": 9,
+      "json_s": 2322,
+      "sal_s": 188,
+      "advantage": 91.9
+    },
+    {
+      "n": 15,
+      "k": 10,
+      "json_s": 2580,
+      "sal_s": 209,
+      "advantage": 91.9
+    },
+    {
+      "n": 16,
+      "k": 1,
+      "json_s": 270,
+      "sal_s": 21,
+      "advantage": 92.22
+    },
+    {
+      "n": 16,
+      "k": 2,
+      "json_s": 540,
+      "sal_s": 43,
+      "advantage": 92.04
+    },
+    {
+      "n": 16,
+      "k": 3,
+      "json_s": 810,
+      "sal_s": 65,
+      "advantage": 91.98
+    },
+    {
+      "n": 16,
+      "k": 4,
+      "json_s": 1080,
+      "sal_s": 87,
+      "advantage": 91.94
+    },
+    {
+      "n": 16,
+      "k": 5,
+      "json_s": 1350,
+      "sal_s": 109,
+      "advantage": 91.93
+    },
+    {
+      "n": 16,
+      "k": 6,
+      "json_s": 1620,
+      "sal_s": 131,
+      "advantage": 91.91
+    },
+    {
+      "n": 16,
+      "k": 7,
+      "json_s": 1890,
+      "sal_s": 153,
+      "advantage": 91.9
+    },
+    {
+      "n": 16,
+      "k": 8,
+      "json_s": 2160,
+      "sal_s": 175,
+      "advantage": 91.9
+    },
+    {
+      "n": 16,
+      "k": 9,
+      "json_s": 2430,
+      "sal_s": 197,
+      "advantage": 91.89
+    },
+    {
+      "n": 16,
+      "k": 10,
+      "json_s": 2700,
+      "sal_s": 219,
+      "advantage": 91.89
+    },
+    {
+      "n": 17,
+      "k": 1,
+      "json_s": 282,
+      "sal_s": 22,
+      "advantage": 92.2
+    },
+    {
+      "n": 17,
+      "k": 2,
+      "json_s": 564,
+      "sal_s": 45,
+      "advantage": 92.02
+    },
+    {
+      "n": 17,
+      "k": 3,
+      "json_s": 846,
+      "sal_s": 68,
+      "advantage": 91.96
+    },
+    {
+      "n": 17,
+      "k": 4,
+      "json_s": 1128,
+      "sal_s": 91,
+      "advantage": 91.93
+    },
+    {
+      "n": 17,
+      "k": 5,
+      "json_s": 1410,
+      "sal_s": 114,
+      "advantage": 91.91
+    },
+    {
+      "n": 17,
+      "k": 6,
+      "json_s": 1692,
+      "sal_s": 137,
+      "advantage": 91.9
+    },
+    {
+      "n": 17,
+      "k": 7,
+      "json_s": 1974,
+      "sal_s": 160,
+      "advantage": 91.89
+    },
+    {
+      "n": 17,
+      "k": 8,
+      "json_s": 2256,
+      "sal_s": 183,
+      "advantage": 91.89
+    },
+    {
+      "n": 17,
+      "k": 9,
+      "json_s": 2538,
+      "sal_s": 206,
+      "advantage": 91.88
+    },
+    {
+      "n": 17,
+      "k": 10,
+      "json_s": 2820,
+      "sal_s": 229,
+      "advantage": 91.88
+    },
+    {
+      "n": 18,
+      "k": 1,
+      "json_s": 294,
+      "sal_s": 23,
+      "advantage": 92.18
+    },
+    {
+      "n": 18,
+      "k": 2,
+      "json_s": 588,
+      "sal_s": 47,
+      "advantage": 92.01
+    },
+    {
+      "n": 18,
+      "k": 3,
+      "json_s": 882,
+      "sal_s": 71,
+      "advantage": 91.95
+    },
+    {
+      "n": 18,
+      "k": 4,
+      "json_s": 1176,
+      "sal_s": 95,
+      "advantage": 91.92
+    },
+    {
+      "n": 18,
+      "k": 5,
+      "json_s": 1470,
+      "sal_s": 119,
+      "advantage": 91.9
+    },
+    {
+      "n": 18,
+      "k": 6,
+      "json_s": 1764,
+      "sal_s": 143,
+      "advantage": 91.89
+    },
+    {
+      "n": 18,
+      "k": 7,
+      "json_s": 2058,
+      "sal_s": 167,
+      "advantage": 91.89
+    },
+    {
+      "n": 18,
+      "k": 8,
+      "json_s": 2352,
+      "sal_s": 191,
+      "advantage": 91.88
+    },
+    {
+      "n": 18,
+      "k": 9,
+      "json_s": 2646,
+      "sal_s": 215,
+      "advantage": 91.87
+    },
+    {
+      "n": 18,
+      "k": 10,
+      "json_s": 2940,
+      "sal_s": 239,
+      "advantage": 91.87
+    },
+    {
+      "n": 19,
+      "k": 1,
+      "json_s": 306,
+      "sal_s": 24,
+      "advantage": 92.16
+    },
+    {
+      "n": 19,
+      "k": 2,
+      "json_s": 612,
+      "sal_s": 49,
+      "advantage": 91.99
+    },
+    {
+      "n": 19,
+      "k": 3,
+      "json_s": 918,
+      "sal_s": 74,
+      "advantage": 91.94
+    },
+    {
+      "n": 19,
+      "k": 4,
+      "json_s": 1224,
+      "sal_s": 99,
+      "advantage": 91.91
+    },
+    {
+      "n": 19,
+      "k": 5,
+      "json_s": 1530,
+      "sal_s": 124,
+      "advantage": 91.9
+    },
+    {
+      "n": 19,
+      "k": 6,
+      "json_s": 1836,
+      "sal_s": 149,
+      "advantage": 91.88
+    },
+    {
+      "n": 19,
+      "k": 7,
+      "json_s": 2142,
+      "sal_s": 174,
+      "advantage": 91.88
+    },
+    {
+      "n": 19,
+      "k": 8,
+      "json_s": 2448,
+      "sal_s": 199,
+      "advantage": 91.87
+    },
+    {
+      "n": 19,
+      "k": 9,
+      "json_s": 2754,
+      "sal_s": 224,
+      "advantage": 91.87
+    },
+    {
+      "n": 19,
+      "k": 10,
+      "json_s": 3060,
+      "sal_s": 249,
+      "advantage": 91.86
+    },
+    {
+      "n": 20,
+      "k": 1,
+      "json_s": 318,
+      "sal_s": 25,
+      "advantage": 92.14
+    },
+    {
+      "n": 20,
+      "k": 2,
+      "json_s": 636,
+      "sal_s": 51,
+      "advantage": 91.98
+    },
+    {
+      "n": 20,
+      "k": 3,
+      "json_s": 954,
+      "sal_s": 77,
+      "advantage": 91.93
+    },
+    {
+      "n": 20,
+      "k": 4,
+      "json_s": 1272,
+      "sal_s": 103,
+      "advantage": 91.9
+    },
+    {
+      "n": 20,
+      "k": 5,
+      "json_s": 1590,
+      "sal_s": 129,
+      "advantage": 91.89
+    },
+    {
+      "n": 20,
+      "k": 6,
+      "json_s": 1908,
+      "sal_s": 155,
+      "advantage": 91.88
+    },
+    {
+      "n": 20,
+      "k": 7,
+      "json_s": 2226,
+      "sal_s": 181,
+      "advantage": 91.87
+    },
+    {
+      "n": 20,
+      "k": 8,
+      "json_s": 2544,
+      "sal_s": 207,
+      "advantage": 91.86
+    },
+    {
+      "n": 20,
+      "k": 9,
+      "json_s": 2862,
+      "sal_s": 233,
+      "advantage": 91.86
+    },
+    {
+      "n": 20,
+      "k": 10,
+      "json_s": 3180,
+      "sal_s": 259,
+      "advantage": 91.86
+    }
+  ]
+}

@@ -1,0 +1,278 @@
+{
+  "method": "zstd level 19, no dictionary, BAEL min(raw, compressed)",
+  "totals": {
+    "json": 6896,
+    "protobuf": 3081,
+    "sal_raw": 928,
+    "sal_dpack": 928
+  },
+  "sal_raw_vs_pb": 69.9,
+  "sal_dpack_vs_pb": 69.9,
+  "scoreboard": {
+    "sal_wins": 28,
+    "pb_wins": 1
+  },
+  "per_vector": [
+    {
+      "id": "MCP-01",
+      "json": 114,
+      "protobuf": 35,
+      "sal_raw": 13,
+      "sal_zstd": 22,
+      "sal_effective": 13,
+      "winner": "SAL"
+    },
+    {
+      "id": "MCP-02",
+      "json": 168,
+      "protobuf": 77,
+      "sal_raw": 37,
+      "sal_zstd": 46,
+      "sal_effective": 37,
+      "winner": "SAL"
+    },
+    {
+      "id": "MCP-03",
+      "json": 162,
+      "protobuf": 78,
+      "sal_raw": 20,
+      "sal_zstd": 29,
+      "sal_effective": 20,
+      "winner": "SAL"
+    },
+    {
+      "id": "MCP-04",
+      "json": 90,
+      "protobuf": 35,
+      "sal_raw": 10,
+      "sal_zstd": 19,
+      "sal_effective": 10,
+      "winner": "SAL"
+    },
+    {
+      "id": "MCP-05",
+      "json": 138,
+      "protobuf": 40,
+      "sal_raw": 29,
+      "sal_zstd": 38,
+      "sal_effective": 29,
+      "winner": "SAL"
+    },
+    {
+      "id": "OAI-01",
+      "json": 150,
+      "protobuf": 29,
+      "sal_raw": 14,
+      "sal_zstd": 23,
+      "sal_effective": 14,
+      "winner": "SAL"
+    },
+    {
+      "id": "OAI-02",
+      "json": 108,
+      "protobuf": 20,
+      "sal_raw": 14,
+      "sal_zstd": 23,
+      "sal_effective": 14,
+      "winner": "SAL"
+    },
+    {
+      "id": "OAI-03",
+      "json": 257,
+      "protobuf": 108,
+      "sal_raw": 30,
+      "sal_zstd": 39,
+      "sal_effective": 30,
+      "winner": "SAL"
+    },
+    {
+      "id": "OAI-04",
+      "json": 176,
+      "protobuf": 47,
+      "sal_raw": 33,
+      "sal_zstd": 42,
+      "sal_effective": 33,
+      "winner": "SAL"
+    },
+    {
+      "id": "OAI-05",
+      "json": 93,
+      "protobuf": 27,
+      "sal_raw": 16,
+      "sal_zstd": 25,
+      "sal_effective": 16,
+      "winner": "SAL"
+    },
+    {
+      "id": "A2A-01",
+      "json": 202,
+      "protobuf": 83,
+      "sal_raw": 37,
+      "sal_zstd": 46,
+      "sal_effective": 37,
+      "winner": "SAL"
+    },
+    {
+      "id": "A2A-02",
+      "json": 267,
+      "protobuf": 122,
+      "sal_raw": 44,
+      "sal_zstd": 53,
+      "sal_effective": 44,
+      "winner": "SAL"
+    },
+    {
+      "id": "A2A-03",
+      "json": 307,
+      "protobuf": 167,
+      "sal_raw": 28,
+      "sal_zstd": 37,
+      "sal_effective": 28,
+      "winner": "SAL"
+    },
+    {
+      "id": "A2A-04",
+      "json": 251,
+      "protobuf": 42,
+      "sal_raw": 30,
+      "sal_zstd": 39,
+      "sal_effective": 30,
+      "winner": "SAL"
+    },
+    {
+      "id": "CREW-01",
+      "json": 287,
+      "protobuf": 178,
+      "sal_raw": 44,
+      "sal_zstd": 53,
+      "sal_effective": 44,
+      "winner": "SAL"
+    },
+    {
+      "id": "CREW-02",
+      "json": 364,
+      "protobuf": 263,
+      "sal_raw": 38,
+      "sal_zstd": 47,
+      "sal_effective": 38,
+      "winner": "SAL"
+    },
+    {
+      "id": "CREW-03",
+      "json": 253,
+      "protobuf": 195,
+      "sal_raw": 38,
+      "sal_zstd": 47,
+      "sal_effective": 38,
+      "winner": "SAL"
+    },
+    {
+      "id": "CREW-04",
+      "json": 222,
+      "protobuf": 164,
+      "sal_raw": 65,
+      "sal_zstd": 71,
+      "sal_effective": 65,
+      "winner": "SAL"
+    },
+    {
+      "id": "AG-01",
+      "json": 252,
+      "protobuf": 149,
+      "sal_raw": 26,
+      "sal_zstd": 35,
+      "sal_effective": 26,
+      "winner": "SAL"
+    },
+    {
+      "id": "AG-02",
+      "json": 197,
+      "protobuf": 95,
+      "sal_raw": 35,
+      "sal_zstd": 44,
+      "sal_effective": 35,
+      "winner": "SAL"
+    },
+    {
+      "id": "AG-03",
+      "json": 213,
+      "protobuf": 119,
+      "sal_raw": 27,
+      "sal_zstd": 36,
+      "sal_effective": 27,
+      "winner": "SAL"
+    },
+    {
+      "id": "AG-04",
+      "json": 825,
+      "protobuf": 483,
+      "sal_raw": 69,
+      "sal_zstd": 78,
+      "sal_effective": 69,
+      "winner": "SAL"
+    },
+    {
+      "id": "DOM-01",
+      "json": 166,
+      "protobuf": 50,
+      "sal_raw": 11,
+      "sal_zstd": 20,
+      "sal_effective": 11,
+      "winner": "SAL"
+    },
+    {
+      "id": "DOM-02",
+      "json": 273,
+      "protobuf": 80,
+      "sal_raw": 46,
+      "sal_zstd": 55,
+      "sal_effective": 46,
+      "winner": "SAL"
+    },
+    {
+      "id": "DOM-03",
+      "json": 260,
+      "protobuf": 43,
+      "sal_raw": 35,
+      "sal_zstd": 44,
+      "sal_effective": 35,
+      "winner": "SAL"
+    },
+    {
+      "id": "DOM-04",
+      "json": 239,
+      "protobuf": 27,
+      "sal_raw": 52,
+      "sal_zstd": 56,
+      "sal_effective": 52,
+      "winner": "PB"
+    },
+    {
+      "id": "DOM-05",
+      "json": 367,
+      "protobuf": 180,
+      "sal_raw": 36,
+      "sal_zstd": 45,
+      "sal_effective": 36,
+      "winner": "SAL"
+    },
+    {
+      "id": "DOM-06",
+      "json": 211,
+      "protobuf": 62,
+      "sal_raw": 10,
+      "sal_zstd": 19,
+      "sal_effective": 10,
+      "winner": "SAL"
+    },
+    {
+      "id": "DOM-07",
+      "json": 284,
+      "protobuf": 83,
+      "sal_raw": 41,
+      "sal_zstd": 50,
+      "sal_effective": 41,
+      "winner": "SAL"
+    }
+  ]
+}

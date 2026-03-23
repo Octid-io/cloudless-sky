@@ -6,6 +6,10 @@ OSMP (Octid Semantic Mesh Protocol) is an open encoding standard for agentic AI 
 
 No cloud required. No inference at the decode layer. No central authority.
 
+<p align="center">
+  <img src="assets/octid-openclaw.png" alt="Octid and the OpenClaw community" width="480">
+</p>
+
 ---
 
 ## The Problem

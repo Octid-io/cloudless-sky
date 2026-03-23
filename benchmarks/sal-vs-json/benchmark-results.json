@@ -1,0 +1,320 @@
+{
+  "total_vectors": 29,
+  "mean_reduction_pct": 85.84258749442917,
+  "min_reduction_pct": 70.72072072072072,
+  "max_reduction_pct": 95.260663507109,
+  "framework_stats": {
+    "MCP": {
+      "count": 7,
+      "mean_reduction_pct": 87.24793661574189
+    },
+    "OpenAI": {
+      "count": 7,
+      "mean_reduction_pct": 85.54140204419078
+    },
+    "Google A2A": {
+      "count": 5,
+      "mean_reduction_pct": 86.13390333970628
+    },
+    "CrewAI": {
+      "count": 5,
+      "mean_reduction_pct": 84.02422453543434
+    },
+    "AutoGen": {
+      "count": 5,
+      "mean_reduction_pct": 85.8238054686428
+    }
+  },
+  "results": [
+    {
+      "id": "MCP-01",
+      "framework": "MCP",
+      "domain": "Environmental / Sensor",
+      "description": "MCP tools/call: get weather for a location",
+      "json_bytes": 114,
+      "sal_bytes": 13,
+      "reduction_pct": 88.59649122807018,
+      "source_url": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools"
+    },
+    {
+      "id": "MCP-02",
+      "framework": "MCP",
+      "domain": "Environmental / Sensor",
+      "description": "MCP tools/call response: weather result",
+      "json_bytes": 168,
+      "sal_bytes": 37,
+      "reduction_pct": 77.97619047619048,
+      "source_url": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools"
+    },
+    {
+      "id": "MCP-03",
+      "framework": "MCP",
+      "domain": "Data / Query / File Transfer",
+      "description": "MCP tools/call error response",
+      "json_bytes": 162,
+      "sal_bytes": 20,
+      "reduction_pct": 87.65432098765432,
+      "source_url": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools"
+    },
+    {
+      "id": "MCP-04",
+      "framework": "MCP",
+      "domain": "Agentic / OSMP-Native",
+      "description": "MCP tools/list request",
+      "json_bytes": 90,
+      "sal_bytes": 10,
+      "reduction_pct": 88.88888888888889,
+      "source_url": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools"
+    },
+    {
+      "id": "MCP-05",
+      "framework": "MCP",
+      "domain": "Agentic / OSMP-Native",
+      "description": "MCP progress notification for long-running operation",
+      "json_bytes": 138,
+      "sal_bytes": 29,
+      "reduction_pct": 78.98550724637681,
+      "source_url": "https://portkey.ai/blog/mcp-message-types-complete-json-rpc-reference-guide/"
+    },
+    {
+      "id": "OAI-01",
+      "framework": "OpenAI",
+      "domain": "Environmental / Sensor",
+      "description": "OpenAI function call: get_weather tool invocation",
+      "json_bytes": 150,
+      "sal_bytes": 14,
+      "reduction_pct": 90.66666666666666,
+      "source_url": "https://developers.openai.com/api/docs/guides/function-calling"
+    },
+    {
+      "id": "OAI-02",
+      "framework": "OpenAI",
+      "domain": "Environmental / Sensor",
+      "description": "OpenAI function call output: weather result returned to model",
+      "json_bytes": 108,
+      "sal_bytes": 14,
+      "reduction_pct": 87.03703703703704,
+      "source_url": "https://developers.openai.com/api/docs/guides/function-calling"
+    },
+    {
+      "id": "OAI-03",
+      "framework": "OpenAI",
+      "domain": "Data / Query / File Transfer",
+      "description": "OpenAI function definition: get_delivery_date tool schema",
+      "json_bytes": 257,
+      "sal_bytes": 30,
+      "reduction_pct": 88.32684824902724,
+      "source_url": "https://developers.openai.com/api/docs/guides/function-calling"
+    },
+    {
+      "id": "OAI-04",
+      "framework": "OpenAI",
+      "domain": "Data / Query / File Transfer",
+      "description": "OpenAI tool call: assistant requests function execution",
+      "json_bytes": 176,
+      "sal_bytes": 33,
+      "reduction_pct": 81.25,
+      "source_url": "https://developers.openai.com/api/docs/guides/function-calling"
+    },
+    {
+      "id": "OAI-05",
+      "framework": "OpenAI",
+      "domain": "Data / Query / File Transfer",
+      "description": "OpenAI tool result: function response message",
+      "json_bytes": 93,
+      "sal_bytes": 16,
+      "reduction_pct": 82.79569892473117,
+      "source_url": "https://developers.openai.com/api/docs/guides/function-calling"
+    },
+    {
+      "id": "A2A-01",
+      "framework": "Google A2A",
+      "domain": "Agentic / OSMP-Native",
+      "description": "A2A message/send: client sends task to remote agent",
+      "json_bytes": 202,
+      "sal_bytes": 37,
+      "reduction_pct": 81.68316831683168,
+      "source_url": "https://codelabs.developers.google.com/intro-a2a-purchasing-concierge"
+    },
+    {
+      "id": "A2A-02",
+      "framework": "Google A2A",
+      "domain": "Agentic / OSMP-Native",
+      "description": "A2A task response: agent returns completed task with artifact",
+      "json_bytes": 267,
+      "sal_bytes": 44,
+      "reduction_pct": 83.52059925093633,
+      "source_url": "https://a2a-protocol.org/v0.2.5/specification/"
+    },
+    {
+      "id": "A2A-03",
+      "framework": "Google A2A",
+      "domain": "Agentic / OSMP-Native",
+      "description": "A2A agent card: capability discovery (skills subset)",
+      "json_bytes": 307,
+      "sal_bytes": 28,
+      "reduction_pct": 90.87947882736157,
+      "source_url": "https://a2a-protocol.org/v0.2.5/specification/"
+    },
+    {
+      "id": "A2A-04",
+      "framework": "Google A2A",
+      "domain": "Financial / Transaction",
+      "description": "A2A message/send with data part: structured payload",
+      "json_bytes": 251,
+      "sal_bytes": 30,
+      "reduction_pct": 88.04780876494024,
+      "source_url": "https://a2a-protocol.org/v0.2.5/specification/"
+    },
+    {
+      "id": "CREW-01",
+      "framework": "CrewAI",
+      "domain": "Cognitive Execution State",
+      "description": "CrewAI task delegation: research agent assigned a search task",
+      "json_bytes": 287,
+      "sal_bytes": 44,
+      "reduction_pct": 84.66898954703834,
+      "source_url": "https://docs.crewai.com/core-concepts/Tasks/"
+    },
+    {
+      "id": "CREW-02",
+      "framework": "CrewAI",
+      "domain": "Cognitive Execution State",
+      "description": "CrewAI task output: structured JSON result",
+      "json_bytes": 364,
+      "sal_bytes": 38,
+      "reduction_pct": 89.56043956043956,
+      "source_url": "https://docs.crewai.com/core-concepts/Tasks/"
+    },
+    {
+      "id": "CREW-03",
+      "framework": "CrewAI",
+      "domain": "Cognitive Execution State",
+      "description": "CrewAI agent kickoff with conversation history",
+      "json_bytes": 253,
+      "sal_bytes": 38,
+      "reduction_pct": 84.98023715415019,
+      "source_url": "https://docs.crewai.com/concepts/agents"
+    },
+    {
+      "id": "CREW-04",
+      "framework": "CrewAI",
+      "domain": "Cognitive Execution State",
+      "description": "CrewAI task with context dependency: write_blog depends on research",
+      "json_bytes": 222,
+      "sal_bytes": 65,
+      "reduction_pct": 70.72072072072072,
+      "source_url": "https://docs.crewai.com/core-concepts/Tasks/"
+    },
+    {
+      "id": "AG-01",
+      "framework": "AutoGen",
+      "domain": "Cognitive Execution State",
+      "description": "AutoGen HandoffMessage: transfer execution to another agent",
+      "json_bytes": 252,
+      "sal_bytes": 26,
+      "reduction_pct": 89.68253968253968,
+      "source_url": "https://microsoft.github.io/autogen/stable//reference/python/autogen_agentchat.messages.html"
+    },
+    {
+      "id": "AG-02",
+      "framework": "AutoGen",
+      "domain": "Cognitive Execution State",
+      "description": "AutoGen StructuredMessage: categorization output",
+      "json_bytes": 197,
+      "sal_bytes": 35,
+      "reduction_pct": 82.23350253807106,
+      "source_url": "https://microsoft.github.io/autogen/stable//user-guide/agentchat-user-guide/tutorial/agents.html"
+    },
+    {
+      "id": "AG-03",
+      "framework": "AutoGen",
+      "domain": "Agentic / OSMP-Native",
+      "description": "AutoGen conversation message with function_call",
+      "json_bytes": 213,
+      "sal_bytes": 27,
+      "reduction_pct": 87.32394366197182,
+      "source_url": "https://microsoft.github.io/autogen/0.2/docs/reference/agentchat/conversable_agent/"
+    },
+    {
+      "id": "AG-04",
+      "framework": "AutoGen",
+      "domain": "Agentic / OSMP-Native",
+      "description": "AutoGen component serialization: agent config dump",
+      "json_bytes": 825,
+      "sal_bytes": 69,
+      "reduction_pct": 91.63636363636364,
+      "source_url": "https://microsoft.github.io/autogen/stable//user-guide/agentchat-user-guide/serialize-components.html"
+    },
+    {
+      "id": "DOM-01",
+      "framework": "MCP",
+      "domain": "Health / Clinical",
+      "description": "Clinical: query ICD-10 code for pneumothorax diagnosis",
+      "json_bytes": 166,
+      "sal_bytes": 11,
+      "reduction_pct": 93.37349397590361,
+      "source_url": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools"
+    },
+    {
+      "id": "DOM-02",
+      "framework": "OpenAI",
+      "domain": "Financial / Transaction",
+      "description": "Financial: execute a payment transfer between accounts",
+      "json_bytes": 273,
+      "sal_bytes": 46,
+      "reduction_pct": 83.15018315018314,
+      "source_url": "https://developers.openai.com/api/docs/guides/function-calling"
+    },
+    {
+      "id": "DOM-03",
+      "framework": "Google A2A",
+      "domain": "Security / Cryptographic",
+      "description": "Security: request encryption of a payload with key rotation",
+      "json_bytes": 260,
+      "sal_bytes": 35,
+      "reduction_pct": 86.53846153846155,
+      "source_url": "https://a2a-protocol.org/v0.2.5/specification/"
+    },
+    {
+      "id": "DOM-04",
+      "framework": "AutoGen",
+      "domain": "Compute / Resource Management",
+      "description": "Compute: scale a service to 5 replicas and set resource limits",
+      "json_bytes": 239,
+      "sal_bytes": 52,
+      "reduction_pct": 78.24267782426779,
+      "source_url": "https://microsoft.github.io/autogen/stable//reference/python/autogen_agentchat.messages.html"
+    },
+    {
+      "id": "DOM-05",
+      "framework": "CrewAI",
+      "domain": "Logging / Audit / Compliance",
+      "description": "Logging: write audit record for a compliance event",
+      "json_bytes": 367,
+      "sal_bytes": 36,
+      "reduction_pct": 90.19073569482289,
+      "source_url": "https://docs.crewai.com/core-concepts/Tasks/"
+    },
+    {
+      "id": "DOM-06",
+      "framework": "MCP",
+      "domain": "Security / Cryptographic",
+      "description": "Security: MITRE ATT&CK technique lookup for phishing detection",
+      "json_bytes": 211,
+      "sal_bytes": 10,
+      "reduction_pct": 95.260663507109,
+      "source_url": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools"
+    },
+    {
+      "id": "DOM-07",
+      "framework": "OpenAI",
+      "domain": "Geospatial / Navigation",
+      "description": "Geospatial: calculate route between two waypoints",
+      "json_bytes": 284,
+      "sal_bytes": 41,
+      "reduction_pct": 85.56338028169014,
+      "source_url": "https://developers.openai.com/api/docs/guides/function-calling"
+    }
+  ]
+}
