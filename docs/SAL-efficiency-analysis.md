@@ -13,9 +13,9 @@
 
 ## Abstract
 
-This paper presents a multi-layer efficiency analysis comparing Semantic Assembly Language (SAL), the instruction encoding format of the Octid Semantic Mesh Protocol (OSMP), against JSON-RPC, MessagePack (self-describing binary), and Protocol Buffers (schema-based binary). The primary evidence base is a 29-vector empirical benchmark drawn from five production frameworks (MCP, OpenAI, Google A2A, CrewAI, Microsoft AutoGen), measured across three dimensions: byte reduction, LLM token economics (GPT-4 cl100k_base tokenizer), and binary serialization comparison (MessagePack and Protocol Buffers). Supplementary analysis includes a 1,000-point grammar-level structural overhead sweep and Shannon entropy measurement of structural token streams.
+This paper presents a multi-layer efficiency analysis comparing Semantic Assembly Language (SAL), the instruction encoding format of the Octid Semantic Mesh Protocol (OSMP), against JSON-RPC, MessagePack, and Protocol Buffers. The primary evidence base is a 29-vector empirical benchmark drawn from five production frameworks (MCP, OpenAI, Google A2A, CrewAI, Microsoft AutoGen), measured across three dimensions: byte reduction, LLM token economics (GPT-4 cl100k_base tokenizer), and binary serialization comparison (MessagePack and compiled Protocol Buffers). Supplementary analysis includes a 1,000-point grammar-level structural overhead sweep and Shannon entropy measurement of structural token streams.
 
-Principal findings: SAL achieves 75.6% mean token reduction (measured with the GPT-4 cl100k_base tokenizer), 86.5% mean byte reduction over JSON, 69.8% over Protocol Buffers, and 84.1% over MessagePack. Protocol Buffers achieves 55.4% reduction over JSON, confirming that schema-based binary formats capture a significant portion of JSON's overhead. SAL's additional reduction over protobuf derives from semantic content compression (replacing natural language descriptions with opcode lookups), not from superior structural encoding alone. The paper includes an adversarial prosecution section, explicit methodological assumptions, and honest disclosure of cases where SAL underperforms protobuf on numeric-heavy payloads.
+Principal findings on the 29-vector benchmark: SAL achieves 76.0% mean token reduction (GPT-4 cl100k_base), 86.8% mean byte reduction versus minified JSON, 70.5% versus compiled Protocol Buffers, and 84.5% versus MessagePack. Protocol Buffers captures much of JSON's structural overhead (55.4% reduction); SAL's remaining advantage over protobuf derives primarily from semantic content compression through a shared opcode vocabulary, not from superior structural encoding alone. The paper includes an adversarial prosecution section, explicit methodological assumptions, and honest disclosure of cases where SAL underperforms protobuf on numeric-heavy payloads.
 
 All methodologies, data, source code, and test vectors are published in the open repository. The protocol has zero production deployments, zero third-party adoption, no independent audit, and no formal verification. This paper measures encoding properties, not production readiness.
 
@@ -23,13 +23,13 @@ All methodologies, data, source code, and test vectors are published in the open
 
 ## 1. Introduction
 
-The dominant serialization format for agent-to-agent communication in 2026 is JSON, transmitted via JSON-RPC 2.0 (in MCP and Google A2A) or as structured function call objects (in OpenAI, CrewAI, and AutoGen). JSON is a self-describing key-value format designed for human developer readability. It has achieved ubiquitous adoption because developers can read, write, and debug it without specialized tools.
+A common serialization format for agent-to-agent communication in current production frameworks is JSON, transmitted via JSON-RPC 2.0 (in MCP and Google A2A) or as structured function call objects (in OpenAI, CrewAI, and AutoGen). JSON is a self-describing key-value format designed for human developer readability. It has achieved ubiquitous adoption because developers can read, write, and debug it without specialized tools.
 
-This design carries a cost. Every JSON message includes key names that repeat with every transmission, nesting braces, quoted string delimiters, type discriminators, and protocol envelopes. These structural elements consume bytes on the wire and tokens in LLM context windows. Schema-based binary formats (Protocol Buffers, Apache Avro, FlatBuffers) address part of this overhead by externalizing field names into a shared schema compiled at both endpoints. Self-describing binary formats (MessagePack, CBOR) address a smaller portion by using compact type headers while preserving key names. None of these, by themselves, replace verbose natural-language instruction content with a constrained operational vocabulary.
+This design carries a cost. Every JSON message includes key names that repeat with every transmission, nesting braces, quoted string delimiters, type discriminators, and protocol envelopes. These structural elements consume bytes on the wire and tokens in LLM context windows. Schema-based binary formats (Protocol Buffers, Apache Avro, FlatBuffers) address part of this overhead by externalizing field names into a shared schema compiled at both endpoints. Self-describing binary formats (MessagePack, CBOR) address a smaller portion by using compact type headers while preserving key names. As used in the benchmarked frameworks, these formats do not compress the semantic content itself: the natural-language strings, verbose method names, and human-readable descriptions that carry much of the message payload.
 
 OSMP's Semantic Assembly Language (SAL) operates at a different layer. It is not a compression algorithm applied to JSON or a binary encoding of JSON's structure. It is a domain-specific instruction language that replaces natural language content with opcode lookups against a shared dictionary (the ASD). This means SAL compresses both structure and content, but at the cost of a stronger dependency: the ASD must be present at both endpoints, and the instruction domain must be covered by the ASD's vocabulary.
 
-OSMP originated from a design exercise exploring the minimum viable encoding for AI agent communication under extreme bandwidth constraints. LoRa radio, the physical layer underlying both the LoRaWAN enterprise network protocol and the Meshtastic peer-to-peer mesh protocol, imposes payload floors ranging from 11 bytes (US915 DR0 under LoRaWAN) to 51 bytes (EU868 DR0) to 255 bytes (standard Meshtastic LongFast deployment). A standard JSON-RPC 2.0 tools/call envelope is 82 bytes before content, exceeding these floors. The protocol was designed from the minimum constraint upward. This paper measures whether the encoding properties that enable constrained-channel operation also produce meaningful efficiency gains on unconstrained cloud infrastructure.
+OSMP originated from a design exercise exploring the minimum viable encoding for AI agent communication under extreme bandwidth constraints. LoRa radio, the physical layer underlying both the LoRaWAN enterprise network protocol and the Meshtastic peer-to-peer mesh protocol, imposes payload floors ranging from 11 bytes (US915 DR0 under LoRaWAN) to 51 bytes (EU868 DR0) to 255 bytes (standard Meshtastic LongFast deployment). A standard JSON-RPC 2.0 tools/call envelope is 82 bytes before content, exceeding these floors. The protocol was designed from the minimum constraint upward. This paper tests whether the same design choices yield measurable efficiency gains on the cloud-oriented benchmark set used here.
 
 ### 1.1 Scope and Limitations
 
@@ -155,7 +155,7 @@ The sweep is synthetic. It is not measured from real agent traffic distributions
 | JSON overhead ratio (structure / total) | 75.1% | 86.2% |
 | SAL overhead ratio (structure / total) | 19.3% | 31.7% |
 
-The near-identity of uniform and weighted results reflects that JSON's overhead scales linearly with every composition parameter while SAL's scales sublinearly. This stability is a property of the model, not an empirical discovery.
+The near-identity of the uniform and weighted results indicates that the model behaves similarly under the two chosen distributions. Because the sweep is synthetic, these results should be read as descriptive of the model rather than predictive of production traffic.
 
 ---
 
@@ -177,8 +177,8 @@ All 29 vectors tokenized with GPT-4 cl100k_base (tiktoken). Measured counts, not
 
 | Metric | JSON | SAL | Reduction |
 |--------|------|-----|-----------|
-| Total tokens (29 vectors) | 1,809 | 441 | 75.6% |
-| Mean tokens per instruction | 62.4 | 15.2 | 75.6% |
+| Total tokens (29 vectors) | 1,809 | 434 | 76.0% |
+| Mean tokens per instruction | 62.4 | 15.0 | 76.0% |
 
 **Token economics at representative LLM input pricing ($2.50 / 1M tokens):**
 
@@ -188,8 +188,8 @@ At 10,000 inter-agent messages per day across a deployment: approximately $430/y
 
 | Layer | Gzip | SAL |
 |-------|------|-----|
-| Wire (HTTP transport) | 70-85% compression | 86.5% byte reduction |
-| Token (LLM context window) | No effect | 75.6% token reduction |
+| Wire (HTTP transport) | 70-85% compression | 86.8% byte reduction |
+| Token (LLM context window) | No effect | 76.0% token reduction |
 
 On unconstrained cloud channels, the wire efficiency argument alone does not justify a protocol change when gzip is available. The token economics argument is structurally independent of gzip because gzip operates below the LLM layer.
 
@@ -218,25 +218,61 @@ All 29 JSON payloads encoded in MessagePack (msgpack.packb) and Protocol Buffers
 | JSON (minified) | 6,896 | baseline |
 | MessagePack (self-describing) | 5,848 | 15.2% |
 | Protocol Buffers (schema-based) | 3,075 | 55.4% |
-| SAL (semantic instruction encoding) | 928 | 86.5% |
+| SAL (semantic instruction encoding) | 908 | 86.8% |
 
 **Cross-format comparisons:**
 
 | Comparison | Reduction |
 |------------|-----------|
-| SAL vs Protocol Buffers | 69.8% |
-| SAL vs MessagePack | 84.1% |
+| SAL vs Protocol Buffers | 70.5% |
+| SAL vs MessagePack | 84.5% |
 | Protobuf vs MessagePack | 47.3% |
 
 ### 6.3 Where SAL Loses
 
-On vector DOM-04 (scale service to 5 replicas with resource limits), protobuf produces 27 bytes while SAL produces 52 bytes. SAL is 92.6% larger. This occurs because the payload is dominated by short numeric values (replicas: 5, cpu: "2000m", memory: "4Gi") that protobuf encodes as 1-2 byte varints while SAL transmits as UTF-8 text. When payloads are predominantly numeric with short string values and no natural language content to compress, protobuf will outperform SAL on wire bytes.
+On vector DOM-04 (scale service to 5 replicas with resource limits), protobuf produces 27 bytes while SAL produces 32 bytes. SAL is 18.5% larger. This occurs because the payload is dominated by short numeric and unit values (replicas: 5, cpu: "2000m", memory: "4Gi") that protobuf encodes as varints and short length-prefixed strings while SAL transmits as human-readable UTF-8 text. The SAL encoding uses a compound instruction with inline resource parameters (`C:SCALE@api-gateway[5:2000m:4Gi]`), eliminating the structural waste of separate opcodes and target duplication present in earlier versions. The remaining 5-byte gap is the human-readability tax on numeric fields.
+
+**The 29/29 option that was not taken.** SAL's slot value architecture (Section 2 of the semantic dictionary) supports single-character codes for enumerated value sets, as used in H:TRIAGE (I/D/M/B/X) and C:STAT (A/D/E/I/O). The same architecture could encode standard Kubernetes resource tiers as single-character slot values:
+
+| Code | CPU Value | Description |
+|------|-----------|-------------|
+| A | 125m | Eighth core |
+| B | 250m | Quarter core |
+| C | 500m | Half core |
+| D | 1000m | One core |
+| E | 2000m | Two cores |
+| F | 4000m | Four cores |
+| G | 8000m | Eight cores |
+
+| Code | Memory Value | Description |
+|------|-------------|-------------|
+| A | 128Mi | Minimal |
+| B | 256Mi | Small |
+| C | 512Mi | Medium-small |
+| D | 1Gi | Medium |
+| E | 2Gi | Medium-large |
+| F | 4Gi | Large |
+| G | 8Gi | Extra-large |
+| H | 16Gi | Double extra-large |
+
+Applying these codes to DOM-04:
+
+| Encoding | SAL Instruction | Bytes | vs Protobuf (27B) |
+|----------|----------------|-------|--------------------|
+| Current (text values) | `C:SCALE@api-gateway[5:2000m:4Gi]` | 32 | +5 (protobuf wins) |
+| With tier codes | `C:SCALE@api-gateway[5:E:F]` | 26 | -1 (SAL wins) |
+
+The tier code encoding beats protobuf by 1 byte and would flip the scoreboard to 29 of 29. Non-standard values that fall outside the tier table (`C:SCALE@api-gateway[5:1742m:3.5Gi]`, 34 bytes) would fall back to text representation, the same behavior as the current encoding.
+
+This optimization was not applied. The slot value codes for resource tiers are ordinal: E is the 5th tier, not a mnemonic for "2000m." A developer inspecting `C:SCALE@api-gateway[5:E:F]` in a Kubernetes deployment log cannot infer that E means 2000m CPU and F means 4Gi memory without the dictionary lookup table. Compare this to H:TRIAGE?I, where I means Immediate, or C:STAT?A, where A means Active. Those are mnemonics. The Kubernetes tier codes are not.
+
+The protocol's design preference is that common operational instructions remain partially inspectable by a human operator without consulting a non-mnemonic lookup table. The triage and status codes satisfy this because their letters are the first letter of the word they represent. Ordinal tier codes that require memorization or reference violate that principle for a 6-byte improvement on one vector. The 5-byte gap on DOM-04 is accepted as the cost of maintaining human readability on the one vector class where it is most expensive. The mechanism is disclosed and available for deployments where byte efficiency at the edge outweighs field inspectability.
 
 ### 6.4 Why the Gap Exists
 
-Protobuf and SAL share the same architectural bet: externalize schema/dictionary, amortize it across the session. Both eliminate key names from the wire. Why does SAL still beat protobuf by 69.8% overall?
+Protobuf and SAL share the same architectural bet: externalize schema/dictionary, amortize it across the session. Both eliminate key names from the wire. Why does SAL still beat protobuf by 70.5% on this benchmark set?
 
-The answer is content compression, not structural encoding. Protobuf transmits the semantic content in full: the string "Transferred to flights_refunder, adopting the role of flights_refunder immediately." is 85 bytes in protobuf (tag + length prefix + 83 bytes UTF-8 content). SAL replaces this with `J:HANDOFF@flights_refunder` (26 bytes) because the opcode `HANDOFF` carries the semantic meaning that the natural language description spelled out.
+On this benchmark set, the answer is content compression, not structural encoding. Protobuf transmits the semantic content in full: the string "Transferred to flights_refunder, adopting the role of flights_refunder immediately." is 85 bytes in protobuf (tag + length prefix + 83 bytes UTF-8 content). SAL replaces this with `J:HANDOFF@flights_refunder` (26 bytes) because the opcode `HANDOFF` carries the semantic meaning that the natural language description spelled out.
 
 This is not a fair structural comparison. It is a vocabulary comparison. Protobuf faithfully serializes whatever content the application provides. SAL replaces the content with a domain-specific code. The reduction comes from the domain vocabulary, not from superior encoding mechanics.
 
@@ -244,7 +280,7 @@ On pure structural overhead (tags, length prefixes, type indicators vs namespace
 
 **Methodological note:** The protobuf sizes in this analysis were verified against compiled .proto schemas using protoc 3.21.12 with Python serialization. The analytical wire format estimates (used for initial comparison) differed from compiled serializer output by 6 bytes total across all 29 vectors (3,081 analytical vs 3,075 compiled, a 0.2% delta). Three vectors produced compiled output 2 bytes smaller than estimated due to proto3 default value omission. All other vectors were byte-identical. The compiled results are used in this paper. The .proto schemas and serialization code are published in the repository.
 
-**Defensible summary:** Against the benchmark set used here, compiled-schema Protocol Buffers captures much of JSON's structural inefficiency, reducing total bytes by 55.4% versus minified JSON. SAL remains smaller by a further 69.8% relative to compiled protobuf, but that remaining gap is attributable primarily to domain-specific semantic abbreviation via a shared dictionary rather than to structural encoding alone.
+**Defensible summary:** Against the benchmark set used here, compiled-schema Protocol Buffers captures much of JSON's structural inefficiency, reducing total bytes by 55.4% versus minified JSON. SAL remains smaller by a further 70.5% relative to compiled protobuf, but that remaining gap is attributable primarily to domain-specific semantic abbreviation via a shared dictionary rather than to structural encoding alone.
 
 ### 6.5 System Complexity
 
@@ -260,20 +296,20 @@ The results in Sections 6.2 through 6.4 measure raw SAL, the human-readable UTF-
 
 | Format + Best Compression | Batch Size (29 instructions) |
 |--------------------------|------------------------------|
-| SAL + lossless block compression | 640 bytes |
+| SAL + lossless block compression | 632 bytes |
 | Protocol Buffers + gzip | 1,751 bytes |
 | JSON (minified) + gzip | 2,623 bytes |
 | MessagePack (array) + gzip | 2,698 bytes |
 
-SAL's batch compression reduces the combined payload from 956 raw bytes to 640 bytes, a 33.1% compression over the already-compact SAL encoding. Protobuf's concatenated binary stream compresses from 3,075 raw bytes to 1,751 under gzip (43.1% compression), confirming that protobuf's binary does contain exploitable redundancy in batch. JSON + gzip achieves 62.1% compression from 6,924 raw bytes to 2,623. Compressed SAL remains 63.4% smaller than compressed protobuf, 75.6% smaller than compressed JSON, and 76.3% smaller than compressed MessagePack. All formats receive their best available second-pass lossless compression in this comparison.
+SAL's batch compression reduces the combined payload from 936 raw bytes to 632 bytes, a 32.5% compression over the already-compact SAL encoding. Protobuf's concatenated binary stream compresses from 3,075 raw bytes to 1,751 under gzip (43.1% compression), confirming that protobuf's binary does contain exploitable redundancy in batch. JSON + gzip achieves 62.1% compression from 6,924 raw bytes to 2,623. Compressed SAL remains 63.9% smaller than compressed protobuf, 75.9% smaller than compressed JSON, and 76.6% smaller than compressed MessagePack. All formats receive their best available second-pass lossless compression in this comparison.
 
 The batch compression ratio improves with message count because SAL's structural tokens (namespace prefixes, colons, operators, bracket patterns) are highly repetitive across instructions in the same domain. Protobuf's binary encoding, already compact per-message, offers less redundancy for a second-pass compressor to exploit.
 
-**Per-vector scoreboard: raw SAL vs Protocol Buffers.** Without any second-tier compression, SAL produces a smaller encoding than Protocol Buffers on 28 of 29 vectors. The single vector where protobuf wins (DOM-04: Kubernetes scaling with resource limits, protobuf 27 bytes, SAL 52 bytes) is a numeric-heavy payload with short string values and no natural language content to compress. On that class of payload, protobuf's binary numeric encoding (variable-length integers) is more compact than SAL's text representation of the same values. This is a consequence of SAL's human-readability constraint: the wire format is inspectable text, which costs bytes on numeric fields that protobuf encodes as binary.
+**Per-vector scoreboard: raw SAL vs Protocol Buffers.** Without any second-tier compression, SAL produces a smaller encoding than Protocol Buffers on 28 of 29 vectors. The single vector where protobuf wins (DOM-04: Kubernetes scaling with resource limits, protobuf 27 bytes, SAL 32 bytes) is a numeric-heavy payload where the 5-byte gap represents the human-readability constraint on resource limit encoding. On all other vector classes, SAL's semantic content compression produces smaller encodings than protobuf's binary serialization.
 
 **Traffic-weighted representation.** The 28-of-29 scoreboard is a vector count, not a traffic-weighted result. If numeric-only payloads (where protobuf is competitive or superior) represent a large fraction of production agent traffic, the effective advantage would be lower than the per-vector count implies. Among the message types documented in production multi-agent frameworks (tool calls, task delegations, handoffs, configuration exchange), the dominant pattern is text-heavy with natural language descriptions, method names, and context strings. Numeric-only patterns are more characteristic of sensor telemetry than agent-to-agent instruction exchange. The scoreboard reflects this instruction-class distribution, but it is based on 29 selected vectors, not measured traffic distributions.
 
-**Interpretation.** The two-tier architecture does not change SAL's per-message competitive position against protobuf. Raw SAL already wins 28 of 29 vectors on semantic compression alone. The second tier matters for compound instruction chains where batch compression of the SAL stream yields further reduction. When all formats receive their best second-pass compression, SAL (640 bytes) remains 63.4% smaller than compressed protobuf (1,751 bytes) and 75.6% smaller than gzipped JSON (2,623 bytes). This is the pattern that occurs in production multi-agent workflows: not single isolated instructions, but sequences of related instructions with shared namespace context, repeated targets, and structural regularity.
+**Interpretation.** The two-tier architecture does not change SAL's per-message competitive position against protobuf. Raw SAL already wins 28 of 29 vectors on semantic compression alone. The second tier matters for compound instruction chains where batch compression of the SAL stream yields further reduction. When all formats receive their best second-pass compression, SAL (632 bytes) remains 63.9% smaller than compressed protobuf (1,751 bytes) and 75.9% smaller than gzipped JSON (2,623 bytes). This is the pattern that occurs in production multi-agent workflows: not single isolated instructions, but sequences of related instructions with shared namespace context, repeated targets, and structural regularity.
 
 ---
 
@@ -376,7 +412,7 @@ None of these can be expressed in CayenneLPP at any byte count. A protobuf encod
 
 The complete sense-decide-act loop (sensor reading, threshold evaluation, alert composition, coordination request, command response) runs in one grammar with zero translation boundaries between stages. A deployment using CayenneLPP for telemetry plus custom binary for thresholds plus JSON for cloud coordination maintains three encoding formats with translation logic at every boundary. Each boundary is code to write, test, maintain, and debug. On a constrained device in a disconnected environment, each boundary is also a failure surface.
 
-42 bytes of numeric tax per vitals panel. One protocol for the entire operational loop. That is the tradeoff.
+42 bytes of numeric tax per vitals panel. The unified protocol surface for the complete sense-decide-act loop is the return on that cost.
 
 ### 9.2 Mode 2: Edge-to-Cloud (Binding Constraint: Asymmetric Encoding)
 
@@ -386,7 +422,7 @@ The H namespace contains 16 clinical opcodes. The ICD-10-CM MDR corpus contains 
 
 ### 9.3 Mode 3: Cloud-to-Cloud (Binding Constraint: Token Economics)
 
-Bandwidth is free. Gzip handles wire compression. But the LLM reads full uncompressed text as tokens. An agent encountering OSMP via the MCP server discovers eight tools and six resources, learns the grammar through tool use, and produces instructions at 75.6% fewer tokens (measured, Section 5.2).
+Bandwidth is free. Gzip handles wire compression. But the LLM reads full uncompressed text as tokens. An agent encountering OSMP via the MCP server discovers eight tools and six resources, learns the grammar through tool use, and produces instructions at 76.0% fewer tokens (measured, Section 5.2).
 
 The tradeoff: SAL instructions are not self-describing. A developer debugging a multi-agent system must consult the ASD to read `H:TRIAGE?I` where JSON shows `"triage_category":"immediate"` directly. For deployments where API cost at scale is the binding constraint, this tradeoff is favorable. For prototyping where cost is immaterial and debuggability is paramount, JSON's self-description has higher immediate value.
 
@@ -400,7 +436,7 @@ Instructions carrying regulatory code references (ICD-10, CFR, NFPA, ISO 20022) 
 
 ### 10.1 Protocol Buffers Is the Missing Strong Comparator (Verdict: Addressed)
 
-Previous versions of this analysis used MessagePack as a binary proxy. That was weak. Protocol Buffers achieves 55.4% reduction over JSON by externalizing field names via compiled schemas. SAL's remaining 69.8% advantage over protobuf derives primarily from semantic content compression (opcode substitution), not structural encoding superiority. On numeric-heavy payloads where there is no natural language to compress, protobuf outperforms SAL (DOM-04: protobuf 27 bytes, SAL 52 bytes). Section 6.3 reports this honestly.
+Previous versions of this analysis used MessagePack as a binary proxy. That was weak. Protocol Buffers achieves 55.4% reduction over JSON by externalizing field names via compiled schemas. SAL's remaining 70.5% advantage over protobuf derives primarily from semantic content compression (opcode substitution), not structural encoding superiority. On numeric-heavy payloads where there is no natural language to compress, protobuf outperforms SAL (DOM-04: protobuf 27 bytes, SAL 32 bytes). Section 6.3 reports this honestly.
 
 ### 10.2 JSON Key Names Carry Information (Verdict: Valid, Acknowledged)
 
@@ -416,9 +452,19 @@ The ASD is a hard dependency. If the receiver lacks it, the message is unintelli
 
 Dictionary lifecycle costs (versioning, synchronization, governance, backward compatibility) are real system costs not measured in this per-message encoding analysis. These costs should not be dismissed as "amortized"; they are engineering burden that scales with deployment complexity.
 
-### 10.5 Dictionary Governance and Version Drift (Verdict: Valid, Unquantified)
+### 10.5 Dictionary Governance and Version Drift (Verdict: Addressed in Implementation)
 
-If sender and receiver ASD versions diverge, instructions may contain opcodes unknown to the receiver. The protocol addresses this through the Frame Negotiation Protocol (requesting definitions for unknown opcodes) and loss tolerance policies (fail-safe, graceful degradation, atomic). These mechanisms exist in the specification but are untested in production. The failure mode behavior under dictionary divergence is a first-order engineering concern for any deployment.
+If sender and receiver ASD versions diverge, instructions may contain opcodes unknown to the receiver. The protocol addresses this through multiple mechanisms at different layers:
+
+The Frame Negotiation Protocol (FNP) detects version mismatch during session handshake via fingerprint and version comparison. The ASD Distribution Protocol (ADP), implemented in v1.0, extends FNP with SAL-level instructions for version identity exchange (`A:ASD[M.m]`), delta request and delivery (`A:ASD:DELTA`), single-opcode micro-delta for task-relevant repair (`A:ASD:DEF`), and hash verification (`A:ASD:HASH`). ADP uses the existing Category 6 glyph designators (+, ←, †) for delta operations with CRDT-based conflict resolution (G-Set for additive, LWW-Register for replacement, Tombstone for deprecation). REPLACE operations enforce mandatory retransmission via FLAGS[C], preventing silent semantic drift.
+
+The ASD version field uses u16 interpreted as u8.u8 (MAJOR.MINOR), enabling breaking-change detection from the version number alone without inspecting delta payloads. A priority hierarchy ensures dictionary synchronization traffic never blocks mission instructions: mission traffic transmits first, micro-deltas (task-relevant single opcode definitions) second, background deltas third, and trickle charge requests in idle bandwidth only.
+
+A semantic dependency resolution buffer holds instructions referencing undefined opcodes as "semantically pending" until the defining delta unit arrives. This prevents instruction loss during synchronization without blocking the session.
+
+A guaranteed minimum operational vocabulary floor ensures that baseline-layer instructions are executable at any node regardless of synchronization state, network connectivity, or duration of disconnection.
+
+The governance model (who approves dictionary changes) remains unquantified and is intentionally outside the protocol specification. The synchronization mechanism (how changes propagate) is now implemented and tested.
 
 ### 10.6 Semantic Loss from Constrained Opcode Inventories (Verdict: Valid)
 
@@ -452,9 +498,9 @@ SAL depends on UTF-8 preservation through the transport layer. Systems that stri
 
 This analysis measures encoding efficiency, not decoding complexity. SAL parsing requires Unicode-aware tokenization, namespace resolution, glyph operator recognition, and ASD lookup. JSON parsing is a solved problem with mature libraries in every language. Protobuf parsing is handled by generated code from compiled schemas. The implementation burden of a new parser for a new format is a real adoption cost not measured here.
 
-### 10.14 Misdecode Risk Under Partial Vocabulary Overlap (Verdict: Acknowledged)
+### 10.14 Misdecode Risk Under Partial Vocabulary Overlap (Verdict: Mitigated, Not Eliminated)
 
-If sender and receiver have overlapping but non-identical ASD versions, an opcode may resolve to different definitions at each endpoint. The protocol specifies Frame Negotiation Protocol for unknown opcodes and loss tolerance policies for unresolvable instructions, but the behavior under partial overlap (where both sides have the opcode but with different semantic definitions due to version drift) is a failure mode that has not been tested. Silent semantic divergence is potentially worse than a clean unknown-opcode error.
+If sender and receiver have overlapping but non-identical ASD versions, an opcode may resolve to different definitions at each endpoint. The ASD Distribution Protocol mitigates this through three mechanisms: FNP fingerprint comparison detects any content divergence at session start, the MAJOR.MINOR version scheme signals breaking changes (REPLACE operations increment the major version), and the mandatory FLAGS[C] retransmission on REPLACE deltas prevents silent semantic drift from lost update packets. However, the failure mode under partial overlap where both sides have the opcode but with different semantic definitions due to a missed REPLACE delta has not been tested in production. Silent semantic divergence is potentially worse than a clean unknown-opcode error. The hash verification instruction (`A:ASD:HASH`) provides a post-synchronization integrity check but does not prevent mid-session divergence if a breaking delta is queued rather than applied.
 
 ### 10.15 Protobuf Comparison Verified Against Compiled Schemas (Verdict: Resolved)
 
@@ -493,23 +539,25 @@ SAL, JSON, Protocol Buffers, and MessagePack encode the same semantic content us
 | Protocol Buffers | Schema-based binary | Externalized | Verbatim | .proto schema |
 | SAL | Semantic instruction encoding | Externalized | Opcode-compressed | ASD dictionary |
 
-The benchmark results reported here follow from these architectural differences:
+The benchmark results reported here are consistent with these architectural differences:
 
 | Dimension | JSON | MessagePack | Protobuf | SAL |
 |-----------|------|-------------|----------|-----|
-| Byte reduction vs JSON (per-message) | -- | 15.2% | 55.4% | 86.5% |
-| Batch (29 msgs, each format best-compressed) | gzip: 2,623B | gzip: 2,698B | gzip: 1,751B | 640B |
-| Token reduction vs JSON | -- | not measured | not applicable (binary) | 75.6% |
+| Byte reduction vs JSON (per-message) | -- | 15.2% | 55.4% | 86.8% |
+| Batch (29 msgs, each format best-compressed) | gzip: 2,623B | gzip: 2,698B | gzip: 1,751B | 632B |
+| Token reduction vs JSON | -- | not measured | not applicable (binary) | 76.0% |
 | Per-vector wins vs protobuf (29 vectors) | -- | -- | 1 | 28 |
 | Schema/dictionary dependency | None | None | Compiled schema | ASD + MDR |
 
-SAL's per-message advantage over protobuf (69.8% byte reduction) derives primarily from semantic content compression: opcodes replacing natural language descriptions. This is a vocabulary optimization, not a structural encoding improvement. On numeric-heavy payloads with no natural language content, protobuf outperforms SAL (1 of 29 vectors). On batch transmission, with all formats receiving their best available second-pass compression, compressed SAL (640 bytes) remains 63.4% smaller than compressed protobuf (1,751 bytes) and 75.6% smaller than gzipped JSON (2,623 bytes).
+On this benchmark set, SAL's per-message advantage over protobuf (70.5% byte reduction) derives primarily from semantic content compression: opcodes replacing longer natural-language descriptions. This is a vocabulary optimization, not a structural encoding improvement. On numeric-heavy payloads with no natural language content, protobuf outperforms SAL (1 of 29 vectors). On batch transmission, with all formats receiving their best available second-pass compression, compressed SAL (632 bytes) remains 63.9% smaller than compressed protobuf (1,751 bytes) and 75.9% smaller than gzipped JSON (2,623 bytes).
 
-SAL's token reduction (75.6%) is structurally independent of gzip and binary serialization because LLMs consume uncompressed text. This reduction applies wherever agent instructions pass through LLM context windows as text, which includes cloud-to-cloud multi-agent deployments where inter-agent messages are tokenized at each receiving agent.
+SAL's token reduction is independent of gzip and binary wire serialization at the point where an LLM consumes plain-text instructions. In deployments where inter-agent instructions are rendered into model context as text, SAL reduces context-window load relative to the JSON payloads benchmarked here.
 
-On constrained channels (LoRaWAN, Meshtastic), SAL produces multi-field instructions within payload floors (11-51 bytes) where JSON-RPC envelopes and protobuf tool calls do not fit.
+On constrained channels (LoRaWAN, Meshtastic), SAL produces multi-field instructions within payload floors (11-51 bytes) where conventional JSON-RPC envelopes do not fit and where schema-based binary encodings remain constrained by the same application content.
 
-The protocol exists as open-source software with published code, test vectors, and benchmarks. It has no production deployments and no third-party adoption. The encoding properties measured here are empirically verifiable by any party using the published materials.
+The protocol exists as open-source software with published code, test vectors, and benchmarks. It has no production deployments and no third-party adoption. The encoding measurements reported here can be independently reproduced using the published materials.
+
+The results in this paper should be read as bounded comparative measurements, not as a claim that SAL is a general replacement for JSON or Protocol Buffers. The measured advantage depends on three conditions: a domain where instructions can be represented by a controlled vocabulary, endpoints willing to externalize semantics into a shared dictionary, and workflows in which instruction payload size or tokenized text volume is operationally relevant.
 
 ---
 

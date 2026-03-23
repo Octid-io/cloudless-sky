@@ -697,8 +697,8 @@ DOMAIN_VECTORS = [
             "metadata": {},
             "created_at": "2025-11-01T12:00:00Z"
         }, separators=(',', ':')),
-        sal_equivalent="C:SCALE@api-gateway?5;C:LIMIT@api-gateway[2000m:4Gi]",
-        notes="Domain scenario over AutoGen. SAL uses C:SCALE then C:LIMIT as sequence."
+        sal_equivalent="C:SCALE@api-gateway[5:2000m:4Gi]",
+        notes="Domain scenario over AutoGen. SAL uses compound C:SCALE with inline resource limits."
     ),
     JSONvsSALVector(
         id="DOM-05",

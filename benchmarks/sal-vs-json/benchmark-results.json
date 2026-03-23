@@ -1,6 +1,6 @@
 {
   "total_vectors": 29,
-  "mean_reduction_pct": 85.84258749442917,
+  "mean_reduction_pct": 86.13114614397469,
   "min_reduction_pct": 70.72072072072072,
   "max_reduction_pct": 95.260663507109,
   "framework_stats": {
@@ -22,7 +22,7 @@
     },
     "AutoGen": {
       "count": 5,
-      "mean_reduction_pct": 85.8238054686428
+      "mean_reduction_pct": 87.49744563600682
     }
   },
   "results": [
@@ -282,8 +282,8 @@
       "domain": "Compute / Resource Management",
       "description": "Compute: scale a service to 5 replicas and set resource limits",
       "json_bytes": 239,
-      "sal_bytes": 52,
-      "reduction_pct": 78.24267782426779,
+      "sal_bytes": 32,
+      "reduction_pct": 86.61087866108787,
       "source_url": "https://microsoft.github.io/autogen/stable//reference/python/autogen_agentchat.messages.html"
     },
     {

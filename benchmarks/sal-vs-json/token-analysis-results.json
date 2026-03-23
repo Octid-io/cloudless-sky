@@ -1,276 +1,183 @@
 {
-  "tokenizer": "cl100k_base (GPT-4)",
-  "vectors": 29,
+  "tokenizer": "cl100k_base",
+  "model_family": "GPT-4",
   "total_json_tokens": 1809,
-  "total_sal_tokens": 441,
-  "mean_token_reduction_pct": 75.6,
-  "total_json_bytes": 6896,
-  "total_sal_bytes": 928,
-  "total_msgpack_bytes": 5848,
-  "mean_byte_reduction_vs_json": 86.5,
-  "mean_msgpack_reduction_vs_json": 15.2,
-  "mean_sal_reduction_vs_msgpack": 84.1,
-  "per_vector": [
+  "total_sal_tokens": 434,
+  "mean_token_reduction_pct": 76.0,
+  "vectors": [
     {
       "id": "MCP-01",
       "json_tokens": 33,
       "sal_tokens": 7,
-      "token_reduction_pct": 78.8,
-      "json_bytes": 114,
-      "sal_bytes": 13,
-      "msgpack_bytes": 89
+      "token_reduction_pct": 78.8
     },
     {
       "id": "MCP-02",
       "json_tokens": 51,
       "sal_tokens": 19,
-      "token_reduction_pct": 62.7,
-      "json_bytes": 168,
-      "sal_bytes": 37,
-      "msgpack_bytes": 134
+      "token_reduction_pct": 62.7
     },
     {
       "id": "MCP-03",
       "json_tokens": 50,
       "sal_tokens": 7,
-      "token_reduction_pct": 86.0,
-      "json_bytes": 162,
-      "sal_bytes": 20,
-      "msgpack_bytes": 135
+      "token_reduction_pct": 86.0
     },
     {
       "id": "MCP-04",
       "json_tokens": 26,
       "sal_tokens": 7,
-      "token_reduction_pct": 73.1,
-      "json_bytes": 90,
-      "sal_bytes": 10,
-      "msgpack_bytes": 72
+      "token_reduction_pct": 73.1
     },
     {
       "id": "MCP-05",
       "json_tokens": 35,
       "sal_tokens": 13,
-      "token_reduction_pct": 62.9,
-      "json_bytes": 138,
-      "sal_bytes": 29,
-      "msgpack_bytes": 110
+      "token_reduction_pct": 62.9
     },
     {
       "id": "OAI-01",
       "json_tokens": 42,
       "sal_tokens": 8,
-      "token_reduction_pct": 81.0,
-      "json_bytes": 150,
-      "sal_bytes": 14,
-      "msgpack_bytes": 123
+      "token_reduction_pct": 81.0
     },
     {
       "id": "OAI-02",
       "json_tokens": 29,
       "sal_tokens": 10,
-      "token_reduction_pct": 65.5,
-      "json_bytes": 108,
-      "sal_bytes": 14,
-      "msgpack_bytes": 88
+      "token_reduction_pct": 65.5
     },
     {
       "id": "OAI-03",
       "json_tokens": 54,
       "sal_tokens": 11,
-      "token_reduction_pct": 79.6,
-      "json_bytes": 257,
-      "sal_bytes": 30,
-      "msgpack_bytes": 217
+      "token_reduction_pct": 79.6
     },
     {
       "id": "OAI-04",
       "json_tokens": 46,
       "sal_tokens": 13,
-      "token_reduction_pct": 71.7,
-      "json_bytes": 176,
-      "sal_bytes": 33,
-      "msgpack_bytes": 139
+      "token_reduction_pct": 71.7
     },
     {
       "id": "OAI-05",
       "json_tokens": 30,
       "sal_tokens": 11,
-      "token_reduction_pct": 63.3,
-      "json_bytes": 93,
-      "sal_bytes": 16,
-      "msgpack_bytes": 77
+      "token_reduction_pct": 63.3
     },
     {
       "id": "A2A-01",
       "json_tokens": 55,
       "sal_tokens": 18,
-      "token_reduction_pct": 67.3,
-      "json_bytes": 202,
-      "sal_bytes": 37,
-      "msgpack_bytes": 165
+      "token_reduction_pct": 67.3
     },
     {
       "id": "A2A-02",
       "json_tokens": 90,
       "sal_tokens": 24,
-      "token_reduction_pct": 73.3,
-      "json_bytes": 267,
-      "sal_bytes": 44,
-      "msgpack_bytes": 222
+      "token_reduction_pct": 73.3
     },
     {
       "id": "A2A-03",
       "json_tokens": 66,
       "sal_tokens": 12,
-      "token_reduction_pct": 81.8,
-      "json_bytes": 307,
-      "sal_bytes": 28,
-      "msgpack_bytes": 262
+      "token_reduction_pct": 81.8
     },
     {
       "id": "A2A-04",
       "json_tokens": 73,
       "sal_tokens": 16,
-      "token_reduction_pct": 78.1,
-      "json_bytes": 251,
-      "sal_bytes": 30,
-      "msgpack_bytes": 198
+      "token_reduction_pct": 78.1
     },
     {
       "id": "CREW-01",
       "json_tokens": 61,
       "sal_tokens": 20,
-      "token_reduction_pct": 67.2,
-      "json_bytes": 287,
-      "sal_bytes": 44,
-      "msgpack_bytes": 253
+      "token_reduction_pct": 67.2
     },
     {
       "id": "CREW-02",
       "json_tokens": 112,
       "sal_tokens": 17,
-      "token_reduction_pct": 84.8,
-      "json_bytes": 364,
-      "sal_bytes": 38,
-      "msgpack_bytes": 329
+      "token_reduction_pct": 84.8
     },
     {
       "id": "CREW-03",
       "json_tokens": 57,
       "sal_tokens": 16,
-      "token_reduction_pct": 71.9,
-      "json_bytes": 253,
-      "sal_bytes": 38,
-      "msgpack_bytes": 229
+      "token_reduction_pct": 71.9
     },
     {
       "id": "CREW-04",
       "json_tokens": 46,
       "sal_tokens": 23,
-      "token_reduction_pct": 50.0,
-      "json_bytes": 222,
-      "sal_bytes": 65,
-      "msgpack_bytes": 205
+      "token_reduction_pct": 50.0
     },
     {
       "id": "AG-01",
       "json_tokens": 68,
       "sal_tokens": 9,
-      "token_reduction_pct": 86.8,
-      "json_bytes": 252,
-      "sal_bytes": 26,
-      "msgpack_bytes": 221
+      "token_reduction_pct": 86.8
     },
     {
       "id": "AG-02",
       "json_tokens": 49,
       "sal_tokens": 13,
-      "token_reduction_pct": 73.5,
-      "json_bytes": 197,
-      "sal_bytes": 35,
-      "msgpack_bytes": 171
+      "token_reduction_pct": 73.5
     },
     {
       "id": "AG-03",
       "json_tokens": 61,
       "sal_tokens": 11,
-      "token_reduction_pct": 82.0,
-      "json_bytes": 213,
-      "sal_bytes": 27,
-      "msgpack_bytes": 186
+      "token_reduction_pct": 82.0
     },
     {
       "id": "AG-04",
       "json_tokens": 182,
       "sal_tokens": 29,
-      "token_reduction_pct": 84.1,
-      "json_bytes": 825,
-      "sal_bytes": 69,
-      "msgpack_bytes": 734
+      "token_reduction_pct": 84.1
     },
     {
       "id": "DOM-01",
       "json_tokens": 50,
       "sal_tokens": 7,
-      "token_reduction_pct": 86.0,
-      "json_bytes": 166,
-      "sal_bytes": 11,
-      "msgpack_bytes": 130
+      "token_reduction_pct": 86.0
     },
     {
       "id": "DOM-02",
       "json_tokens": 73,
       "sal_tokens": 26,
-      "token_reduction_pct": 64.4,
-      "json_bytes": 273,
-      "sal_bytes": 46,
-      "msgpack_bytes": 223
+      "token_reduction_pct": 64.4
     },
     {
       "id": "DOM-03",
       "json_tokens": 73,
       "sal_tokens": 16,
-      "token_reduction_pct": 78.1,
-      "json_bytes": 260,
-      "sal_bytes": 35,
-      "msgpack_bytes": 205
+      "token_reduction_pct": 78.1
     },
     {
       "id": "DOM-04",
       "json_tokens": 67,
-      "sal_tokens": 23,
-      "token_reduction_pct": 65.7,
-      "json_bytes": 239,
-      "sal_bytes": 52,
-      "msgpack_bytes": 202
+      "sal_tokens": 16,
+      "token_reduction_pct": 76.1
     },
     {
       "id": "DOM-05",
       "json_tokens": 86,
       "sal_tokens": 25,
-      "token_reduction_pct": 70.9,
-      "json_bytes": 367,
-      "sal_bytes": 36,
-      "msgpack_bytes": 328
+      "token_reduction_pct": 70.9
     },
     {
       "id": "DOM-06",
       "json_tokens": 61,
       "sal_tokens": 7,
-      "token_reduction_pct": 88.5,
-      "json_bytes": 211,
-      "sal_bytes": 10,
-      "msgpack_bytes": 169
+      "token_reduction_pct": 88.5
     },
     {
       "id": "DOM-07",
       "json_tokens": 83,
       "sal_tokens": 23,
-      "token_reduction_pct": 72.3,
-      "json_bytes": 284,
-      "sal_bytes": 41,
-      "msgpack_bytes": 232
+      "token_reduction_pct": 72.3
     }
   ]
 }

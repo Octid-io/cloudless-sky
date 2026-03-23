@@ -2,12 +2,12 @@
   "method": "zstd level 19, no dictionary, BAEL min(raw, compressed)",
   "totals": {
     "json": 6896,
-    "protobuf": 3081,
-    "sal_raw": 928,
-    "sal_dpack": 928
+    "protobuf": 3075,
+    "sal_raw": 908,
+    "sal_dpack": 908
   },
-  "sal_raw_vs_pb": 69.9,
-  "sal_dpack_vs_pb": 69.9,
+  "sal_raw_vs_pb": 70.5,
+  "sal_dpack_vs_pb": 70.5,
   "scoreboard": {
     "sal_wins": 28,
     "pb_wins": 1
@@ -25,7 +25,7 @@
     {
       "id": "MCP-02",
       "json": 168,
-      "protobuf": 77,
+      "protobuf": 75,
       "sal_raw": 37,
       "sal_zstd": 46,
       "sal_effective": 37,
@@ -124,7 +124,7 @@
     {
       "id": "A2A-03",
       "json": 307,
-      "protobuf": 167,
+      "protobuf": 165,
       "sal_raw": 28,
       "sal_zstd": 37,
       "sal_effective": 28,
@@ -142,7 +142,7 @@
     {
       "id": "CREW-01",
       "json": 287,
-      "protobuf": 178,
+      "protobuf": 176,
       "sal_raw": 44,
       "sal_zstd": 53,
       "sal_effective": 44,
@@ -242,9 +242,9 @@
       "id": "DOM-04",
       "json": 239,
       "protobuf": 27,
-      "sal_raw": 52,
-      "sal_zstd": 56,
-      "sal_effective": 52,
+      "sal_raw": 32,
+      "sal_zstd": 41,
+      "sal_effective": 32,
       "winner": "PB"
     },
     {

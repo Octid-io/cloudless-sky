@@ -5,12 +5,12 @@
     "json_bytes": 6896,
     "msgpack_bytes": 5848,
     "protobuf_bytes": 3081,
-    "sal_bytes": 928
+    "sal_bytes": 908
   },
   "reductions_vs_json": {
     "msgpack": 15.2,
     "protobuf": 55.3,
-    "sal": 86.5
+    "sal": 86.8
   },
-  "sal_vs_protobuf": 69.9
+  "sal_vs_protobuf": 70.5
 }

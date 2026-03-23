@@ -358,11 +358,11 @@
       "description": "Compute: scale a service to 5 replicas and set resource limits",
       "domain": "Compute / Resource Management",
       "json_payload": "{\"type\":\"ToolCallSummaryMessage\",\"source\":\"assistant\",\"content\":\"{\\\"action\\\":\\\"scale_service\\\",\\\"service\\\":\\\"api-gateway\\\",\\\"replicas\\\":5,\\\"cpu_limit\\\":\\\"2000m\\\",\\\"memory_limit\\\":\\\"4Gi\\\"}\",\"metadata\":{},\"created_at\":\"2025-11-01T12:00:00Z\"}",
-      "sal_equivalent": "C:SCALE@api-gateway?5;C:LIMIT@api-gateway[2000m:4Gi]",
+      "sal_equivalent": "C:SCALE@api-gateway[5:2000m:4Gi]",
       "json_bytes": 239,
-      "sal_bytes": 52,
-      "reduction_pct": 78.2,
-      "notes": "Domain scenario over AutoGen. SAL uses C:SCALE then C:LIMIT as sequence."
+      "sal_bytes": 32,
+      "reduction_pct": 86.6,
+      "notes": "Domain scenario over AutoGen. SAL uses compound C:SCALE with inline resource limits."
     },
     {
       "id": "DOM-05",
