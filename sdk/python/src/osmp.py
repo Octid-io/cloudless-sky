@@ -220,12 +220,14 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "ACCEPT":  "accept_proposed_action",
         "ACK":     "positive_acknowledgment",
         "AR":      "agentic_request",
+        "ASD":     "asd_version_identity_or_delta",
         "AUTH":    "authorization_assertion",
         "CMP":     "compress_compare",
         "CMPR":    "structured_comparison_returning_result",
         "COMP":    "compliance_gate_assertion",
         "DA":      "delegate_to_agent",
         "ERR":     "error_handler",
+        "MDR":     "mdr_corpus_version_identity_or_delta",
         "MEM":     "memory_operation",
         "NACK":    "negative_acknowledgment",
         "PING":    "liveness_check",
@@ -964,6 +966,543 @@ class FNPSession:
             self.common_namespaces = None
             self.match_status = None
             self.negotiated_capacity = None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ASD VERSION MAPPING — u16 wire format interpreted as u8.u8 (MAJOR.MINOR)
+#
+# The FNP binary format carries asd_version as u16 big-endian at offset 10.
+# That wire format is unchanged. The upper byte is MAJOR, lower byte is MINOR.
+# MAJOR increments on breaking changes (REPLACE/RETRACT).
+# MINOR increments on additive changes (ADD/DEPRECATE/EXTEND). Resets on MAJOR.
+# Breaking-change detection from version number alone: compare upper bytes.
+#
+# Patent ref: OSMP-001-UTIL Section VII.F (tripartite resolution flags)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def asd_version_pack(major: int, minor: int) -> int:
+    """Pack MAJOR.MINOR into u16 for FNP wire format."""
+    if not (0 <= major <= 255 and 0 <= minor <= 255):
+        raise ValueError(f"Version {major}.{minor} out of u8.u8 range")
+    return (major << 8) | minor
+
+
+def asd_version_unpack(u16: int) -> tuple[int, int]:
+    """Unpack u16 from FNP wire format into (major, minor)."""
+    return (u16 >> 8, u16 & 0xFF)
+
+
+def asd_version_str(u16: int) -> str:
+    """Display string for SAL instructions: '2.7'."""
+    major, minor = asd_version_unpack(u16)
+    return f"{major}.{minor}"
+
+
+def asd_version_parse(s: str) -> int:
+    """Parse '2.7' into u16. Inverse of asd_version_str."""
+    parts = s.split(".")
+    if len(parts) != 2:
+        raise ValueError(f"Invalid version string: {s}")
+    return asd_version_pack(int(parts[0]), int(parts[1]))
+
+
+def asd_version_is_breaking(old_u16: int, new_u16: int) -> bool:
+    """True if the version change includes a MAJOR increment (breaking)."""
+    return (new_u16 >> 8) > (old_u16 >> 8)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ASD DISTRIBUTION PROTOCOL (ADP) — SAL-layer dictionary synchronization
+#
+# Complements the binary FNP handshake with SAL-level instructions for:
+#   - version identity exchange (mesh broadcast, gossip)
+#   - delta request and delivery
+#   - single-opcode micro-delta (task-relevant repair)
+#   - hash verification
+#   - MDR corpus version tracking
+#
+# All ADP instructions are A namespace SAL instructions using existing
+# Category 6 glyph designators (+, ←, †) for delta operations.
+#
+# Priority hierarchy (scheduling, not protocol mechanism):
+#   1. Mission traffic (any non-ADP instruction)
+#   2. Micro-delta (task-relevant, A:ASD:DEF)
+#   3. Background delta (A:ASD:DELTA)
+#   4. Trickle charge request (A:ASD:REQ)
+#
+# Patent ref: OSMP-001-UTIL Claims 20-21, Section VII.F, X-L
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ADP instruction priorities (lower = higher priority)
+ADP_PRIORITY_MISSION    = 0
+ADP_PRIORITY_MICRO      = 1
+ADP_PRIORITY_DELTA      = 2
+ADP_PRIORITY_TRICKLE    = 3
+
+
+@dataclass
+class ADPDeltaOp:
+    """A single operation within a delta payload."""
+    namespace: str
+    mode: str          # "+" | "\u2190" | "\u2020"
+    opcode: str
+    definition: str = ""  # empty for DEPRECATE
+
+    @property
+    def mode_name(self) -> str:
+        return {"+": "ADDITIVE", "\u2190": "REPLACE", "\u2020": "DEPRECATE"}[self.mode]
+
+    @property
+    def is_breaking(self) -> bool:
+        return self.mode == "\u2190"  # REPLACE
+
+    def to_sal(self) -> str:
+        return f"{self.namespace}{self.mode}[{self.opcode}]"
+
+
+@dataclass
+class ADPDelta:
+    """A complete delta payload with version range and operations."""
+    from_version: str   # "2.5"
+    to_version: str     # "2.7"
+    operations: list[ADPDeltaOp] = field(default_factory=list)
+
+    @property
+    def has_breaking(self) -> bool:
+        return any(op.is_breaking for op in self.operations)
+
+    def to_sal(self) -> str:
+        ops = ":".join(op.to_sal() for op in self.operations)
+        return f"A:ASD:DELTA[{self.from_version}\u2192{self.to_version}:{ops}]"
+
+
+@dataclass
+class PendingInstruction:
+    """An instruction held in the semantic pending queue."""
+    sal: str
+    unresolved_namespace: str
+    unresolved_opcode: str
+    timestamp: float = 0.0
+
+
+class ADPSession:
+    """ASD Distribution Protocol session manager.
+
+    Manages SAL-layer dictionary synchronization between sovereign nodes.
+    Operates alongside FNPSession: FNP handles binary handshake, ADP handles
+    SAL-level version exchange, delta delivery, and semantic pending queue.
+
+    Usage:
+        adp = ADPSession(asd, asd_version=asd_version_pack(2, 7))
+
+        # Generate version identity for broadcast
+        announce = adp.version_identity()
+
+        # Process received version identity
+        adp.receive_version("A:ASD[2.5:H2.1:K1.0]")
+
+        # If mismatch, generate delta request
+        req = adp.request_delta(target="2.7")
+
+        # Apply received delta
+        adp.apply_delta_sal("A:ASD:DELTA[2.5\u21922.7:H+[LACTATE]:H+[HRV]]")
+
+        # Handle unknown opcode (semantic pending queue)
+        result = adp.resolve_or_pend("H:LACTATE[4.2]")
+        if result.pending:
+            micro_req = result.micro_delta_request
+
+    Patent ref: OSMP-001-UTIL Claims 20-21, Section IV.C Step 4, X-L
+    """
+
+    def __init__(self, asd: AdaptiveSharedDictionary,
+                 asd_version: int = asd_version_pack(1, 0),
+                 namespace_versions: dict[str, str] | None = None):
+        self.asd = asd
+        self.asd_version = asd_version
+        self.namespace_versions: dict[str, str] = namespace_versions or {}
+        self.pending_queue: list[PendingInstruction] = []
+        self.delta_log: list[str] = []
+        self.remote_version: int | None = None
+        self.remote_namespace_versions: dict[str, str] | None = None
+
+    # ── Version identity ────────────────────────────────────────────────
+
+    def version_identity(self, include_namespaces: bool = True) -> str:
+        """Generate A:ASD version identity instruction.
+
+        Returns SAL string, e.g. 'A:ASD[2.7:H2.3:K1.0]'
+        """
+        ver = asd_version_str(self.asd_version)
+        if include_namespaces and self.namespace_versions:
+            ns = "".join(f":{k}{v}" for k, v in
+                         sorted(self.namespace_versions.items()))
+            return f"A:ASD[{ver}{ns}]"
+        return f"A:ASD[{ver}]"
+
+    def version_query(self) -> str:
+        """Generate version query broadcast: A:ASD?"""
+        return "A:ASD?"
+
+    def version_alert(self) -> str:
+        """Generate version update announcement: A:ASD[M.m]\u26a0"""
+        return f"A:ASD[{asd_version_str(self.asd_version)}]\u26a0"
+
+    # ── Version parsing ─────────────────────────────────────────────────
+
+    def receive_version(self, sal: str) -> dict:
+        """Parse a received A:ASD version identity instruction.
+
+        Returns dict with 'version', 'u16', 'namespaces', 'breaking'.
+        """
+        # Strip A:ASD[ and trailing ] or ]\u26a0
+        inner = sal
+        if inner.startswith("A:ASD["):
+            inner = inner[6:]
+        inner = inner.rstrip("]\u26a0")
+
+        parts = inner.split(":")
+        ver_str = parts[0]
+        remote_u16 = asd_version_parse(ver_str)
+        self.remote_version = remote_u16
+
+        # Parse namespace versions if present
+        ns_versions = {}
+        for part in parts[1:]:
+            # Format: H2.3 -> namespace H, version 2.3
+            if len(part) >= 2 and part[0].isalpha():
+                ns = part[0]
+                ns_ver = part[1:]
+                ns_versions[ns] = ns_ver
+        self.remote_namespace_versions = ns_versions
+
+        breaking = asd_version_is_breaking(self.asd_version, remote_u16)
+
+        return {
+            "version": ver_str,
+            "u16": remote_u16,
+            "namespaces": ns_versions,
+            "breaking": breaking,
+            "match": remote_u16 == self.asd_version,
+        }
+
+    # ── Delta request ───────────────────────────────────────────────────
+
+    def request_delta(self, target: str | None = None,
+                      namespace: str | None = None) -> str:
+        """Generate delta request instruction.
+
+        If namespace is specified, requests namespace-scoped delta.
+        Otherwise requests full ASD delta.
+        """
+        my_ver = asd_version_str(self.asd_version)
+        tgt = target or (asd_version_str(self.remote_version)
+                         if self.remote_version else my_ver)
+        if namespace and self.namespace_versions and self.remote_namespace_versions:
+            my_ns = self.namespace_versions.get(namespace, "0.0")
+            remote_ns = self.remote_namespace_versions.get(namespace, "0.0")
+            return f"A:ASD:REQ[{namespace}{my_ns}\u2192{namespace}{remote_ns}]"
+        return f"A:ASD:REQ[{my_ver}\u2192{tgt}]"
+
+    # ── Delta construction ──────────────────────────────────────────────
+
+    @staticmethod
+    def build_delta(from_ver: str, to_ver: str,
+                    operations: list[ADPDeltaOp]) -> ADPDelta:
+        """Construct a delta payload."""
+        return ADPDelta(from_version=from_ver, to_version=to_ver,
+                        operations=operations)
+
+    # ── Delta application ───────────────────────────────────────────────
+
+    def apply_delta_sal(self, sal: str) -> dict:
+        """Parse and apply a received A:ASD:DELTA instruction.
+
+        Returns dict with 'applied', 'operations', 'breaking', 'queued'.
+        Breaking deltas are logged but not applied if the session is active
+        and uses affected namespaces.
+        """
+        self.delta_log.append(sal)
+
+        # Parse: A:ASD:DELTA[from\u2192to:NS+[OP]:NS\u2190[OP]:NS\u2020[OP]]
+        inner = sal
+        if inner.startswith("A:ASD:DELTA["):
+            inner = inner[12:]
+        inner = inner.rstrip("]")
+
+        # Split version range from operations
+        arrow_idx = inner.find("\u2192")
+        if arrow_idx < 0:
+            return {"applied": False, "error": "No version range found"}
+
+        # Find the end of to_version (next colon after arrow)
+        after_arrow = inner[arrow_idx + 1:]  # \u2192 is 1 char
+        colon_idx = after_arrow.find(":")
+        if colon_idx < 0:
+            return {"applied": False, "error": "No operations found"}
+
+        from_ver = inner[:arrow_idx]
+        to_ver = after_arrow[:colon_idx]
+        ops_str = after_arrow[colon_idx + 1:]
+
+        # Parse operations
+        operations = []
+        has_breaking = False
+        mode_chars = {"+", "\u2190", "\u2020"}
+
+        # Split on namespace boundaries (uppercase letter followed by mode char)
+        current_pos = 0
+        while current_pos < len(ops_str):
+            # Find namespace letter
+            if not ops_str[current_pos].isalpha():
+                current_pos += 1
+                continue
+
+            ns = ops_str[current_pos]
+            current_pos += 1
+
+            if current_pos >= len(ops_str):
+                break
+
+            mode = ops_str[current_pos]
+            if mode not in mode_chars:
+                continue
+            current_pos += 1
+
+            # Extract [OPCODE]
+            if current_pos < len(ops_str) and ops_str[current_pos] == "[":
+                end_bracket = ops_str.find("]", current_pos)
+                if end_bracket >= 0:
+                    opcode = ops_str[current_pos + 1:end_bracket]
+                    current_pos = end_bracket + 1
+                else:
+                    opcode = ops_str[current_pos + 1:]
+                    current_pos = len(ops_str)
+            else:
+                continue
+
+            op = ADPDeltaOp(namespace=ns, mode=mode, opcode=opcode)
+            operations.append(op)
+            if op.is_breaking:
+                has_breaking = True
+
+        # Apply operations to ASD
+        applied = []
+        for op in operations:
+            asd_mode = {
+                "+": AdaptiveSharedDictionary.UpdateMode.ADDITIVE,
+                "\u2190": AdaptiveSharedDictionary.UpdateMode.REPLACE,
+                "\u2020": AdaptiveSharedDictionary.UpdateMode.DEPRECATE,
+            }[op.mode]
+            self.asd.apply_delta(op.namespace, op.opcode, op.definition,
+                                 asd_mode, to_ver)
+            applied.append(f"{op.namespace}:{op.opcode}({op.mode_name})")
+
+        # Attempt to resolve pending instructions
+        resolved = self._resolve_pending()
+
+        return {
+            "applied": True,
+            "from": from_ver,
+            "to": to_ver,
+            "operations": applied,
+            "breaking": has_breaking,
+            "pending_resolved": resolved,
+        }
+
+    # ── Micro-delta (single opcode definition) ──────────────────────────
+
+    def request_definition(self, namespace: str, opcode: str) -> str:
+        """Generate micro-delta request: A:ASD:DEF?[NS:OPCODE]"""
+        return f"A:ASD:DEF?[{namespace}:{opcode}]"
+
+    def send_definition(self, namespace: str, opcode: str,
+                        definition: str, layer: int = 1) -> str:
+        """Generate micro-delta response: A:ASD:DEF[NS:OP:def:layer]"""
+        return f"A:ASD:DEF[{namespace}:{opcode}:{definition}:{layer}]"
+
+    def apply_definition(self, sal: str) -> dict:
+        """Parse and apply a received A:ASD:DEF instruction."""
+        self.delta_log.append(sal)
+
+        inner = sal
+        if inner.startswith("A:ASD:DEF["):
+            inner = inner[10:]
+        inner = inner.rstrip("]")
+
+        parts = inner.split(":")
+        if len(parts) < 3:
+            return {"applied": False, "error": "Insufficient fields"}
+
+        namespace = parts[0]
+        opcode = parts[1]
+        definition = parts[2]
+        layer = int(parts[3]) if len(parts) > 3 else 1
+
+        self.asd.apply_delta(namespace, opcode, definition,
+                             AdaptiveSharedDictionary.UpdateMode.ADDITIVE,
+                             "micro")
+
+        resolved = self._resolve_pending()
+
+        return {
+            "applied": True,
+            "namespace": namespace,
+            "opcode": opcode,
+            "definition": definition,
+            "layer": layer,
+            "pending_resolved": resolved,
+        }
+
+    # ── Hash verification ───────────────────────────────────────────────
+
+    def hash_identity(self, hex_length: int = 8) -> str:
+        """Generate hash verification: A:ASD:HASH[M.m:hex]"""
+        ver = asd_version_str(self.asd_version)
+        fp = self.asd.fingerprint()[:hex_length]
+        return f"A:ASD:HASH[{ver}:{fp}]"
+
+    def verify_hash(self, sal: str) -> dict:
+        """Verify a received A:ASD:HASH instruction against local state."""
+        inner = sal
+        if inner.startswith("A:ASD:HASH["):
+            inner = inner[11:]
+        inner = inner.rstrip("]")
+
+        parts = inner.split(":")
+        if len(parts) < 2:
+            return {"match": False, "error": "Invalid hash instruction"}
+
+        remote_ver = parts[0]
+        remote_hash = parts[1]
+        local_hash = self.asd.fingerprint()[:len(remote_hash)]
+
+        return {
+            "match": remote_hash == local_hash,
+            "remote_version": remote_ver,
+            "remote_hash": remote_hash,
+            "local_hash": local_hash,
+        }
+
+    # ── MDR corpus versioning ───────────────────────────────────────────
+
+    @staticmethod
+    def mdr_identity(corpora: dict[str, str]) -> str:
+        """Generate MDR version identity: A:MDR[ICD:2026:ATT:15.1]"""
+        parts = ":".join(f"{k}:{v}" for k, v in sorted(corpora.items()))
+        return f"A:MDR[{parts}]"
+
+    @staticmethod
+    def mdr_request(corpus: str, from_ver: str, to_ver: str) -> str:
+        """Generate MDR delta request: A:MDR:REQ[ICD:2025\u21922026]"""
+        return f"A:MDR:REQ[{corpus}:{from_ver}\u2192{to_ver}]"
+
+    # ── Semantic pending queue ──────────────────────────────────────────
+
+    def resolve_or_pend(self, sal: str) -> dict:
+        """Check if an instruction's opcodes are resolvable. If not, pend it.
+
+        This implements the semantic dependency resolution buffer from
+        UTIL Claim 20: instructions referencing undefined opcodes are held
+        as semantically pending until the defining delta unit arrives.
+
+        Returns dict with 'resolved', 'pending', optionally 'micro_delta_request'.
+        """
+        # Extract namespace and opcode from instruction
+        ns, opcode = self._extract_ns_opcode(sal)
+        if ns is None:
+            return {"resolved": True, "pending": False}
+
+        # Check if opcode exists in ASD
+        definition = self.asd.lookup(ns, opcode)
+        if definition is not None:
+            return {"resolved": True, "pending": False, "definition": definition}
+
+        # Opcode unresolved. Add to pending queue.
+        import time
+        pending = PendingInstruction(
+            sal=sal,
+            unresolved_namespace=ns,
+            unresolved_opcode=opcode,
+            timestamp=time.time(),
+        )
+        self.pending_queue.append(pending)
+
+        return {
+            "resolved": False,
+            "pending": True,
+            "unresolved": f"{ns}:{opcode}",
+            "micro_delta_request": self.request_definition(ns, opcode),
+            "queue_depth": len(self.pending_queue),
+        }
+
+    def _resolve_pending(self) -> list[str]:
+        """Attempt to resolve pending instructions after a delta or def."""
+        resolved = []
+        still_pending = []
+        for p in self.pending_queue:
+            definition = self.asd.lookup(p.unresolved_namespace,
+                                          p.unresolved_opcode)
+            if definition is not None:
+                resolved.append(p.sal)
+            else:
+                still_pending.append(p)
+        self.pending_queue = still_pending
+        return resolved
+
+    @staticmethod
+    def _extract_ns_opcode(sal: str) -> tuple[str | None, str | None]:
+        """Extract namespace and opcode from a SAL instruction string."""
+        if not sal or not sal[0].isalpha() or ":" not in sal:
+            return None, None
+        parts = sal.split(":")
+        if len(parts) < 2:
+            return None, None
+        ns = parts[0]
+        if len(ns) != 1:
+            return None, None
+        # Opcode is everything before [, ?, <, >, @, or end
+        opcode_raw = parts[1]
+        opcode = ""
+        for ch in opcode_raw:
+            if ch in "[]?<>@\u2227\u2228\u2192\u26a0":
+                break
+            opcode += ch
+        return ns, opcode if opcode else None
+
+    # ── Acknowledge ─────────────────────────────────────────────────────
+
+    @staticmethod
+    def acknowledge_version(version: str) -> str:
+        """Generate version acknowledge: A:ACK[ASD:M.m]"""
+        return f"A:ACK[ASD:{version}]"
+
+    @staticmethod
+    def acknowledge_hash() -> str:
+        """Generate hash acknowledge: A:ACK[ASD:HASH]"""
+        return "A:ACK[ASD:HASH]"
+
+    @staticmethod
+    def acknowledge_def() -> str:
+        """Generate micro-delta acknowledge: A:ACK[ASD:DEF]"""
+        return "A:ACK[ASD:DEF]"
+
+    # ── Priority classification ─────────────────────────────────────────
+
+    @staticmethod
+    def classify_priority(sal: str) -> int:
+        """Return the ADP priority level for a SAL instruction.
+
+        0 = mission (non-ADP), 1 = micro-delta, 2 = background delta,
+        3 = trickle charge request. Implementation uses this for scheduling.
+        """
+        if not sal.startswith("A:ASD") and not sal.startswith("A:MDR"):
+            return ADP_PRIORITY_MISSION
+        if "DEF" in sal:
+            return ADP_PRIORITY_MICRO
+        if "DELTA" in sal:
+            return ADP_PRIORITY_DELTA
+        return ADP_PRIORITY_TRICKLE
 
 
 # ─────────────────────────────────────────────────────────────────────────────

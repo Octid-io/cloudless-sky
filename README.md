@@ -108,7 +108,7 @@ All three SDKs are independently verified against the canonical test suite. Wire
 
 Everything here is operational from the floor ASD without MDR, cloud access, or additional tooling.
 
-**Instruction encoding across all 26 standard namespaces** — 339 opcodes drawn from authoritative sources: IEC 61850 (energy), ICD-10/SNOMED CT/CPT (clinical), ISO 20022/FIX/SWIFT (financial), ISO 10218-1:2025 (robotics), FEMA ICS/NIMS (emergency management), BDI/PDDL/HTN (cognitive AI), OpenAI/Anthropic APIs (model operations).
+**Instruction encoding across all 26 standard namespaces** — 341 opcodes drawn from authoritative sources: IEC 61850 (energy), ICD-10/SNOMED CT/CPT (clinical), ISO 20022/FIX/SWIFT (financial), ISO 10218-1:2025 (robotics), FEMA ICS/NIMS (emergency management), BDI/PDDL/HTN (cognitive AI), OpenAI/Anthropic APIs (model operations).
 
 **Four AI-native namespaces** — J (Cognitive Execution State), Q (Quality/Evaluation/Grounding), Y (Memory + Retrieval), Z (Model/Inference Operations). No prior agent communication protocol defines these. They encode what agents do internally, not just what they communicate between themselves. The J→Y→Z→Q chain encodes the full AI cognitive pipeline as a single transmissible SAL instruction sequence, decodable by ASD lookup without neural inference.
 
@@ -141,7 +141,7 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 | Component | Function |
 |---|---|
 | **SAL** — Semantic Assembly Language | Domain-specific symbolic instruction format |
-| **ASD** — Adaptive Shared Dictionary | 339-opcode version-pinned compression dictionary |
+| **ASD** — Adaptive Shared Dictionary | 341-opcode version-pinned compression dictionary |
 | **FNP** — Frame Negotiation Protocol | Capability negotiation and session handshake |
 | **SNA** — Sovereign Node Architecture | Autonomous edge node, air-gapped operation |
 | **TCL** — Translational Compression Layer | Semantic serialization and transcoding |

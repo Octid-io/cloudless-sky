@@ -380,7 +380,132 @@ REPLACE operations must use FLAGS[C] (criticality override in the fragment heade
 
 A version-pinned subset of the ASD basis set unconditionally present on every sovereign node regardless of dictionary synchronization state, network connectivity, or duration of off-grid operation. Instructions authored exclusively against floor-version glyphs are **baseline-layer instructions** guaranteed executable at any node in any synchronization state.
 
-### 10.4 Two-Tier Corpus Compression (D:PACK / D:UNPACK)
+### 10.4 ASD Distribution Protocol (ADP)
+
+The ADP extends FNP binary handshake with SAL-level instructions for dictionary synchronization over mesh and gossip channels where binary FNP is not the transport. ADP instructions are A namespace opcodes using existing Category 6 glyph designators for delta operations.
+
+#### 10.4.1 Version Scheme
+
+ASD versions use the existing FNP `asd_version` u16 field (Section 9.1, offset 10) interpreted as u8.u8: upper byte is MAJOR, lower byte is MINOR. MAJOR increments on breaking changes (REPLACE or RETRACT). MINOR increments on additive changes (ADD, DEPRECATE, EXTEND) and resets to 0 on MAJOR bump. The wire format is unchanged; the interpretation is a display convention.
+
+Breaking-change detection from version number alone: compare upper bytes. If `(new >> 8) > (old >> 8)`, the version gap contains at least one REPLACE operation requiring session renegotiation.
+
+SAL display: `2.7` (u16 value 0x0207). Range: 0.0 through 255.255.
+
+MDR corpora carry separate version identifiers using the source authority's own version scheme (e.g., ICD-10-CM uses calendar year, MITRE ATT&CK uses major.minor).
+
+#### 10.4.2 ADP Instructions
+
+Seven SAL instruction patterns using two new A namespace opcodes (A:ASD, A:MDR) and the existing A:ACK:
+
+| Instruction | Pattern | Example | Bytes | EU DR0 |
+|---|---|---|---|---|
+| Version identity | `A:ASD[M.m]` or `A:ASD[M.m:NsM.m:...]` | `A:ASD[2.7:H2.3:K1.0]` | 10-51 | Yes |
+| Version query | `A:ASD?` | `A:ASD?` | 6 | Yes |
+| Version alert | `A:ASD[M.m]⚠` | `A:ASD[2.7]⚠` | 13 | Yes |
+| Delta request | `A:ASD:REQ[from→to]` | `A:ASD:REQ[2.5→2.7]` | 20 | Yes |
+| Delta payload | `A:ASD:DELTA[from→to:Ns{mode}[OP]:...]` | `A:ASD:DELTA[2.5→2.7:H+[LACTATE]]` | 34-51 | Yes (single op) |
+| Micro-delta request | `A:ASD:DEF?[NS:OP]` | `A:ASD:DEF?[H:LACTATE]` | 21 | Yes |
+| Micro-delta response | `A:ASD:DEF[NS:OP:def:layer]` | `A:ASD:DEF[H:LACTATE:lactate_level:1]` | 36 | Yes |
+| Hash verification | `A:ASD:HASH[M.m:hex]` | `A:ASD:HASH[2.7:a3f8b1c2]` | 24 | Yes |
+| MDR identity | `A:MDR[corpus:ver:...]` | `A:MDR[ICD:2026:ATT:15.1]` | 24 | Yes |
+| MDR request | `A:MDR:REQ[corpus:from→to]` | `A:MDR:REQ[ICD:2025→2026]` | 26 | Yes |
+| Acknowledge | `A:ACK[ASD:M.m]` | `A:ACK[ASD:2.7]` | 14 | Yes |
+
+Delta payloads use Category 6 glyph designators as mode operators within the payload: `+` (ADDITIVE), `←` (REPLACE), `†` (DEPRECATE). Multi-operation deltas exceeding 51 bytes route to the Overflow Protocol for fragmentation.
+
+#### 10.4.3 Exchange Sequences
+
+**Sequence 1: Version Match (no sync needed)**
+
+```
+Node A → B:  A:ASD[2.7:H2.3:K1.0]
+Node B → A:  A:ASD[2.7:H2.3:K1.0]
+(Match. Session proceeds.)
+```
+
+**Sequence 2: Additive Delta (safe mid-session)**
+
+```
+Node A → B:  A:ASD[2.7:H2.3:K1.0]
+Node B → A:  A:ASD[2.5:H2.1:K1.0]
+(K matches. H mismatch. Only H delta needed.)
+Node B → A:  A:ASD:REQ[H2.1→H2.3]
+Node A → B:  A:ASD:DELTA[2.5→2.7:H+[LACTATE]:H+[HRV]]
+Node B:      (apply, verify)
+Node B → A:  A:ACK[ASD:2.7]
+```
+
+**Sequence 3: Task-Relevant Micro-Delta**
+
+```
+Node A → B:  H:LACTATE[4.2]
+Node B:      (H:LACTATE not in local ASD. Held in semantic pending queue.)
+Node B → A:  A:ASD:DEF?[H:LACTATE]
+Node A → B:  A:ASD:DEF[H:LACTATE:lactate_level:1]
+Node B:      (apply definition, resolve pending instruction)
+```
+
+**Sequence 4: Mesh Broadcast Discovery**
+
+```
+Node A → *:  A:ASD?
+Node B → A:  A:ASD[2.7]
+Node C → A:  A:ASD[2.3]
+Node D → A:  A:ASD[1.4]
+(Node A now knows the mesh version landscape.)
+```
+
+**Sequence 5: Trickle Charge (idle bandwidth, background sync)**
+
+```
+(No active instruction traffic.)
+Node D → A:  A:ASD:REQ[1.4→2.7]
+Node A → D:  A:ASD:DELTA[1.4→1.5:H+[LACTATE]:H+[HRV]]
+(Mission traffic arrives. Delta pauses.)
+...
+(Idle again. Resume.)
+Node A → D:  A:ASD:DELTA[1.5→1.6:E+[SOIL]:E+[PH]]
+...
+Node A → D:  A:ASD:DELTA[2.6→2.7:H+[GCS]]
+Node D → A:  A:ASD:HASH[2.7:a3f8b1c2]
+Node A → D:  A:ACK[ASD:HASH]
+```
+
+**Sequence 6: Breaking Change**
+
+```
+Node A → B:  A:ASD:DELTA[2.7→3.0:H←[TRIAGE]]
+(← signals REPLACE. Breaking change. FLAGS[C] mandatory.)
+Node B:      (Active session uses H:TRIAGE. Queue delta. Do not apply.)
+(Session ends.)
+Node B:      (Apply delta. Renegotiate version on next session.)
+```
+
+#### 10.4.4 Semantic Pending Queue
+
+When a node receives an instruction referencing an opcode not present in its local ASD, the instruction is held in a semantic pending queue rather than discarded or failed. The pending queue is architecturally distinct from a retransmit buffer: semantic resolution is pending receipt of a defining delta unit, not retransmission of a lost packet.
+
+Upon receipt of a defining delta (via A:ASD:DELTA or A:ASD:DEF), the node re-evaluates all pending instructions. Instructions whose unresolved opcodes are now defined are released from the queue and executed. Instructions with remaining unresolved opcodes stay pending.
+
+The micro-delta request (`A:ASD:DEF?[NS:OP]`) is the trigger mechanism: when a node queues an instruction as pending, it simultaneously requests the specific opcode definition from the sending node.
+
+Patent ref: OSMP-001-UTIL Claim 20 (semantic dependency resolution buffer).
+
+#### 10.4.5 Priority Hierarchy
+
+ADP traffic is subordinate to mission traffic. An ASD update never blocks, delays, or degrades an active instruction exchange. Priority levels (lower number = higher priority):
+
+| Priority | Traffic Class | Description |
+|---|---|---|
+| 0 | Mission | Any non-ADP instruction (H, K, E, M, etc.) |
+| 1 | Micro-delta | Task-relevant single opcode definition (A:ASD:DEF) |
+| 2 | Background delta | Namespace delta payload (A:ASD:DELTA) |
+| 3 | Trickle charge | Version queries, delta requests, announcements |
+
+Priority enforcement is implementation-defined. The protocol specifies the ordering; the scheduling algorithm is left to the implementing party. On constrained channels, priority 2 and 3 traffic transmits only in idle bandwidth gaps between mission instructions.
+
+### 10.5 Two-Tier Corpus Compression (D:PACK / D:UNPACK)
 
 `D:PACK` applies OSMP SAL encoding as a first-tier semantic compression pass, followed by a lossless dictionary-based compressor as a second-tier byte-level pass, for at-rest corpus storage. The result is a two-tier encoded corpus in which the semantic structure of the original content is preserved in the SAL intermediate representation.
 
@@ -388,7 +513,7 @@ A version-pinned subset of the ASD basis set unconditionally present on every so
 
 Both opcodes are defined in the D namespace of the ASD floor vocabulary and are operational today without MDR.
 
-#### 10.4.1 Compression Profiles
+#### 10.5.1 Compression Profiles
 
 D:PACK defines two binary profiles addressing different deployment targets. Both profiles share the same first-tier SAL encoding. The second tier differs in algorithm, binary structure, and resolution strategy.
 
@@ -433,7 +558,7 @@ ESP32 SRAM budget (C implementation, D:PACK/BLK, dict-free):
 - Output buffer: 40 KB
 - Total: approximately 117 KB (22% of 520KB SRAM)
 
-#### 10.4.2 Empirical Results
+#### 10.5.2 Empirical Results
 
 On a 5,000-byte partial medical domain corpus, D:PACK achieved 72.7% total reduction and 3.7x compression multiplier versus natural language + LZMA baseline.
 
@@ -512,6 +637,8 @@ A conformant implementation MAY:
 - Implement sovereign namespace extensions (Ω: prefix, U+03A9, 2 UTF-8 bytes)
 - Implement FNP dynamic vocabulary expansion
 - Implement dictionary delta synchronization
+- Implement ASD Distribution Protocol (ADP) SAL-level synchronization per Section 10.4
+- Implement the semantic pending queue per Section 10.4.4
 - Implement the full namespace suite
 
 ---

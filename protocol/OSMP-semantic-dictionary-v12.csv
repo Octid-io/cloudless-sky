@@ -199,6 +199,7 @@ Namespace,Prefix,Domain,Opcode,Definition,Layer,Authoritative_Source,UTIL_Claim_
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,ACCEPT,accept_proposed_action — inter-agent negotiation primitive,1,OSMP-defined,Claim 3,1.0
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,ACK,positive_acknowledgment — complement to NACK; used in Atomic policy confirmation for K and H namespace instructions,1,OSMP-defined,Claim 12,1.0
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,AR,agentic_request,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,ASD,asd_version_identity_or_delta — ADP version exchange and delta synchronization; sub-instructions A:ASD:REQ A:ASD:DELTA A:ASD:DEF A:ASD:HASH,1,OSMP-defined,Claims 20-21,1.0
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,AUTH,authorization_assertion,1,OSMP-defined,Claim 3,1.0
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,CMP,compress_compare — context compression and comparison utility (see Dataset C example),1,OSMP-defined,Claim 3,1.0
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,COMP,compliance_gate_assertion — compliance check precondition in cross-namespace authorization chain I:KYC∧I:AML→I:⊤→A:COMP→K:TRD→R:⚠MOV,1,OSMP-defined,Claims 24-27; FIG.13,1.0
@@ -206,6 +207,7 @@ Agentic / OSMP-Native,A,Agentic / OSMP-Native,CMPR,structured_comparison_returni
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,DA,delegate_to_agent,1,OSMP-defined,Claim 3,1.0
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,ERR,error_handler,1,OSMP-defined,Claim 3,1.0
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,MEM,memory_operation,1,OSMP-defined,Claim 3,1.0
+Agentic / OSMP-Native,A,Agentic / OSMP-Native,MDR,mdr_corpus_version_identity_or_delta — ADP corpus version exchange; sub-instructions A:MDR:REQ,1,OSMP-defined,Claims 20-21,1.0
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,NACK,negative_acknowledgment — used in Atomic policy; payload encodes missing fragment indices as A:NACK[MSG:[id]∖[missing_indices]],1,OSMP-defined,Claim 12,1.0
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,PING,liveness_check,1,OSMP-defined,Claim 3,1.0
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,PONG,liveness_response,1,OSMP-defined,Claim 3,1.0
