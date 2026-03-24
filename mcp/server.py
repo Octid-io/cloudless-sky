@@ -14,10 +14,16 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
-# -- Resolve repo root and import the Python SDK --------------------------
-REPO_ROOT = Path(__file__).resolve().parent.parent
-SDK_PATH = REPO_ROOT / "sdk" / "python" / "src"
-sys.path.insert(0, str(SDK_PATH))
+# -- Resolve paths (auto-detect bundled package vs repo) ------------------
+_PKG_DIR = Path(__file__).resolve().parent
+_BUNDLED_SDK = _PKG_DIR / "osmp.py"
+if _BUNDLED_SDK.exists():
+    # Running from PyPI package: osmp.py is next to server.py
+    sys.path.insert(0, str(_PKG_DIR))
+else:
+    # Running from repo: import from sdk/python/src
+    REPO_ROOT = _PKG_DIR.parent.parent
+    sys.path.insert(0, str(REPO_ROOT / "sdk" / "python" / "src"))
 
 from osmp import (  # noqa: E402
     SALEncoder,
@@ -30,18 +36,32 @@ from osmp import (  # noqa: E402
     run_benchmark,
 )
 
-# -- Paths ----------------------------------------------------------------
-MDR_DIR = REPO_ROOT / "mdr"
-VECTORS_PATH = REPO_ROOT / "protocol" / "test-vectors" / "canonical-test-vectors.json"
-
-MDR_CORPORA = {
-    "icd": MDR_DIR / "icd10cm" / "MDR-ICD10CM-FY2026-blk.dpack",
-    "icd10cm": MDR_DIR / "icd10cm" / "MDR-ICD10CM-FY2026-blk.dpack",
-    "iso": MDR_DIR / "iso20022" / "MDR-ISO20022-K-ISO-blk.dpack",
-    "iso20022": MDR_DIR / "iso20022" / "MDR-ISO20022-K-ISO-blk.dpack",
-    "attack": MDR_DIR / "mitre-attack" / "MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack",
-    "mitre": MDR_DIR / "mitre-attack" / "MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack",
-}
+# -- Paths (auto-detect bundled data vs repo) -----------------------------
+_DATA_DIR = _PKG_DIR / "data"
+if _DATA_DIR.exists():
+    # Running from PyPI package
+    MDR_CORPORA = {
+        "icd": _DATA_DIR / "MDR-ICD10CM-FY2026-blk.dpack",
+        "icd10cm": _DATA_DIR / "MDR-ICD10CM-FY2026-blk.dpack",
+        "iso": _DATA_DIR / "MDR-ISO20022-K-ISO-blk.dpack",
+        "iso20022": _DATA_DIR / "MDR-ISO20022-K-ISO-blk.dpack",
+        "attack": _DATA_DIR / "MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack",
+        "mitre": _DATA_DIR / "MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack",
+    }
+    VECTORS_PATH = None
+else:
+    # Running from repo
+    REPO_ROOT = _PKG_DIR.parent.parent
+    MDR_DIR = REPO_ROOT / "mdr"
+    MDR_CORPORA = {
+        "icd": MDR_DIR / "icd10cm" / "MDR-ICD10CM-FY2026-blk.dpack",
+        "icd10cm": MDR_DIR / "icd10cm" / "MDR-ICD10CM-FY2026-blk.dpack",
+        "iso": MDR_DIR / "iso20022" / "MDR-ISO20022-K-ISO-blk.dpack",
+        "iso20022": MDR_DIR / "iso20022" / "MDR-ISO20022-K-ISO-blk.dpack",
+        "attack": MDR_DIR / "mitre-attack" / "MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack",
+        "mitre": MDR_DIR / "mitre-attack" / "MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack",
+    }
+    VECTORS_PATH = REPO_ROOT / "protocol" / "test-vectors" / "canonical-test-vectors.json"
 
 # -- Singleton instances --------------------------------------------------
 _encoder = SALEncoder()
