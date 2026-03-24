@@ -1,24 +1,20 @@
 {
-    "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-    "name": "io.github.Octid-io/osmp",
-    "description": "Agentic AI instruction encoding. 86.8% byte reduction vs JSON. 70.5% vs compiled protobuf. Inference-free decode. Any channel.",
-    "repository": {
-        "url": "https://github.com/octid-io/cloudless-sky",
-        "source": "github"
-    },
-<<<<<<< HEAD
-    "version": "1.0.19",
-=======
-    "version": "1.0.18",
->>>>>>> bc3212e82d8a75a2f35f14d7c37c6830e92599f4
-    "packages": [
-        {
-            "registryType": "pypi",
-            "identifier": "osmp-mcp",
-            "version": "1.0.19",
-            "transport": {
-                "type": "stdio"
-            }
-        }
-    ]
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Octid-io/osmp",
+  "description": "Agentic AI instruction encoding. 86.8% byte reduction vs JSON. 70.5% vs compiled protobuf. Inference-free decode. Any channel.",
+  "repository": {
+    "url": "https://github.com/octid-io/cloudless-sky",
+    "source": "github"
+  },
+  "version": "1.0.18",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "osmp-mcp",
+      "version": "1.0.19",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
 }
