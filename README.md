@@ -58,7 +58,13 @@ H:HR@NODE1>120→H:CASREP∧M:EVA@*
 
 ## Measured Performance
 
-SAL achieves **86.8%** byte reduction vs JSON, **70.5%** vs compiled Protocol Buffers, and **76.0%** token reduction (GPT-4 cl100k_base).
+<table>
+<tr>
+<td align="center"><h1>86.8%</h1><b>byte reduction vs JSON</b><br>29 real-world vectors from 5 frameworks</td>
+<td align="center"><h1>70.5%</h1><b>byte reduction vs protobuf</b><br>compiled schemas, protoc 3.21.12</td>
+<td align="center"><h1>76.0%</h1><b>fewer tokens (GPT-4)</b><br>cl100k_base tokenizer, 1,809 → 434</td>
+</tr>
+</table>
 
 Compression claims are measured, not estimated. The [29-vector SAL vs JSON benchmark](benchmarks/sal-vs-json/) uses real wire-format payloads from MCP, OpenAI, Google A2A, CrewAI, and AutoGen. Full methodology and adversarial review in the [whitepaper](docs/SAL-efficiency-analysis.md).
 
