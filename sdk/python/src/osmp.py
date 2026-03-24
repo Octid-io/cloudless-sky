@@ -2475,7 +2475,7 @@ def utf8_bytes(s: str) -> int:
 def run_benchmark(vectors_path: str | None = None) -> dict:
     if vectors_path is None:
         vectors_path = str(
-            Path(__file__).parent.parent.parent /
+            Path(__file__).parent.parent.parent.parent /
             "protocol" / "test-vectors" / "canonical-test-vectors.json"
         )
     with open(vectors_path, encoding="utf-8") as f:
@@ -2564,7 +2564,7 @@ if __name__ == "__main__":
     print(f"  Decoded: ns={d.namespace} op={d.opcode} "
           f"({d.opcode_meaning}) target={d.target}\n")
 
-    vectors_path = (Path(__file__).parent.parent.parent /
+    vectors_path = (Path(__file__).parent.parent.parent.parent /
                     "protocol" / "test-vectors" / "canonical-test-vectors.json")
     if vectors_path.exists():
         run_benchmark(str(vectors_path))
