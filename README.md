@@ -16,6 +16,26 @@ No cloud required. No inference at the decode layer. No central authority.
 
 When AI agents communicate in JSON over HTTP, the cost compounds at every hop.
 
+```json
+{"action": "move", "agent": "BOT1", "waypoint": "WP1", "priority": "urgent"}
+```
+
+82 bytes of JSON envelope before you put any content in. Requires tokenization. Requires inference to parse. Fails completely at the 51-byte LoRa minimum payload.
+
+## The Solution
+
+```
+R:MOV@BOT1:WPT:WP1↺
+```
+
+21 bytes. Decode is a table lookup. Fits a single LoRa packet at maximum-range spreading factor. No inference required at the receiving node. The LLM's existing NL→structured output capability handles the translation. The system prompt supplies the SAL grammar, the ASD, and examples from the canonical test vectors. No new tooling required on the generating side. What OSMP changes is the output format, and the decode layer: the receiving node does a table lookup, not inference.
+
+---
+
+## Integration Path
+
+OSMP replaces JSON as the agent instruction serialization format. An LLM that currently outputs:
+
 ```
 "If heart rate at node 1 exceeds 120, assemble casualty report
  and broadcast evacuation to all nodes."
@@ -24,7 +44,7 @@ When AI agents communicate in JSON over HTTP, the cost compounds at every hop.
   Fails completely at 51-byte LoRa minimum payload.
 ```
 
-## The Solution
+can be configured via system prompt to output:
 
 ```
 H:HR@NODE1>120→H:CASREP∧M:EVA@*
@@ -34,29 +54,13 @@ H:HR@NODE1>120→H:CASREP∧M:EVA@*
   No inference required at the receiving node.
 ```
 
-OSMP replaces JSON as the serialization format for agentic instruction exchange. An LLM that currently outputs JSON can be configured via system prompt to output SAL instead — no new tooling required on the generating side, because LLMs already handle NL→structured output. What OSMP changes is the output format, and the decode layer: the receiving node does a table lookup, not inference.
-
 ---
 
-## Benchmark
+## Measured Performance
 
-```
-$ python3 sdk/python/src/osmp.py
+SAL achieves **86.8%** byte reduction vs JSON, **70.5%** vs compiled Protocol Buffers, and **76.0%** token reduction (GPT-4 cl100k_base).
 
-OSMP BENCHMARK — Cloudless Sky Protocol v1.0
-SDK: Python (reference)
-
-  ID         NL Bytes OSMP Bytes  Reduction
-  ✓ TV-001         43         10      76.7%
-  ✓ TV-013        100         35      65.0%
-  ✓ TV-015        101         30      70.3%
-  ...
-
-  Mean reduction: 60.8%
-  CONFORMANT ✓  (mean 60.8% vs 60.0% threshold)
-```
-
-Run it yourself. The numbers are real and independently reproducible across all three SDKs.
+Compression claims are measured, not estimated. The [29-vector SAL vs JSON benchmark](benchmarks/sal-vs-json/) uses real wire-format payloads from MCP, OpenAI, Google A2A, CrewAI, and AutoGen. Full methodology and adversarial review in the [whitepaper](docs/SAL-efficiency-analysis.md).
 
 ---
 
@@ -91,6 +95,19 @@ import "github.com/octid-io/cloudless-sky/sdk/go/osmp"
 
 ---
 
+## Why OSMP Is Different From Every Other Agent Protocol
+
+| Protocol | Transport | Offline | Compression | Inference-Free Decode |
+|---|---|---|---|---|
+| MCP (Anthropic) | HTTP/JSON | ✗ | ✗ | ✗ |
+| A2A (Google/Linux Foundation) | HTTPS/JSON | ✗ | ✗ | ✗ |
+| ACP (IBM) | REST/HTTP | ✗ | ✗ | ✗ |
+| **OSMP** | **Any channel** | **✓** | **86.8% vs JSON** | **✓** |
+
+MCP, A2A, and ACP are framework-layer protocols. OSMP is an encoding-layer protocol. It operates beneath any of them. Two agents using different frameworks that share the OSMP grammar and dictionary can communicate with no modification to either framework.
+
+---
+
 ## SDK Status
 
 All three SDKs are independently verified against the canonical test suite. Wire compatibility is confirmed: Python, TypeScript, and Go produce field-for-field identical decode results across every namespace, every operator, and every edge case documented in the spec. D:PACK/BLK resolve is verified across all 124,215 domain codes (74,719 ICD-10-CM + 47,835 ISO 20022 + 1,661 MITRE ATT&CK) in all three SDKs.
@@ -101,6 +118,26 @@ All three SDKs are independently verified against the canonical test suite. Wire
 | **TypeScript** | OpenClaw / web agent integrations | CONFORMANT | `fzstd` (82KB, pure JS, zero native deps) for D:PACK/BLK |
 | **Go** | PicoClaw / constrained hardware | CONFORMANT | ASD compiled-in; D:PACK/BLK via `klauspost/compress/zstd` (3.1MB binary) |
 | **MCP Server** | Any MCP-compatible AI client | `pip install osmp-mcp` | 8 tools: encode, decode, compound_decode, lookup, discover, resolve, batch_resolve, benchmark |
+
+### Benchmark
+
+```
+$ python3 sdk/python/src/osmp.py
+
+OSMP BENCHMARK — Cloudless Sky Protocol v1.0
+SDK: Python (reference)
+
+  ID         NL Bytes OSMP Bytes  Reduction
+  ✓ TV-001         43         10      76.7%
+  ✓ TV-013        100         35      65.0%
+  ✓ TV-015        101         30      70.3%
+  ...
+
+  Mean reduction: 60.8%
+  CONFORMANT ✓  (mean 60.8% vs 60.0% threshold)
+```
+
+Run it yourself. The numbers are real and independently reproducible across all three SDKs.
 
 ---
 
@@ -145,25 +182,11 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 | **SAL** — Semantic Assembly Language | Domain-specific symbolic instruction format |
 | **ASD** — Adaptive Shared Dictionary | 341-opcode version-pinned compression dictionary |
 | **FNP** — Frame Negotiation Protocol | Capability negotiation and session handshake |
+| **ADP** — ASD Distribution Protocol | Dictionary delta synchronization across nodes |
 | **SNA** — Sovereign Node Architecture | Autonomous edge node, air-gapped operation |
 | **TCL** — Translational Compression Layer | Semantic serialization and transcoding |
 | **OP** — Overflow Protocol | Message fragmentation, priority, graceful degradation |
 | **BAEL** — Bandwidth-Agnostic Efficiency Layer | Adaptive encoding across any channel capacity |
-
----
-
-## Why OSMP Is Different From Every Other Agent Protocol
-
-| Protocol | Transport | Offline | Compression | Inference-Free Decode |
-|---|---|---|---|---|
-| MCP (Anthropic) | HTTP/JSON | ✗ | ✗ | ✗ |
-| A2A (Google/Linux Foundation) | HTTPS/JSON | ✗ | ✗ | ✗ |
-| ACP (IBM) | REST/HTTP | ✗ | ✗ | ✗ |
-| **OSMP** | **Any channel** | **✓** | **86.8% vs JSON** | **✓** |
-
-MCP, A2A, and ACP are framework-layer protocols. OSMP is an encoding-layer protocol. It operates beneath any of them. Two agents using different frameworks that share the OSMP grammar and dictionary can communicate with no modification to either framework.
-
-Compression claims are measured, not estimated. The [29-vector SAL vs JSON benchmark](benchmarks/sal-vs-json/) uses real wire-format payloads from MCP, OpenAI, Google A2A, CrewAI, and AutoGen. SAL achieves 86.8% byte reduction vs JSON, 70.5% vs compiled Protocol Buffers, and 76.0% token reduction (GPT-4 cl100k_base). Full methodology and adversarial review in the [whitepaper](docs/SAL-efficiency-analysis.md).
 
 ---
 
@@ -224,24 +247,6 @@ K:PAY@RECV↔I:§→K:XFR[AMT]
 J:GOAL∧Y:SEARCH∧Z:INF∧Q:GROUND
 → "Declare goal, retrieve from memory, invoke inference, verify grounding."
 ```
-
----
-
-## Integration Path
-
-OSMP replaces JSON as the agent instruction serialization format. An LLM that currently outputs:
-
-```json
-{"action": "move", "agent": "BOT1", "waypoint": "WP1", "priority": "urgent"}
-```
-
-can be configured via system prompt to output:
-
-```
-R:MOV@BOT1:WPT:WP1↺
-```
-
-The LLM's existing NL→structured output capability handles the translation. The system prompt supplies the SAL grammar, the ASD, and examples from the canonical test vectors. No new tooling required on the generating side. What changes is that the receiving node decodes by table lookup instead of inference — enabling LoRa transport, offline operation, and any-device participation.
 
 ---
 
