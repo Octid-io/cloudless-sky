@@ -2,7 +2,7 @@
 
 Encoding efficiency comparison: SAL (Semantic Assembly Language) vs JSON-RPC vs MessagePack vs Protocol Buffers.
 
-Supporting data for [SAL Efficiency Analysis](../docs/SAL-efficiency-analysis.md).
+Supporting data for [SAL Efficiency Analysis](../../docs/SAL-efficiency-analysis.md).
 
 ## Quick Start
 
@@ -50,6 +50,6 @@ python3 protobuf-comparison.py
 
 Token reduction (GPT-4 cl100k_base): 76.0% (1,809 JSON tokens vs 434 SAL tokens).
 
-Per-vector scoreboard vs compiled protobuf: SAL wins 28 of 29. The single protobuf win (DOM-04: Kubernetes scaling, protobuf 27B vs SAL 32B) is a deliberate design choice preserving human readability on numeric payloads. See [Section 6.3](../docs/SAL-efficiency-analysis.md#63-where-sal-loses) of the whitepaper.
+Per-vector scoreboard vs compiled protobuf: SAL wins 28 of 29. The single protobuf win (DOM-04: Kubernetes scaling, protobuf 27B vs SAL 32B) is a deliberate design choice preserving human readability on numeric payloads. See [Section 6.3](../../docs/SAL-efficiency-analysis.md#63-where-sal-loses) of the whitepaper.
 
-See the [full analysis](../docs/SAL-efficiency-analysis.md) for methodology, prosecution, and limitations.
+See the [full analysis](../../docs/SAL-efficiency-analysis.md) for methodology, prosecution, and limitations.

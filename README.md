@@ -124,6 +124,8 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 
 **FNP handshake** — Two-message capability advertisement + acknowledgment (40B + 38B = 78 bytes total). Negotiates dictionary alignment, namespace intersection, and channel capacity in two LoRa packets. Implemented in all three SDKs with byte-identical wire format. Channel capacity negotiation selects the LCD of both nodes, so the mesh scales within the most constrained link.
 
+**ADP dictionary synchronization** — The ASD Distribution Protocol keeps dictionaries aligned across nodes after initial FNP handshake. Delta-based updates decompose dictionary changes into independently parseable units, each carrying a version pointer and a tripartite resolution flag (additive, superseding replacement with mandatory retransmission, or deprecation). Nodes apply deltas as they arrive and operate in a partially updated but internally consistent state during synchronization. Instructions referencing opcodes whose defining delta has not yet arrived are held in a semantic pending queue and resolved on receipt. MAJOR.MINOR version signaling detects breaking changes. The guaranteed minimum operational vocabulary floor ensures every node can decode baseline instructions regardless of synchronization state. Implemented in the Python SDK with 69 tests passing.
+
 **Sovereign namespace extension** — `Ω:` (U+03A9) allows any implementing party to define proprietary namespace extensions without central approval or registration.
 
 ---
