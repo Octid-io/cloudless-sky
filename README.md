@@ -93,7 +93,7 @@ import "github.com/octid-io/cloudless-sky/sdk/go/osmp"
 
 ## SDK Status
 
-All three SDKs are independently verified against the canonical test suite. Wire compatibility is confirmed: Python, TypeScript, and Go produce field-for-field identical decode results across every namespace, every operator, and every edge case documented in the spec. D:PACK/BLK resolve is verified across all 122,554 domain codes (74,719 ICD-10-CM + 47,835 ISO 20022) in all three SDKs.
+All three SDKs are independently verified against the canonical test suite. Wire compatibility is confirmed: Python, TypeScript, and Go produce field-for-field identical decode results across every namespace, every operator, and every edge case documented in the spec. D:PACK/BLK resolve is verified across all 124,215 domain codes (74,719 ICD-10-CM + 47,835 ISO 20022 + 1,661 MITRE ATT&CK) in all three SDKs.
 
 | SDK | Target | Conformance | Notes |
 |---|---|---|---|
@@ -157,9 +157,11 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 | MCP (Anthropic) | HTTP/JSON | ✗ | ✗ | ✗ |
 | A2A (Google/Linux Foundation) | HTTPS/JSON | ✗ | ✗ | ✗ |
 | ACP (IBM) | REST/HTTP | ✗ | ✗ | ✗ |
-| **OSMP** | **Any channel** | **✓** | **60.8% mean** | **✓** |
+| **OSMP** | **Any channel** | **✓** | **86.8% vs JSON** | **✓** |
 
 MCP, A2A, and ACP are framework-layer protocols. OSMP is an encoding-layer protocol. It operates beneath any of them. Two agents using different frameworks that share the OSMP grammar and dictionary can communicate with no modification to either framework.
+
+Compression claims are measured, not estimated. The [29-vector SAL vs JSON benchmark](benchmarks/sal-vs-json/) uses real wire-format payloads from MCP, OpenAI, Google A2A, CrewAI, and AutoGen. SAL achieves 86.8% byte reduction vs JSON, 70.5% vs compiled Protocol Buffers, and 76.0% token reduction (GPT-4 cl100k_base). Full methodology and adversarial review in the [whitepaper](docs/SAL-efficiency-analysis.md).
 
 ---
 
@@ -257,14 +259,18 @@ cloudless-sky/
     server.py       <- MCP server (pip install osmp-mcp)
     server.json     <- MCP Registry descriptor
   mdr/
-    icd10cm/        <- CMS FY2026 ICD-10-CM: LZMA and BLK dict-free binaries
-    iso20022/       <- ISO 20022 eRepository: LZMA and BLK dict-free binaries
+    icd10cm/        <- CMS FY2026 ICD-10-CM (74,719 codes, 477KB)
+    iso20022/       <- ISO 20022 eRepository (47,835 elements, 1.2MB)
+    mitre-attack/   <- MITRE ATT&CK Enterprise v18.1 (1,661 entries, 20KB)
+  benchmarks/
+    sal-vs-json/    <- 29-vector framework benchmark, four-way comparison, grammar analysis
+  docs/
+    SAL-efficiency-analysis.md  <- Whitepaper v2.0: structural efficiency analysis
+    adr/            <- Architecture Decision Records
   tests/
     tier1/          <- Unit tests per SDK + D:PACK/BLK resolve tests
     tier2/          <- Cross-SDK wire compatibility
     tier3/          <- Tier 3 DAG decomposition tests (Python, TypeScript, Go)
-  docs/
-    adr/            <- Architecture Decision Records
 ```
 
 ---
