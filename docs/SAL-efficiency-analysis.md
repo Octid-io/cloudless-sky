@@ -2,7 +2,7 @@
 
 ## A Multi-Layer Comparison of SAL, JSON-RPC, and Binary Serialization Formats Across Wire, Token, and Grammar Dimensions
 
-**Version 2.0 | March 2026**
+**Version 2.1 | March 2026**
 **Octid Semantic Mesh Protocol (OSMP) v1.0 | Cloudless Sky Project**
 **Author: Clay Holberg**
 **Contact: ack@octid.io | octid.io**
@@ -13,7 +13,7 @@
 
 ## Abstract
 
-This paper presents a multi-layer efficiency analysis comparing Semantic Assembly Language (SAL), the instruction encoding format of the Octid Semantic Mesh Protocol (OSMP), against JSON-RPC, MessagePack, and Protocol Buffers. The primary evidence base is a 29-vector empirical benchmark drawn from five production frameworks (MCP, OpenAI, Google A2A, CrewAI, Microsoft AutoGen), measured across three dimensions: byte reduction, LLM token economics (GPT-4 cl100k_base tokenizer), and binary serialization comparison (MessagePack and compiled Protocol Buffers). Supplementary analysis includes a 1,000-point grammar-level structural overhead sweep and Shannon entropy measurement of structural token streams.
+This paper presents a multi-layer efficiency analysis comparing Semantic Assembly Language (SAL), the instruction encoding format of the Octid Semantic Mesh Protocol (OSMP), against JSON-RPC, MessagePack, and Protocol Buffers. The primary evidence base is a 29-vector empirical benchmark drawn from five production frameworks (MCP, OpenAI, Google A2A, CrewAI, Microsoft AutoGen), measured across three dimensions: byte reduction, LLM token economics (GPT-4 cl100k_base tokenizer), and binary serialization comparison (MessagePack and compiled Protocol Buffers). Supplementary analysis includes a 1,000-point grammar-level structural overhead sweep, Shannon entropy measurement of structural token streams, and a production token economics model extrapolating per-instruction savings across cited real-world multipliers (conversation history accumulation, multi-step tool chains, retry loops, context window saturation, and aggregate system inefficiency).
 
 Principal findings on the 29-vector benchmark: SAL achieves 76.0% mean token reduction (GPT-4 cl100k_base), 86.8% mean byte reduction versus minified JSON, 70.5% versus compiled Protocol Buffers, and 84.5% versus MessagePack. Protocol Buffers captures much of JSON's structural overhead (55.4% reduction); SAL's remaining advantage over protobuf derives primarily from semantic content compression through a shared opcode vocabulary, not from superior structural encoding alone. The paper includes an adversarial prosecution section, explicit methodological assumptions, and honest disclosure of cases where SAL underperforms protobuf on numeric-heavy payloads.
 
@@ -180,11 +180,66 @@ All 29 vectors tokenized with GPT-4 cl100k_base (tiktoken). Measured counts, not
 | Total tokens (29 vectors) | 1,809 | 434 | 76.0% |
 | Mean tokens per instruction | 62.4 | 15.0 | 76.0% |
 
-**Token economics at representative LLM input pricing ($2.50 / 1M tokens):**
+### 5.3 Baseline Token Economics (Clean Model)
 
-At 10,000 inter-agent messages per day across a deployment: approximately $430/year in input token savings. At 50,000 messages per day: approximately $2,150/year. These figures cover input tokens only, at a single price point, for a single tokenizer. Output tokens (priced higher) and context window capacity freed for reasoning are not quantified here.
+The following model assumes an idealized deployment: one encoding pass per message, no retries, no accumulated conversation history, no reasoning loops. This is the provable minimum.
 
-### 5.3 The Gzip Boundary
+**Representative LLM input pricing: $2.50 / 1M tokens (GPT-4o, March 2026).**
+
+| Daily messages | JSON tokens/year | SAL tokens/year | Annual input token savings |
+|---------------|-----------------|----------------|---------------------------|
+| 10,000 | 227.8M | 54.8M | ~$430 |
+| 50,000 | 1.14B | 274M | ~$2,150 |
+
+These figures cover input tokens only, at a single price point, for a single tokenizer. Output tokens (priced higher) and context window capacity freed for reasoning are not quantified. This is the floor. A deployment that achieves single-pass message delivery with no retries, no context accumulation, and no multi-step reasoning chains would realize savings in this range. The baseline exists to establish a provable minimum, not to predict production costs.
+
+### 5.4 Production Token Economics (Cited Multipliers)
+
+Production multi-agent systems do not operate at baseline. Empirical reporting from deployed systems identifies five categories of token multiplication that compound on top of per-message encoding cost.
+
+**1. Conversation history accumulation.** Multi-agent frameworks re-read the full conversation history on every LLM call. A task that requires 1,000 tokens in a simple single-pass workflow has been measured consuming 5,000+ tokens when conversation history is included, because every participating agent receives the accumulated context [19]. In AutoGen's GroupChat pattern, a 4-agent discussion with 5 rounds generates a minimum of 20 LLM calls, each carrying progressively longer conversation history [20]. The token cost of each call grows with the conversation length, creating superlinear cost growth within a single task.
+
+**2. Multi-step tool chains.** Autonomous agents routinely chain 10-20 sequential API calls to complete a single task, including tool lookups, retrieval-augmented generation queries, multi-step reasoning, and final completions [21]. Each call in the chain carries the serialized instruction payload. A 10-call chain does not cost 10x a single call because context accumulates, but the serialization overhead of the instruction format is present in every call.
+
+**3. Retry and fallback loops.** Failed tool calls trigger repeated LLM invocations [22]. If an agent encounters an unexpected error format, it may enter a retry loop consuming thousands of tokens without achieving its goal [23]. Each retry carries the full serialized instruction payload again. The serialization overhead is a fixed cost per attempt, regardless of whether the attempt succeeds or fails.
+
+**4. Context window saturation.** Poor context management accounts for 60-70% of total token spend in production agent systems [24]. A production agent handling 2,000 conversations per day at an average of 1,500 tokens per conversation generates approximately 90 million tokens per month [25]. A customer service deployment processing 10,000 conversations per day at 5 turns per conversation at 200 tokens per turn reaches 10 million tokens per day [26]. At these volumes, the serialization format of inter-agent instructions is a recurring line item on every call, not a one-time cost.
+
+**5. Aggregate system inefficiency.** A typical unoptimized multi-agent system processes 10-50x more tokens than strictly necessary [22]. Unoptimized production agents can cost $10-100+ per session due to long context windows and multi-step loops [24]. A single autonomous agent running a multi-step research task can consume $5-15 in API calls in minutes [22].
+
+### 5.5 Compounded Savings Model
+
+The 76.0% token reduction measured in Section 5.2 applies to the serialization layer of every inter-agent instruction. This reduction is a fixed component of a variable cost. Every API call that carries a serialized instruction, whether it is the initial call, a retry, a reasoning step, or a fallback attempt, includes the encoding overhead that SAL eliminates.
+
+The baseline model (Section 5.3) assumes a 1x multiplier: one encoding per message, no repetition. Production systems operate at higher effective multipliers due to the factors documented in Section 5.4.
+
+**At 10,000 inter-agent messages per day:**
+
+| Scenario | Effective multiplier | Annual JSON input tokens | Annual SAL input tokens | Annual input token savings |
+|----------|---------------------|------------------------|------------------------|---------------------------|
+| Baseline (clean) | 1x | 227.8M | 54.8M | ~$430 |
+| Moderate production | 5x | 1.14B | 274M | ~$2,150 |
+| Multi-agent orchestration | 20x | 4.56B | 1.10B | ~$8,650 |
+| Unoptimized system | 50x | 11.39B | 2.74B | ~$21,625 |
+
+**At 50,000 inter-agent messages per day:**
+
+| Scenario | Effective multiplier | Annual JSON input tokens | Annual SAL input tokens | Annual input token savings |
+|----------|---------------------|------------------------|------------------------|---------------------------|
+| Baseline (clean) | 1x | 1.14B | 274M | ~$2,150 |
+| Moderate production | 5x | 5.70B | 1.37B | ~$10,825 |
+| Multi-agent orchestration | 20x | 22.78B | 5.48B | ~$43,250 |
+| Unoptimized system | 50x | 56.95B | 13.70B | ~$108,125 |
+
+The multipliers are derived from cited production reporting and industry analyses, not from theoretical modeling within this paper. The 5x multiplier reflects measured conversation history accumulation in simple multi-agent workflows [19]. The 20x multiplier reflects multi-step tool chains of 10-20 calls with moderate context growth [21]. The 50x multiplier reflects the upper bound of measured inefficiency in unoptimized multi-agent systems [22]. Actual multipliers in any given deployment will depend on the agent architecture, framework, task complexity, and optimization maturity.
+
+**What this model does not claim.** SAL does not reduce the multiplier itself. An agent that retries 10 times under JSON will retry 10 times under SAL. The conversation history accumulation, the reasoning loops, and the fallback patterns are architectural behaviors of the agent framework, not properties of the serialization format. What SAL reduces is the per-instruction cost that rides on every iteration of that multiplier. The serialization tax is a fixed component of the variable cost, and the variable cost in production is 5-50x higher than the clean model predicts.
+
+### 5.6 Scope Boundary: Decode Fidelity
+
+This analysis measures encoding efficiency, not meaning resolution fidelity. SAL decode is deterministic by design: the same instruction produces the same structured output on every decode via table lookup. Whether JSON parsed through an LLM inference layer reliably resolves to the same semantic instruction at production scale is an open empirical question with no published comparative data. A controlled comparison of meaning resolution accuracy between deterministic decode and inference-based parsing under production conditions would constitute a separate analysis with different methodology, different evidence requirements, and different conclusions.
+
+### 5.7 The Gzip Boundary
 
 | Layer | Gzip | SAL |
 |-------|------|-----|
@@ -303,7 +358,7 @@ The results in Sections 6.2 through 6.4 measure raw SAL, the human-readable UTF-
 
 SAL's batch compression reduces the combined payload from 936 raw bytes to 632 bytes, a 32.5% compression over the already-compact SAL encoding. Protobuf's concatenated binary stream compresses from 3,075 raw bytes to 1,751 under gzip (43.1% compression), confirming that protobuf's binary does contain exploitable redundancy in batch. JSON + gzip achieves 62.1% compression from 6,924 raw bytes to 2,623. Compressed SAL remains 63.9% smaller than compressed protobuf, 75.9% smaller than compressed JSON, and 76.6% smaller than compressed MessagePack. All formats receive their best available second-pass lossless compression in this comparison.
 
-The batch compression ratio improves with message count because SAL's structural tokens (namespace prefixes, colons, operators, bracket patterns) are highly repetitive across instructions in the same domain. Protobuf's binary encoding, already compact per-message, offers less redundancy for a second-pass compressor to exploit.
+The batch compression ratio improves with message count because SAL's structural tokens (namespace prefixes, colons, operators, bracket patterns) are highly repetitive across instructions in the same domain. Protobuf's binary encoding, already compact per-message, offers less redundancy for a second-pass compressor to exploit. The batch experiment is a benchmark aggregate, not a measured production traffic trace.
 
 **Per-vector scoreboard: raw SAL vs Protocol Buffers.** Without any second-tier compression, SAL produces a smaller encoding than Protocol Buffers on 28 of 29 vectors. The single vector where protobuf wins (DOM-04: Kubernetes scaling with resource limits, protobuf 27 bytes, SAL 32 bytes) is a numeric-heavy payload where the 5-byte gap represents the human-readability constraint on resource limit encoding. On all other vector classes, SAL's semantic content compression produces smaller encodings than protobuf's binary serialization.
 
@@ -381,7 +436,7 @@ At 11 bytes, `H:TRIAGE?I` (10 bytes) fits. A bare `{"a":1}` is 7 bytes. A JSON-R
 
 CayenneLPP cannot express conditional logic, multi-step workflows, cross-domain composition, or any form of agentic instruction. When a LoRaWAN deployment needs to send instructions rather than readings, custom binary byte layouts with device-specific payload formatters are the norm. There is no dominant standardized, semantically composable instruction encoding for these channels comparable to what CayenneLPP provides for telemetry.
 
-OSMP targets this instruction-encoding space. A SAL payload formatter for The Things Stack would be a JavaScript function performing ASD lookup, enabling any LoRaWAN network server to decode OSMP instructions without per-device custom code. On Meshtastic, SAL instructions are UTF-8 text through the existing message channel. This does not mean no other instruction-layer solutions exist; custom TLV protocols, domain-specific command encodings, and proprietary control payloads are widely used. What does not exist is a cross-domain standard with a published dictionary and open implementations.
+OSMP is proposed for this instruction-encoding space. A SAL payload formatter for The Things Stack would be a JavaScript function performing ASD lookup, enabling any LoRaWAN network server to decode OSMP instructions without per-device custom code. On Meshtastic, SAL instructions are UTF-8 text through the existing message channel. This does not mean no other instruction-layer solutions exist; custom TLV protocols, domain-specific command encodings, and proprietary control payloads are widely used. What does not exist is a cross-domain standard with a published dictionary and open implementations.
 
 The constrained-channel claim should be scoped precisely: OSMP does not replace CayenneLPP for compact numeric telemetry (where CayenneLPP's binary encoding is more compact per reading). It addresses the instruction encoding space that CayenneLPP does not cover.
 
@@ -410,9 +465,9 @@ A complete vitals panel (7 readings): SAL costs 69 bytes. Binary costs 27 bytes.
 
 None of these can be expressed in CayenneLPP at any byte count. A protobuf encoding could serialize equivalent data structures, but the .proto schema defining those structures must be designed, agreed upon by sender and receiver, compiled, deployed to both endpoints, and versioned. SAL carries the semantics in the encoding itself, resolvable by any node with the ASD.
 
-The complete sense-decide-act loop (sensor reading, threshold evaluation, alert composition, coordination request, command response) runs in one grammar with zero translation boundaries between stages. A deployment using CayenneLPP for telemetry plus custom binary for thresholds plus JSON for cloud coordination maintains three encoding formats with translation logic at every boundary. Each boundary is code to write, test, maintain, and debug. On a constrained device in a disconnected environment, each boundary is also a failure surface.
+The complete sense-decide-act loop (sensor reading, threshold evaluation, alert composition, coordination request, command response) can run in one grammar with no protocol translation boundaries between stages. A deployment using CayenneLPP for telemetry plus custom binary for thresholds plus JSON for cloud coordination maintains three encoding formats with translation logic at every boundary. Each boundary is code to write, test, maintain, and debug. On a constrained device in a disconnected environment, each boundary is also a failure surface.
 
-42 bytes of numeric tax per vitals panel. The unified protocol surface for the complete sense-decide-act loop is the return on that cost.
+The protocol-level tradeoff is a 42-byte numeric tax per vitals panel in exchange for a unified encoding surface across the sense-decide-act loop.
 
 ### 9.2 Mode 2: Edge-to-Cloud (Binding Constraint: Asymmetric Encoding)
 
@@ -444,7 +499,7 @@ Key names have real engineering value: debugging, interoperability, evolvability
 
 ### 10.3 Gzip Narrows the Wire Gap (Verdict: Valid on Wire, Inapplicable on Tokens)
 
-Correct at the wire layer. Inapplicable at the token layer. On constrained channels, gzip is unavailable. See Section 5.3.
+Correct at the wire layer. Inapplicable at the token layer. On constrained channels, gzip is unavailable. See Section 5.7.
 
 ### 10.4 SAL Requires a Shared Dictionary (Verdict: Valid Architectural Tradeoff)
 
@@ -551,7 +606,7 @@ The benchmark results reported here are consistent with these architectural diff
 
 On this benchmark set, SAL's per-message advantage over protobuf (70.5% byte reduction) derives primarily from semantic content compression: opcodes replacing longer natural-language descriptions. This is a vocabulary optimization, not a structural encoding improvement. On numeric-heavy payloads with no natural language content, protobuf outperforms SAL (1 of 29 vectors). On batch transmission, with all formats receiving their best available second-pass compression, compressed SAL (632 bytes) remains 63.9% smaller than compressed protobuf (1,751 bytes) and 75.9% smaller than gzipped JSON (2,623 bytes).
 
-SAL's token reduction is independent of gzip and binary wire serialization at the point where an LLM consumes plain-text instructions. In deployments where inter-agent instructions are rendered into model context as text, SAL reduces context-window load relative to the JSON payloads benchmarked here.
+SAL's token reduction is independent of gzip and binary wire serialization at the point where an LLM consumes plain-text instructions. In deployments where inter-agent instructions are rendered into model context as text, SAL reduces context-window load relative to the JSON payloads benchmarked here. To the extent that serialized instruction payloads recur across retry loops, conversation history accumulation, and multi-step tool chains documented in production multi-agent systems (Section 5.4-5.5), the 76.0% per-instruction token reduction compounds with those effects. Cited production multipliers of 5-50x over clean single-pass baselines place the effective annual savings range between approximately $2,150 and $108,125 at 50,000 daily inter-agent messages, depending on system optimization maturity. These extrapolations are bounded by the cited sources and should be read as indicative ranges, not predictions for any specific deployment.
 
 On constrained channels (LoRaWAN, Meshtastic), SAL produces multi-field instructions within payload floors (11-51 bytes) where conventional JSON-RPC envelopes do not fit and where schema-based binary encodings remain constrained by the same application content.
 
@@ -610,6 +665,22 @@ Protocol Buffers schemas: benchmark.proto (compiled with protoc 3.21.12). Two-ti
 [17] myDevices. Cayenne Low Power Payload (CayenneLPP). docs.mydevices.com/docs/lorawan/cayenne-lpp.
 
 [18] Semtech. "Packet Size Considerations." lora-developers.semtech.com.
+
+[19] 47 Billion (2026). "AI Agents in Production: Frameworks, Protocols, and What Actually Works in 2026." 47billion.com/blog. (Measured 5x token consumption from conversation history accumulation in multi-agent workflows; AutoGen GroupChat 20-call minimum for 4-agent, 5-round task.)
+
+[20] GuruSup (2026). "Best Multi-Agent Frameworks in 2026." gurusup.com/blog. (AutoGen 4-agent GroupChat: 20 LLM calls minimum per 5-round task.)
+
+[21] Zuplo (2026). "Token-Based Rate Limiting: How to Manage AI Agent API Traffic in 2026." zuplo.com/learning-center. (Autonomous agents chain 10-20 sequential API calls per single task.)
+
+[22] Moltbook-AI (2026). "AI Agent Cost Optimization Guide 2026." moltbook-ai.com. (Unoptimized multi-agent systems process 10-50x more tokens than necessary; single research task $5-15 in API calls in minutes.)
+
+[23] InvestGlass (2026). "How to Control API Costs in an Agentic AI World." investglass.com. (Agents entering retry loops from unexpected error formats, consuming thousands of tokens per loop.)
+
+[24] Fast.io (2026). "AI Agent Token Cost Optimization: Complete Guide for 2026." fast.io/resources. (Poor context management causes 60-70% of total spend; unoptimized agents $10-100+ per session.)
+
+[25] Neontri (2026). "AI Agent Development Cost in 2026: Full Budget Guide." neontri.com/blog. (Production agent: 2,000 conversations/day, ~90M tokens/month at 1,500 tokens/conversation with 1:2 input-to-output ratio.)
+
+[26] Spheron (2026). "How to Build GPU Infrastructure for AI Agents: The 2026 Compute Playbook." spheron.network/blog. (Customer service agent: 10,000 conversations/day x 5 turns x 200 tokens = 10M tokens/day.)
 
 ---
 
