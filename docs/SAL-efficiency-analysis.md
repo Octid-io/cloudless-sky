@@ -58,7 +58,7 @@ Example: `H:TRIAGE?I` (10 bytes) encodes "triage classification: immediate." The
 
 ### 2.2 Adaptive Shared Dictionary (ASD)
 
-The ASD is the shared reference enabling positional encoding without self-description. It contains 339 opcodes across 26 namespaces, drawn from authoritative domain standards (ICD-10, ISO 20022, MITRE ATT&CK, IEEE 1451, RFC 5424, FIPS 140-3, and others). Three MDR corpora extend the ASD with 124,215 resolvable domain codes.
+The ASD is the shared reference enabling positional encoding without self-description. It contains 341 opcodes across 26 namespaces, drawn from authoritative domain standards (ICD-10, ISO 20022, MITRE ATT&CK, IEEE 1451, RFC 5424, FIPS 140-3, and others). Three MDR corpora extend the ASD with 124,215 resolvable domain codes.
 
 Both sender and receiver must possess the ASD. This is architecturally analogous to protobuf's requirement for compiled .proto schemas at both endpoints, and to MCP's tools/list schema discovery step. The ASD shifts schema from per-message to per-session. Unlike protobuf schemas, the ASD also provides semantic vocabulary compression: opcode names replace natural language descriptions.
 
@@ -523,7 +523,7 @@ The governance model (who approves dictionary changes) remains unquantified and 
 
 ### 10.6 Semantic Loss from Constrained Opcode Inventories (Verdict: Valid)
 
-339 opcodes across 26 namespaces cannot express every possible agent instruction. If the instruction domain falls outside the ASD vocabulary, SAL cannot encode it without sovereign extension (the Omega namespace) or MDR registration. Deterministic decode is not semantic adequacy: an exact decode of a limited vocabulary may lose nuance present in the original natural language instruction.
+341 opcodes across 26 namespaces cannot express every possible agent instruction. If the instruction domain falls outside the ASD vocabulary, SAL cannot encode it without sovereign extension (the Omega namespace) or MDR registration. Deterministic decode is not semantic adequacy: an exact decode of a limited vocabulary may lose nuance present in the original natural language instruction.
 
 ### 10.7 Content Compression Conflated with Grammar Compression (Verdict: Addressed in Methodology)
 
@@ -568,7 +568,7 @@ The Protocol Buffers byte counts were initially computed analytically from wire 
 | Component | Status |
 |-----------|--------|
 | Specification | OSMP v1.0, SAL EBNF grammar, semantic dictionary v12 |
-| Patent | Provisional filed March 17, 2026 (#64/007,684); non-provisional in progress |
+| Patent | Provisional filed March 17, 2026 ; non-provisional in progress |
 | Python SDK (reference) | 167 tests passing |
 | TypeScript SDK | 52 tests passing |
 | Go SDK | 12 tests passing |
@@ -684,4 +684,4 @@ Protocol Buffers schemas: benchmark.proto (compiled with protoc 3.21.12). Two-ti
 
 ---
 
-*OSMP is patent pending (Application #64/007,684, filed March 17, 2026). This paper describes measurement methodology and competitive analysis applied to the disclosed protocol. The analytical frameworks (Shannon entropy, grammar production comparison, token cost measurement) are measurement tools, not protocol extensions. The benchmark results, format comparisons, and economic projections are analytical work product not present in the patent application. Readers should not treat this paper as a definitive scope statement regarding the patent's disclosure.*
+*OSMP is patent pending (Application filed March 17, 2026). This paper describes measurement methodology and competitive analysis applied to the disclosed protocol. The analytical frameworks (Shannon entropy, grammar production comparison, token cost measurement) are measurement tools, not protocol extensions. The benchmark results, format comparisons, and economic projections are analytical work product not present in the patent application. Readers should not treat this paper as a definitive scope statement regarding the patent's disclosure.*

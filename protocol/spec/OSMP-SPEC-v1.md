@@ -651,7 +651,7 @@ See `/protocol/test-vectors/` for the canonical test vector suite. Every conform
 
 ## 15. Patent Notice
 
-This protocol specification is provided under Apache 2.0 license. The underlying architecture is covered by pending US patent application OSMP-001-UTIL (inventor: Clay Holberg), filed March 16, 2026, with priority date August 7, 2025. A continuation-in-part application (OSMP-001-CIP) extends coverage to cloud-scale AI orchestration, non-RF channels, and the AI-native namespace architecture. Apache 2.0 includes an express patent grant for implementations of this specification.
+This protocol specification is provided under Apache 2.0 license. The underlying architecture is covered by pending US patent application OSMP-001-UTIL (inventor: Clay Holberg), filed March 17, 2026, with conception date August 7, 2025. A continuation-in-part application (OSMP-001-CIP) extends coverage to cloud-scale AI orchestration, non-RF channels, and the AI-native namespace architecture. Apache 2.0 includes an express patent grant for implementations of this specification.
 
 ---
 

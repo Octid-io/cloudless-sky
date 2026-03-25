@@ -8,3 +8,4 @@ sdk/typescript/dist/
 *.d.ts.map
 sdk/go/osmp-benchmark
 .DS_Store
+desktop.ini

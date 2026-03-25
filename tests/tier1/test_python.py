@@ -58,7 +58,7 @@ class TestCanonicalOpcodes:
 
     def test_total_opcode_count(self):
         total = sum(len(v) for v in ASD_BASIS.values())
-        assert total >= 339, f"Expected ≥339 opcodes, got {total}"
+        assert total >= 341, f"Expected ≥341 opcodes, got {total}"
 
     def test_all_26_namespaces(self):
         assert set(ASD_BASIS.keys()) == set("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
