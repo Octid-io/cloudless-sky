@@ -45,17 +45,19 @@ consequence_class   ::= "⚠" | "↺" | "⊘"             # R namespace mandator
 # NAMESPACE AND OPCODE
 # ─────────────────────────────────────────────
 
-namespace_prefix    ::= standard_prefix | sovereign_prefix
+namespace_prefix    ::= standard_prefix | tier2_prefix | sovereign_prefix
 
 standard_prefix     ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H"
                       | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P"
                       | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X"
                       | "Y" | "Z"
 
+tier2_prefix        ::= uppercase_alpha uppercase_alpha ":"
+                      # 351 order-invariant double-Latin slots (AB=BA canonical form)
+                      # MDR-registered domain-specific extensions without Ω sovereign scope
+
 sovereign_prefix    ::= "Ω" ":"  # U+03A9 OMEGA — 2 UTF-8 bytes
-                      | uppercase_alpha uppercase_alpha ":"  # legacy two-char form
-                      # Two-character prefix followed by colon
-                      # Must not conflict with standard prefixes
+                      # Tier 3: unlimited extension space, no registration required
 
 opcode              ::= uppercase_alpha (uppercase_alpha | digit)*
                       # 1–8 characters, uppercase alphanumeric
@@ -123,7 +125,9 @@ frag_idx            ::= 1-byte-unsigned-integer
 frag_ct             ::= 1-byte-unsigned-integer
 flags               ::= 1-byte-bitfield
                       # bit 0: T — Terminal (final fragment)
-                      # bit 1: C — Criticality override
+                      # bit 1: C — Criticality override (forces Atomic for this message)
+                      # bit 2: NL_PASSTHROUGH (0x04) — BAEL Mode 3: payload is natural language, skip ASD lookup
+                      # bit 3: EXTENDED_DEP (0x08) — Tier 3: first 4 payload bytes are u32 BE dependency bitmap
 dep                 ::= 1-byte-unsigned-integer   # dependency pointer
 
 # ─────────────────────────────────────────────

@@ -32,13 +32,14 @@ OSMP achieves mean 60.8% UTF-8 byte reduction relative to natural language equiv
 
 ## 2. Architecture Overview
 
-OSMP comprises seven components:
+OSMP comprises eight components:
 
 | Component | Full Name | Function |
 |---|---|---|
 | SAL | Semantic Assembly Language | Domain-specific symbolic instruction format |
 | ASD | Adaptive Shared Dictionary | Adaptive shared compression dictionary |
 | FNP | Frame Negotiation Protocol | Capability negotiation and session handshake |
+| ADP | ASD Distribution Protocol | Dictionary delta synchronization across nodes |
 | SNA | Sovereign Node Architecture | Autonomous edge node architecture |
 | TCL | Translational Compression Layer | Semantic serialization and transcoding layer |
 | OP | Overflow Protocol | Message fragmentation, priority, and graceful degradation |
@@ -100,7 +101,7 @@ TCL glyph substitution alone reduces character count 5-25% depending on instruct
 
 Measurement basis: UTF-8 byte count (`len(s.encode('utf-8'))` in Python). All numbers are independently reproducible by running the benchmark against the canonical test vectors.
 
-Two-tier corpus compression (D:PACK): SAL first tier + lossless dictionary-based compression second tier. Two profiles are defined: D:PACK/LZMA for companion devices with adequate SRAM for full-corpus decompression, and D:PACK/BLK (zstd, block-level random access) for microcontroller targets where full-corpus decompression exceeds available SRAM. On a 5,000-byte partial medical domain corpus, this architecture achieved 72.7% total reduction and 3.7x compression multiplier versus natural language + LZMA baseline, with the SAL tier contributing a larger proportion on the small sample. At full scale on CMS FY2026 ICD-10-CM (74,719 clinical descriptions, 5.4MB raw): D:PACK/LZMA produced a 505KB binary (91.1% reduction); D:PACK/BLK produced a 477KB binary (91.4% reduction, dict-free) with single-code resolution requiring only 38KB of SRAM versus 6,177KB for the LZMA profile. On ISO 20022 eRepository (66,956 financial definitions, 8.7MB raw), D:PACK/BLK achieved 86.5% total reduction in a 1.21MB binary (dict-free); D:PACK/LZMA achieved 87.2% in a 1.14MB binary. The SAL first tier contributes 8-16% depending on corpus repetitiveness; the second tier contributes the dominant share. The primary value of the two-tier architecture at full scale is edge-local deployment: entire domain code libraries in microcontroller flash for infrastructure-denied operations without network dependency.
+Two-tier corpus compression (D:PACK): SAL first tier + lossless dictionary-based compression second tier. Two profiles are defined: D:PACK/LZMA for companion devices with adequate SRAM for full-corpus decompression, and D:PACK/BLK (zstd, block-level random access) for microcontroller targets where full-corpus decompression exceeds available SRAM. On a 5,000-byte partial medical domain corpus, this architecture achieved 72.7% total reduction and 3.7x compression multiplier versus natural language + LZMA baseline, with the SAL tier contributing a larger proportion on the small sample. At full scale on CMS FY2026 ICD-10-CM (74,719 clinical descriptions, 5.4MB raw): D:PACK/LZMA produced a 505KB binary (91.1% reduction); D:PACK/BLK produced a 477KB binary (91.4% reduction, dict-free) with single-code resolution requiring only 38KB of SRAM versus 6,177KB for the LZMA profile. On ISO 20022 eRepository (47,835 unique financial definitions extracted from 66,956 source rows, 8.7MB raw), D:PACK/BLK achieved 86.5% total pipeline reduction in a 1.2MB binary (dict-free); D:PACK/LZMA achieved 87.2% in a 1.14MB binary. The SAL first tier contributes 8-16% depending on corpus repetitiveness; the second tier contributes the dominant share. The primary value of the two-tier architecture at full scale is edge-local deployment: entire domain code libraries in microcontroller flash for infrastructure-denied operations without network dependency.
 
 ### 3.5 Six-Category Typed Symbol Architecture
 
@@ -571,7 +572,7 @@ Full-scale results on the CMS FY2026 ICD-10-CM code set (74,719 clinical descrip
 
 The D:PACK/BLK dict-free profile is 3.3% smaller than D:PACK/LZMA on ICD-10-CM and 5.5% larger on ISO 20022. The dict-free format eliminates trained dictionary overhead, enabling a single binary readable by all three SDKs (Python, TypeScript, Go) with no native decompression dependencies in the TypeScript path. The primary advantage of the BLK profile is not total size but resolution memory: 38 KB versus 6,177 KB (ICD-10-CM) or 9,941 KB (ISO 20022), enabling on-device code resolution at microcontroller scale without full-corpus decompression.
 
-On the complete ISO 20022 eRepository (66,956 financial message element definitions, 8.7MB raw), D:PACK/BLK achieved 86.5% total reduction in a 1,207KB dict-free binary (201 blocks); D:PACK/LZMA achieved 87.2% in a 1,143KB binary (843KB corpus + 327KB index). The SAL first tier contributed 15.8% on clinical text and 8.4% on financial text; the second tier contributed the dominant share on both corpora.
+On the complete ISO 20022 eRepository (47,835 unique financial definitions extracted from 66,956 source rows, 8.7MB raw), D:PACK/BLK achieved 86.5% total pipeline reduction in a 1,207KB dict-free binary (201 blocks); D:PACK/LZMA achieved 87.2% in a 1,143KB binary (843KB corpus + 327KB index). The SAL first tier contributed 15.8% on clinical text and 8.4% on financial text; the second tier contributed the dominant share on both corpora.
 
 The primary value of the two-tier architecture at full scale is edge-local deployment: entire domain code libraries in microcontroller flash for infrastructure-denied operations without network dependency.
 
@@ -611,8 +612,8 @@ The primary value of the two-tier architecture at full scale is edge-local deplo
 | D:PACK/BLK resolve latency | 0.1 -- 0.3 ms | Single-code, Python reference SDK |
 | D:PACK/BLK format | dict-free | Universal format, all SDKs, no trained dictionary |
 | D:PACK/BLK vs LZMA size | -3.3% (ICD), +5.5% (ISO) | BLK smaller on ICD, larger on ISO; tradeoff is resolution memory |
-| Two-tier corpus reduction (full ISO 20022, BLK) | 86.5% | ISO 20022 eRepository, 66,956 definitions, 8.7MB raw, SAL + zstd dict-free |
-| Two-tier corpus reduction (full ISO 20022, LZMA) | 87.2% | ISO 20022 eRepository, 66,956 definitions, 8.7MB raw, SAL + LZMA |
+| Two-tier corpus reduction (full ISO 20022, BLK) | 86.5% | ISO 20022 eRepository, 47,835 unique definitions (66,956 source rows), 8.7MB raw, SAL + zstd dict-free |
+| Two-tier corpus reduction (full ISO 20022, LZMA) | 87.2% | ISO 20022 eRepository, 47,835 unique definitions (66,956 source rows), 8.7MB raw, SAL + LZMA |
 | D:PACK/BLK binary (ISO 20022) | 1,207 KB | Full ISO 20022 data dictionary (201 blocks, dict-free) |
 | D:PACK/LZMA binary (ISO 20022) | 1,143 KB | Full ISO 20022 data dictionary (843KB corpus + 327KB index) |
 | SAL first-tier contribution (clinical) | 15.8% | Highly repetitive clinical description text |

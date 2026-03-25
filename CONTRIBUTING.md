@@ -70,14 +70,13 @@ Both profiles produce binaries stored in `mdr/` subdirectories.
 ```
 mdr/
   icd10cm/
-    MDR-ICD10CM-FY2026.csv            Source: CMS FY2026 code descriptions
-    MDR-ICD10CM-FY2026.dpack          LZMA profile (legacy)
-    MDR-ICD10CM-FY2026-blk.dpack      BLK profile (active)
+    MDR-ICD10CM-FY2026-blk.dpack      BLK profile (74,719 codes, 477KB)
   iso20022/
     MDR-ISO20022-DEFINITIONS-FULL.csv  Source: ISO 20022 eRepository extraction
     MDR-ISO20022-MSG-FULL.csv          Source: message type catalog
-    MDR-ISO20022-K-ISO.dpack           LZMA profile (legacy)
-    MDR-ISO20022-K-ISO-blk.dpack       BLK profile (active)
+    MDR-ISO20022-K-ISO-blk.dpack       BLK profile (47,835 unique definitions, 1.2MB)
+  mitre-attack/
+    MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack  BLK profile (1,661 entries, 20KB)
 ```
 
 ### DBLK Binary Format (v1)
@@ -112,6 +111,7 @@ All numbers measured from source artifacts with zero round-trip errors:
 |---|---|---|---|---|
 | ICD-10-CM (H:ICD) | 74,719 | 5.4 MB | 477 KB | 91.4% |
 | ISO 20022 (K:ISO) | 47,835 | 8.7 MB | 1,207 KB | 86.5% |
+| MITRE ATT&CK Enterprise (S:ATT) | 1,661 | 82 KB | 20 KB | 75.3% |
 
 ---
 
@@ -119,7 +119,7 @@ All numbers measured from source artifacts with zero round-trip errors:
 
 ### D:PACK/BLK Resolve for TypeScript and Go -- shipped
 
-Read-only DBLK binary resolution is implemented and verified across all 122,554 codes (74,719 ICD-10-CM + 47,835 ISO 20022) in all three SDKs. TypeScript uses `fzstd` (82KB, pure JS, zero native deps). Go uses `github.com/klauspost/compress/zstd` (decode-only, 3.1MB compiled binary). Dict-free binaries only in the TypeScript path; Go supports both. Pack (write) stays Python-only. Tier 1 unit tests: `tests/tier1/test_dpack.ts` and `tests/tier1/dpack_test.go` (14 hardcoded codes).
+Read-only DBLK binary resolution is implemented and verified across all 124,215 codes (74,719 ICD-10-CM + 47,835 ISO 20022 + 1,661 MITRE ATT&CK) in all three SDKs. TypeScript uses `fzstd` (82KB, pure JS, zero native deps). Go uses `github.com/klauspost/compress/zstd` (decode-only, 3.1MB compiled binary). Dict-free binaries only in the TypeScript path; Go supports both. Pack (write) stays Python-only. Tier 1 unit tests: `tests/tier1/test_dpack.ts` and `tests/tier1/dpack_test.go` (14 hardcoded codes).
 
 ### C++ Firmware-Level Encoder/Decoder -- highest priority
 
