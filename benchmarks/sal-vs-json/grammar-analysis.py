@@ -628,11 +628,11 @@ analysis. Every point below is a genuine weakness or limitation.
    comparison is incomplete.
    
    COUNTERARGUMENT: JSON is Turing-complete in the sense that any data
-   structure can be serialized. SAL is limited to 339 opcodes.
+   structure can be serialized. SAL is limited to 341 opcodes.
    
    REBUTTAL: SAL is an instruction encoding, not a general serialization
    format. It doesn't claim to replace JSON for arbitrary data. It claims
-   to replace JSON for agent instructions, where 339 opcodes + 124K MDR
+   to replace JSON for agent instructions, where 341 opcodes + 124K MDR
    domain codes cover the instruction space. Free-form data (images,
    documents, arbitrary blobs) stays in whatever format it's already in.
    
