@@ -568,7 +568,7 @@ The Protocol Buffers byte counts were initially computed analytically from wire 
 | Component | Status |
 |-----------|--------|
 | Specification | OSMP v1.0, SAL EBNF grammar, semantic dictionary v12 |
-| Patent | Provisional filed March 17, 2026 (#64/007,684); non-provisional in progress |
+| Patent | Provisional filed March 17, 2026 ; non-provisional in progress |
 | Python SDK (reference) | 167 tests passing |
 | TypeScript SDK | 52 tests passing |
 | Go SDK | 12 tests passing |
@@ -684,4 +684,4 @@ Protocol Buffers schemas: benchmark.proto (compiled with protoc 3.21.12). Two-ti
 
 ---
 
-*OSMP is patent pending (Application #64/007,684, filed March 17, 2026). This paper describes measurement methodology and competitive analysis applied to the disclosed protocol. The analytical frameworks (Shannon entropy, grammar production comparison, token cost measurement) are measurement tools, not protocol extensions. The benchmark results, format comparisons, and economic projections are analytical work product not present in the patent application. Readers should not treat this paper as a definitive scope statement regarding the patent's disclosure.*
+*OSMP is patent pending (Application filed March 17, 2026). This paper describes measurement methodology and competitive analysis applied to the disclosed protocol. The analytical frameworks (Shannon entropy, grammar production comparison, token cost measurement) are measurement tools, not protocol extensions. The benchmark results, format comparisons, and economic projections are analytical work product not present in the patent application. Readers should not treat this paper as a definitive scope statement regarding the patent's disclosure.*
