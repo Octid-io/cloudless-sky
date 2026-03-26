@@ -2,7 +2,7 @@
 
 ## A Multi-Layer Comparison of SAL, JSON-RPC, and Binary Serialization Formats Across Wire, Token, and Grammar Dimensions
 
-**Version 2.1 | March 2026**
+**Version 2.2 | March 2026**
 **Octid Semantic Mesh Protocol (OSMP) v1.0 | Cloudless Sky Project**
 **Author: Clay Holberg**
 **Contact: ack@octid.io | octid.io**
