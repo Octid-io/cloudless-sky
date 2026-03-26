@@ -197,7 +197,7 @@ These figures cover input tokens only, at a single price point, for a single tok
 
 Production multi-agent systems do not operate at baseline. Empirical reporting from deployed systems identifies five categories of token multiplication that compound on top of per-message encoding cost.
 
-**1. Conversation history accumulation.** Multi-agent frameworks re-read the full conversation history on every LLM call. A task that requires 1,000 tokens in a simple single-pass workflow has been measured consuming 5,000+ tokens when conversation history is included, because every participating agent receives the accumulated context [19]. In AutoGen's GroupChat pattern, a 4-agent discussion with 5 rounds generates a minimum of 20 LLM calls, each carrying progressively longer conversation history [20]. The token cost of each call grows with the conversation length, creating superlinear cost growth within a single task.
+**1. Conversation history accumulation.** Multi-agent frameworks re-read the full conversation history on every LLM call. A document analysis workflow consuming 10,000 tokens with a single agent has been measured requiring 35,000 tokens across a four-agent implementation, a 3.5x cost multiplier before retries, error handling, and coordination messages [19]. This is consistent with the AgentTaxo finding that 72% of tokens in MetaGPT are duplicates appearing in two or more LLM calls [12], implying a comparable 3.6x effective multiplier. In AutoGen's GroupChat pattern, a 4-agent discussion with 5 rounds generates a minimum of 20 LLM calls, each carrying progressively longer conversation history [20]. The token cost of each call grows with the conversation length, creating superlinear cost growth within a single task.
 
 **2. Multi-step tool chains.** Autonomous agents routinely chain 10-20 sequential API calls to complete a single task, including tool lookups, retrieval-augmented generation queries, multi-step reasoning, and final completions [21]. Each call in the chain carries the serialized instruction payload. A 10-call chain does not cost 10x a single call because context accumulates, but the serialization overhead of the instruction format is present in every call.
 
@@ -218,7 +218,7 @@ The baseline model (Section 5.3) assumes a 1x multiplier: one encoding per messa
 | Scenario | Effective multiplier | Annual JSON input tokens | Annual SAL input tokens | Annual input token savings |
 |----------|---------------------|------------------------|------------------------|---------------------------|
 | Baseline (clean) | 1x | 227.8M | 54.8M | ~$430 |
-| Moderate production | 5x | 1.14B | 274M | ~$2,150 |
+| Moderate production | 3.5x | 797M | 192M | ~$1,515 |
 | Multi-agent orchestration | 20x | 4.56B | 1.10B | ~$8,650 |
 | Unoptimized system | 50x | 11.39B | 2.74B | ~$21,625 |
 
@@ -227,13 +227,13 @@ The baseline model (Section 5.3) assumes a 1x multiplier: one encoding per messa
 | Scenario | Effective multiplier | Annual JSON input tokens | Annual SAL input tokens | Annual input token savings |
 |----------|---------------------|------------------------|------------------------|---------------------------|
 | Baseline (clean) | 1x | 1.14B | 274M | ~$2,150 |
-| Moderate production | 5x | 5.70B | 1.37B | ~$10,825 |
+| Moderate production | 3.5x | 3.99B | 958M | ~$7,575 |
 | Multi-agent orchestration | 20x | 22.78B | 5.48B | ~$43,250 |
 | Unoptimized system | 50x | 56.95B | 13.70B | ~$108,125 |
 
-The multipliers are derived from cited production reporting and industry analyses, not from theoretical modeling within this paper. The 5x multiplier reflects measured conversation history accumulation in simple multi-agent workflows [19]. The 20x multiplier reflects multi-step tool chains of 10-20 calls with moderate context growth [21]. The 50x multiplier reflects the upper bound of measured inefficiency in unoptimized multi-agent systems [22]. Actual multipliers in any given deployment will depend on the agent architecture, framework, task complexity, and optimization maturity.
+The multipliers are derived from cited production reporting, empirical research, and industry analyses, not from theoretical modeling within this paper. The 3.5x multiplier reflects measured conversation history accumulation and token duplication in multi-agent workflows, independently documented at 3.5x in a four-agent implementation [19] and implied at 3.6x by the 72% token duplication rate measured in MetaGPT [12]. The 20x multiplier reflects multi-step tool chains of 10-20 calls with moderate context growth [21]. The 50x multiplier reflects the upper bound of measured inefficiency in unoptimized multi-agent systems [22]. Actual multipliers in any given deployment will depend on the agent architecture, framework, task complexity, and optimization maturity.
 
-**What this model does not claim.** SAL does not reduce the multiplier itself. An agent that retries 10 times under JSON will retry 10 times under SAL. The conversation history accumulation, the reasoning loops, and the fallback patterns are architectural behaviors of the agent framework, not properties of the serialization format. What SAL reduces is the per-instruction cost that rides on every iteration of that multiplier. The serialization tax is a fixed component of the variable cost, and the variable cost in production is 5-50x higher than the clean model predicts.
+**What this model does not claim.** SAL does not reduce the multiplier itself. An agent that retries 10 times under JSON will retry 10 times under SAL. The conversation history accumulation, the reasoning loops, and the fallback patterns are architectural behaviors of the agent framework, not properties of the serialization format. What SAL reduces is the per-instruction cost that rides on every iteration of that multiplier. The serialization tax is a fixed component of the variable cost, and the variable cost in production is 3.5-50x higher than the clean model predicts.
 
 ### 5.6 Scope Boundary: Decode Fidelity
 
@@ -606,7 +606,7 @@ The benchmark results reported here are consistent with these architectural diff
 
 On this benchmark set, SAL's per-message advantage over protobuf (70.5% byte reduction) derives primarily from semantic content compression: opcodes replacing longer natural-language descriptions. This is a vocabulary optimization, not a structural encoding improvement. On numeric-heavy payloads with no natural language content, protobuf outperforms SAL (1 of 29 vectors). On batch transmission, with all formats receiving their best available second-pass compression, compressed SAL (632 bytes) remains 63.9% smaller than compressed protobuf (1,751 bytes) and 75.9% smaller than gzipped JSON (2,623 bytes).
 
-SAL's token reduction is independent of gzip and binary wire serialization at the point where an LLM consumes plain-text instructions. In deployments where inter-agent instructions are rendered into model context as text, SAL reduces context-window load relative to the JSON payloads benchmarked here. To the extent that serialized instruction payloads recur across retry loops, conversation history accumulation, and multi-step tool chains documented in production multi-agent systems (Section 5.4-5.5), the 76.0% per-instruction token reduction compounds with those effects. Cited production multipliers of 5-50x over clean single-pass baselines place the effective annual savings range between approximately $2,150 and $108,125 at 50,000 daily inter-agent messages, depending on system optimization maturity. These extrapolations are bounded by the cited sources and should be read as indicative ranges, not predictions for any specific deployment.
+SAL's token reduction is independent of gzip and binary wire serialization at the point where an LLM consumes plain-text instructions. In deployments where inter-agent instructions are rendered into model context as text, SAL reduces context-window load relative to the JSON payloads benchmarked here. To the extent that serialized instruction payloads recur across retry loops, conversation history accumulation, and multi-step tool chains documented in production multi-agent systems (Section 5.4-5.5), the 76.0% per-instruction token reduction compounds with those effects. Cited production multipliers of 3.5-50x over clean single-pass baselines place the effective annual savings range between approximately $2,150 and $108,125 at 50,000 daily inter-agent messages, depending on system optimization maturity. These extrapolations are bounded by the cited sources and should be read as indicative ranges, not predictions for any specific deployment.
 
 On constrained channels (LoRaWAN, Meshtastic), SAL produces multi-field instructions within payload floors (11-51 bytes) where conventional JSON-RPC envelopes do not fit and where schema-based binary encodings remain constrained by the same application content.
 
@@ -666,21 +666,21 @@ Protocol Buffers schemas: benchmark.proto (compiled with protoc 3.21.12). Two-ti
 
 [18] Semtech. "Packet Size Considerations." lora-developers.semtech.com.
 
-[19] 47 Billion (2026). "AI Agents in Production: Frameworks, Protocols, and What Actually Works in 2026." 47billion.com/blog. (Measured 5x token consumption from conversation history accumulation in multi-agent workflows; AutoGen GroupChat 20-call minimum for 4-agent, 5-round task.)
+[19] Towards Data Science (2026). "The Multi-Agent Trap." towardsdatascience.com/the-multi-agent-trap/. Retrieved March 2026. (Measured 3.5x token cost multiplier in 4-agent document analysis workflow: 10,000 tokens single-agent to 35,000 tokens multi-agent, before retries and coordination overhead.)
 
-[20] GuruSup (2026). "Best Multi-Agent Frameworks in 2026." gurusup.com/blog. (AutoGen 4-agent GroupChat: 20 LLM calls minimum per 5-round task.)
+[20] GuruSup (2026). "Best Multi-Agent Frameworks in 2026." gurusup.com/blog/best-multi-agent-frameworks-2026. Retrieved March 2026. (AutoGen 4-agent GroupChat: 20 LLM calls minimum per 5-round task.)
 
-[21] Zuplo (2026). "Token-Based Rate Limiting: How to Manage AI Agent API Traffic in 2026." zuplo.com/learning-center. (Autonomous agents chain 10-20 sequential API calls per single task.)
+[21] Zuplo (2026). "Token-Based Rate Limiting: How to Manage AI Agent API Traffic in 2026." zuplo.com/learning-center/token-based-rate-limiting-ai-agents. Retrieved March 2026. (Autonomous agents chain 10-20 sequential API calls per single task.)
 
-[22] Moltbook-AI (2026). "AI Agent Cost Optimization Guide 2026." moltbook-ai.com. (Unoptimized multi-agent systems process 10-50x more tokens than necessary; single research task $5-15 in API calls in minutes.)
+[22] Moltbook-AI (2026). "AI Agent Cost Optimization Guide 2026." moltbook-ai.com/posts/ai-agent-cost-optimization-2026. Retrieved March 2026. (Unoptimized multi-agent systems process 10-50x more tokens than necessary; single research task $5-15 in API calls in minutes.)
 
-[23] InvestGlass (2026). "How to Control API Costs in an Agentic AI World." investglass.com. (Agents entering retry loops from unexpected error formats, consuming thousands of tokens per loop.)
+[23] InvestGlass (2026). "How to Control API Costs in an Agentic AI World." investglass.com/how-to-control-api-costs-in-an-agentic-ai-world/. Retrieved March 2026. (Agents entering retry loops from unexpected error formats, consuming thousands of tokens in seconds.)
 
-[24] Fast.io (2026). "AI Agent Token Cost Optimization: Complete Guide for 2026." fast.io/resources. (Poor context management causes 60-70% of total spend; unoptimized agents $10-100+ per session.)
+[24] Fast.io (2026). "AI Agent Token Cost Optimization: Complete Guide for 2026." fast.io/resources/ai-agent-token-cost-optimization/. Retrieved March 2026. (Poor context management causes 60-70% of total spend; unoptimized agents $10-100+ per session.)
 
-[25] Neontri (2026). "AI Agent Development Cost in 2026: Full Budget Guide." neontri.com/blog. (Production agent: 2,000 conversations/day, ~90M tokens/month at 1,500 tokens/conversation with 1:2 input-to-output ratio.)
+[25] Neontri (2026). "AI Agent Development Cost in 2026: Full Budget Guide." neontri.com/blog/ai-agent-development-cost/. Retrieved March 2026. (Production agent: 2,000 conversations/day, ~90M tokens/month at 1,500 tokens/conversation with 1:2 input-to-output ratio.)
 
-[26] Spheron (2026). "How to Build GPU Infrastructure for AI Agents: The 2026 Compute Playbook." spheron.network/blog. (Customer service agent: 10,000 conversations/day x 5 turns x 200 tokens = 10M tokens/day.)
+[26] Spheron (2026). "How to Build GPU Infrastructure for AI Agents: The 2026 Compute Playbook." spheron.network/blog/gpu-infrastructure-ai-agents-2026/. Retrieved March 2026. (Customer service agent: 10,000 conversations/day x 5 turns x 200 tokens = 10M tokens/day.)
 
 ---
 
