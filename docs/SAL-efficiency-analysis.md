@@ -169,7 +169,7 @@ When Agent A sends a tool call to Agent B in a cloud environment:
 
 2. **Token layer:** The full, uncompressed JSON text is placed into the LLM's context window. Every key name, brace, quote, and envelope token consumes API metering and context capacity. Gzip does not operate at this layer. The LLM never sees compressed bytes.
 
-Empirical studies of production multi-agent systems reveal that 53-86% of tokens are consumed by communication overhead rather than useful work. The AgentTaxo study measured token duplication rates across frameworks: 72% in MetaGPT, 86% in CAMEL, and 53% in AgentVerse [12]. AgentPrune demonstrated comparable performance at 87% cost reduction by pruning redundant communication [13]. OPTIMA achieved up to 90% token reduction through optimized multi-agent communication training [14].
+Empirical studies of production multi-agent systems reveal significant token redundancy. The AgentTaxo study measured token duplication rates (tokens appearing in two or more LLM calls within a single task) across frameworks: 72% in MetaGPT, 86% in CAMEL, and 53% in AgentVerse [12]. The AgentPrune method demonstrated 87% cost reduction by pruning redundant inter-agent communication [13]. Optima achieved up to 90% token reduction through optimized multi-agent communication training [14].
 
 ### 5.2 Empirical Token Measurement
 
@@ -425,7 +425,7 @@ OSMP operates at the application layer, above both. The payload encoding goes in
 
 | Transport / Config | Application Payload |
 |-------------------|-------------------|
-| LoRaWAN US915 DR0 (SF12) | 11 bytes |
+| LoRaWAN US915 DR0 (SF10) | 11 bytes |
 | LoRaWAN EU868 DR0 (SF12) | 51 bytes |
 | LoRaWAN US/EU DR3+ (SF9) | 125+ bytes |
 | Meshtastic LongFast (default) | 228-255 bytes |
@@ -634,7 +634,7 @@ Protocol Buffers schemas: benchmark.proto (compiled with protoc 3.21.12). Two-ti
 
 [2] Chomsky, N. (1956). "Three models for the description of language." IRE Transactions on Information Theory, 2(3), 113-124.
 
-[3] Hernandez-Barrera, M. et al. (2025). "Human languages trade off complexity against efficiency." PLOS Complex Systems.
+[3] Koplenig, A., Wolfer, S., Rüdiger, J.O., and Meyer, P. (2025). "Human languages trade off complexity against efficiency." PLOS Complex Systems, 2(2), e0000032. DOI: 10.1371/journal.pcsy.0000032.
 
 [4] RFC 8259: The JavaScript Object Notation (JSON) Data Interchange Format.
 
@@ -652,11 +652,11 @@ Protocol Buffers schemas: benchmark.proto (compiled with protoc 3.21.12). Two-ti
 
 [11] Van Gassen, E. (2026). "Semantic Compression of LLM Instructions via Symbolic Metalanguages." arXiv:2601.07354.
 
-[12] Xu, H. et al. (2025). "On the Limits of Multi-Agent LLM Systems." ICLR 2025 Workshop. (AgentTaxo: 53-86% token duplication across MetaGPT, CAMEL, AgentVerse.)
+[12] Wang, Q., Tang, Z., Jiang, Z., Chen, N., Wang, T., and He, B. (2025). "AgentTaxo: Dissecting and Benchmarking Token Distribution of LLM Multi-Agent Systems." ICLR 2025 Workshop on Foundation Models in the Wild. (Token duplication rates: 72% in MetaGPT, 86% in CAMEL, 53% in AgentVerse.)
 
-[13] Zhang, Z. et al. (2025). "AgentPrune: Compressing Multi-Agent Systems Through Pruning Redundant Communication." ICLR 2025.
+[13] Zhang, G., Yue, Y., Li, Z., et al. (2025). "Cut the Crap: An Economical Communication Pipeline for LLM-based Multi-Agent Systems." ICLR 2025. arXiv:2410.02506.
 
-[14] Li, X. et al. (2025). "OPTIMA: Optimizing Multi-Agent Communication with Efficiency Training." ACL Findings 2025.
+[14] Chen, W., Yuan, J., Qian, C., Yang, C., Liu, Z., and Sun, M. (2025). "Optima: Optimizing Effectiveness and Efficiency for LLM-Based Multi-Agent System." Findings of ACL 2025, pp. 11534-11557. arXiv:2410.08115.
 
 [15] Protocol Buffers Encoding Guide. protobuf.dev/programming-guides/encoding.
 
