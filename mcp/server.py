@@ -88,9 +88,11 @@ mcp = FastMCP(
         "Protocol ack = A:ACK. Human ack = U:ACK. Ambiguous = NL passthrough.\n"
         "4. IF NO OPCODE MATCHES THE CORE ACTION: send natural language as-is (NL_PASSTHROUGH). "
         "Do not force-fit. 'Order me tacos' = NL. 'Book a flight' = NL. 'Send an email' = NL.\n"
-        "5. R NAMESPACE: every instruction (except ESTOP) needs a consequence class "
-        "(HAZARDOUS, REVERSIBLE, or IRREVERSIBLE). HAZARDOUS/IRREVERSIBLE require I:section as precondition. "
-        "Aerial = HAZARDOUS. Ground + humans = HAZARDOUS. No medium declared = HAZARDOUS.\n"
+        "5. R NAMESPACE: EVERY R instruction (except ESTOP) MUST end with a consequence class "
+        "(⚠ HAZARDOUS, ↺ REVERSIBLE, or ⊘ IRREVERSIBLE). This applies to EVERY R instruction "
+        "in a sequence, not just the first. ⚠/⊘ require I:§ as precondition. "
+        "Aerial = ⚠. Ground + humans = ⚠. No medium declared = ⚠. "
+        "Mobile peripheral (torch, haptic, vibe, bt, wifi, nfc, gps, accel) = ↺. Camera/mic/scrn = ⚠.\n"
         "6. @ takes a node_id or * (broadcast). NEVER namespace:opcode. "
         "Correct: H:ICD[J083]->H:CASREP. Wrong: H:CASREP@H:ICD[J083].\n"
         "7. IF SAL IS LONGER THAN THE NATURAL LANGUAGE: send natural language. "
@@ -424,15 +426,17 @@ P2: DEFINITION MATCH, NOT MNEMONIC MATCH. Read the ASD definition. If the
    mnemonic match is a false positive. A:ACK = "protocol acknowledgment,
    NACK complement, Atomic policy." That is not "acknowledge a business receipt."
    K:ORD = "financial order entry." That is not "order food."
-5. R namespace: every instruction (except ESTOP) needs \u26a0, \u21ba, or \u2298.
+5. R namespace: EVERY R instruction (except ESTOP) MUST carry \u26a0, \u21ba, or \u2298.
+   This is mandatory on EVERY R instruction, including sequences of multiple R
+   instructions. R:TORCH\u21ba R:VIBE\u21ba R:WIFI\u21ba — the designator never drops.
    \u26a0 and \u2298 require I:\u00a7\u2192 as precondition.
    CONSEQUENCE CLASS BY MEDIUM (physics determines reversibility):
    Ground + no humans (COLLAB:O) = \u21ba. Ground + humans (COLLAB:A) = \u26a0.
    Aerial (all) = \u26a0. Gravity makes in-transit failure unrecoverable.
    Surface water controlled = \u21ba. Open water / offshore = \u26a0.
    Subsurface (UUV) = \u26a0. Microgravity propulsive = \u2298. Non-propulsive = \u26a0.
-   Mobile peripheral (torch, haptic) = \u21ba. Camera/mic = \u26a0 (privacy).
-   No medium declared = default \u26a0 (conservative).
+   Mobile peripheral (torch, haptic, vibe, spkr, disp, bt, wifi, nfc, gps, accel) = \u21ba.
+   Camera/mic/scrn = \u26a0 (privacy). No medium declared = default \u26a0 (conservative).
 6. BYTE CHECK: if SAL bytes >= NL bytes, use NL_PASSTHROUGH.
    EXCEPTION: safety-complete R namespace chains are exempt.
 7. SEMANTIC CHECK: decode your SAL. If meaning diverges from intent, NL_PASSTHROUGH.

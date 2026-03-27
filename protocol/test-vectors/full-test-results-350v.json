@@ -1,0 +1,3502 @@
+[
+  {
+    "id": "A-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:ACCEPT@ALPHA"
+  },
+  {
+    "id": "A-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:ACK@DELTA"
+  },
+  {
+    "id": "A-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:PROPOSE@*"
+  },
+  {
+    "id": "A-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:MDR@*"
+  },
+  {
+    "id": "A-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:AUTH"
+  },
+  {
+    "id": "A-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:CMPR"
+  },
+  {
+    "id": "A-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:CMP"
+  },
+  {
+    "id": "A-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:COMP"
+  },
+  {
+    "id": "A-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": false,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:DELEGATE@GAMMA"
+  },
+  {
+    "id": "A-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:ERR"
+  },
+  {
+    "id": "A-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:MACRO[MEDEVAC,J93.0]@*"
+  },
+  {
+    "id": "A-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:MDR"
+  },
+  {
+    "id": "A-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:MEM[dark_mode]"
+  },
+  {
+    "id": "A-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:NACK[3,5]"
+  },
+  {
+    "id": "A-015",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:PING@BRAVO"
+  },
+  {
+    "id": "A-016",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:PONG@ALPHA"
+  },
+  {
+    "id": "A-017",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:PROPOSE@*"
+  },
+  {
+    "id": "A-018",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:REJECT@BETA"
+  },
+  {
+    "id": "A-019",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:SUM"
+  },
+  {
+    "id": "A-020",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:TRUST@DELTA"
+  },
+  {
+    "id": "A-021",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:TXN"
+  },
+  {
+    "id": "A-022",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:VERIFY"
+  },
+  {
+    "id": "B-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "B:AP[delta]"
+  },
+  {
+    "id": "B-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "B:BA[5]"
+  },
+  {
+    "id": "B-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "B:BS?[3]"
+  },
+  {
+    "id": "B-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "B:HVAC[zone_2,shutdown]"
+  },
+  {
+    "id": "B-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "B:L"
+  },
+  {
+    "id": "B-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "B:X"
+  },
+  {
+    "id": "C-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:ALLOC[4cpu,8gb]"
+  },
+  {
+    "id": "C-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:CHKPT"
+  },
+  {
+    "id": "C-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:FREE"
+  },
+  {
+    "id": "C-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:KILL@7"
+  },
+  {
+    "id": "C-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:LIMIT[2GB]"
+  },
+  {
+    "id": "C-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:MIGRT@ALPHA→@BRAVO"
+  },
+  {
+    "id": "C-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:PAUSE"
+  },
+  {
+    "id": "C-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:PRTY[HIGH]"
+  },
+  {
+    "id": "C-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:QUOTA[16GB]"
+  },
+  {
+    "id": "C-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:RESUME"
+  },
+  {
+    "id": "C-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:RSTRT@3"
+  },
+  {
+    "id": "C-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:SCALE[8]"
+  },
+  {
+    "id": "C-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:SPAWN"
+  },
+  {
+    "id": "C-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "C:STAT"
+  },
+  {
+    "id": "D-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:ABORT"
+  },
+  {
+    "id": "D-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:CHUNK@BRAVO"
+  },
+  {
+    "id": "D-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:CSUM"
+  },
+  {
+    "id": "D-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:FEED@4A"
+  },
+  {
+    "id": "D-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:LOG"
+  },
+  {
+    "id": "D-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:PACK"
+  },
+  {
+    "id": "D-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:PULL@CHARLIE"
+  },
+  {
+    "id": "D-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:PUSH@*"
+  },
+  {
+    "id": "D-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:Q"
+  },
+  {
+    "id": "D-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:RESUME"
+  },
+  {
+    "id": "D-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:RT"
+  },
+  {
+    "id": "D-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:STAT"
+  },
+  {
+    "id": "D-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:UNPACK"
+  },
+  {
+    "id": "D-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "D:XFER@DELTA"
+  },
+  {
+    "id": "E-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "E:TH@4A[0]"
+  },
+  {
+    "id": "E-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "E:GPS"
+  },
+  {
+    "id": "E-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "E:HU"
+  },
+  {
+    "id": "E-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "E:OBS"
+  },
+  {
+    "id": "E-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "E:BP"
+  },
+  {
+    "id": "E-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "E:TH"
+  },
+  {
+    "id": "E-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "E:UV"
+  },
+  {
+    "id": "F-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": false,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:AUTH"
+  },
+  {
+    "id": "F-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": false,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "I:§"
+  },
+  {
+    "id": "F-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": false,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "A:PROPOSE"
+  },
+  {
+    "id": "F-004",
+    "bound": false,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "NL_PASSTHROUGH",
+    "expected": "FULL_OSMP",
+    "sal": ""
+  },
+  {
+    "id": "G-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "G:BEARING"
+  },
+  {
+    "id": "G-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "G:CONF"
+  },
+  {
+    "id": "G-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "G:DR"
+  },
+  {
+    "id": "G-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "G:ELEV"
+  },
+  {
+    "id": "G-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "G:POS"
+  },
+  {
+    "id": "G-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "G:RANGE@BRAVO"
+  },
+  {
+    "id": "G-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "G:ROUT"
+  },
+  {
+    "id": "G-008",
+    "bound": false,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "NL_PASSTHROUGH",
+    "expected": "FULL_OSMP",
+    "sal": ""
+  },
+  {
+    "id": "G-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "G:WPT@ALPHA"
+  },
+  {
+    "id": "H-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:ALERT"
+  },
+  {
+    "id": "H-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:BP"
+  },
+  {
+    "id": "H-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:CASREP"
+  },
+  {
+    "id": "H-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:CPT"
+  },
+  {
+    "id": "H-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:ECG"
+  },
+  {
+    "id": "H-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:GLUC"
+  },
+  {
+    "id": "H-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:HR"
+  },
+  {
+    "id": "H-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:ICD"
+  },
+  {
+    "id": "H-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:MEDREC"
+  },
+  {
+    "id": "H-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:RR"
+  },
+  {
+    "id": "H-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:SNOMED"
+  },
+  {
+    "id": "H-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:SPO2"
+  },
+  {
+    "id": "H-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:TEMP"
+  },
+  {
+    "id": "H-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:TRIAGE"
+  },
+  {
+    "id": "H-015",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:VITALS"
+  },
+  {
+    "id": "I-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "I:AML"
+  },
+  {
+    "id": "I-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "I:BIO"
+  },
+  {
+    "id": "I-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "I:CONS"
+  },
+  {
+    "id": "I-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "I:ID"
+  },
+  {
+    "id": "I-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "I:KYC"
+  },
+  {
+    "id": "I-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "I:PERM"
+  },
+  {
+    "id": "I-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "I:§"
+  },
+  {
+    "id": "J-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:ABANDON"
+  },
+  {
+    "id": "J-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:BELIEF"
+  },
+  {
+    "id": "J-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:BLOCK"
+  },
+  {
+    "id": "J-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:COMMIT"
+  },
+  {
+    "id": "J-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:DECOMP"
+  },
+  {
+    "id": "J-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:DONE"
+  },
+  {
+    "id": "J-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:GOAL"
+  },
+  {
+    "id": "J-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:HANDOFF"
+  },
+  {
+    "id": "J-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:INTENT"
+  },
+  {
+    "id": "J-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:PLAN"
+  },
+  {
+    "id": "J-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:REPLAN"
+  },
+  {
+    "id": "J-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:STATUS"
+  },
+  {
+    "id": "J-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:STEP"
+  },
+  {
+    "id": "J-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "J:SUBGOAL"
+  },
+  {
+    "id": "K-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "K:XFR"
+  },
+  {
+    "id": "K-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "K:ORD"
+  },
+  {
+    "id": "K-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "K:PAY"
+  },
+  {
+    "id": "K-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "K:TRD"
+  },
+  {
+    "id": "K-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "K:XFR"
+  },
+  {
+    "id": "L-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:ALERT"
+  },
+  {
+    "id": "L-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:ATTEST"
+  },
+  {
+    "id": "L-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:AUDIT"
+  },
+  {
+    "id": "L-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:CHAIN"
+  },
+  {
+    "id": "L-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:EXPORT"
+  },
+  {
+    "id": "L-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:FORENS"
+  },
+  {
+    "id": "L-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:AUDIT"
+  },
+  {
+    "id": "L-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:LSIGN"
+  },
+  {
+    "id": "L-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:PURGE"
+  },
+  {
+    "id": "L-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:QUERY"
+  },
+  {
+    "id": "L-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:REPORT"
+  },
+  {
+    "id": "L-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:RETAIN"
+  },
+  {
+    "id": "L-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:SEV"
+  },
+  {
+    "id": "L-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:QUERY"
+  },
+  {
+    "id": "M-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": false,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:ALARM"
+  },
+  {
+    "id": "M-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "M:EVA"
+  },
+  {
+    "id": "M-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": false,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "H:CASREP"
+  },
+  {
+    "id": "M-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": false,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:ALERT"
+  },
+  {
+    "id": "M-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "M:RT"
+  },
+  {
+    "id": "N-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "N:BK"
+  },
+  {
+    "id": "N-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "N:CFG@12B"
+  },
+  {
+    "id": "N-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "N:CMD@ALPHA"
+  },
+  {
+    "id": "N-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "N:INET→N:Q"
+  },
+  {
+    "id": "N-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "N:Q"
+  },
+  {
+    "id": "N-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "N:Q"
+  },
+  {
+    "id": "N-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "N:PR"
+  },
+  {
+    "id": "O-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:AUTH"
+  },
+  {
+    "id": "O-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:BW"
+  },
+  {
+    "id": "O-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:CHAN"
+  },
+  {
+    "id": "O-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:CONOPS"
+  },
+  {
+    "id": "O-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:CONSTRAINT"
+  },
+  {
+    "id": "O-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:POSTURE"
+  },
+  {
+    "id": "O-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:EMCON"
+  },
+  {
+    "id": "O-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:POSTURE[emergency]"
+  },
+  {
+    "id": "O-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:FLOOR[51]"
+  },
+  {
+    "id": "O-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:IAP[2]"
+  },
+  {
+    "id": "O-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:LATENCY?"
+  },
+  {
+    "id": "O-012",
+    "bound": false,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "NL_PASSTHROUGH",
+    "expected": "FULL_OSMP",
+    "sal": ""
+  },
+  {
+    "id": "O-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:MESH?"
+  },
+  {
+    "id": "O-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:MODE[emergency]"
+  },
+  {
+    "id": "O-015",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:PERIOD[3]"
+  },
+  {
+    "id": "O-016",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:PHASE[recovery]"
+  },
+  {
+    "id": "O-017",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:POSTURE[defensive]"
+  },
+  {
+    "id": "O-018",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:READY[2]"
+  },
+  {
+    "id": "O-019",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:SCOPE"
+  },
+  {
+    "id": "O-020",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:TEMPO[3]"
+  },
+  {
+    "id": "O-021",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:TYPE"
+  },
+  {
+    "id": "O-022",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "O:UPLINK?"
+  },
+  {
+    "id": "P-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": false,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "L:LOG→M:A"
+  },
+  {
+    "id": "P-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "P:DEVICE[pump]"
+  },
+  {
+    "id": "P-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "P:GUIDE[filter]"
+  },
+  {
+    "id": "P-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "P:PART[AF-2240]"
+  },
+  {
+    "id": "P-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "P:STAT[complete]"
+  },
+  {
+    "id": "P-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "P:STEP[3]"
+  },
+  {
+    "id": "Q-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:BENCH"
+  },
+  {
+    "id": "Q-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:CITE"
+  },
+  {
+    "id": "Q-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:CONF[0.92]"
+  },
+  {
+    "id": "Q-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:CORRECT"
+  },
+  {
+    "id": "Q-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:CRIT"
+  },
+  {
+    "id": "Q-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:EVAL"
+  },
+  {
+    "id": "Q-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:FAIL"
+  },
+  {
+    "id": "Q-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:FLAG"
+  },
+  {
+    "id": "Q-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:GROUND"
+  },
+  {
+    "id": "Q-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:FLAG"
+  },
+  {
+    "id": "Q-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:PASS"
+  },
+  {
+    "id": "Q-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:REFLECT"
+  },
+  {
+    "id": "Q-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:REVISE"
+  },
+  {
+    "id": "Q-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:SCORE[0.85]"
+  },
+  {
+    "id": "Q-015",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Q:VERIFY"
+  },
+  {
+    "id": "R-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:ACCEL⚠→I:§"
+  },
+  {
+    "id": "R-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:BT⚠→I:§"
+  },
+  {
+    "id": "R-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:CAM⚠→I:§"
+  },
+  {
+    "id": "R-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:COLLAB⚠→I:§"
+  },
+  {
+    "id": "R-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:DISP⚠→I:§"
+  },
+  {
+    "id": "R-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:DPTH⚠→I:§"
+  },
+  {
+    "id": "R-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:DRVE↺"
+  },
+  {
+    "id": "R-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:ESTOP"
+  },
+  {
+    "id": "R-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:FORM⚠→I:§"
+  },
+  {
+    "id": "R-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:GPS⚠→I:§"
+  },
+  {
+    "id": "R-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:HANDOFF⚠→I:§"
+  },
+  {
+    "id": "R-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:HAPTIC⚠→I:§"
+  },
+  {
+    "id": "R-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:HDNG⚠→I:§"
+  },
+  {
+    "id": "R-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:LAND⚠→I:§"
+  },
+  {
+    "id": "R-015",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:MIC⚠→I:§"
+  },
+  {
+    "id": "R-016",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:MOV⚠→I:§"
+  },
+  {
+    "id": "R-017",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:NFC⚠→I:§"
+  },
+  {
+    "id": "R-018",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:NOTIF⚠→I:§"
+  },
+  {
+    "id": "R-019",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:RTH⚠→I:§"
+  },
+  {
+    "id": "R-020",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:SCRN⚠→I:§"
+  },
+  {
+    "id": "R-021",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:SPKR⚠→I:§"
+  },
+  {
+    "id": "R-022",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:SRFC⚠→I:§"
+  },
+  {
+    "id": "R-023",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:STAT⚠→I:§"
+  },
+  {
+    "id": "R-024",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:STOP↺"
+  },
+  {
+    "id": "R-025",
+    "bound": true,
+    "safe": false,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:TKOF"
+  },
+  {
+    "id": "R-026",
+    "bound": true,
+    "safe": false,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:TORCH"
+  },
+  {
+    "id": "R-027",
+    "bound": true,
+    "safe": false,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:VIBE"
+  },
+  {
+    "id": "R-028",
+    "bound": true,
+    "safe": false,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:WIFI"
+  },
+  {
+    "id": "R-029",
+    "bound": true,
+    "safe": false,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:WPT[35.7,-122.4]"
+  },
+  {
+    "id": "R-030",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "R:ZONE⚠→I:§"
+  },
+  {
+    "id": "S-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:ATST"
+  },
+  {
+    "id": "S-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:CERT"
+  },
+  {
+    "id": "S-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:DEC"
+  },
+  {
+    "id": "S-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:ENC"
+  },
+  {
+    "id": "S-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:HASH"
+  },
+  {
+    "id": "S-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:HMAC"
+  },
+  {
+    "id": "S-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:KEYEX@BRAVO"
+  },
+  {
+    "id": "S-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:KEYGEN"
+  },
+  {
+    "id": "S-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:OPEN"
+  },
+  {
+    "id": "S-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:REVOK"
+  },
+  {
+    "id": "S-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:ROTATE"
+  },
+  {
+    "id": "S-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:SEAL"
+  },
+  {
+    "id": "S-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:SIGN"
+  },
+  {
+    "id": "S-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:TRUST"
+  },
+  {
+    "id": "S-015",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "S:VFY"
+  },
+  {
+    "id": "T-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:AFTER→D:BACKUP"
+  },
+  {
+    "id": "T-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:ALARM[0600]"
+  },
+  {
+    "id": "T-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:BEFORE[1700]"
+  },
+  {
+    "id": "T-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:CRON[0 0 * * *]"
+  },
+  {
+    "id": "T-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:DELAY[30]"
+  },
+  {
+    "id": "T-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:DUR[300]"
+  },
+  {
+    "id": "T-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:EPOCH"
+  },
+  {
+    "id": "T-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:EXP[24h]"
+  },
+  {
+    "id": "T-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:NOW"
+  },
+  {
+    "id": "T-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:REPEAT[15min]→H:VITALS"
+  },
+  {
+    "id": "T-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:SCHED[sat0200]→M:MA"
+  },
+  {
+    "id": "T-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:SYNC@*"
+  },
+  {
+    "id": "T-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:UNTIL[threshold]→E:TH"
+  },
+  {
+    "id": "T-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "T:WIN[0800-1700]"
+  },
+  {
+    "id": "U-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:ACK[briefing]"
+  },
+  {
+    "id": "U-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:ALERT[urgent,system_failure]"
+  },
+  {
+    "id": "U-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:APPROVE[batch_deletion]"
+  },
+  {
+    "id": "U-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:ASSIGN[investigation]"
+  },
+  {
+    "id": "U-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:CONFIRM[deployment_params]"
+  },
+  {
+    "id": "U-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:DELEGATE[decision]"
+  },
+  {
+    "id": "U-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:DISPLAY[status_dashboard]"
+  },
+  {
+    "id": "U-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:ESCALATE[issue]"
+  },
+  {
+    "id": "U-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:FEEDBACK[solution]"
+  },
+  {
+    "id": "U-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:INPUT[config_param]"
+  },
+  {
+    "id": "U-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:NOTIFY[job_complete]"
+  },
+  {
+    "id": "U-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:OVERRIDE[instruction]"
+  },
+  {
+    "id": "U-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:REJECT[config_change]"
+  },
+  {
+    "id": "U-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "U:REVIEW[report]"
+  },
+  {
+    "id": "V-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:AIS→V:POS"
+  },
+  {
+    "id": "V-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:CARGO"
+  },
+  {
+    "id": "V-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:COURSE"
+  },
+  {
+    "id": "V-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:DOCK[berth7]"
+  },
+  {
+    "id": "V-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:ETA"
+  },
+  {
+    "id": "V-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:ETD"
+  },
+  {
+    "id": "V-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:FLEET@*"
+  },
+  {
+    "id": "V-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:HDG"
+  },
+  {
+    "id": "V-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:MAYDAY[taking_water]"
+  },
+  {
+    "id": "V-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:MMSI"
+  },
+  {
+    "id": "V-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:PANPAN[assistance]"
+  },
+  {
+    "id": "V-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:PORT"
+  },
+  {
+    "id": "V-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:POS"
+  },
+  {
+    "id": "V-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:ROUTE"
+  },
+  {
+    "id": "V-015",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:SPEED"
+  },
+  {
+    "id": "V-016",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:STATUS"
+  },
+  {
+    "id": "V-017",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "V:UNDOCK[7]"
+  },
+  {
+    "id": "W-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:ALERT"
+  },
+  {
+    "id": "W-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:FCST"
+  },
+  {
+    "id": "W-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:FIRE"
+  },
+  {
+    "id": "W-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:FLOOD"
+  },
+  {
+    "id": "W-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:HURR"
+  },
+  {
+    "id": "W-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:METAR[KAUS]"
+  },
+  {
+    "id": "W-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:PRECIP"
+  },
+  {
+    "id": "W-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:PRESS"
+  },
+  {
+    "id": "W-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:TAF[KAUS]"
+  },
+  {
+    "id": "W-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:TEMP"
+  },
+  {
+    "id": "W-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:VIS"
+  },
+  {
+    "id": "W-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:WARN"
+  },
+  {
+    "id": "W-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:WATCH"
+  },
+  {
+    "id": "W-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "W:WIND"
+  },
+  {
+    "id": "X-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:DR"
+  },
+  {
+    "id": "X-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:EV[4]"
+  },
+  {
+    "id": "X-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:FAULT"
+  },
+  {
+    "id": "X-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:FREQ"
+  },
+  {
+    "id": "X-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:GEN"
+  },
+  {
+    "id": "X-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:GRID"
+  },
+  {
+    "id": "X-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:ISLND"
+  },
+  {
+    "id": "X-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:LOAD"
+  },
+  {
+    "id": "X-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:METER"
+  },
+  {
+    "id": "X-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:PRICE"
+  },
+  {
+    "id": "X-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:RESTORE"
+  },
+  {
+    "id": "X-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:SHED@7"
+  },
+  {
+    "id": "X-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:SOLAR"
+  },
+  {
+    "id": "X-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:STORE"
+  },
+  {
+    "id": "X-015",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:VOLT"
+  },
+  {
+    "id": "X-016",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "X:WIND"
+  },
+  {
+    "id": "Y-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:CLEAR"
+  },
+  {
+    "id": "Y-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:EMBED"
+  },
+  {
+    "id": "Y-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": false,
+    "op_match": false,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:CTX"
+  },
+  {
+    "id": "Y-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:FORGET"
+  },
+  {
+    "id": "Y-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:INDEX"
+  },
+  {
+    "id": "Y-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:PAGE"
+  },
+  {
+    "id": "Y-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:PROMOTE"
+  },
+  {
+    "id": "Y-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:RECALL"
+  },
+  {
+    "id": "Y-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:RETRIEVE"
+  },
+  {
+    "id": "Y-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:SEARCH[OSMP encoding]"
+  },
+  {
+    "id": "Y-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:SHARE@GAMMA"
+  },
+  {
+    "id": "Y-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:STAT"
+  },
+  {
+    "id": "Y-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:STORE"
+  },
+  {
+    "id": "Y-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:SUMM"
+  },
+  {
+    "id": "Y-015",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Y:SYNC"
+  },
+  {
+    "id": "Z-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:BATCH"
+  },
+  {
+    "id": "Z-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:CACHE"
+  },
+  {
+    "id": "Z-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:CAP"
+  },
+  {
+    "id": "Z-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:CONF"
+  },
+  {
+    "id": "Z-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:COST"
+  },
+  {
+    "id": "Z-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:CTX"
+  },
+  {
+    "id": "Z-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:EMBED"
+  },
+  {
+    "id": "Z-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:FINISH"
+  },
+  {
+    "id": "Z-009",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:INF"
+  },
+  {
+    "id": "Z-010",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:LATENCY"
+  },
+  {
+    "id": "Z-011",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:MAXT[4096]"
+  },
+  {
+    "id": "Z-012",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:MDLUSED"
+  },
+  {
+    "id": "Z-013",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:MODEL[claude-sonnet-4-20250514]"
+  },
+  {
+    "id": "Z-014",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:RESP"
+  },
+  {
+    "id": "Z-015",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:ROUTE"
+  },
+  {
+    "id": "Z-016",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:STOP"
+  },
+  {
+    "id": "Z-017",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:STREAM"
+  },
+  {
+    "id": "Z-018",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:TEMP[0.7]"
+  },
+  {
+    "id": "Z-019",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:TOKENS"
+  },
+  {
+    "id": "Z-020",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:TOPK[40]"
+  },
+  {
+    "id": "Z-021",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "FULL_OSMP",
+    "expected": "FULL_OSMP",
+    "sal": "Z:TOPP[0.9]"
+  },
+  {
+    "id": "NL-001",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "NL_PASSTHROUGH",
+    "expected": "NL_PASSTHROUGH",
+    "sal": ""
+  },
+  {
+    "id": "NL-002",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "NL_PASSTHROUGH",
+    "expected": "NL_PASSTHROUGH",
+    "sal": ""
+  },
+  {
+    "id": "NL-003",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "NL_PASSTHROUGH",
+    "expected": "NL_PASSTHROUGH",
+    "sal": ""
+  },
+  {
+    "id": "NL-004",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "NL_PASSTHROUGH",
+    "expected": "NL_PASSTHROUGH",
+    "sal": ""
+  },
+  {
+    "id": "NL-005",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "NL_PASSTHROUGH",
+    "expected": "NL_PASSTHROUGH",
+    "sal": ""
+  },
+  {
+    "id": "NL-006",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "NL_PASSTHROUGH",
+    "expected": "NL_PASSTHROUGH",
+    "sal": ""
+  },
+  {
+    "id": "NL-007",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "NL_PASSTHROUGH",
+    "expected": "NL_PASSTHROUGH",
+    "sal": ""
+  },
+  {
+    "id": "NL-008",
+    "bound": true,
+    "safe": true,
+    "ns_match": true,
+    "op_match": true,
+    "mode": "NL_PASSTHROUGH",
+    "expected": "NL_PASSTHROUGH",
+    "sal": ""
+  }
+]
