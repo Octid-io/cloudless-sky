@@ -1,6 +1,6 @@
 /**
  * OSMP Glyph Tables and ASD Basis Set
- * AUTO-GENERATED from osmp.py (which is generated from canonical dictionary v12)
+ * AUTO-GENERATED from osmp.py (which is generated from canonical dictionary v13)
  * Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
  * License: Apache 2.0
  */
@@ -82,6 +82,7 @@ export const ASD_BASIS: Record<string, Record<string, string>> = {
     "COMP": "compliance_gate_assertion",
     "DA": "delegate_to_agent",
     "ERR": "error_handler",
+    "MACRO": "registered_macro_invocation",
     "MDR": "mdr_corpus_version_identity_or_delta",
     "MEM": "memory_operation",
     "NACK": "negative_acknowledgment",

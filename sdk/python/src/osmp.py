@@ -61,7 +61,7 @@ COMPOUND_OPERATORS: dict[str, dict] = {
 
 # ─────────────────────────────────────────────────────────────────────────────
 # CATEGORY 2 — CONSEQUENCE CLASS DESIGNATORS
-# Source: dictionary v12 Section 1 Category 2
+# Source: dictionary v13 Section 1 Category 2
 # ─────────────────────────────────────────────────────────────────────────────
 
 CONSEQUENCE_CLASSES: dict[str, dict] = {
@@ -165,7 +165,7 @@ FLAG_EXTENDED_DEP     = 0b00001000   # Tier 3: payload prefix is u32 dependency 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SLOT VALUE ENCODING TABLE
-# Source: dictionary v12 Section 2
+# Source: dictionary v13 Section 2
 # Single-character codes for all finite enumerated slot value sets.
 # ─────────────────────────────────────────────────────────────────────────────
 

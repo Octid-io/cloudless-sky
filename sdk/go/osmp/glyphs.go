@@ -5,7 +5,7 @@ package osmp
 const ASDFloorVersion = "1.0"
 
 // GlyphOperators — Category 1: Logical and Compositional Operators (18 total).
-// Source: OSMP-semantic-dictionary-v12.csv Section 1, Category 1
+// Source: OSMP-semantic-dictionary-v13.csv Section 1, Category 1
 var GlyphOperators = map[string]string{
 	"∧": "AND",            // U+2227 3B
 	"∨": "OR",             // U+2228 3B
@@ -46,7 +46,7 @@ var DictUpdateModeGlyphs = map[string]string{
 }
 
 // ASDFloorBasis is the compiled-in ASD basis set.
-// Source: OSMP-semantic-dictionary-v12.csv (canonical source of truth)
+// Source: OSMP-semantic-dictionary-v13.csv (canonical source of truth)
 // DO NOT EDIT — regenerate via tools/gen_asd.py
 var ASDFloorBasis = map[string]map[string]string{
 	"A": {
@@ -60,6 +60,7 @@ var ASDFloorBasis = map[string]map[string]string{
 		"COMP": "compliance_gate_assertion",
 		"DA": "delegate_to_agent",
 		"ERR": "error_handler",
+		"MACRO": "registered_macro_invocation",
 		"MDR": "mdr_corpus_version_identity_or_delta",
 		"MEM": "memory_operation",
 		"NACK": "negative_acknowledgment",
