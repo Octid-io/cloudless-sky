@@ -65,7 +65,38 @@ def _load_mdr(corpus: str) -> bytes:
 # -- MCP Server -----------------------------------------------------------
 mcp = FastMCP(
     "osmp",
-    instructions="Use when encoding agent instructions, reducing inter-agent token spend, or resolving domain codes (ICD-10, ISO 20022, MITRE ATT&CK). 86.8% byte reduction vs JSON. 70.5% vs compiled protobuf. Deterministic decode by table lookup.",
+    instructions=(
+        "OSMP encodes agentic instructions as SAL (Semantic Assembly Language). "
+        "Decode is table lookup. No inference. 86.8% byte reduction vs JSON.\n\n"
+        "MANDATORY RULES FOR COMPOSITION:\n"
+        "1. ALWAYS call osmp_lookup before composing. Never guess opcodes. "
+        "If lookup returns 0 results, the opcode does not exist.\n"
+        "2. READ THE DEFINITION, NOT THE MNEMONIC. "
+        "K:ORD = financial order entry (ISO 20022), NOT food ordering. "
+        "A:SUM = summarize/condense, NOT arithmetic sum. "
+        "S:SIGN = cryptographic signature, NOT legal signing. "
+        "Z:TEMP = inference sampling temperature, NOT physical temperature. "
+        "E:OBS = obstacle, NOT observation. "
+        "If the ASD definition doesn't match the intent, the opcode does not apply.\n"
+        "3. SELECT NAMESPACE BY DOMAIN CONTEXT. "
+        "Patient temp = H:TEMP. Sensor temp = E:TH. Weather temp = W:TEMP. Model temp = Z:TEMP. "
+        "Energy wind = X:WIND. Weather wind = W:WIND. "
+        "Building fire = B:BA + M:EVA. Weather fire advisory = W:FIRE. "
+        "Protocol ack = A:ACK. Human ack = U:ACK. Ambiguous = NL passthrough.\n"
+        "4. IF NO OPCODE MATCHES THE CORE ACTION: send natural language as-is (NL_PASSTHROUGH). "
+        "Do not force-fit. 'Order me tacos' = NL. 'Book a flight' = NL. 'Send an email' = NL.\n"
+        "5. R NAMESPACE: every instruction (except ESTOP) needs a consequence class "
+        "(HAZARDOUS, REVERSIBLE, or IRREVERSIBLE). HAZARDOUS/IRREVERSIBLE require I:section as precondition. "
+        "Aerial = HAZARDOUS. Ground + humans = HAZARDOUS. No medium declared = HAZARDOUS.\n"
+        "6. @ takes a node_id or * (broadcast). NEVER namespace:opcode. "
+        "Correct: H:ICD[J083]->H:CASREP. Wrong: H:CASREP@H:ICD[J083].\n"
+        "7. IF SAL IS LONGER THAN THE NATURAL LANGUAGE: send natural language. "
+        "Exception: safety-complete R namespace chains.\n"
+        "8. NEVER emit an Omega opcode not confirmed by osmp_lookup. "
+        "The agent is a dictionary consumer, not a dictionary author.\n\n"
+        "Use osmp_lookup to search opcodes. Use osmp_discover for domain codes. "
+        "Read the osmp://system_prompt resource for the full composition doctrine."
+    ),
 )
 
 
@@ -294,17 +325,25 @@ def osmp_benchmark() -> str:
 
 @mcp.resource("osmp://system_prompt")
 def get_system_prompt() -> str:
-    """SAL grammar and composition reference."""
+    """SAL grammar, composition reference, and usage doctrine."""
     asd = AdaptiveSharedDictionary()
     ns_lines = []
     for ns, ops in sorted(asd._data.items()):
         ns_lines.append(f"  {ns}: {', '.join(sorted(ops.keys())[:6])}{'...' if len(ops) > 6 else ''}")
 
+    opcode_count = sum(len(ops) for ops in asd._data.values())
+    namespace_count = len(asd._data)
+    namespace_listing = chr(10).join(ns_lines)
+
     return f"""SAL encodes agent instructions as deterministic opcode strings.
 Decode is table lookup. No inference.
+ARCHITECTURAL NOTE: This prompt governs agent-layer composition.
+Decode is protocol-layer (no inference). Compose is agent-layer (inference
+constrained by these rules). The agent is a dictionary consumer, not a
+dictionary author. The agent composes from what exists in the local ASD.
 
 GRAMMAR: [NS:]OPCODE[@TARGET][OPERATOR INSTRUCTION]
-OPERATORS: -> THEN  ^ AND  v OR  ; SEQUENCE  || PARALLEL
+OPERATORS: \u2192 THEN  \u2227 AND  \u2228 OR  ; SEQUENCE  \u2225 PARALLEL
 TARGET: @NODE_ID or @* (broadcast)  QUERY: ?SLOT  PARAM: [value]
 
 COMPOSITION RULES:
@@ -314,22 +353,97 @@ COMPOSITION RULES:
   H:ICD[J083], K:XFR[AMT], Z:TOKENS[847].
 - Layer 2 accessors (H:ICD, H:SNOMED, H:CPT) are H namespace, not D.
   They are standalone frames in a chain, not target parameters.
-  Correct: H:ICD[J083]->H:CASREP->M:EVA@MEDEVAC (38 bytes, 3 frames).
+  Correct: H:ICD[J083]\u2192H:CASREP\u2192M:EVA@MEDEVAC (38 bytes, 3 frames).
   Wrong: H:CASREP@H:ICD[J083] (ICD is not a target, it is its own frame).
 - / is not a SAL operator. Never use slashes.
 - One declaration per frame. Chain frames with operators.
+- Conditions precede actions across \u2192. I:\u00a7 precedes R:\u26a0 and R:\u2298.
 - Always call osmp_lookup before composing. Never guess opcodes.
 - Always call osmp_discover when you don't know a domain code.
 
-EXAMPLE: H:HR@NODE1>120->H:CASREP^M:EVA@*
+OPCODE SELECTION DOCTRINE:
+Before composing SAL from natural language, follow this decision logic:
+1. DECOMPOSE the NL into actions, conditions, targets, parameters.
+2. SEARCH the full local ASD (osmp_lookup) for every action. This is mandatory.
+   The ASD includes all tiers: Tier 1 (A-Z), Tier 2 (registered double-Latin),
+   and any Omega entries registered by the sovereign node operator.
+   Tier provenance is invisible to composition: an opcode is an opcode.
+3. If zero ASD matches for the core action at ANY tier:
+   a. If the gap is operationally critical, recurring, and HITL is available:
+      surface a vocabulary gap proposal to the human operator. If approved,
+      register the Omega entry, then compose. Never compose before registration.
+   b. Otherwise: NL_PASSTHROUGH. Do not force-fit.
+   "Order me tacos" \u2192 NL. K:ORD is financial order entry, not food.
+   "Book a flight" \u2192 NL. No travel opcode exists.
+   "Send an email" \u2192 NL. No email opcode exists.
+4. If multiple namespace matches: select by DOMAIN CONTEXT, not mnemonic.
+   Patient temperature \u2192 H:TEMP. Sensor temperature \u2192 E:TH.
+   Weather temperature \u2192 W:TEMP. Model temperature \u2192 Z:TEMP.
+   Energy wind \u2192 X:WIND. Weather wind \u2192 W:WIND.
+   Agent task handoff \u2192 J:HANDOFF. Physical authority handoff \u2192 R:HANDOFF.
+   Store to memory \u2192 Y:STORE. Store energy \u2192 X:STORE.
+   Generate embedding \u2192 Z:EMBED. Store embedding \u2192 Y:EMBED.
+   Crypto verify \u2192 S:VFY. Quality verify \u2192 Q:VERIFY. Agent verify \u2192 A:VERIFY.
+   Protocol acknowledge \u2192 A:ACK. Human acknowledge \u2192 U:ACK. Ambiguous \u2192 NL.
+
+NAMESPACE PRINCIPLES (apply when the collision list above doesn't cover it):
+P1: OPERATIONAL EVENT vs EXTERNAL DATA. Building on fire = B:BA + M:EVA (event
+   happening to you). Fire weather watch from NWS = W:FIRE (data product about
+   conditions). Your sensor reads 38C = E:TH (local instrument). NWS publishes
+   temperature = W:TEMP (external data). This applies to every hazard type.
+P2: DEFINITION MATCH, NOT MNEMONIC MATCH. Read the ASD definition. If the
+   definition's operational context diverges from the NL usage context, the
+   mnemonic match is a false positive. A:ACK = "protocol acknowledgment,
+   NACK complement, Atomic policy." That is not "acknowledge a business receipt."
+   K:ORD = "financial order entry." That is not "order food."
+5. R namespace: every instruction (except ESTOP) needs \u26a0, \u21ba, or \u2298.
+   \u26a0 and \u2298 require I:\u00a7\u2192 as precondition.
+   CONSEQUENCE CLASS BY MEDIUM (physics determines reversibility):
+   Ground + no humans (COLLAB:O) = \u21ba. Ground + humans (COLLAB:A) = \u26a0.
+   Aerial (all) = \u26a0. Gravity makes in-transit failure unrecoverable.
+   Surface water controlled = \u21ba. Open water / offshore = \u26a0.
+   Subsurface (UUV) = \u26a0. Microgravity propulsive = \u2298. Non-propulsive = \u26a0.
+   Mobile peripheral (torch, haptic) = \u21ba. Camera/mic = \u26a0 (privacy).
+   No medium declared = default \u26a0 (conservative).
+6. BYTE CHECK: if SAL bytes >= NL bytes, use NL_PASSTHROUGH.
+   EXCEPTION: safety-complete R namespace chains are exempt.
+7. SEMANTIC CHECK: decode your SAL. If meaning diverges from intent, NL_PASSTHROUGH.
+8. When genuinely ambiguous and no context resolves it: NL_PASSTHROUGH.
+   A correct NL_PASSTHROUGH is always better than an incorrect SAL composition.
+
+READ THE DEFINITION, NOT THE MNEMONIC:
+A:SUM = summarize (condense), not arithmetic sum.
+A:CMP = compress/compare, not compute.
+E:OBS = obstacle, not observation. Mnemonic similarity is not definition match.
+K:ORD = financial order entry (ISO 20022), not food ordering.
+S:SIGN = cryptographic signature, not legal document signing.
+Z:TEMP = inference sampling temperature, not physical temperature.
+H:ALERT = clinical threshold crossing, not general notification.
+L:ALERT = compliance alert, not clinical or weather.
+W:ALERT = weather advisory, not clinical or compliance.
+U:ALERT = urgent operator alert (human-facing notification).
+
+PROHIBITED PATTERNS:
+- Never hallucinate an opcode. If osmp_lookup returns 0 results, the opcode does not exist.
+- Never place namespace:opcode after @. The @ target is a node_id or *.
+- Never use / as an operator. It is not SAL syntax.
+- Never force-fit an OOV concept into the closest-sounding opcode.
+- Never omit consequence class on R namespace (except ESTOP).
+- Never omit I:\u00a7 before R:\u26a0 or R:\u2298.
+- Never emit SAL longer than the NL input (BAEL guarantee).
+- Never emit an Omega opcode not in the local ASD. The agent is a dictionary
+  consumer, not a dictionary author. Propose Omega entries via HITL gate;
+  never compose against an unregistered Omega opcode.
+
+EXAMPLE: H:HR@NODE1>120\u2192H:CASREP\u2227M:EVA@*
   "If heart rate >120, casualty report AND evacuate all." 35 bytes.
 
-{sum(len(ops) for ops in asd._data.values())} opcodes, {len(asd._data)} namespaces. Use osmp_lookup to search.
-{chr(10).join(ns_lines)}
+{opcode_count} opcodes, {namespace_count} namespaces. Use osmp_lookup to search.
+{namespace_listing}
 
 osmp_compound_decode shows DAG topology and loss tolerance behavior.
 osmp_discover searches domain corpora by keyword (use when you don't know the code).
-osmp_resolve / osmp_batch_resolve for exact code lookup (ICD-10, ISO 20022, MITRE ATT&CK).
+osmp_resolve / osmp_batch_resolve for exact code lookup (ICD-10, ISO 20022, MITRE ATT\u0026CK).
 If SAL is longer than the NL, send the NL. Floor: 51 bytes.
 """
 

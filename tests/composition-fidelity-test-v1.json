@@ -1,0 +1,493 @@
+{
+  "version": "1.0",
+  "description": "OSMP Composition Fidelity Test Suite. Tests LLM ability to compose correct SAL from ambiguous natural language with NO namespace or opcode hints. Scoring: NS (namespace), OP (opcode), COMP (composition), BOUND (boundary detection), SAFE (no prohibited patterns). 5 points per vector. Minimum passing: 4/5 per vector, 90% aggregate.",
+  "scoring": {
+    "dimensions": ["NS", "OP", "COMP", "BOUND", "SAFE"],
+    "points_per_dimension": 1,
+    "max_per_vector": 5,
+    "minimum_per_vector": 4,
+    "minimum_aggregate_pct": 90
+  },
+  "vectors": [
+    {
+      "id": "CF-001",
+      "category": "clean_mapping",
+      "description": "Clinical vital with threshold",
+      "natural_language": "Alert me if the patient's heart rate goes above 130.",
+      "expected_sal": ["H:HR>130\u2192H:ALERT", "H:HR>130\u2192U:ALERT"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "H (clinical context: patient, heart rate)",
+        "OP": "HR + ALERT (threshold + notification)",
+        "COMP": "\u2192 with condition left of arrow",
+        "BOUND": "SAL (both actions map to ASD)",
+        "SAFE": "No hallucination"
+      },
+      "failure_traps": ["Using E:TH (environmental, not clinical)", "Omitting the threshold value", "Using \u2227 instead of \u2192"]
+    },
+    {
+      "id": "CF-002",
+      "category": "clean_mapping",
+      "description": "Multi-sensor environmental query",
+      "natural_language": "Get me the temperature and humidity from sensor node 4A.",
+      "expected_sal": ["E:EQ@4A?TH:0\u2227?HU:0", "E:TH@4A?\u2227E:HU@4A?"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "E (sensor node context)",
+        "OP": "EQ or TH+HU",
+        "COMP": "\u2227 (AND) joining two queries",
+        "BOUND": "SAL",
+        "SAFE": "Clean"
+      },
+      "failure_traps": ["Using H:TEMP (clinical, not sensor)", "Using W:TEMP (weather, not sensor)"]
+    },
+    {
+      "id": "CF-003",
+      "category": "clean_mapping",
+      "description": "Cryptographic operation chain",
+      "natural_language": "Generate a key pair, then sign the payload, then send it to node BRAVO.",
+      "expected_sal": ["S:KEYGEN;S:SIGN;D:PUSH@BRAVO"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "S + D (crypto then data transfer)",
+        "OP": "KEYGEN + SIGN + PUSH",
+        "COMP": "; (SEQUENCE) in correct temporal order",
+        "BOUND": "SAL",
+        "SAFE": "Clean"
+      },
+      "failure_traps": ["Using \u2227 instead of ; (these are sequential, not concurrent)", "Using D:XFER instead of D:PUSH", "Hallucinating S:KEYPAIR"]
+    },
+    {
+      "id": "CF-004",
+      "category": "clean_mapping",
+      "description": "Emergency stop",
+      "natural_language": "Stop everything immediately. Emergency.",
+      "expected_sal": ["R:ESTOP"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "R",
+        "OP": "ESTOP (not STOP; emergency context)",
+        "COMP": "Single frame, no chaining",
+        "BOUND": "SAL",
+        "SAFE": "ESTOP requires no consequence class and no I:\u00a7"
+      },
+      "failure_traps": ["Using R:STOP (not emergency-grade)", "Adding consequence class to ESTOP", "Adding I:\u00a7 precondition to ESTOP"]
+    },
+    {
+      "id": "CF-005",
+      "category": "clean_mapping",
+      "description": "Financial transaction with human gate",
+      "natural_language": "Process the payment but only if a human approves it first.",
+      "expected_sal": ["I:\u00a7\u2192K:PAY", "I:\u00a7\u2194K:PAY"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "I + K",
+        "OP": "\u00a7 + PAY",
+        "COMP": "\u2192 or \u2194 with I:\u00a7 as precondition",
+        "BOUND": "SAL",
+        "SAFE": "Clean"
+      },
+      "failure_traps": ["Omitting I:\u00a7 (human gate is explicit in the NL)", "Using U:APPROVE instead of I:\u00a7"]
+    },
+    {
+      "id": "CF-006",
+      "category": "clean_mapping",
+      "description": "Agent cognitive handoff",
+      "natural_language": "Hand this task off to agent BETA with full context.",
+      "expected_sal": ["J:HANDOFF@BETA"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "J (cognitive execution, not R physical authority)",
+        "OP": "HANDOFF",
+        "COMP": "Single frame with target",
+        "BOUND": "SAL",
+        "SAFE": "J:HANDOFF not R:HANDOFF (task transfer, not physical authority)"
+      },
+      "failure_traps": ["Using R:HANDOFF (physical authority transfer)", "Using A:DA (delegate is different from handoff with full state)"]
+    },
+    {
+      "id": "CF-007",
+      "category": "clean_mapping",
+      "description": "Inference configuration and execution",
+      "natural_language": "Run the model at temperature 0.3 with top-p 0.9 and report the token count.",
+      "expected_sal": ["Z:TEMP:0.3\u2227Z:TOPP:0.9\u2192Z:INF\u2192Z:TOKENS?"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "Z throughout",
+        "OP": "TEMP + TOPP + INF + TOKENS",
+        "COMP": "Config (\u2227) then inference (\u2192) then report (\u2192)",
+        "BOUND": "SAL",
+        "SAFE": "Clean"
+      },
+      "failure_traps": ["Using E:TH for temperature (this is inference temperature, Z namespace)"]
+    },
+    {
+      "id": "CF-008",
+      "category": "clean_mapping",
+      "description": "Building emergency with evacuation (Principle 1: operational event vs external data)",
+      "natural_language": "Fire alarm in sector 3. Evacuate the whole building.",
+      "expected_sal": ["B:BA@BS\u2227M:EVA@*", "B:L@BS:3\u2192M:EVA@*"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "B + M. Per Principle 1: a building on fire is B (building event) + M (municipal response). W:FIRE is weather fire advisory from NWS/NOAA, not a building fire alarm.",
+        "OP": "BA or L + EVA. B:BA is building alert. M:EVA is evacuation. Both are in the ASD.",
+        "COMP": "\u2227 or \u2192 linking alert to evacuation",
+        "BOUND": "SAL",
+        "SAFE": "Clean"
+      },
+      "failure_traps": ["Using W:FIRE (Principle 1 violation: W is external weather data, not operational events happening to you)", "Using H:ALERT (clinical threshold, not building fire)", "HITL_PROPOSAL claiming M:EVA doesn't exist (it does)"]
+    },
+    {
+      "id": "CF-009",
+      "category": "clean_mapping",
+      "description": "Weather observation",
+      "natural_language": "What's the wind and visibility at the airfield?",
+      "expected_sal": ["W:WIND?\u2227W:VIS?", "W:METAR?"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "W (weather/external, not E sensor)",
+        "OP": "WIND + VIS or METAR (aviation weather)",
+        "COMP": "\u2227 joining queries or single METAR",
+        "BOUND": "SAL",
+        "SAFE": "Clean"
+      },
+      "failure_traps": ["Using E namespace (external weather is W, not E local sensor)", "Using X:WIND (energy generation)"]
+    },
+    {
+      "id": "CF-010",
+      "category": "clean_mapping",
+      "description": "Robotic movement with safety",
+      "natural_language": "Move the robot to waypoint alpha, but make sure it respects the safety zone around the workers.",
+      "expected_sal": ["R:ZONE[WORKERS]\u2227I:\u00a7\u2192R:\u26a0MOV@WPT[ALPHA]"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "R + I",
+        "OP": "ZONE + MOV with \u26a0",
+        "COMP": "Safety zone declared, consequence class present, I:\u00a7 precondition",
+        "BOUND": "SAL",
+        "SAFE": "Consequence class \u26a0 present, I:\u00a7 present"
+      },
+      "failure_traps": ["Omitting consequence class on R:MOV", "Omitting I:\u00a7 for \u26a0 instruction", "Omitting R:ZONE"]
+    },
+    {
+      "id": "CF-011",
+      "category": "nl_passthrough",
+      "description": "Food order (OOV)",
+      "natural_language": "Order me some tacos.",
+      "expected_sal": null,
+      "expected_mode": "NL_PASSTHROUGH",
+      "scoring_notes": {
+        "NS": "n/a",
+        "OP": "n/a",
+        "COMP": "n/a",
+        "BOUND": "NL_PASSTHROUGH (K:ORD is financial order entry, not food ordering)",
+        "SAFE": "No forced fit"
+      },
+      "failure_traps": ["Using K:ORD (financial order entry, ISO 20022)", "Hallucinating a food opcode"]
+    },
+    {
+      "id": "CF-012",
+      "category": "nl_passthrough",
+      "description": "Travel booking (OOV)",
+      "natural_language": "Book me a flight to Denver next Tuesday.",
+      "expected_sal": null,
+      "expected_mode": "NL_PASSTHROUGH",
+      "scoring_notes": {
+        "NS": "n/a",
+        "OP": "n/a",
+        "COMP": "n/a",
+        "BOUND": "NL_PASSTHROUGH (no travel booking opcode)",
+        "SAFE": "No hallucinated opcode"
+      },
+      "failure_traps": ["Hallucinating V:BOOK or T:SCHED for travel", "Using G:ROUT (geospatial routing, not travel booking)"]
+    },
+    {
+      "id": "CF-013",
+      "category": "nl_passthrough",
+      "description": "Email composition (OOV)",
+      "natural_language": "Send an email to the engineering team about the deployment schedule.",
+      "expected_sal": null,
+      "expected_mode": "NL_PASSTHROUGH",
+      "scoring_notes": {
+        "NS": "n/a",
+        "OP": "n/a",
+        "COMP": "n/a",
+        "BOUND": "NL_PASSTHROUGH (no email opcode)",
+        "SAFE": "No hallucinated opcode"
+      },
+      "failure_traps": ["Using D:PUSH (data push, not email)", "Using U:NOTIFY (operator notification, not email)", "Hallucinating U:EMAIL"]
+    },
+    {
+      "id": "CF-014",
+      "category": "nl_passthrough",
+      "description": "Social media (OOV)",
+      "natural_language": "Post this photo to Instagram with the caption 'sunset over Austin'.",
+      "expected_sal": null,
+      "expected_mode": "NL_PASSTHROUGH",
+      "scoring_notes": {
+        "NS": "n/a",
+        "OP": "n/a",
+        "COMP": "n/a",
+        "BOUND": "NL_PASSTHROUGH (no social media opcode)",
+        "SAFE": "No forced fit"
+      },
+      "failure_traps": ["Hallucinating any social media opcode", "Using D:PUSH for social posting"]
+    },
+    {
+      "id": "CF-015",
+      "category": "nl_passthrough",
+      "description": "Conversational (OOV)",
+      "natural_language": "Hey, how's it going?",
+      "expected_sal": null,
+      "expected_mode": "NL_PASSTHROUGH",
+      "scoring_notes": {
+        "NS": "n/a",
+        "OP": "n/a",
+        "COMP": "n/a",
+        "BOUND": "NL_PASSTHROUGH (conversational, no instruction)",
+        "SAFE": "No SAL attempted"
+      },
+      "failure_traps": ["Attempting any SAL encoding of a greeting"]
+    },
+    {
+      "id": "CF-016",
+      "category": "nl_passthrough",
+      "description": "Arithmetic (OOV)",
+      "natural_language": "What's 247 times 83?",
+      "expected_sal": null,
+      "expected_mode": "NL_PASSTHROUGH",
+      "scoring_notes": {
+        "NS": "n/a",
+        "OP": "n/a",
+        "COMP": "n/a",
+        "BOUND": "NL_PASSTHROUGH (A:CMP is compress/compare, A:SUM is summarize, not arithmetic)",
+        "SAFE": "No misuse of A:SUM or A:CMP"
+      },
+      "failure_traps": ["Using A:SUM (summarize, not arithmetic sum)", "Using A:CMP (compress/compare, not compute)"]
+    },
+    {
+      "id": "CF-017",
+      "category": "nl_passthrough",
+      "description": "Short imperative (byte check)",
+      "natural_language": "Stop.",
+      "expected_sal": null,
+      "expected_mode": "NL_PASSTHROUGH",
+      "scoring_notes": {
+        "NS": "n/a",
+        "OP": "n/a",
+        "COMP": "n/a",
+        "BOUND": "NL_PASSTHROUGH (5 bytes NL vs 6+ bytes any SAL encoding)",
+        "SAFE": "Byte check catches this"
+      },
+      "failure_traps": ["Encoding R:STOP or R:ESTOP without checking byte count"]
+    },
+    {
+      "id": "CF-018",
+      "category": "nl_passthrough",
+      "description": "Cultural knowledge question (OOV)",
+      "natural_language": "Who painted the Mona Lisa?",
+      "expected_sal": null,
+      "expected_mode": "NL_PASSTHROUGH",
+      "scoring_notes": {
+        "NS": "n/a",
+        "OP": "n/a",
+        "COMP": "n/a",
+        "BOUND": "NL_PASSTHROUGH (knowledge question, not instruction)",
+        "SAFE": "No forced fit"
+      },
+      "failure_traps": ["Using D:Q for a knowledge question (D:Q is data query primitive, not general Q&A)"]
+    },
+    {
+      "id": "CF-019",
+      "category": "partial_mapping",
+      "description": "Action maps but domain qualifier does not",
+      "natural_language": "Summarize the customer feedback survey results.",
+      "expected_sal": ["A:SUM[customer feedback survey results]"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "A",
+        "OP": "SUM",
+        "COMP": "Unmapped qualifier in brackets as string literal",
+        "BOUND": "SAL (core action maps)",
+        "SAFE": "Clean"
+      },
+      "failure_traps": ["NL_PASSTHROUGH when the core action clearly maps", "Hallucinating a customer or survey opcode"]
+    },
+    {
+      "id": "CF-020",
+      "category": "partial_mapping",
+      "description": "Ambiguous namespace (no context)",
+      "natural_language": "Check the temperature.",
+      "expected_sal": null,
+      "expected_mode": "NL_PASSTHROUGH",
+      "scoring_notes": {
+        "NS": "Ambiguous without context (H:TEMP, E:TH, W:TEMP, or Z:TEMP)",
+        "OP": "Depends on namespace",
+        "COMP": "n/a",
+        "BOUND": "NL_PASSTHROUGH preferred when genuinely ambiguous",
+        "SAFE": "No arbitrary namespace selection without justification"
+      },
+      "failure_traps": ["Defaulting to any single namespace without context", "Using E:TH as a generic default"]
+    },
+    {
+      "id": "CF-021",
+      "category": "partial_mapping",
+      "description": "Near-miss opcode",
+      "natural_language": "Calculate the total cost.",
+      "expected_sal": null,
+      "expected_mode": "NL_PASSTHROUGH",
+      "scoring_notes": {
+        "NS": "n/a",
+        "OP": "n/a",
+        "COMP": "n/a",
+        "BOUND": "NL_PASSTHROUGH (A:SUM is summarize; Z:COST is inference cost report)",
+        "SAFE": "No misuse of A:SUM or Z:COST"
+      },
+      "failure_traps": ["Using A:SUM (summarize, not arithmetic)", "Using Z:COST (inference cost, not general cost calculation)"]
+    },
+    {
+      "id": "CF-022",
+      "category": "partial_mapping",
+      "description": "Namespace collision with clear context",
+      "natural_language": "The wind farm output dropped. Check the wind generation status.",
+      "expected_sal": ["X:WIND?"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "X (energy generation, not W weather)",
+        "OP": "WIND",
+        "COMP": "Single query frame",
+        "BOUND": "SAL",
+        "SAFE": "Correct namespace based on energy generation context"
+      },
+      "failure_traps": ["Using W:WIND (meteorological wind, not energy generation)"]
+    },
+    {
+      "id": "CF-023",
+      "category": "partial_mapping",
+      "description": "Complex multi-namespace chain",
+      "natural_language": "Verify the patient's identity, check their blood pressure, and if it's above 180, file a casualty report and medevac them to base camp.",
+      "expected_sal": ["I:ID@PATIENT\u2192H:BP@PATIENT>180\u2192H:CASREP\u2227M:EVA@BASECAMP"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "I + H + M",
+        "OP": "ID + BP + CASREP + EVA",
+        "COMP": "\u2192 for conditional chain, \u2227 for concurrent final actions",
+        "BOUND": "SAL (all core actions map)",
+        "SAFE": "Clean"
+      },
+      "failure_traps": ["Omitting identity verification", "Using \u2227 throughout instead of \u2192 for conditionals", "Inverting condition and action order"]
+    },
+    {
+      "id": "CF-024",
+      "category": "partial_mapping",
+      "description": "Vocabulary gap with Omega resolution paths",
+      "natural_language": "Report the soil moisture at sensor grid point 7.",
+      "expected_sal": ["\u03a9:SOIL@GRID7?"],
+      "expected_mode": "CONDITIONAL",
+      "scoring_notes": {
+        "NS": "\u03a9 if registered Omega entry exists in local ASD; n/a if NL_PASSTHROUGH",
+        "OP": "SOIL if registered; n/a if NL_PASSTHROUGH",
+        "COMP": "Single query frame if composing; n/a if NL_PASSTHROUGH",
+        "BOUND": "Three valid paths: (a) compose against existing Omega entry if osmp_lookup returns one; (b) surface HITL proposal if gap is recurring and HITL available; (c) NL_PASSTHROUGH if no entry and no HITL. Agent must never autonomously emit unregistered Omega opcode.",
+        "SAFE": "Do NOT force-fit into E:EQ. Do NOT autonomously create Omega entry without HITL gate."
+      },
+      "failure_traps": ["Using E:EQ as forced fit", "Hallucinating E:SOIL", "Emitting \u03a9:SOIL without verifying it exists in local ASD via osmp_lookup", "Creating Omega entry without human approval"]
+    },
+    {
+      "id": "CF-025",
+      "category": "partial_mapping",
+      "description": "Byte check failure",
+      "natural_language": "Go.",
+      "expected_sal": null,
+      "expected_mode": "NL_PASSTHROUGH",
+      "scoring_notes": {
+        "NS": "n/a",
+        "OP": "n/a",
+        "COMP": "n/a",
+        "BOUND": "NL_PASSTHROUGH (3 bytes NL; any SAL encoding is longer)",
+        "SAFE": "Byte check"
+      },
+      "failure_traps": ["Encoding R:\u21baMOV without byte check"]
+    },
+    {
+      "id": "CF-026",
+      "category": "adversarial",
+      "description": "English word matches opcode mnemonic (definition-match gate)",
+      "natural_language": "I need to acknowledge the receipt.",
+      "expected_sal": null,
+      "expected_mode": "NL_PASSTHROUGH",
+      "scoring_notes": {
+        "NS": "Ambiguous (A:ACK is protocol ack, U:ACK is human ack). Collision table now lists this explicitly.",
+        "OP": "Ambiguous",
+        "COMP": "n/a",
+        "BOUND": "NL_PASSTHROUGH. Per Principle 2: A:ACK definition is 'positive acknowledgment, complement to NACK, Atomic policy confirmation.' That is machine protocol, not business correspondence. Definition context diverges from NL usage context. Mnemonic match is a false positive.",
+        "SAFE": "No default to A:ACK without context analysis"
+      },
+      "failure_traps": ["Defaulting to A:ACK because the mnemonic matches the English word without reading the ASD definition", "Defaulting to shorter encoding (A:ACK over U:ACK) when the disambiguation is about context not bytes"]
+    },
+    {
+      "id": "CF-027",
+      "category": "adversarial",
+      "description": "Chain with OOV step in middle",
+      "natural_language": "Encrypt the data, email it to the team lead, then log the audit trail.",
+      "expected_sal": null,
+      "expected_mode": "NL_OR_HITL",
+      "scoring_notes": {
+        "NS": "S + ? + L (email step breaks the chain)",
+        "OP": "ENC + ? + AUDIT",
+        "COMP": "Chain integrity broken by OOV step",
+        "BOUND": "NL_PASSTHROUGH or HITL_PROPOSAL both valid. NL is conservative. HITL encodes mapped steps and flags the gap. The only wrong answer is FULL_OSMP silently dropping the email step.",
+        "SAFE": "No hallucinated email opcode, no silent OOV drop"
+      },
+      "failure_traps": ["Hallucinating an email opcode", "Encoding only the covered steps as FULL_OSMP and silently dropping the email step", "Using D:PUSH as email substitute"]
+    },
+    {
+      "id": "CF-028",
+      "category": "adversarial",
+      "description": "R namespace needing full safety chain",
+      "natural_language": "Move the drone to coordinates 35.7, -122.4.",
+      "expected_sal": ["I:\u00a7\u2192R:\u26a0MOV@DRONE1\u2227E:GPS[35.7,-122.4]"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "I + R + E",
+        "OP": "\u00a7 + MOV + GPS",
+        "COMP": "I:\u00a7 precondition, \u26a0 consequence class, GPS coordinates",
+        "BOUND": "SAL",
+        "SAFE": "Consequence class \u26a0 present, I:\u00a7 present"
+      },
+      "failure_traps": ["Omitting consequence class on R:MOV", "Omitting I:\u00a7 for hazardous movement", "Using G:POS instead of E:GPS for coordinates"]
+    },
+    {
+      "id": "CF-029",
+      "category": "adversarial",
+      "description": "Layer 2 accessor correctness",
+      "natural_language": "The patient has pneumothorax. Code J93.0. Get a casualty report to the medevac team.",
+      "expected_sal": ["H:ICD[J930]\u2192H:CASREP\u2192M:EVA@MEDEVAC"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "H + M",
+        "OP": "ICD + CASREP + EVA",
+        "COMP": "\u2192 chain with ICD as standalone frame (Layer 2 accessor), not target parameter",
+        "BOUND": "SAL",
+        "SAFE": "ICD is standalone frame, not @H:ICD[J930]"
+      },
+      "failure_traps": ["H:CASREP@H:ICD[J930] (ICD is not a target)", "Using D:Q for ICD lookup", "Omitting ICD code"]
+    },
+    {
+      "id": "CF-030",
+      "category": "adversarial",
+      "description": "Deceptive namespace keyword",
+      "natural_language": "Schedule a maintenance window for the grid controller.",
+      "expected_sal": ["T:WIN\u2227P:DEVICE[GRID_CTRL]", "T:SCHED\u2227P:DEVICE[GRID_CTRL]"],
+      "expected_mode": "FULL_OSMP",
+      "scoring_notes": {
+        "NS": "T + P (time scheduling + procedural maintenance, NOT X energy)",
+        "OP": "WIN or SCHED + DEVICE",
+        "COMP": "\u2227 linking time window to device reference",
+        "BOUND": "SAL",
+        "SAFE": "No forced fit into X namespace based on keyword 'grid'"
+      },
+      "failure_traps": ["Using X:GRID (energy grid status, not maintenance scheduling)", "Using X namespace because 'grid' appears in the NL"]
+    }
+  ]
+}
