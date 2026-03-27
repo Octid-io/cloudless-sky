@@ -28,6 +28,9 @@ from osmp import (  # noqa: E402
     DAGReassembler,
     LossPolicy,
     run_benchmark,
+    validate_composition,
+    CompositionResult,
+    CompositionIssue,
 )
 
 # -- Paths ----------------------------------------------------------------
@@ -95,6 +98,8 @@ mcp = FastMCP(
         "8. NEVER emit an Omega opcode not confirmed by osmp_lookup. "
         "The agent is a dictionary consumer, not a dictionary author.\n\n"
         "Use osmp_lookup to search opcodes. Use osmp_discover for domain codes. "
+        "Use osmp_validate to check composition rules before emission. "
+        "If osmp_lookup returns a MACRO entry, use it instead of composing from individual opcodes. "
         "Read the osmp://system_prompt resource for the full composition doctrine."
     ),
 )
@@ -321,6 +326,29 @@ def osmp_benchmark() -> str:
     return "\n".join(lines)
 
 
+@mcp.tool()
+def osmp_validate(sal: str, nl_input: str = "") -> str:
+    """Validate a composed SAL instruction against composition rules before emission.
+    Checks: hallucinated opcodes, namespace-as-target, consequence class, I:§ precondition,
+    byte inflation, slash operator, mixed-mode. Returns violations or PASS."""
+    asd = AdaptiveSharedDictionary()
+    result = validate_composition(sal, nl=nl_input, asd=asd)
+    if result.valid:
+        return json.dumps({"status": "PASS", "sal": sal, "violations": [],
+                           "warnings": [{"rule": w.rule, "message": w.message} for w in result.warnings]},
+                          indent=2, ensure_ascii=False)
+    return json.dumps({
+        "status": "FAIL",
+        "sal": sal,
+        "error_count": len(result.errors),
+        "warning_count": len(result.warnings),
+        "violations": [
+            {"rule": i.rule, "message": i.message, "severity": i.severity}
+            for i in result.issues
+        ],
+    }, indent=2, ensure_ascii=False)
+
+
 # -- Resources ------------------------------------------------------------
 
 @mcp.resource("osmp://system_prompt")
@@ -435,12 +463,22 @@ PROHIBITED PATTERNS:
   consumer, not a dictionary author. Propose Omega entries via HITL gate;
   never compose against an unregistered Omega opcode.
 
+MACRO ARCHITECTURE:
+A:MACRO[name] invokes a pre-validated multi-step SAL chain template by name
+and slot-fill. If osmp_lookup returns a MACRO entry for the required workflow,
+USE THE MACRO instead of composing from individual opcodes. The macro eliminates
+composition errors: the chain structure is pre-validated, the agent only fills slots.
+Composition priority: (1) Macro if registered, (2) individual opcode composition,
+(3) NL_PASSTHROUGH if no dictionary coverage.
+Always call osmp_validate on composed SAL before emission.
+
 EXAMPLE: H:HR@NODE1>120\u2192H:CASREP\u2227M:EVA@*
   "If heart rate >120, casualty report AND evacuate all." 35 bytes.
 
 {opcode_count} opcodes, {namespace_count} namespaces. Use osmp_lookup to search.
 {namespace_listing}
 
+osmp_validate checks composition rules before emission (hallucination, consequence class, etc).
 osmp_compound_decode shows DAG topology and loss tolerance behavior.
 osmp_discover searches domain corpora by keyword (use when you don't know the code).
 osmp_resolve / osmp_batch_resolve for exact code lookup (ICD-10, ISO 20022, MITRE ATT\u0026CK).

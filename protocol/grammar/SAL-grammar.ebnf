@@ -11,11 +11,30 @@ instruction         ::= simple_instruction
                       | broadcast_instruction
                       | parallel_instruction
                       | sequence_instruction
+                      | macro_instruction
 
 compound_instruction ::= instruction operator instruction
 parallel_instruction ::= instruction "∥" "[" instruction ("∧" instruction)* "]"
 sequence_instruction ::= instruction ";" instruction
 broadcast_instruction ::= namespace_prefix ":" opcode "@" wildcard "!" opcode
+
+# ─────────────────────────────────────────────
+# MACRO INSTRUCTION (Section 11)
+# ─────────────────────────────────────────────
+
+macro_instruction   ::= "A:MACRO[" macro_name "]" macro_slots [expansion_annotation]
+
+macro_name          ::= uppercase_alpha (uppercase_alpha | digit)*     # 1-16 characters
+
+macro_slots         ::= (":" slot_name "[" slot_value "]")*
+
+expansion_annotation ::= ":_EXP[" instruction "]"
+                       # Non-authoritative transparency annotation.
+                       # Receiver expands from own local ASD, never from _EXP content.
+                       # Inclusion governed by BAEL channel capacity state:
+                       #   omitted at constrained bandwidth (LoRa floor),
+                       #   included at unconstrained bandwidth (cloud, local network).
+                       # See OSMP-SPEC Section 11.3.
 
 # ─────────────────────────────────────────────
 # SIMPLE INSTRUCTION

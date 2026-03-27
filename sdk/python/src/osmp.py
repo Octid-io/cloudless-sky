@@ -2,9 +2,9 @@
 OSMP Python Reference Implementation
 Octid Semantic Mesh Protocol — Cloudless Sky Project
 
-Source of truth: OSMP-semantic-dictionary-v12.csv | OSMP-SPEC-v1.md | SAL-grammar.ebnf
+Source of truth: OSMP-semantic-dictionary-v13.csv | OSMP-SPEC-v1.md | SAL-grammar.ebnf
 All opcode names, definitions, and namespace assignments are drawn directly from the
-canonical semantic dictionary v12.0, not from any prior implementation.
+canonical semantic dictionary v13.0, not from any prior implementation.
 
 Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
 License: Apache 2.0
@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import lzma
+import re
 import struct
 import hashlib
 from dataclasses import dataclass, field
@@ -30,7 +31,7 @@ except ImportError:
 
 # ─────────────────────────────────────────────────────────────────────────────
 # GLYPH OPERATOR TABLE — Category 1 (18 operators)
-# Source: OSMP-semantic-dictionary-v12.csv Section 1, Category 1
+# Source: OSMP-semantic-dictionary-v13.csv Section 1, Category 1
 # ─────────────────────────────────────────────────────────────────────────────
 
 GLYPH_OPERATORS: dict[str, dict] = {
@@ -208,7 +209,7 @@ SLOT_VALUES: dict[str, dict[str, str]] = {
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ASD BASIS SET — Guaranteed minimum operational vocabulary floor v1.0
-# Source of truth: OSMP-semantic-dictionary-v12.csv Section 3
+# Source of truth: OSMP-semantic-dictionary-v13.csv Section 3
 # Every opcode name and definition drawn directly from the canonical dictionary.
 # DO NOT MODIFY opcode names or definitions — they are protocol wire format.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -227,6 +228,7 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "COMP":    "compliance_gate_assertion",
         "DA":      "delegate_to_agent",
         "ERR":     "error_handler",
+        "MACRO":   "registered_macro_invocation",
         "MDR":     "mdr_corpus_version_identity_or_delta",
         "MEM":     "memory_operation",
         "NACK":    "negative_acknowledgment",
@@ -1549,8 +1551,181 @@ class SALEncoder:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SAL DECODER
+# COMPOSITION VALIDATION (Section 12.5 of OSMP-SPEC-v1)
 # ─────────────────────────────────────────────────────────────────────────────
+
+# Operators that split compound SAL instructions into frames
+_FRAME_SPLIT_RE = re.compile(r'([→∧∨↔∥;])')
+# Pattern matching namespace:opcode after @ (prohibited: namespace-as-target)
+_NS_TARGET_RE = re.compile(r'@([A-Z]{1,2}):([A-Z][A-Z0-9]+)')
+# Pattern extracting namespace:opcode from a SAL frame
+_FRAME_NS_OP_RE = re.compile(r'^([A-Z]{1,2}):([A-Z§][A-Z0-9§]*)')
+
+
+@dataclass
+class CompositionIssue:
+    """A single validation issue found in a composed instruction."""
+    rule: str          # e.g. "HALLUCINATED_OPCODE", "NAMESPACE_AS_TARGET"
+    severity: str      # "error" (blocks emission) or "warning" (advisory)
+    message: str
+    frame: str = ""    # the offending frame or substring, if applicable
+
+
+@dataclass
+class CompositionResult:
+    """Result of composition validation."""
+    valid: bool
+    issues: list[CompositionIssue]
+    sal: str
+    nl: str = ""
+
+    @property
+    def errors(self) -> list[CompositionIssue]:
+        return [i for i in self.issues if i.severity == "error"]
+
+    @property
+    def warnings(self) -> list[CompositionIssue]:
+        return [i for i in self.issues if i.severity == "warning"]
+
+
+def validate_composition(
+    sal: str,
+    nl: str = "",
+    asd: AdaptiveSharedDictionary | None = None,
+    r_safety_exempt: bool = True,
+) -> CompositionResult:
+    """Validate a composed SAL instruction against the seven deterministic rules.
+
+    Rules enforced (Section 12.5 of OSMP-SPEC-v1):
+      1. Hallucination check — every opcode must exist in the ASD
+      2. Namespace-as-target — @ must not be followed by NS:OPCODE
+      3. R namespace consequence class — mandatory except R:ESTOP
+      4. I:§ precondition — ⚠ and ⊘ require I:§ in the chain
+      5. Byte check — SAL bytes must not exceed NL bytes (exception: R safety chains)
+      6. Slash rejection — / is not a SAL operator
+      7. Mixed-mode check — no natural language text embedded in SAL frames
+
+    Args:
+        sal: The composed SAL instruction string.
+        nl: The source natural language string (required for byte check).
+        asd: ASD instance to validate against. Uses default if None.
+        r_safety_exempt: If True, R namespace safety chains are exempt from byte check.
+
+    Returns:
+        CompositionResult with valid=True if no errors, issues list with details.
+    """
+    if asd is None:
+        asd = AdaptiveSharedDictionary()
+
+    issues: list[CompositionIssue] = []
+
+    # ── Rule 6: Slash rejection ──────────────────────────────────────────
+    if "/" in sal:
+        issues.append(CompositionIssue(
+            rule="SLASH_OPERATOR",
+            severity="error",
+            message="/ is not a SAL operator. Use → for THEN, ∧ for AND, ∨ for OR.",
+            frame=sal,
+        ))
+
+    # ── Rule 2: Namespace-as-target ──────────────────────────────────────
+    ns_target_matches = _NS_TARGET_RE.findall(sal)
+    for ns, op in ns_target_matches:
+        issues.append(CompositionIssue(
+            rule="NAMESPACE_AS_TARGET",
+            severity="error",
+            message=f"@ target must be a node_id or *, not a namespace:opcode. Found @{ns}:{op}",
+            frame=f"@{ns}:{op}",
+        ))
+
+    # ── Split into frames and validate each ──────────────────────────────
+    parts = _FRAME_SPLIT_RE.split(sal)
+    frames = [p.strip() for p in parts if p.strip() and p.strip() not in "→∧∨↔∥;"]
+
+    has_r_namespace = False
+    has_r_hazardous_or_irreversible = False
+    has_i_section = False
+
+    for frame in frames:
+        m = _FRAME_NS_OP_RE.match(frame)
+        if not m:
+            # Frame doesn't start with NS:OP pattern — could be a slot value
+            # or operator artifact. Skip unless it looks like embedded NL.
+            if len(frame) > 20 and " " in frame:
+                issues.append(CompositionIssue(
+                    rule="MIXED_MODE",
+                    severity="warning",
+                    message=f"Frame appears to contain embedded natural language: '{frame[:40]}...'",
+                    frame=frame,
+                ))
+            continue
+
+        ns = m.group(1)
+        op = m.group(2)
+
+        # ── Rule 1: Hallucination check ──────────────────────────────────
+        # Skip I:§ (it's a glyph-opcode, always valid)
+        if not (ns == "I" and op == "§"):
+            definition = asd.lookup(ns, op)
+            if definition is None:
+                issues.append(CompositionIssue(
+                    rule="HALLUCINATED_OPCODE",
+                    severity="error",
+                    message=f"{ns}:{op} does not exist in the Adaptive Shared Dictionary.",
+                    frame=frame,
+                ))
+
+        # ── Rules 3 & 4: R namespace consequence class and I:§ ───────────
+        if ns == "R":
+            has_r_namespace = True
+            if op != "ESTOP":
+                has_cc = any(cc in frame for cc in ("⚠", "↺", "⊘"))
+                if not has_cc:
+                    issues.append(CompositionIssue(
+                        rule="CONSEQUENCE_CLASS_OMISSION",
+                        severity="error",
+                        message=f"R:{op} requires a consequence class designator (⚠/↺/⊘). R:ESTOP is the sole exception.",
+                        frame=frame,
+                    ))
+                if "⚠" in frame or "⊘" in frame:
+                    has_r_hazardous_or_irreversible = True
+
+        if ns == "I" and op == "§":
+            has_i_section = True
+
+    # ── Rule 4 (chain-level): I:§ must precede ⚠/⊘ ──────────────────────
+    if has_r_hazardous_or_irreversible and not has_i_section:
+        issues.append(CompositionIssue(
+            rule="AUTHORIZATION_OMISSION",
+            severity="error",
+            message="R namespace instructions with ⚠ (HAZARDOUS) or ⊘ (IRREVERSIBLE) require I:§ as a structural precondition in the instruction chain.",
+        ))
+
+    # ── Rule 5: Byte check ───────────────────────────────────────────────
+    if nl:
+        sal_bytes = len(sal.encode("utf-8"))
+        nl_bytes = len(nl.encode("utf-8"))
+        if sal_bytes >= nl_bytes:
+            if r_safety_exempt and has_r_namespace:
+                issues.append(CompositionIssue(
+                    rule="BYTE_CHECK_EXEMPT",
+                    severity="warning",
+                    message=f"SAL ({sal_bytes}B) >= NL ({nl_bytes}B). Exempt: safety-complete R namespace chain.",
+                ))
+            else:
+                issues.append(CompositionIssue(
+                    rule="BYTE_INFLATION",
+                    severity="error",
+                    message=f"SAL ({sal_bytes}B) >= NL ({nl_bytes}B). Use NL_PASSTHROUGH. BAEL compression floor guarantee violated.",
+                ))
+
+    errors = [i for i in issues if i.severity == "error"]
+    return CompositionResult(
+        valid=len(errors) == 0,
+        issues=issues,
+        sal=sal,
+        nl=nl,
+    )
 
 @dataclass
 class DecodedInstruction:

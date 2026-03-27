@@ -200,6 +200,32 @@ R namespace instructions carry mandatory consequence class designators. An R nam
 
 **ITAR Scope Limitation:** The R namespace is directed to civilian operation only. Nothing herein covers weapons engagement, targeting systems, lethal autonomous action, or any subject matter controlled under ITAR (22 CFR Parts 120-130) or EAR (15 CFR Parts 730-774).
 
+### 5.1 Medium-Dependent Consequence Class Defaults
+
+The consequence class applied to an R namespace instruction is a property of the operational medium, not the opcode. `R:MOV` encodes the semantic primitive "move" regardless of medium; the consequence of a failed `R:MOV` differs categorically across operational media because the physics of each medium imposes different reversibility constraints on the same kinematic action.
+
+The composing agent reads the operational medium from O namespace context (`O:CONOPS`, `O:MODE`, or session initialization). When a medium is declared, the agent applies the default below unless the deployer has overridden it via `N:CFG` standing configuration.
+
+| Medium | Condition | Default | I:§ | Rationale |
+|---|---|---|---|---|
+| Ground, controlled | No humans (R:COLLAB:O) | ↺ | No | Fenced/isolated. Robot can be stopped, reversed. |
+| Ground, collaborative | Humans present (R:COLLAB:A) | ⚠ | Yes | Human proximity escalates consequence regardless of enclosure. |
+| Ground, uncontrolled | Outdoor, terrain, bystanders | ⚠ | Yes | Cannot guarantee recovery. |
+| Aerial (all) | Any drone, UAV, airborne agent | ⚠ | Yes | Gravity makes in-transit failure unrecoverable. |
+| Surface water, controlled | Harbor, marina, recovery vessels | ↺ | No | Low speed, contained, recovery feasible. |
+| Surface water, open | Offshore, open ocean | ⚠ | Yes | Currents, weather, grounding risk. |
+| Subsurface (UUV) | Any depth | ⚠ | Yes | Pressure, entanglement, comms loss at depth. |
+| Microgravity, propulsive | Thrust, orbital maneuver, delta-v | ⊘ | Yes | Delta-v is finite and non-renewable. Bad thrust vector may be unrecoverable. |
+| Microgravity, non-propulsive | Manipulator arm, tool use | ⚠ | Yes | Equipment/crew risk. Recoverable but consequential. |
+| Mobile peripheral, reversible | R:TORCH, R:HAPTIC, R:VIBE, R:SPKR, R:DISP | ↺ | No | On/off, inherently reversible. |
+| Mobile peripheral, privacy | R:CAM, R:MIC, R:SCRN | ⚠ | Yes | Privacy-consequential activation. |
+
+**Undeclared medium default:** When O namespace context does not declare an operational medium, the default is ⚠ HAZARDOUS with mandatory I:§. The safe assumption when the medium is unknown is that consequences are not reversible. A conforming implementation SHOULD surface the undeclared condition to the operator.
+
+**Deployer override:** A sovereign node operator may override any default through `N:CFG` standing configuration. The protocol default is the conservative assumption; the deployer override is the informed relaxation based on operational knowledge.
+
+**Human proximity discriminator:** The R:COLLAB slot value (A=active, S=standby, O=off) is the discriminating factor for ground operations. COLLAB:A escalates any ground operation to ⚠ regardless of whether the environment is indoor, fenced, or otherwise controlled. The line is human proximity, not building envelope.
+
 ---
 
 ## 6. Outcome State Designators (I Namespace)
@@ -578,7 +604,106 @@ The primary value of the two-tier architecture at full scale is edge-local deplo
 
 ---
 
-## 11. Example Instructions
+## 11. Registered Macro Architecture
+
+A registered macro is a pre-validated multi-step SAL instruction chain template stored as a single callable entry in the Adaptive Shared Dictionary. The agent invokes a macro by dictionary lookup and slot-fill, producing the complete chain without composing from individual opcodes.
+
+### 11.1 Macro Entry Structure
+
+A macro entry in the ASD comprises:
+
+- **Macro identifier:** An A namespace opcode (`A:MACRO`) with the macro name as its primary slot value.
+- **Chain template:** An ordered sequence of namespace-prefixed opcodes connected by glyph operators, with typed parameter slots at positions requiring context-specific values.
+- **Slot definitions:** Name, type, and namespace constraint for each parameter slot in the template.
+- **Version identifier (optional):** Enables ADP synchronization to track macro definition updates independently of the opcodes composing the chain.
+
+Example registration:
+```
+A:MACRO[MEDEVAC]  →  H:ICD[{dx_code}]→H:CASREP→M:EVA@{target}
+  slots: dx_code (H namespace Layer 2 ICD-10 code), target (node_id)
+```
+
+### 11.2 Transmission Modes
+
+A macro invocation may be transmitted in either of two modes, selected by the composing node based on two existing protocol mechanisms: the FNP namespace intersection (which determines whether both nodes share the macro definition) and the BAEL channel capacity state (which determines available bandwidth).
+
+**Compact mode:** When FNP confirms both nodes share the macro definition, the sender transmits the compact invocation: `A:MACRO[MEDEVAC]:dx[J930]:tgt[MED]`. The receiver looks up the macro identifier in its own local ASD, retrieves the chain template, substitutes received slot values, and executes the expanded chain. The expanded chain is not transmitted on the wire. Wire efficiency is proportional to the difference between the compact invocation and the fully expanded chain.
+
+**Expanded mode:** When FNP does not confirm shared definitions, the sender expands locally and transmits the full SAL chain: `H:ICD[J930]→H:CASREP→M:EVA@MED`. The receiver decodes as standard SAL with no knowledge that the chain originated from a macro. This preserves universal interoperability.
+
+### 11.3 Adaptive Transparency Annotation
+
+In compact mode, the sender may include an expansion annotation (`_EXP` slot) containing the fully expanded chain. Inclusion is governed by BAEL channel capacity state: omitted at constrained bandwidth (LoRa floor), included at unconstrained bandwidth (cloud, local network).
+
+The `_EXP` annotation is **non-authoritative**. The receiver expands from its own local ASD and does not use the annotation for execution. If `_EXP` content differs from the receiver's local expansion (ASD version mismatch), the receiver's local expansion governs. The annotation serves monitoring, debugging, and audit functions only.
+
+### 11.4 Composition Priority Hierarchy
+
+The three instruction production paths form a priority hierarchy:
+
+1. **Macro invocation** (pre-validated, no composition error surface) — preferred when a registered macro covers the required workflow.
+2. **Individual opcode composition** (grammar-constrained, inference-dependent) — used when no macro covers the chain.
+3. **Natural language passthrough** (no compression, no encoding) — used when the input does not resolve to dictionary coverage per Section 12.
+
+The agent's mandatory ASD lookup (Section 12) returns macro entries alongside standard opcode entries. When lookup returns a macro matching the required workflow, the agent uses the macro. The agent composes from individual opcodes only when no registered macro covers the required chain.
+
+### 11.5 Audit and Version Coherence
+
+L namespace logging records macro invocations as distinct events: the audit record includes the macro identifier, filled slot values, and a flag indicating template expansion rather than agent composition. This distinction is material for compliance: an instruction produced by a pre-validated template carries a different trust profile than one composed by an agent.
+
+When the MDR updates a macro definition, ADP synchronization propagates the change. Every agent invoking the updated macro automatically produces the updated chain on next invocation without changes to system prompts, composition rules, or application code.
+
+---
+
+## 12. Composition and Usage
+
+### 12.1 Architectural Separation
+
+OSMP distinguishes two structurally independent operations:
+
+- **Decode** (protocol layer): Table lookup. The receiving node resolves a SAL expression into its semantic meaning by ASD lookup. No neural inference. No model. No ambiguity resolution. This is the core protocol claim.
+- **Compose** (agent layer): The process of translating natural language into a valid SAL expression. This inherently requires intelligence. An LLM performs it using its native inference capability constrained by the grammar enforcement rules below. Composition does not modify the inference-free decode property.
+
+These operations occur at different nodes, different architectural layers, and different times.
+
+### 12.2 Mandatory Per-Opcode Lookup Gate
+
+For every opcode candidate identified in a natural language input, the composing agent MUST invoke dictionary lookup to confirm the opcode exists in the local ASD prior to composition. This gate operates per opcode candidate: each candidate in a multi-opcode chain is independently confirmed. No opcode in the chain may be assumed without dictionary confirmation.
+
+Three outcomes: exactly one match routes to composition; multiple matches across namespaces routes to namespace selection (Section 12.3); zero matches routes to boundary detection (Section 12.4).
+
+### 12.3 Namespace Selection
+
+When a concept maps to opcodes in multiple namespaces, domain context determines the correct namespace:
+
+**Principle 1 — Operational Event vs External Data:** E namespace encodes direct sensor readings from the composing node's instruments. W namespace encodes external data products from meteorological authorities. B namespace encodes events in structures. M namespace encodes operational responses. A building on fire is B + M. A fire weather watch from NWS is W:FIRE. A sensor reading is E.
+
+**Principle 2 — Definition Match, Not Mnemonic Match:** The ASD resolves opcodes by their registered definitions, not by mnemonic correspondence. When an English word matches an opcode mnemonic, the match is valid only if the ASD definition's operational context matches the natural language usage context. If they diverge, the mnemonic match is a false positive and the opcode must not be used.
+
+### 12.4 Boundary Detection
+
+When ASD lookup resolves nothing at any tier (Tier 1, Tier 2, registered Omega), the agent transmits in NL_PASSTHROUGH mode (Section 8.4). The agent is a dictionary consumer, not a dictionary author. An agent may surface a vocabulary gap proposal to a human operator through the I:§ confirmation architecture; the human approves, the entry registers in the local ASD under the Omega sovereign extension, and the agent then composes against the newly registered entry. The agent never composes against an opcode that does not exist in the ASD at the moment of composition.
+
+### 12.5 Prohibited Composition Patterns
+
+The following patterns render a composed instruction non-conformant:
+
+1. **Hallucinated opcodes:** Opcodes not confirmed by dictionary lookup.
+2. **Namespace as target:** The @ operator takes a node identifier or wildcard, never a namespace-prefixed opcode.
+3. **Forced fit:** Substituting the closest-sounding opcode when the concept does not map. Mnemonic similarity is not definition match.
+4. **Mixed-mode frames:** SAL and natural language may not be mixed within a single payload.
+5. **Consequence class omission:** Every R namespace instruction except R:ESTOP must carry a consequence class designator.
+6. **Authorization omission:** R namespace instructions carrying ⚠ or ⊘ require I:§ as a structural precondition.
+7. **Autonomous Omega creation:** Emitting an unregistered Omega opcode without HITL approval.
+8. **Byte inflation:** SAL encoding that exceeds the natural language byte count (exception: safety-complete R namespace chains).
+
+### 12.6 Full Doctrine Reference
+
+The complete composition doctrine, including the six-step decision tree, namespace collision table, 30-vector fidelity test suite, and 11-class failure taxonomy, is maintained at `docs/SAL-usage-doctrine-v1.md`. The MCP server system prompt (`osmp://system_prompt` resource) carries an inline summary. The server `instructions` field carries the condensed critical rules delivered automatically on MCP connection.
+
+---
+
+## 13. Example Instructions
 
 | ID | Description | Encoded | Natural Language | NL Bytes | OSMP Bytes | Reduction |
 |---|---|---|---|---|---|---|
@@ -591,7 +716,7 @@ The primary value of the two-tier architecture at full scale is edge-local deplo
 
 ---
 
-## 12. Compression Data
+## 14. Compression Data
 
 | Metric | Value | Basis |
 |---|---|---|
@@ -621,7 +746,7 @@ The primary value of the two-tier architecture at full scale is edge-local deplo
 
 ---
 
-## 13. Conformance
+## 15. Conformance
 
 A conformant OSMP implementation MUST:
 
@@ -632,6 +757,15 @@ A conformant OSMP implementation MUST:
 5. Implement at least one loss tolerance policy from Section 8.2
 6. Produce UTF-8 byte reduction ≥60% on the standard benchmark instruction set (see test vectors)
 7. Decode any conformant OSMP instruction by table lookup without neural inference
+8. Reject R namespace instructions (except R:ESTOP) that lack a consequence class designator as malformed
+9. Validate that every opcode in a composed instruction exists in the local ASD before emission
+
+A conformant implementation SHOULD:
+
+- Apply medium-dependent consequence class defaults per Section 5.1 when the composing agent must determine the consequence class
+- Default to HAZARDOUS with I:§ when no operational medium is declared in O namespace context
+- Reject composed instructions where SAL byte count exceeds natural language byte count (exception: safety-complete R namespace chains)
+- Surface undeclared operational medium conditions to the human operator
 
 A conformant implementation MAY:
 
@@ -641,21 +775,24 @@ A conformant implementation MAY:
 - Implement ASD Distribution Protocol (ADP) SAL-level synchronization per Section 10.4
 - Implement the semantic pending queue per Section 10.4.4
 - Implement the full namespace suite
+- Implement the registered macro architecture per Section 11
+- Implement HITL-gated Omega vocabulary expansion per Section 12.4
+- Implement composition validation per the prohibited patterns of Section 12.5
 
 ---
 
-## 14. Test Vectors
+## 16. Test Vectors
 
 See `/protocol/test-vectors/` for the canonical test vector suite. Every conformant implementation must pass all test vectors before submission to the community registry.
 
 ---
 
-## 15. Patent Notice
+## 17. Patent Notice
 
 This protocol specification is provided under Apache 2.0 license. The underlying architecture is covered by pending US patent application OSMP-001-UTIL (inventor: Clay Holberg), filed March 17, 2026, with conception date August 7, 2025. A continuation-in-part application (OSMP-001-CIP) extends coverage to cloud-scale AI orchestration, non-RF channels, and the AI-native namespace architecture. Apache 2.0 includes an express patent grant for implementations of this specification.
 
 ---
 
-## 16. Contributing
+## 18. Contributing
 
 See `CONTRIBUTING.md`. SDK implementations in any language are welcome. All implementations must pass the canonical test vector suite in `/protocol/test-vectors/`. Architecture decisions are documented in `/docs/adr/`.
