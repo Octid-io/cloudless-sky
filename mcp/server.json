@@ -6,7 +6,7 @@
     "url": "https://github.com/octid-io/cloudless-sky",
     "source": "github"
   },
-  "version": "1.0.22",
+  "version": "1.0.21",
   "packages": [
     {
       "registryType": "pypi",
