@@ -357,9 +357,49 @@ def osmp_validate(sal: str, nl_input: str = "") -> str:
 def get_system_prompt() -> str:
     """SAL grammar, composition reference, and usage doctrine."""
     asd = AdaptiveSharedDictionary()
+
+    # Brief definitions for opcodes where 2-word truncation loses meaning
+    _DEF_OVERRIDES = {
+        "A:CMPR": "structured comparison", "A:DA": "delegate to agent",
+        "A:MACRO": "macro invocation", "A:MDR": "corpus version",
+        "A:VERIFY": "verify output", "D:PACK": "corpus encode",
+        "D:UNPACK": "corpus decode", "D:RESUME": "resume transfer",
+        "E:TH": "temp+humidity", "I:AML": "AML check",
+        "I:CONS": "consent mgmt", "I:KYC": "KYC check",
+        "I:\u00a7": "human confirm", "J:BLOCK": "blocked dependency",
+        "J:COMMIT": "commit plan", "J:STEP": "plan step",
+        "J:HANDOFF": "transfer execution", "L:CHAIN": "chain custody",
+        "L:QUERY": "audit query", "L:TRAIL": "audit trail",
+        "O:CONOPS": "concept ops", "Q:FAIL": "gate fail",
+        "Q:PASS": "gate pass", "R:RTH": "return home",
+        "R:NFC": "nfc read/write", "R:TORCH": "flashlight",
+        "S:OPEN": "unseal payload", "T:AFTER": "after condition",
+        "T:BEFORE": "before deadline", "T:UNTIL": "until condition",
+        "U:APPROVE": "human approval", "U:CONFIRM": "human confirm",
+        "U:FEEDBACK": "human feedback", "U:REVIEW": "human review",
+        "U:DELEGATE": "delegate human", "V:COURSE": "course ground",
+        "V:ETA": "arrival time", "V:ETD": "departure time",
+        "V:PORT": "port of call", "V:SPEED": "speed ground",
+        "V:MMSI": "vessel MMSI", "W:TAF": "terminal forecast",
+        "Y:FETCH": "retrieve key", "Y:FORGET": "delete memory",
+        "Y:PAGE": "page out mem", "Y:PROMOTE": "working to LT",
+        "Y:RECALL": "episodic recall", "Y:RETRIEVE": "retrieve LCS",
+        "Y:SUMM": "compress memory", "Y:SYNC": "sync peer mem",
+        "Z:TOPP": "top-p sampling", "Z:TOPK": "top-k sampling",
+    }
+
+    def _abbrev(ns, op, defn):
+        key = f"{ns}:{op}"
+        if key in _DEF_OVERRIDES:
+            return _DEF_OVERRIDES[key]
+        d = defn.replace("_", " ")
+        words = d.split()
+        return " ".join(words[:2]) if len(words) > 2 else d
+
     ns_lines = []
     for ns, ops in sorted(asd._data.items()):
-        ns_lines.append(f"  {ns}: {', '.join(sorted(ops.keys())[:6])}{'...' if len(ops) > 6 else ''}")
+        parts = [f"{op}({_abbrev(ns, op, defn)})" for op, defn in sorted(ops.items())]
+        ns_lines.append(f"  {ns}: {' '.join(parts)}")
 
     opcode_count = sum(len(ops) for ops in asd._data.values())
     namespace_count = len(asd._data)
