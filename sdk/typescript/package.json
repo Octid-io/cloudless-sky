@@ -17,7 +17,7 @@
   },
   "author": "Clay Holberg <clay@octid.io>",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/octid/cloudless-sky",
+  "homepage": "https://github.com/octid-io/cloudless-sky",
   "engines": {
     "node": ">=18.0.0"
   },
