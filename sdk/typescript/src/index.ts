@@ -3,6 +3,8 @@
  * Patent: OSMP-001-UTIL (pending) | License: Apache 2.0
  */
 export { AdaptiveSharedDictionary } from "./asd.js";
+export { validateComposition } from "./validate.js";
+export type { CompositionIssue, CompositionResult } from "./validate.js";
 export { OSMPEncoder } from "./encoder.js";
 export { OSMPDecoder } from "./decoder.js";
 export { OverflowProtocol, packFragment, unpackFragment, isTerminal, isCritical } from "./overflow.js";

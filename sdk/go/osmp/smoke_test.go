@@ -6,9 +6,10 @@ import (
 )
 
 func TestCanonicalOpcodeNames(t *testing.T) {
-	// Verify opcodes match canonical dictionary v12
+	// Verify opcodes match canonical dictionary v13
 	asd := osmp.NewASD()
 	cases := []struct{ ns, op, want string }{
+		{"A","MACRO","registered_macro_invocation"},
 		{"Z","INF","invoke_inference"},          // was Z:INFER in prior drift
 		{"V","HDG","heading"},                    // was V:HDNG
 		{"V","ROUTE","routing_instruction"},      // was V:ROUT
@@ -143,4 +144,59 @@ func TestConformanceBenchmark(t *testing.T) {
 	if err != nil { t.Fatalf("benchmark error: %v", err) }
 	if !report.Conformant { t.Errorf("non-conformant: mean=%.1f%%", report.MeanReductionPct) }
 	if report.MeanReductionPct < 60.0 { t.Errorf("mean %.1f%% < 60%%", report.MeanReductionPct) }
+}
+
+func TestValidateCompositionValid(t *testing.T) {
+	r := osmp.ValidateComposition("H:HR[130]→H:ALERT", "Alert if heart rate exceeds 130", nil, true)
+	if !r.Valid { t.Errorf("expected valid, got errors: %v", r.Errors()) }
+}
+
+func TestValidateCompositionHallucination(t *testing.T) {
+	r := osmp.ValidateComposition("H:FAKE→H:ALERT", "", nil, true)
+	if r.Valid { t.Error("expected invalid for hallucinated opcode") }
+	found := false
+	for _, e := range r.Errors() { if e.Rule == "HALLUCINATED_OPCODE" { found = true } }
+	if !found { t.Error("expected HALLUCINATED_OPCODE error") }
+}
+
+func TestValidateCompositionNamespaceAsTarget(t *testing.T) {
+	r := osmp.ValidateComposition("H:CASREP@H:ICD[J083]", "", nil, true)
+	if r.Valid { t.Error("expected invalid for namespace-as-target") }
+	found := false
+	for _, e := range r.Errors() { if e.Rule == "NAMESPACE_AS_TARGET" { found = true } }
+	if !found { t.Error("expected NAMESPACE_AS_TARGET error") }
+}
+
+func TestValidateCompositionMissingConsequenceClass(t *testing.T) {
+	r := osmp.ValidateComposition("R:MOV@BOT1", "", nil, true)
+	if r.Valid { t.Error("expected invalid for missing consequence class") }
+	found := false
+	for _, e := range r.Errors() { if e.Rule == "CONSEQUENCE_CLASS_OMISSION" { found = true } }
+	if !found { t.Error("expected CONSEQUENCE_CLASS_OMISSION error") }
+}
+
+func TestValidateCompositionMissingAuthorization(t *testing.T) {
+	r := osmp.ValidateComposition("R:MOV@BOT1⚠", "", nil, true)
+	if r.Valid { t.Error("expected invalid for missing I:§ before ⚠") }
+	found := false
+	for _, e := range r.Errors() { if e.Rule == "AUTHORIZATION_OMISSION" { found = true } }
+	if !found { t.Error("expected AUTHORIZATION_OMISSION error") }
+}
+
+func TestValidateCompositionESTOPExempt(t *testing.T) {
+	r := osmp.ValidateComposition("R:ESTOP@*", "", nil, true)
+	if !r.Valid { t.Errorf("R:ESTOP should be exempt from consequence class, got: %v", r.Errors()) }
+}
+
+func TestValidateCompositionSlash(t *testing.T) {
+	r := osmp.ValidateComposition("H:HR/H:ALERT", "", nil, true)
+	if r.Valid { t.Error("expected invalid for slash operator") }
+	found := false
+	for _, e := range r.Errors() { if e.Rule == "SLASH_OPERATOR" { found = true } }
+	if !found { t.Error("expected SLASH_OPERATOR error") }
+}
+
+func TestValidateCompositionSafetyChainValid(t *testing.T) {
+	r := osmp.ValidateComposition("I:§→R:WPT[35.7,-122.4]⚠", "Navigate drone to coordinates", nil, true)
+	if !r.Valid { t.Errorf("expected valid safety chain, got: %v", r.Errors()) }
 }
