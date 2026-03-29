@@ -58,7 +58,7 @@ Example: `H:TRIAGE?I` (10 bytes) encodes "triage classification: immediate." The
 
 ### 2.2 Adaptive Shared Dictionary (ASD)
 
-The ASD is the shared reference enabling positional encoding without self-description. It contains 341 opcodes across 26 namespaces, drawn from authoritative domain standards (ICD-10, ISO 20022, MITRE ATT&CK, IEEE 1451, RFC 5424, FIPS 140-3, and others). Three MDR corpora extend the ASD with 124,215 resolvable domain codes.
+The ASD is the shared reference enabling positional encoding without self-description. It contains 342 opcodes across 26 namespaces, drawn from authoritative domain standards (ICD-10, ISO 20022, MITRE ATT&CK, IEEE 1451, RFC 5424, FIPS 140-3, and others). Three MDR corpora extend the ASD with 124,215 resolvable domain codes.
 
 Both sender and receiver must possess the ASD. This is architecturally analogous to protobuf's requirement for compiled .proto schemas at both endpoints, and to MCP's tools/list schema discovery step. The ASD shifts schema from per-message to per-session. Unlike protobuf schemas, the ASD also provides semantic vocabulary compression: opcode names replace natural language descriptions.
 
@@ -523,7 +523,7 @@ The governance model (who approves dictionary changes) remains unquantified and 
 
 ### 10.6 Semantic Loss from Constrained Opcode Inventories (Verdict: Valid)
 
-341 opcodes across 26 namespaces cannot express every possible agent instruction. If the instruction domain falls outside the ASD vocabulary, SAL cannot encode it without sovereign extension (the Omega namespace) or MDR registration. Deterministic decode is not semantic adequacy: an exact decode of a limited vocabulary may lose nuance present in the original natural language instruction.
+342 opcodes across 26 namespaces cannot express every possible agent instruction. If the instruction domain falls outside the ASD vocabulary, SAL cannot encode it without sovereign extension (the Omega namespace) or MDR registration. Deterministic decode is not semantic adequacy: an exact decode of a limited vocabulary may lose nuance present in the original natural language instruction.
 
 ### 10.7 Content Compression Conflated with Grammar Compression (Verdict: Addressed in Methodology)
 
