@@ -302,7 +302,7 @@ Wanted: C++ firmware-level encoder/decoder (ESP32/nRF52 sovereign nodes), Kotlin
 
 ## Patent Notice
 
-The OSMP architecture is covered by pending US patent application OSMP-001-UTIL (inventor: Clay Holberg, priority date March 17, 2026). A continuation-in-part (OSMP-001-CIP) extends coverage to cloud-scale AI orchestration, non-RF channels, and the AI-native namespace architecture. Apache 2.0 includes an express patent grant for implementations of this specification. See [`PATENT-NOTICE.md`](PATENT-NOTICE.md).
+Patent pending. Priority date March 17, 2026. Apache 2.0 includes an express patent grant for implementations of this specification. See [`PATENT-NOTICE.md`](PATENT-NOTICE.md).
 
 ---
 
