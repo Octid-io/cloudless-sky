@@ -409,6 +409,163 @@ def osmp_validate(sal: str, nl_input: str = "") -> str:
     }, indent=2, ensure_ascii=False)
 
 
+# -- Bridge ---------------------------------------------------------------
+# Singleton bridge instance, lazily initialized.
+_bridge = None
+
+
+def _get_bridge() -> "SALBridge":
+    global _bridge
+    if _bridge is None:
+        from osmp.bridge import SALBridge
+        _bridge = SALBridge("OSMP-MCP-BRIDGE")
+    return _bridge
+
+
+@mcp.tool()
+def osmp_bridge_register(
+    peer_id: str,
+    attempt_fnp: bool = False,
+) -> str:
+    """Register a non-OSMP peer with the SAL bridge.
+
+    The bridge manages translation between SAL and natural language
+    at the boundary. Non-OSMP peers receive NL with SAL annotations
+    that seed their context window. Over time, peers may acquire SAL
+    through exposure.
+
+    Example: osmp_bridge_register(peer_id="GPT_AGENT_1")
+    """
+    bridge = _get_bridge()
+    state = bridge.register_peer(peer_id, attempt_fnp=attempt_fnp)
+    return json.dumps({
+        "peer_id": peer_id,
+        "state": state,
+        "annotate": bridge.annotate,
+        "detail": "Peer registered. Use osmp_bridge_send to send SAL through the bridge.",
+    }, indent=2)
+
+
+@mcp.tool()
+def osmp_bridge_send(
+    sal: str,
+    peer_id: str,
+) -> str:
+    """Send a SAL instruction through the bridge to a peer.
+
+    - ESTABLISHED/ACQUIRED peers receive SAL directly.
+    - FALLBACK peers receive NL decoded from SAL, annotated with the
+      SAL equivalent for context seeding.
+
+    Returns the translated message ready for transmission.
+
+    Example: osmp_bridge_send(sal="H:HR@NODE1>120;H:CASREP", peer_id="GPT_AGENT_1")
+    """
+    bridge = _get_bridge()
+    translated = bridge.send(sal, peer_id)
+    state = bridge.peer_state(peer_id)
+    sal_bytes = len(sal.encode("utf-8"))
+    translated_bytes = len(translated.encode("utf-8"))
+    return json.dumps({
+        "peer_id": peer_id,
+        "state": state,
+        "original_sal": sal,
+        "original_bytes": sal_bytes,
+        "translated": translated,
+        "translated_bytes": translated_bytes,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def osmp_bridge_receive(
+    message: str,
+    peer_id: str,
+) -> str:
+    """Process an inbound message from a peer through the bridge.
+
+    Scans for valid SAL fragments in the message. Updates acquisition
+    metrics. Handles FALLBACK -> ACQUIRED and ACQUIRED -> FALLBACK
+    transitions automatically.
+
+    Example: osmp_bridge_receive(message="A:ACK;M:EVA@MED", peer_id="GPT_AGENT_1")
+    """
+    from osmp.bridge import BridgeInbound
+    bridge = _get_bridge()
+    result = bridge.receive(message, peer_id)
+    metrics = bridge.get_metrics(peer_id)
+    return json.dumps({
+        "peer_id": result.peer_id,
+        "state": result.state,
+        "passthrough": result.passthrough,
+        "sal": result.sal,
+        "nl": result.nl,
+        "detected_frames": result.detected_frames,
+        "acquisition_score": round(metrics.acquisition_score, 2) if metrics else 0,
+        "consecutive_hits": metrics.consecutive_sal_hits if metrics else 0,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def osmp_bridge_status(peer_id: str = "") -> str:
+    """Get bridge status and acquisition metrics.
+
+    If peer_id is provided, returns metrics for that peer.
+    If empty, returns summary across all peers.
+
+    Example: osmp_bridge_status(peer_id="GPT_AGENT_1")
+    """
+    bridge = _get_bridge()
+    if not peer_id:
+        return json.dumps(bridge.summary(), indent=2, ensure_ascii=False)
+
+    metrics = bridge.get_metrics(peer_id)
+    state = bridge.peer_state(peer_id)
+    if metrics is None:
+        return json.dumps({"error": f"No peer registered with id '{peer_id}'"}, indent=2)
+
+    return json.dumps({
+        "peer_id": peer_id,
+        "state": state,
+        "total_messages": metrics.total_messages,
+        "messages_with_sal": metrics.messages_with_sal,
+        "acquisition_score": round(metrics.acquisition_score, 2),
+        "consecutive_hits": metrics.consecutive_sal_hits,
+        "consecutive_misses": metrics.consecutive_sal_misses,
+        "peak_consecutive_hits": metrics.peak_consecutive_hits,
+        "unique_opcodes_seen": sorted(metrics.unique_opcodes_seen),
+        "valid_frames_seen": metrics.valid_frames_seen,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def osmp_bridge_comparison(peer_id: str) -> str:
+    """Get side-by-side SAL vs NL byte comparison for all bridged messages to a peer.
+
+    This is the measurement data for efficiency analysis. Each entry shows
+    the SAL encoding, the NL equivalent, byte counts, and reduction percentage.
+
+    Example: osmp_bridge_comparison(peer_id="GPT_AGENT_1")
+    """
+    bridge = _get_bridge()
+    comparisons = bridge.get_comparison(peer_id)
+    if not comparisons:
+        return json.dumps({"peer_id": peer_id, "comparisons": [],
+                           "note": "No annotated messages recorded yet."}, indent=2)
+
+    total_sal = sum(c["sal_bytes"] for c in comparisons)
+    total_nl = sum(c["nl_bytes"] for c in comparisons)
+    avg_reduction = (1 - total_sal / total_nl) * 100 if total_nl > 0 else 0
+
+    return json.dumps({
+        "peer_id": peer_id,
+        "message_count": len(comparisons),
+        "total_sal_bytes": total_sal,
+        "total_nl_bytes": total_nl,
+        "aggregate_reduction_pct": round(avg_reduction, 1),
+        "comparisons": comparisons,
+    }, indent=2, ensure_ascii=False)
+
+
 # -- Resources ------------------------------------------------------------
 
 @mcp.resource("osmp://system_prompt")

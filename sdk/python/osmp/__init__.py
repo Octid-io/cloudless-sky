@@ -143,4 +143,20 @@ def byte_size(sal: str) -> int:
 
 
 # Version
-__version__ = "2.0.0"
+__version__ = "2.0.1"
+
+
+# Bridge — lazy import to avoid loading protocol.py until needed
+def bridge(node_id: str, **kwargs):
+    """Create a SALBridge instance for boundary translation.
+
+    OSMP spreads by contact, not installation.
+
+        from osmp import bridge
+        b = bridge("MY_NODE")
+        b.register_peer("GPT_AGENT")
+        out = b.send("H:HR@NODE1>120", "GPT_AGENT")
+        inb = b.receive("acknowledged", "GPT_AGENT")
+    """
+    from osmp.bridge import SALBridge
+    return SALBridge(node_id, **kwargs)

@@ -62,10 +62,12 @@ const nsLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 type FNPState string
 
 const (
-	FNPStateIdle       FNPState = "IDLE"
-	FNPStateADVSent    FNPState = "ADV_SENT"
+	FNPStateIdle        FNPState = "IDLE"
+	FNPStateADVSent     FNPState = "ADV_SENT"
 	FNPStateEstablished FNPState = "ESTABLISHED"
-	FNPStateSyncNeeded FNPState = "SYNC_NEEDED"
+	FNPStateSyncNeeded  FNPState = "SYNC_NEEDED"
+	FNPStateFallback    FNPState = "FALLBACK"
+	FNPStateAcquired    FNPState = "ACQUIRED"
 )
 
 // FNPSession manages the two-message handshake between sovereign nodes.
@@ -362,4 +364,50 @@ func (s *FNPSession) Timeout() {
 		s.MatchStatus = -1
 		s.NegotiatedCapacity = -1
 	}
+}
+
+// Fallback transitions to FALLBACK when the remote peer does not speak OSMP.
+//
+// Called when:
+//   - ADV was sent but the response is not a valid FNP packet
+//   - The transport is known to be non-OSMP (e.g., plain JSON-RPC, NL)
+//   - Timeout occurred during negotiation attempt with a new peer
+//
+// Transitions: ADV_SENT -> FALLBACK, or IDLE -> FALLBACK (direct).
+func (s *FNPSession) Fallback(remoteID string) {
+	if s.State == FNPStateADVSent || s.State == FNPStateIdle {
+		s.State = FNPStateFallback
+		s.RemoteNodeID = remoteID
+		s.RemoteFingerprint = nil
+		s.CommonNamespaces = []string{}
+		s.MatchStatus = -1
+		s.NegotiatedCapacity = -1
+	}
+}
+
+// Acquire transitions to ACQUIRED when the remote peer starts producing valid SAL.
+// Called by SALBridge when the acquisition score exceeds threshold.
+// Transitions: FALLBACK -> ACQUIRED.
+func (s *FNPSession) Acquire() {
+	if s.State == FNPStateFallback {
+		s.State = FNPStateAcquired
+	}
+}
+
+// Regress transitions back to FALLBACK when an ACQUIRED peer stops producing valid SAL.
+// Transitions: ACQUIRED -> FALLBACK.
+func (s *FNPSession) Regress() {
+	if s.State == FNPStateAcquired {
+		s.State = FNPStateFallback
+	}
+}
+
+// IsLegacyPeer returns true if the session is in FALLBACK or ACQUIRED state.
+func (s *FNPSession) IsLegacyPeer() bool {
+	return s.State == FNPStateFallback || s.State == FNPStateAcquired
+}
+
+// IsAcquired returns true if the session is in ACQUIRED state.
+func (s *FNPSession) IsAcquired() bool {
+	return s.State == FNPStateAcquired
 }

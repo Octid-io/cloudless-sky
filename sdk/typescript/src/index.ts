@@ -152,3 +152,5 @@ export { ADPSession, asdVersionPack, asdVersionUnpack, asdVersionStr,
          ADP_PRIORITY_MISSION, ADP_PRIORITY_MICRO,
          ADP_PRIORITY_DELTA, ADP_PRIORITY_TRICKLE } from "./adp.js";
 export type { ADPDeltaOp, ADPDelta, PendingInstruction } from "./adp.js";
+export { SALBridge } from "./bridge.js";
+export type { AcquisitionMetrics, BridgeEvent, BridgeInbound, BridgeSummary } from "./bridge.js";

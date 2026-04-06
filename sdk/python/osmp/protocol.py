@@ -969,6 +969,60 @@ class FNPSession:
             self.match_status = None
             self.negotiated_capacity = None
 
+    def fallback(self, remote_id: str = "UNKNOWN") -> None:
+        """Transition to FALLBACK when the remote peer does not speak OSMP.
+
+        Called when:
+        - ADV was sent but the response is not a valid FNP packet
+        - The transport is known to be non-OSMP (e.g., plain JSON-RPC, NL)
+        - Timeout occurred during negotiation attempt with a new peer
+
+        Transitions: ADV_SENT -> FALLBACK, or IDLE -> FALLBACK (direct).
+
+        The FALLBACK state means: this peer exists, we can talk to it,
+        but it does not speak SAL. Outbound messages must be decoded to
+        natural language at the boundary. Inbound messages are tagged
+        NL_PASSTHROUGH.
+        """
+        if self.state in ("ADV_SENT", "IDLE"):
+            self.state = "FALLBACK"
+            self.remote_node_id = remote_id
+            self.remote_fingerprint = None
+            self.common_namespaces = []
+            self.match_status = None
+            self.negotiated_capacity = None
+
+    def acquire(self) -> None:
+        """Transition to ACQUIRED when the remote peer starts producing valid SAL.
+
+        Called by SALBridge when the acquisition score exceeds threshold.
+        The peer has learned SAL through contextual exposure and is now
+        producing parseable SAL fragments in its responses.
+
+        Transitions: FALLBACK -> ACQUIRED.
+        """
+        if self.state == "FALLBACK":
+            self.state = "ACQUIRED"
+
+    def regress(self) -> None:
+        """Transition back to FALLBACK when an ACQUIRED peer stops producing valid SAL.
+
+        LLMs are stochastic. Context windows rotate. System prompts change.
+        An acquired peer may regress at any time.
+
+        Transitions: ACQUIRED -> FALLBACK.
+        """
+        if self.state == "ACQUIRED":
+            self.state = "FALLBACK"
+
+    def is_legacy_peer(self) -> bool:
+        """True if this session is in FALLBACK or ACQUIRED state (non-native OSMP)."""
+        return self.state in ("FALLBACK", "ACQUIRED")
+
+    def is_acquired(self) -> bool:
+        """True if this session is in ACQUIRED state (peer learned SAL through exposure)."""
+        return self.state == "ACQUIRED"
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ASD VERSION MAPPING — u16 wire format interpreted as u8.u8 (MAJOR.MINOR)

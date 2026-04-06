@@ -44,7 +44,7 @@ const NS_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 // ── types ───────────────────────────────────────────────────────────
 
-export type FNPState = "IDLE" | "ADV_SENT" | "ESTABLISHED" | "SYNC_NEEDED";
+export type FNPState = "IDLE" | "ADV_SENT" | "ESTABLISHED" | "SYNC_NEEDED" | "FALLBACK" | "ACQUIRED";
 
 export interface FNPSessionInfo {
   state: FNPState;
@@ -305,5 +305,57 @@ export class FNPSession {
       this.matchStatus = null;
       this.negotiatedCapacity = null;
     }
+  }
+
+  /**
+   * Transition to FALLBACK when the remote peer does not speak OSMP.
+   *
+   * Called when:
+   * - ADV was sent but the response is not a valid FNP packet
+   * - The transport is known to be non-OSMP (e.g., plain JSON-RPC, NL)
+   * - Timeout occurred during negotiation attempt with a new peer
+   *
+   * Transitions: ADV_SENT -> FALLBACK, or IDLE -> FALLBACK (direct).
+   */
+  fallback(remoteId: string = "UNKNOWN"): void {
+    if (this.state === "ADV_SENT" || this.state === "IDLE") {
+      this.state = "FALLBACK";
+      this.remoteNodeId = remoteId;
+      this.remoteFingerprint = null;
+      this.commonNamespaces = [];
+      this.matchStatus = null;
+      this.negotiatedCapacity = null;
+    }
+  }
+
+  /**
+   * Transition to ACQUIRED when the remote peer starts producing valid SAL.
+   * Called by SALBridge when the acquisition score exceeds threshold.
+   * Transitions: FALLBACK -> ACQUIRED.
+   */
+  acquire(): void {
+    if (this.state === "FALLBACK") {
+      this.state = "ACQUIRED";
+    }
+  }
+
+  /**
+   * Transition back to FALLBACK when an ACQUIRED peer stops producing valid SAL.
+   * Transitions: ACQUIRED -> FALLBACK.
+   */
+  regress(): void {
+    if (this.state === "ACQUIRED") {
+      this.state = "FALLBACK";
+    }
+  }
+
+  /** True if this session is in FALLBACK or ACQUIRED state. */
+  isLegacyPeer(): boolean {
+    return this.state === "FALLBACK" || this.state === "ACQUIRED";
+  }
+
+  /** True if this session is in ACQUIRED state. */
+  isAcquired(): boolean {
+    return this.state === "ACQUIRED";
   }
 }
