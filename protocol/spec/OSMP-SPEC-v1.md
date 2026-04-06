@@ -12,7 +12,7 @@
 
 The Octid Semantic Mesh Protocol (OSMP) is a bandwidth-agnostic application-layer wire protocol for semantic instruction encoding in agentic AI systems. OSMP enables AI-to-AI and human-to-AI instruction exchange across any communication channel — from 51-byte LoRa radio payloads to high-bandwidth cloud infrastructure — using a composable domain-specific symbolic instruction format (Semantic Assembly Language, or SAL), an adaptive shared compression dictionary (Adaptive Shared Dictionary, or ASD), and a capability negotiation and session handshake protocol (Frame Negotiation Protocol, or FNP).
 
-OSMP achieves mean 60.8% UTF-8 byte reduction relative to natural language equivalents across the 55-vector canonical test suite (range varies by instruction complexity; up to 82.1% on short imperative instructions). Decode is a table lookup operation requiring no neural inference at the receiving node. Any device capable of string processing can participate as a sovereign OSMP node.
+OSMP achieves 86.8% byte reduction versus minified JSON, 84.5% versus MessagePack, and 70.5% versus compiled Protocol Buffers on the 29-vector wire-format benchmark suite drawn from MCP, OpenAI, Google A2A, CrewAI, and AutoGen message formats. Decode is a table lookup operation requiring no neural inference at the receiving node. Any device capable of string processing can participate as a sovereign OSMP node.
 
 ---
 
@@ -99,7 +99,7 @@ Glyph operators are single Unicode characters with formal logical equivalences. 
 
 ### 3.4 Compression Properties
 
-TCL glyph substitution alone reduces character count 5-25% depending on instruction type prior to opcode encoding. Combined with full OSMP encoding: **mean 60.8% UTF-8 byte reduction** across the 55-vector canonical test suite (range 0.0% to 82.1%). On the 20 representative instruction types in the provisional filing Datasets A-D (longer, more complex instructions averaging 115 bytes NL), the range is 68.3%-87.5%.
+TCL glyph substitution alone reduces character count 5-25% depending on instruction type prior to opcode encoding. On the 29-vector wire-format benchmark suite (real-world messages from MCP, OpenAI, Google A2A, CrewAI, and AutoGen): **86.8% byte reduction versus minified JSON**, 84.5% versus MessagePack, and 70.5% versus compiled Protocol Buffers. The 55-vector conformance test suite measures a mean 60.8% UTF-8 byte reduction relative to natural language equivalents (range 0.0% to 82.1%); this is the conformance threshold (Section 15), not the wire-format performance claim. On the 20 representative instruction types in the provisional filing Datasets A-D (longer, more complex instructions averaging 115 bytes NL), the range is 68.3%-87.5%.
 
 Measurement basis: UTF-8 byte count (`len(s.encode('utf-8'))` in Python). All numbers are independently reproducible by running the benchmark against the canonical test vectors.
 
@@ -817,7 +817,7 @@ The complete composition doctrine, including the six-step decision tree, namespa
 |---|---|---|
 | UTF-8 compression range (provisional) | 68.3% -- 87.5% | 20 instruction types in provisional filing Datasets A-D |
 | UTF-8 compression range (55-vector suite) | 0.0% -- 82.1% | 55 canonical test vectors, full range |
-| Mean UTF-8 reduction (55-vector suite) | 60.8% | Conformance benchmark, independently reproducible |
+| Mean UTF-8 reduction (55-vector suite) | 60.8% | Conformance threshold (Section 15), not wire-format claim |
 | Token compression range | 55.2% -- 79.2% | cl100k approximation, provisional Datasets A-D |
 | LoRa floor | 51 bytes | SF12 BW125kHz maximum-range spreading factor |
 | Standard deployment | 255 bytes | SF11 BW250kHz / Meshtastic LongFast |
