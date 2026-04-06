@@ -1,9 +1,9 @@
-// Package osmpwire implements OSMP wire modes: SAIL (Semantic Assembly Isomorphic Language)
+// Package osmp implements OSMP wire modes: SAIL (Semantic Assembly Isomorphic Language)
 // and SEC (Security Envelope) for the Octid Semantic Mesh Protocol.
 //
 // Zero external dependencies. Compiles into a binary.
 // Dictionary: OSMP-semantic-dictionary-v14.csv
-package osmpwire
+package osmp
 
 import (
 	"crypto/hmac"

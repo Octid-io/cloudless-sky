@@ -129,7 +129,7 @@ process.stdout.write(JSON.stringify(results));
 GO_RUNNER = '''package main
 import (
 \t"encoding/json"; "fmt"; "os"
-\t"github.com/octid/cloudless-sky/sdk/go/osmp"
+\t"github.com/octid-io/cloudless-sky/sdk/go/osmp"
 )
 type R struct {
 \tNamespace,Opcode,OpcodeMeaning,Target,QuerySlot string
@@ -168,11 +168,18 @@ def decode_ts_batch(encoded_list):
 
 def decode_go_batch(encoded_list):
     runner_dir = "/tmp/osmp_go_runner"
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     os.makedirs(runner_dir, exist_ok=True)
     with open(f"{runner_dir}/main.go","w") as f: f.write(GO_RUNNER)
-    result = subprocess.run(["go","run",f"{runner_dir}/main.go", json.dumps(encoded_list)],
-                            capture_output=True, text=True,
-                            cwd="/home/claude/cloudless-sky/sdk/go")
+    with open(f"{runner_dir}/go.mod","w") as f:
+        f.write(f"module osmp_runner\n\ngo 1.22.2\n\n"
+                f"require github.com/octid-io/cloudless-sky/sdk/go v0.0.0\n\n"
+                f"replace github.com/octid-io/cloudless-sky/sdk/go => {repo_root}/sdk/go\n")
+    subprocess.run(["go","mod","tidy"], capture_output=True, text=True, cwd=runner_dir,
+                   env={**os.environ, "GOPROXY":"direct", "GONOSUMCHECK":"*"})
+    result = subprocess.run(["go","run","main.go", json.dumps(encoded_list)],
+                            capture_output=True, text=True, cwd=runner_dir,
+                            env={**os.environ, "GOPROXY":"direct", "GONOSUMCHECK":"*"})
     if result.returncode != 0: raise RuntimeError(f"Go runner failed: {result.stderr[:200]}")
     return json.loads(result.stdout)
 

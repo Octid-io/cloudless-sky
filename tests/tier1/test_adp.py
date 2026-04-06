@@ -108,8 +108,8 @@ class TestADPOpcodes:
         assert asd.lookup("K", "PAY") == "payment_execution"
 
     def test_a_namespace_count(self):
-        """A namespace should now have 21 opcodes (19 + ASD + MDR)."""
-        assert len(ASD_BASIS["A"]) == 21
+        """A namespace should now have 22 opcodes (19 + ASD + MDR + MACRO)."""
+        assert len(ASD_BASIS["A"]) == 22
 
     def test_all_26_namespaces_still_present(self):
         assert set(ASD_BASIS.keys()) == set("ABCDEFGHIJKLMNOPQRSTUVWXYZ")

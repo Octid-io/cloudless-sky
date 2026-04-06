@@ -113,7 +113,7 @@ type SALBridge struct {
 // NewSALBridge creates a new bridge instance.
 func NewSALBridge(nodeID string, asd *AdaptiveSharedDictionary, annotate bool) *SALBridge {
 	if asd == nil {
-		asd = NewAdaptiveSharedDictionary("")
+		asd = NewASD()
 	}
 	return &SALBridge{
 		NodeID:               nodeID,

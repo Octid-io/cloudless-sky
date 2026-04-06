@@ -83,7 +83,7 @@ class TestTier1DX:
 
     def test_version(self):
         from osmp import __version__
-        assert __version__ == "2.0.0"
+        assert __version__ == "2.0.1"
 
     def test_tier2_class_api(self):
         """Tier 2: class-based, same results."""

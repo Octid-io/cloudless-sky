@@ -1,0 +1,115 @@
+{
+  "vector_count": 10,
+  "total_source_bytes": 1248,
+  "total_sal_bytes": 252,
+  "mean_byte_reduction_pct": 79.8,
+  "lora_fit_count": 10,
+  "multi_hop_token_savings": {
+    "at_2_hops": "50.0%",
+    "at_5_hops": "80.0%",
+    "at_10_hops": "90.0%",
+    "at_50_hops": "98.0%"
+  },
+  "vectors": [
+    {
+      "id": "MH-01",
+      "source_bytes": 114,
+      "sal_bytes": 13,
+      "byte_reduction_pct": 88.6,
+      "source_tokens": 28,
+      "sal_tokens": 3,
+      "token_reduction_pct": 89.3,
+      "fits_lora_51": true
+    },
+    {
+      "id": "MH-02",
+      "source_bytes": 100,
+      "sal_bytes": 35,
+      "byte_reduction_pct": 65.0,
+      "source_tokens": 25,
+      "sal_tokens": 7,
+      "token_reduction_pct": 72.0,
+      "fits_lora_51": true
+    },
+    {
+      "id": "MH-03",
+      "source_bytes": 127,
+      "sal_bytes": 32,
+      "byte_reduction_pct": 74.8,
+      "source_tokens": 31,
+      "sal_tokens": 7,
+      "token_reduction_pct": 77.4,
+      "fits_lora_51": true
+    },
+    {
+      "id": "MH-04",
+      "source_bytes": 69,
+      "sal_bytes": 21,
+      "byte_reduction_pct": 69.6,
+      "source_tokens": 17,
+      "sal_tokens": 4,
+      "token_reduction_pct": 76.5,
+      "fits_lora_51": true
+    },
+    {
+      "id": "MH-05",
+      "source_bytes": 167,
+      "sal_bytes": 33,
+      "byte_reduction_pct": 80.2,
+      "source_tokens": 41,
+      "sal_tokens": 8,
+      "token_reduction_pct": 80.5,
+      "fits_lora_51": true
+    },
+    {
+      "id": "MH-06",
+      "source_bytes": 176,
+      "sal_bytes": 44,
+      "byte_reduction_pct": 75.0,
+      "source_tokens": 44,
+      "sal_tokens": 10,
+      "token_reduction_pct": 77.3,
+      "fits_lora_51": true
+    },
+    {
+      "id": "MH-07",
+      "source_bytes": 135,
+      "sal_bytes": 29,
+      "byte_reduction_pct": 78.5,
+      "source_tokens": 33,
+      "sal_tokens": 7,
+      "token_reduction_pct": 78.8,
+      "fits_lora_51": true
+    },
+    {
+      "id": "MH-08",
+      "source_bytes": 95,
+      "sal_bytes": 7,
+      "byte_reduction_pct": 92.6,
+      "source_tokens": 23,
+      "sal_tokens": 1,
+      "token_reduction_pct": 95.7,
+      "fits_lora_51": true
+    },
+    {
+      "id": "MH-09",
+      "source_bytes": 134,
+      "sal_bytes": 16,
+      "byte_reduction_pct": 88.1,
+      "source_tokens": 33,
+      "sal_tokens": 4,
+      "token_reduction_pct": 87.9,
+      "fits_lora_51": true
+    },
+    {
+      "id": "MH-10",
+      "source_bytes": 131,
+      "sal_bytes": 22,
+      "byte_reduction_pct": 83.2,
+      "source_tokens": 32,
+      "sal_tokens": 4,
+      "token_reduction_pct": 87.5,
+      "fits_lora_51": true
+    }
+  ]
+}
