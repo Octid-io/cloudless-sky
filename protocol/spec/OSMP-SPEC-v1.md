@@ -32,18 +32,20 @@ OSMP achieves mean 60.8% UTF-8 byte reduction relative to natural language equiv
 
 ## 2. Architecture Overview
 
-OSMP comprises eight components:
+OSMP comprises ten components:
 
 | Component | Full Name | Function |
 |---|---|---|
-| SAL | Semantic Assembly Language | Domain-specific symbolic instruction format |
-| ASD | Adaptive Shared Dictionary | Adaptive shared compression dictionary |
-| FNP | Frame Negotiation Protocol | Capability negotiation and session handshake |
 | ADP | ASD Distribution Protocol | Dictionary delta synchronization across nodes |
+| ASD | Adaptive Shared Dictionary | Adaptive shared compression dictionary |
+| BAEL | Bandwidth-Agnostic Efficiency Layer | Adaptive encoding layer adjusting compression parameters based on negotiated channel capacity |
+| FNP | Frame Negotiation Protocol | Capability negotiation, session handshake, and boundary detection for non-OSMP peers |
+| OP | Overflow Protocol | Message fragmentation, priority, and graceful degradation |
+| SAIL | Semantic Assembly Isomorphic Language | Binary wire encoding, isomorphic to SAL |
+| SAL | Semantic Assembly Language | Human-readable symbolic instruction format |
+| SEC | Security Envelope | AEAD + Ed25519 mesh authentication without certificate authority |
 | SNA | Sovereign Node Architecture | Autonomous edge node architecture |
 | TCL | Translational Compression Layer | Semantic serialization and transcoding layer |
-| OP | Overflow Protocol | Message fragmentation, priority, and graceful degradation |
-| BAEL | Bandwidth-Agnostic Efficiency Layer | Adaptive encoding layer adjusting compression parameters based on negotiated channel capacity |
 
 ---
 
@@ -126,6 +128,25 @@ The OSMP glyph system comprises six functionally distinct symbol categories. Cat
 + (U+002B, ADDITIVE -- append entry, preserve prior), ← (U+2190, REPLACE -- supersede and retire prior, mandatory retransmit), † (U+2020, DEPRECATE -- mark retired, preserve backward compatibility). Used exclusively in dictionary delta payload mode fields. REPLACE operations require mandatory FLAGS[C] (criticality override) to ensure retransmit-on-loss; graceful degradation is not permitted for dictionary replacement operations.
 
 ---
+
+### 3.6 SAIL (Semantic Assembly Isomorphic Language)
+
+SAIL is the binary wire encoding of SAL. Every valid SAL instruction has exactly one SAIL encoding. Every valid SAIL payload decodes to exactly one SAL instruction. The mapping is bijective: no information is lost in either direction.
+
+SAL is the human-readable encoding (Unicode glyphs, inspectable at every hop). SAIL is the binary encoding (opaque bytes, maximum compression for constrained channels). The decode path is encoding-agnostic: whether the wire carries UTF-8 SAL or packed SAIL, the receiving node performs the same dictionary lookup and produces the same decoded instruction.
+
+SAIL encoding operates on the SAL instruction structure:
+
+1. Each namespace prefix (A-Z) encodes to a single byte (0x41-0x5A).
+2. Each opcode encodes to a 2-byte value: the namespace byte followed by a dictionary index byte.
+3. Glyph operators encode to single bytes from a fixed operator table.
+4. Target identifiers, slot values, and Layer 2 accessor content encode as length-prefixed UTF-8 strings.
+5. The sequence separator (;) encodes as 0x3B, preserving frame boundaries.
+
+The SAIL codec is shipped in all three SDKs (Python, TypeScript, Go). Round-trip fidelity is verified on all 55 canonical test vectors: SAL to SAIL to SAL produces the identical input string.
+
+The development workflow: compose and debug in SAL (human-readable), deploy in SAIL (binary, maximum compression), decompile the wire payload back to readable SAL for inspection at any point.
+
 
 ## 4. Namespace Architecture
 
@@ -322,6 +343,42 @@ Mode selection is governed by O namespace operational context instructions (`O:C
 
 The NL_PASSTHROUGH mode ensures that very short natural language instructions (e.g., "Stop") are never inflated by encoding overhead. A receiving node checks bit 2 of the FLAGS field; if set, the payload is interpreted as natural language without ASD lookup.
 
+### 8.5 Four-Mode Wire Architecture
+
+BAEL selects the wire encoding and security mode automatically based on two inputs: channel capacity (from FNP negotiation) and instruction consequence class (from the R namespace designator or the deployer's standing configuration).
+
+| Channel | Consequence | Wire Mode |
+|---|---|---|
+| Constrained (LoRa, BLE) | HAZARDOUS/IRREVERSIBLE | SAIL + SEC (binary, signed) |
+| Constrained (LoRa, BLE) | REVERSIBLE | SAIL (binary, unsigned) |
+| Unconstrained (HTTP, WiFi) | HAZARDOUS/IRREVERSIBLE | SAL + SEC (readable, signed) |
+| Unconstrained (HTTP, WiFi) | REVERSIBLE | SAL (readable, unsigned) |
+
+The four modes are the Cartesian product of two encoding formats (SAL, SAIL) and two security modes (unsigned, SEC). BAEL selects the mode per instruction. The receiving node determines the encoding format from the wire content (UTF-8 SAL or binary SAIL) and the security mode from the SEC header presence.
+
+### 8.6 SEC (Security Envelope)
+
+SEC is the authentication wrapper for OSMP instructions transmitted over mesh networks with no certificate authority and no internet connectivity. SEC provides message integrity, sender authentication, and replay protection.
+
+SEC envelope structure (87 bytes fixed overhead):
+
+| Field | Size | Description |
+|---|---|---|
+| sec_version | 1B | SEC format version (0x01) |
+| node_id | 23B | Sender node ID (UTF-8, null-padded, matches FNP node_id field) |
+| sequence | 8B | Monotonic sequence counter (big-endian u64, never reused) |
+| nonce | 12B | AEAD nonce (derived from node_id + sequence) |
+| aead_tag | 16B | AEAD authentication tag (ChaCha20-Poly1305 or AES-256-GCM) |
+| signature | 64B | Ed25519 signature over (sec_version || node_id || sequence || payload) |
+| payload | variable | SAL or SAIL encoded instruction |
+
+The sequence counter provides replay protection. Each node maintains a monotonic counter that increments per transmitted message and never resets. The receiving node tracks the highest sequence number seen from each peer and rejects any message with a sequence number equal to or lower than the recorded maximum.
+
+The Ed25519 signature authenticates the sender without a certificate authority. Nodes exchange public keys during FNP handshake or via out-of-band provisioning. The signature covers the full envelope header and payload, preventing tampering with any field.
+
+SEC is designed for sovereign mesh networks operating without internet connectivity. No certificate authority, no OCSP, no CRL. Trust is established by key exchange during physical provisioning or FNP handshake, not by hierarchical certificate chains.
+
+
 ---
 
 ## 9. Frame Negotiation Protocol (FNP)
@@ -373,15 +430,52 @@ The session byte budget is the minimum of what both nodes declare. An ESP32 on L
 IDLE -> initiate() -> ADV_SENT
 ADV_SENT -> receive ACK (match) -> ESTABLISHED
 ADV_SENT -> receive ACK (mismatch) -> SYNC_NEEDED
-ADV_SENT -> timeout -> IDLE
+ADV_SENT -> timeout or invalid response -> FALLBACK
+IDLE -> register non-OSMP peer -> FALLBACK
 IDLE -> receive ADV -> send ACK -> ESTABLISHED or SYNC_NEEDED
+FALLBACK -> peer produces valid SAL (acquisition) -> ACQUIRED
+ACQUIRED -> peer stops producing valid SAL (regression) -> FALLBACK
+ACQUIRED -> peer responds to SAL-level negotiation -> ESTABLISHED
 ```
 
-ESTABLISHED: dictionaries match, session active. SYNC_NEEDED: fingerprint or version mismatch detected, delta synchronization required (see section 10).
+**ESTABLISHED:** Dictionaries match, session active. Both nodes speak SAL natively.
+
+**SYNC_NEEDED:** Fingerprint or version mismatch detected, delta synchronization required (see section 10).
+
+**FALLBACK:** The remote peer does not speak OSMP. Entered when FNP negotiation fails (timeout, invalid response, non-FNP packet received) or when a peer is registered as known non-OSMP. In FALLBACK, outbound SAL is decoded to natural language at the boundary. Inbound natural language is tagged NL_PASSTHROUGH (FLAGS bit 2). The SALBridge (Section 9.7) manages the translation.
+
+**ACQUIRED:** The remote peer has learned SAL through contextual exposure and is producing parseable SAL fragments. The bridge detected consistent valid SAL production and transitioned from FALLBACK. In ACQUIRED, outbound messages are sent as pure SAL. Regression detection monitors for consecutive failures; if the peer stops producing valid SAL, the session drops back to FALLBACK.
 
 ### 9.6 Gossip Propagation
 
 Negotiated session parameters propagate to adjacent nodes via gossip protocol, extending vocabulary expansion without per-pair handshake overhead.
+
+### 9.7 SALBridge: Boundary Translation and Language Propagation
+
+The SALBridge is the mechanism by which OSMP propagates across network boundaries without requiring installation on the remote peer. It operates at the FALLBACK/ACQUIRED boundary of the FNP state machine.
+
+**Outbound translation (FALLBACK peers):** The bridge decodes outbound SAL to natural language and appends the original SAL as an annotation:
+
+```
+heart_rate at NODE1 exceeds 120; casualty_report
+[SAL: H:HR@NODE1>120;H:CASREP]
+```
+
+The annotation seeds the remote agent's context window with SAL patterns. The remote agent does not need to understand the annotation. After repeated exposure, LLM-based agents begin producing SAL-like structures in their responses because they mirror patterns in context. This is few-shot prompting through the transport layer.
+
+**Outbound translation (ACQUIRED peers):** The bridge sends pure SAL without annotation.
+
+**Inbound scanning:** Every inbound message from a FALLBACK or ACQUIRED peer is scanned for valid SAL fragments. The bridge validates candidates against the ASD. Consecutive valid SAL messages increment the acquisition score; consecutive natural language messages decrement it.
+
+**Acquisition transition:** When the acquisition score exceeds the threshold (implementation-defined, default 5 consecutive valid SAL messages), the session transitions from FALLBACK to ACQUIRED.
+
+**Regression detection:** LLMs are stochastic. Context windows rotate. System prompts change. An ACQUIRED peer may regress at any time. When consecutive natural language messages exceed the regression threshold (implementation-defined, default 3), the session drops back to FALLBACK and annotation resumes.
+
+**Comparison logging:** Every bridged message records both the SAL byte count and the natural language byte count, producing a side-by-side measurement of the efficiency gap for every message that crosses the boundary.
+
+The SALBridge is implemented in all three SDKs (Python, TypeScript, Go) and exposed through the MCP server as five bridge tools.
+
+OSMP does not spread by installation. It spreads by contact.
 
 ---
 
@@ -696,6 +790,7 @@ The following patterns render a composed instruction non-conformant:
 6. **Authorization omission:** R namespace instructions carrying ⚠ or ⊘ require I:§ as a structural precondition.
 7. **Autonomous Omega creation:** Emitting an unregistered Omega opcode without HITL approval.
 8. **Byte inflation:** SAL encoding that exceeds the natural language byte count (exception: safety-complete R namespace chains).
+9. **Regulatory dependency violation:** An instruction chain that violates a REQUIRES dependency rule loaded from the Managed Dictionary Registry. REQUIRES rules are SAL expressions evaluated within the SAL framework. Example: `F:AV[Part108] REQUIRES F:AV[Part89]` means any instruction chain containing Part 108 BVLOS authorization without a preceding Part 89 remote ID compliance declaration is structurally invalid and rejected by the composition validator. Conjunctive prerequisites are supported: `A AND B OR C AND D` parses as `(A AND B) OR (C AND D)`. REQUIRES rules load at runtime from the MDR corpus, not compiled into the base SDK.
 
 ### 12.6 Full Doctrine Reference
 
@@ -743,6 +838,14 @@ The complete composition doctrine, including the six-step decision tree, namespa
 | D:PACK/LZMA binary (ISO 20022) | 1,143 KB | Full ISO 20022 data dictionary (843KB corpus + 327KB index) |
 | SAL first-tier contribution (clinical) | 15.8% | Highly repetitive clinical description text |
 | SAL first-tier contribution (financial) | 8.4% | Financial message element definitions |
+| Wire-format reduction vs minified JSON | 86.8% | 29 real-world vectors from MCP, OpenAI, Google A2A, CrewAI, AutoGen |
+| Wire-format reduction vs MessagePack | 84.5% | Binary serialization baseline |
+| Wire-format reduction vs compiled protobuf | 70.5% | protoc 3.21.12, compiled schemas |
+| Token reduction (GPT-4 cl100k_base) | 76.0% | 1,809 tokens (JSON) to 434 tokens (SAL) |
+| Behavioral compliance (SAL, cross-model) | 88-95% | Claude Sonnet 4, GPT-4o, GPT-4o-mini |
+| Behavioral compliance (JSON, cross-model) | 85-90% | Same models, full wire cost |
+| Consequence class identification (SAL) | 100% | All models tested |
+| Consequence class identification (JSON) | 75% | All models tested |
 
 ---
 
@@ -767,6 +870,11 @@ A conformant implementation SHOULD:
 - Reject composed instructions where SAL byte count exceeds natural language byte count (exception: safety-complete R namespace chains)
 - Surface undeclared operational medium conditions to the human operator
 
+A conformant implementation SHOULD:
+
+- Implement SAIL binary wire encoding per Section 3.6 for constrained channel deployments
+- Validate composed instructions against REQUIRES dependency rules when MDR corpora are loaded per Section 12.5 rule 9
+
 A conformant implementation MAY:
 
 - Implement sovereign namespace extensions (Ω: prefix, U+03A9, 2 UTF-8 bytes)
@@ -777,6 +885,10 @@ A conformant implementation MAY:
 - Implement the full namespace suite
 - Implement the registered macro architecture per Section 11
 - Implement HITL-gated Omega vocabulary expansion per Section 12.4
+- Implement FNP FALLBACK and ACQUIRED states for non-OSMP peer interoperation per Section 9.5
+- Implement the SALBridge boundary translation and language propagation mechanism per Section 9.7
+- Implement the SEC security envelope per Section 8.6
+- Implement the four-mode wire architecture per Section 8.5
 - Implement composition validation per the prohibited patterns of Section 12.5
 
 ---
