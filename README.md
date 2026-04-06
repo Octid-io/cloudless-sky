@@ -2,7 +2,7 @@
 
 **Agentic AI mesh without the cloud.**
 
-OSMP (Octid Semantic Mesh Protocol) is an open encoding standard for agentic AI instruction exchange. It works across any channel — from a 51-byte LoRa radio packet to a high-throughput cloud inference pipeline — using the same grammar, the same dictionary, and the same decode logic.
+OSMP (Octid Semantic Mesh Protocol) is an open encoding standard for agentic AI instruction exchange. It works across any channel -- from a 51-byte LoRa radio packet to a high-throughput cloud inference pipeline -- using the same grammar, the same dictionary, and the same decode logic.
 
 No cloud required. No inference at the decode layer. No central authority.
 
@@ -56,6 +56,61 @@ H:HR@NODE1>120→H:CASREP∧M:EVA@*
 
 ---
 
+
+---
+
+## Where OSMP Sits
+
+OSMP is not a framework. It is an encoding layer. MCP, A2A, and ACP define how agents discover and invoke each other. OSMP defines how the instructions themselves are encoded once composed. An MCP client using OSMP encodes its tool calls in SAL instead of JSON. The framework stays the same. The wire format changes.
+
+```
++--------------------------------------------------+
+|  APPLICATION LAYER                               |
+|  MCP, A2A, ACP, CrewAI, AutoGen, LangGraph,      |
+|  or any custom orchestrator                      |
+|  The LLM lives here. It composes instructions.   |
++--------------------------------------------------+
+|  ENCODING LAYER  (OSMP replaces JSON here)       |
+|                                                  |
+|  SAL  (human-readable wire format)               |
+|    H:HR@NODE1>120→H:CASREP∧M:EVA@*             |
+|                                                  |
+|  SAIL (binary wire format, same instruction)     |
+|    [0x82 0x48 0x08 0x40 ...] (opaque bytes)      |
+|                                                  |
+|  Composition Validator (8 deterministic rules)   |
+|  ASD (dictionary for encode + decode)            |
+|  BAEL (selects SAL, SAIL, or NL passthrough)     |
++--------------------------------------------------+
+|  TRANSPORT LAYER                                 |
+|  HTTP, LoRa, BLE, WiFi, Meshtastic mesh,         |
+|  satellite, wired serial, MQTT, raw TCP/UDP      |
++--------------------------------------------------+
+```
+
+Today, every framework above the line serializes to JSON-RPC over HTTP. That works when your transport is an unconstrained internet connection. It fails at 51 bytes. OSMP replaces that serialization step. JSON-RPC requires HTTP. Protocol Buffers require a schema compiler and a reliable transport. SAL and SAIL encode to raw bytes that fit any channel, from a 51-byte LoRa packet at maximum-range spreading factor to a high-throughput cloud pipeline. Two agents using different frameworks that share the OSMP grammar and dictionary can communicate with no modification to either framework.
+
+## SAL and SAIL
+
+**SAL** (Semantic Assembly Language) is the human-readable encoding. Unicode glyphs. Inspectable at every hop.
+
+**SAIL** (Semantic Assembly Isomorphic Language) is the binary encoding. Opaque bytes. Maximum compression for constrained channels.
+
+SAL and SAIL are isomorphic. Every valid SAL instruction has exactly one SAIL encoding. Every valid SAIL payload decodes to exactly one SAL instruction. The decode path is encoding-agnostic: the same dictionary lookup, the same result.
+
+BAEL selects the wire mode automatically based on channel capacity and instruction safety classification:
+
+| Channel | Consequence | Wire Mode |
+|---|---|---|
+| Constrained (LoRa, BLE) | HAZARDOUS/IRREVERSIBLE | SAIL + SEC (binary, signed) |
+| Constrained | REVERSIBLE | SAIL (binary, unsigned) |
+| Unconstrained (HTTP, WiFi) | HAZARDOUS/IRREVERSIBLE | SAL + SEC (readable, signed) |
+| Unconstrained | REVERSIBLE | SAL (readable, unsigned) |
+
+SEC is the security envelope: node ID + monotonic sequence counter + AEAD tag + Ed25519 signature. 87 bytes of fixed overhead. Designed for mesh networks with no certificate authority and no internet connectivity.
+
+---
+
 ## Measured Performance
 
 <table>
@@ -72,58 +127,71 @@ Compression claims are measured, not estimated. The [29-vector SAL vs JSON bench
 
 ## Quick Start
 
-### MCP Server (any AI client)
+```python
+from osmp import encode, decode
+
+sal = encode(["H:HR@NODE1>120", "H:CASREP", "M:EVA@*"])
+# "H:HR@NODE1>120;H:CASREP;M:EVA@*"
+
+text = decode(sal)
+# "H:heart_rate →NODE1>120; H:casualty_report; M:evacuation →*"
+```
+
+Three lines. Zero setup. Zero dependencies. The SDK handles dictionary initialization internally.
+
+### Install
+
+Pick the path that matches your architecture.
+
+**Python (reference implementation, zero dependencies):**
+```bash
+pip install osmp
+```
+```python
+from osmp import encode, decode
+```
+
+**TypeScript:**
+```bash
+npm install osmp-protocol
+```
+```typescript
+import { encode, decode } from "osmp-protocol";
+```
+
+**Go:**
+```go
+import "github.com/octid-io/cloudless-sky/sdk/go/osmp"
+
+sal := osmp.Encode([]string{"H:HR@NODE1>120", "H:CASREP", "M:EVA@*"})
+text := osmp.Decode(sal)
+```
+
+**MCP Server (for AI client integration):**
 ```bash
 pip install osmp-mcp
 osmp-mcp
 ```
+The MCP server wraps the Python SDK. It gives AI clients (Claude Desktop, Cursor, Claude Code) nine tools for encode, decode, validate, lookup, discover, resolve, batch_resolve, compound_decode, and benchmark. Connect from Claude Code: `claude mcp add osmp -- osmp-mcp`. Listed on the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.Octid-io/osmp`.
 
-Installs the MCP server with three domain corpora (ICD-10-CM, ISO 20022, MITRE ATT&CK) included. Connect from Claude Code (`claude mcp add osmp -- osmp-mcp`), Claude Desktop, Cursor, or any MCP-compatible client. Listed on the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.Octid-io/osmp`.
+Use the MCP server when your agent runs inside an MCP client and you want to give it OSMP tools without writing code. Use the SDK directly when you are building a sending or receiving node.
 
-### From source
-```bash
-git clone https://github.com/octid-io/cloudless-sky
-cd cloudless-sky
-python3 sdk/python/src/osmp.py
-```
-
-No dependencies beyond Python standard library.
-
-### npm
-```bash
-npm install osmp-protocol
-```
-
-### Go
-```go
-import "github.com/octid-io/cloudless-sky/sdk/go/osmp"
-```
+For platform-specific install notes (Termux, Raspberry Pi, constrained hardware), see [KNOWN-ISSUES.md](KNOWN-ISSUES.md).
 
 ---
 
-## Why OSMP Is Different From Every Other Agent Protocol
 
-| Protocol | Transport | Offline | Compression | Inference-Free Decode |
-|---|---|---|---|---|
-| MCP (Anthropic) | HTTP/JSON | ✗ | ✗ | ✗ |
-| A2A (Google/Linux Foundation) | HTTPS/JSON | ✗ | ✗ | ✗ |
-| ACP (IBM) | REST/HTTP | ✗ | ✗ | ✗ |
-| **OSMP** | **Any channel** | **✓** | **86.8% vs JSON** | **✓** |
-
-MCP, A2A, and ACP are framework-layer protocols. OSMP is an encoding-layer protocol. It operates beneath any of them. Two agents using different frameworks that share the OSMP grammar and dictionary can communicate with no modification to either framework.
-
----
 
 ## SDK Status
 
 All three SDKs are independently verified against the canonical test suite. Wire compatibility is confirmed: Python, TypeScript, and Go produce field-for-field identical decode results across every namespace, every operator, and every edge case documented in the spec. D:PACK/BLK resolve is verified across all 124,215 domain codes (74,719 ICD-10-CM + 47,835 ISO 20022 + 1,661 MITRE ATT&CK) in all three SDKs.
 
-| SDK | Target | Conformance | Notes |
+| SDK | Install | API | Notes |
 |---|---|---|---|
-| **Python** | Reference implementation | CONFORMANT | Single source of truth for all SDK behavior |
-| **TypeScript** | OpenClaw / web agent integrations | CONFORMANT | `fzstd` (82KB, pure JS, zero native deps) for D:PACK/BLK |
-| **Go** | PicoClaw / constrained hardware | CONFORMANT | ASD compiled-in; D:PACK/BLK via `klauspost/compress/zstd` (3.1MB binary) |
-| **MCP Server** | Any MCP-compatible AI client | `pip install osmp-mcp` | 9 tools: encode, decode, compound_decode, lookup, validate, discover, resolve, batch_resolve, benchmark |
+| **Python** | `pip install osmp` | `from osmp import encode, decode` | Reference implementation |
+| **TypeScript** | `npm install osmp-protocol` | `import { encode, decode }` | `fzstd` for D:PACK/BLK |
+| **Go** | `go get .../sdk/go/osmp` | `osmp.Encode()` / `osmp.Decode()` | ASD compiled-in |
+| **MCP Server** | `pip install osmp-mcp` | 9 tools via MCP protocol | Wraps Python SDK |
 
 ### Benchmark
 
@@ -139,11 +207,10 @@ SDK: Python (reference)
   ✓ TV-015        101         30      70.3%
   ...
 
-  Mean reduction: 60.8%
-  CONFORMANT ✓  (mean 60.8% vs 60.0% threshold)
+  CONFORMANT ✓
 ```
 
-Run it yourself. The numbers are real and independently reproducible across all three SDKs.
+Run it yourself. The numbers are real and independently reproducible across all three SDKs. The measured wire-format comparisons (86.8% vs JSON, 70.5% vs protobuf, 76.0% fewer tokens) use the [29-vector benchmark suite](benchmarks/sal-vs-json/).
 
 ---
 
@@ -195,6 +262,8 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 | **TCL** — Translational Compression Layer | Semantic serialization and transcoding |
 | **OP** — Overflow Protocol | Message fragmentation, priority, graceful degradation |
 | **BAEL** — Bandwidth-Agnostic Efficiency Layer | Adaptive encoding across any channel capacity |
+| **SAIL** — Semantic Assembly Isomorphic Language | Binary wire encoding (isomorphic to SAL) |
+| **SEC** — Security Envelope | AEAD + Ed25519 authentication for mesh networks |
 
 ---
 
@@ -267,7 +336,9 @@ cloudless-sky/
     grammar/        <- SAL-grammar.ebnf -- formal grammar (EBNF)
     test-vectors/   <- canonical-test-vectors.json -- conformance suite
   sdk/
-    python/         <- Reference implementation
+    python/
+      osmp/         <- Package: pip install osmp (encode, decode, validate)
+      src/          <- Reference single-file implementation
     typescript/     <- OpenClaw/web SDK (fzstd for D:PACK/BLK)
     go/             <- PicoClaw/constrained hardware SDK
   mcp/
@@ -302,7 +373,7 @@ Wanted: C++ firmware-level encoder/decoder (ESP32/nRF52 sovereign nodes), Kotlin
 
 ## Patent Notice
 
-The OSMP architecture is covered by pending US patent application OSMP-001-UTIL (inventor: Clay Holberg, priority date March 17, 2026). A continuation-in-part (OSMP-001-CIP) extends coverage to cloud-scale AI orchestration, non-RF channels, and the AI-native namespace architecture. Apache 2.0 includes an express patent grant for implementations of this specification. See [`PATENT-NOTICE.md`](PATENT-NOTICE.md).
+Patent pending. Priority date March 17, 2026. Apache 2.0 includes an express patent grant for implementations of this specification. See [`PATENT-NOTICE.md`](PATENT-NOTICE.md).
 
 ---
 

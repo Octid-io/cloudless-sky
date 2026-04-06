@@ -1,11 +1,11 @@
 [build-system]
 requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
-name = "osmp-protocol"
-version = "1.0.0"
-description = "OSMP — Octid Semantic Mesh Protocol. Agentic AI instruction encoding for any channel."
+name = "osmp"
+version = "2.0.0"
+description = "OSMP -- Octid Semantic Mesh Protocol. Deterministic agentic instruction encoding."
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [{ name = "Clay Holberg", email = "clay@octid.io" }]
@@ -26,14 +26,20 @@ classifiers = [
 requires-python = ">=3.9"
 dependencies = []
 
+[project.optional-dependencies]
+dpack = ["zstandard>=0.21"]
+
 [project.scripts]
-osmp-benchmark = "osmp:run_benchmark"
+osmp-benchmark = "osmp.protocol:run_benchmark_entry"
 
 [project.urls]
-Homepage = "https://github.com/octid/cloudless-sky"
-Documentation = "https://github.com/octid/cloudless-sky/blob/main/protocol/spec/OSMP-SPEC-v1.md"
-Repository = "https://github.com/octid/cloudless-sky"
-Issues = "https://github.com/octid/cloudless-sky/issues"
+Homepage = "https://github.com/Octid-io/cloudless-sky"
+Documentation = "https://github.com/Octid-io/cloudless-sky/blob/main/protocol/spec/OSMP-SPEC-v1.md"
+Repository = "https://github.com/Octid-io/cloudless-sky"
+Issues = "https://github.com/Octid-io/cloudless-sky/issues"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+include = ["osmp*"]
+
+[tool.setuptools.package-data]
+osmp = ["data/*.csv"]

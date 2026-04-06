@@ -1,7 +1,7 @@
-OSMP SEMANTIC DICTIONARY v13.0
-Source of Truth: OSMP-001-UTIL-v18 + OSMP-001-CIP-v13 | Docket: OSMP-001-UTIL (patent pending)
+OSMP SEMANTIC DICTIONARY v14.0
+Source of Truth: OSMP-001-UTIL-v19 + OSMP-001-CIP-v14 | Docket: OSMP-001-UTIL (patent pending)
 "Inventor: Clay Holberg | Filing Date: March 17, 2026"
-Standard namespaces: 26 (A-Z) | Tier 2: 351 order-invariant double-Latin slots (AB=BA canonical)
+Standard namespaces: 26 (A-Z) | Tier 2: 351 order-invariant double-Latin slots (AB=BA canonical) | Autonomous Ops MDR extension: 26 new opcodes
 Sovereign extension: Ω: (U+03A9) | Floor version: 1.0 | All entries floor_version=1.0
 
 SECTION 1: GLYPH OPERATORS — SIX-CATEGORY ARCHITECTURE (UTIL Section X-C)
@@ -260,17 +260,31 @@ Environmental / Sensor,E,Environmental / Sensor,PU,pressure,1,IEEE 1451 | NMEA 0
 Environmental / Sensor,E,Environmental / Sensor,TH,temperature_humidity_composite,1,IEEE 1451 | NMEA 0183,Claim 1,1.0
 Environmental / Sensor,E,Environmental / Sensor,UV,ultraviolet,1,IEEE 1451 | NMEA 0183,Claim 1,1.0
 Federal / Regulatory,F,Federal / Regulatory,AV,authorization,1,CFR titles,Claim 3,1.0
+Federal / Regulatory,F,Federal / Regulatory,AUTH,operational_authorization_type_declaration — permit/certificate/exemption/COA for autonomous operations,1,OSMP-defined,Claims 14 | 19; CIP-21,1.0
+Federal / Regulatory,F,Federal / Regulatory,BVLOS,beyond_visual_line_of_sight_authorization — Part 108 operational authorization status; slot values drawn from FAA authorization tiers,2,14 CFR Part 108 (NPRM),Claims 14 | 19; CIP-21,1.0
+Federal / Regulatory,F,Federal / Regulatory,CFR,code_of_federal_regulations_section_reference — Layer 2 accessor into CFR section numbers; slot value is regulatory section identifier (e.g. 14.107.31),2,14 CFR | 49 CFR,Claims 14 | 19; CIP-21,1.0
+Federal / Regulatory,F,Federal / Regulatory,COLREG,international_collision_regulations_rule_reference — Layer 2 accessor into IMO COLREGs rule numbers (1-38),2,IMO COLREGs 1972 as amended,Claims 14 | 19; CIP-21,1.0
+Federal / Regulatory,F,Federal / Regulatory,FMVSS,federal_motor_vehicle_safety_standard_reference — Layer 2 accessor into NHTSA FMVSS standard numbers,2,49 CFR FMVSS | SAE J3016:2021,Claims 14 | 19; CIP-21,1.0
 Federal / Regulatory,F,Federal / Regulatory,PRO,proceed_protocol,1,CFR titles,Claim 3,1.0
 Federal / Regulatory,F,Federal / Regulatory,Q,query_request,1,CFR titles,Claim 3,1.0
+Federal / Regulatory,F,Federal / Regulatory,REMID,remote_identification_compliance_status — Part 89 Remote ID broadcast compliance declaration,2,14 CFR Part 89 | ASTM F3586,Claims 14 | 19; CIP-21,1.0
+Federal / Regulatory,F,Federal / Regulatory,SOLAS,safety_of_life_at_sea_convention_reference — Layer 2 accessor into IMO SOLAS chapters and MASS Code degrees (D1-D4),2,IMO SOLAS | IMO MASS Code,Claims 14 | 19; CIP-21,1.0
 Federal / Regulatory,F,Federal / Regulatory,W,wait,1,CFR titles,Claim 3,1.0
+Federal / Regulatory,F,Federal / Regulatory,WAIVER,regulatory_waiver_or_exemption_status — declaration of active waiver/exemption from standard regulatory requirement,1,14 CFR Part 107.200 | 49 CFR Part 555,Claims 14 | 19; CIP-21,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,ASPACE,airspace_class_designation — slot values: A through G plus P(prohibited) R(restricted) MOA TFR FRIA per FAA airspace classification,2,14 CFR Part 71 | ICAO Annex 2,Claims 14 | 15; CIP-21,1.0
 Geospatial / Navigation,G,Geospatial / Navigation,BEARING,heading_bearing,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
 Geospatial / Navigation,G,Geospatial / Navigation,CONF,position_confidence_rating,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
 Geospatial / Navigation,G,Geospatial / Navigation,DR,dead_reckoning_state,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
 Geospatial / Navigation,G,Geospatial / Navigation,ELEV,elevation_query,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,FENCE,geofence_boundary_reference — geographic operational boundary definition or identifier,1,ASTM F3411 | FAA Part 89,Claims 14 | 15; CIP-21,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,ODD,operational_design_domain — SAE J3016 ODD parameters defining conditions under which automated driving system is designed to function,2,SAE J3016:2021,Claims 14 | 15; CIP-21,1.0
 Geospatial / Navigation,G,Geospatial / Navigation,POS,position_coordinates — G:POS[lat,lon,alt],1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
 Geospatial / Navigation,G,Geospatial / Navigation,RANGE,distance_calculation,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
 Geospatial / Navigation,G,Geospatial / Navigation,ROUT,routing_query,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,SEAZONE,maritime_zone_designation — slot values drawn from IMO sea area classifications: port coastal offshore inland VTS TSS,2,IMO COLREGs Rule 10 | SOLAS,Claims 14 | 15; CIP-21,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,TFR,temporary_flight_restriction — FAA-issued temporary airspace restriction reference,2,14 CFR Part 91.137-91.145,Claims 14 | 15; CIP-21,1.0
 Geospatial / Navigation,G,Geospatial / Navigation,TRAIL,trail_segment_reference,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
+Geospatial / Navigation,G,Geospatial / Navigation,TSS,traffic_separation_scheme — IMO-designated maritime traffic routing measure,2,IMO COLREGs Rule 10,Claims 14 | 15; CIP-21,1.0
 Geospatial / Navigation,G,Geospatial / Navigation,WPT,waypoint_reference,1,OpenStreetMap | USGS | USFS | ICAO,Claims 1 | 7 | 14 | 15,1.0
 Health / Clinical,H,Health / Clinical,ALERT,threshold_crossing_event,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15,1.0
 Health / Clinical,H,Health / Clinical,BP,blood_pressure,1,ICD-10 | SNOMED CT | CPT | START/SALT | 9-liner MEDEVAC,Claims 7 | 12 | 15,1.0
@@ -340,13 +354,16 @@ Network / Routing,N,Network / Routing,PR,primary_relay,1,OSMP-defined,Claim 3,1.
 Network / Routing,N,Network / Routing,Q,query_discovery,1,OSMP-defined,Claim 3,1.0
 Network / Routing,N,Network / Routing,S,status,1,OSMP-defined,Claim 3,1.0
 Operational Context / Environment,O,Operational Context / Environment,AUTH,authority_level — slot values defined in Section 2,1,FEMA ICS/NIMS | DEFCON/FPCON | EMCON (NATO) | OPCON/TACON (JP 1) | MIL-STD-2525D | Semtech SX127x | 3GPP,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,AUTOLEV,autonomy_level_declaration — normalized 0-5 scale mapping across SAE J3016 (L0-L5) and FAA Part 107/108 tiers and IMO MASS Degrees (D1-D4),1,SAE J3016:2021 | 14 CFR Part 107/108 | IMO MASS Code,Claims 14 | 31; CIP-26 | CIP-39,1.0
 Operational Context / Environment,O,Operational Context / Environment,BW,available_bandwidth,1,FEMA ICS/NIMS | Semtech SX127x | 3GPP,Claim 31; CIP-26,1.0
 Operational Context / Environment,O,Operational Context / Environment,CHAN,active_channel_type — slot values defined in Section 2; O:CHAN is the explicit machine-readable channel declaration read by the BAEL to select encoding mode,1,Semtech SX127x | IEEE 802.11 | 3GPP | Meshtastic presets,Claim 31; CIP-26,1.0
 Operational Context / Environment,O,Operational Context / Environment,CONOPS,concept_of_operations,1,FEMA ICS/NIMS | MIL-STD-2525D,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,CONSPIC,conspicuity_broadcast_mode — identity broadcast system active declaration; slot values indicate Remote_ID AIS ADSB V2X active,1,14 CFR Part 89 | ITU-R M.1371-5 | RTCA DO-260C,Claims 14 | 31; CIP-26,1.0
 Operational Context / Environment,O,Operational Context / Environment,CONSTRAINT,active_constraint_declaration,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
 Operational Context / Environment,O,Operational Context / Environment,DESC,operational_deescalation,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
 Operational Context / Environment,O,Operational Context / Environment,EMCON,emission_control_level — slot values: F=full R=reduced S=silent,1,EMCON (NATO),Claim 31; CIP-26,1.0
 Operational Context / Environment,O,Operational Context / Environment,ESC,operational_escalation,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
+Operational Context / Environment,O,Operational Context / Environment,FALLBACK,fallback_authority_state — human authority status for autonomous operations; slot values: active standby degraded handoff,1,SAE J3016:2021 | IMO MASS Code,Claims 14 | 31; CIP-26 | CIP-39,1.0
 Operational Context / Environment,O,Operational Context / Environment,FLOOR,payload_floor_bytes — explicit machine-readable declaration of current LoRa payload constraint; O:FLOOR:51 at SF12/BW125kHz; O:FLOOR:255 at LongFast; read by BAEL for mode selection,1,Semtech SX127x | Meshtastic channel presets,Claim 31; CIP-26,1.0
 Operational Context / Environment,O,Operational Context / Environment,IAP,incident_action_plan,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
 Operational Context / Environment,O,Operational Context / Environment,LATENCY,link_latency_class — slot values 1-5 defined in Section 2,1,3GPP signal quality indicators,Claim 31; CIP-26,1.0
@@ -383,6 +400,8 @@ Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,REVISE,reque
 Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,SCORE,quality_score_assertion,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
 Quality / Evaluation / Grounding,Q,Quality / Evaluation / Grounding,VERIFY,request_verification_of_claim_by_another_agent,1,Reflexion | RAGAS | HELM (Stanford CRFM) | Constitutional AI (Anthropic) | LangSmith,Claim 30; CIP-33,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,COLLAB,collaborative_mode — slot values: A=active S=standby O=off,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,DAA,detect_and_avoid_maneuver — collision avoidance action execution per DAA system requirements,1,14 CFR Part 108 | DO-365/DO-366 | ISO 10218-1:2025,Claims 1 | 25; CIP-1 | CIP-39,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,DOCK,automated_docking_landing_parking_action — physical docking maneuver distinct from V:DOCK fleet status,1,OSMP-defined,Claims 1 | 25; CIP-1 | CIP-39,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,DPTH,depth_control,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,DRVE,drive,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,ESTOP,emergency_stop — sole OSMP instruction that overrides ALL execution policies including Λ Atomic; executes on receipt of any single fragment carrying ESTOP opcode without waiting for complete fragment receipt without I:§ verification and without policy check; asymmetric harm justification: unnecessary stop is recoverable; failure to stop is unbounded harm,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claim 25; CIP-26 | CIP-29,1.0
@@ -391,12 +410,16 @@ Robotic / Physical Agent,R,Robotic / Physical Agent,HANDOFF,authority_handoff,1,
 Robotic / Physical Agent,R,Robotic / Physical Agent,HDNG,heading,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,LAND,landing,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,MOV,move,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claim 25,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,OEDR,object_event_detection_response — SAE J3016 OEDR execution; detect classify and respond to objects and events in operational environment,1,SAE J3016:2021 | ISO 10218-1:2025,Claims 1 | 25; CIP-1 | CIP-39,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,RTB,return_to_base — autonomous return to designated home position or launch point,1,ISO 10218-1:2025 | ROS2,Claims 1 | 25; CIP-1,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,RTH,return_to_home_origin,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,SAFELAND,emergency_safe_landing — controlled emergency descent or stop to minimal-risk condition per SAE J3016 MRC,1,14 CFR Part 108 | SAE J3016:2021 | ISO 10218-1:2025,Claims 1 | 25; CIP-1 | CIP-39,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,SRFC,surface_command_UUV,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,STAT,status — slot values: A=active D=degraded E=emergency I=idle O=offline (see Section 2),1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,STOP,stop,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claim 25,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,TKOF,takeoff,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,WPT,waypoint,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claims 25 | 7,1.0
+Robotic / Physical Agent,R,Robotic / Physical Agent,YIELD,yield_right_of_way — COLREGs Rule 16/17 give-way compliance action; applicable across air surface and maritime mediums,1,IMO COLREGs Rules 13-17 | 14 CFR Part 107.37,Claims 1 | 25; CIP-1 | CIP-39,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,ZONE,safety_zone_declaration,1,ISO 10218-1:2025 | ISO 10218-2:2025 | ROS2,Claim 25,1.0
 Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,ACCEL,accelerometer_data_stream — backed by Claim 7 hardware capability enumeration (accelerometer listed),1,ISO 10218-1:2025 | Android API | iOS API,Claim 7; CIP-11 | CIP-12,1.0
 Robotic / Physical Agent — Mobile Device Peripherals,R,Robotic / Physical Agent — Mobile Device Peripherals,BT,bluetooth_state,1,ISO 10218-1:2025 | Android API | iOS API,Claim 7; CIP-11 | CIP-12,1.0
@@ -458,7 +481,9 @@ User / Human Interaction,U,User / Human Interaction,REVIEW,request_human_review,
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,AIS,ais_position_report,1,ITU-R M.1371-5 | NMEA 0183/IEC 61162-1 | NMEA 2000/IEC 61162-3 | SAE J1939 | ICAO Doc 9684,Claim 14,1.0
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,CARGO,cargo_manifest,1,ITU-R M.1371-5 | NMEA 0183 | SAE J1939,Claim 14,1.0
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,COURSE,course_over_ground,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,CSPOS,control_station_position — geographic position of remote control station or remote operations center; Part 89.305 required broadcast element,2,14 CFR Part 89.305 | IMO MASS Code,Claims 14 | 19; CIP-21,1.0
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,DOCK,docking_operation,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,EMERG,emergency_status_broadcast — vehicle emergency condition declaration with type classification,1,ITU-R M.1371-5 | 14 CFR Part 89 | SAE J2735,Claims 14 | 19; CIP-21,1.0
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,ETA,estimated_time_arrival,1,ITU-R M.1371-5 | NMEA 0183 | ICAO Doc 9684,Claim 14,1.0
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,ETD,estimated_time_departure,1,ITU-R M.1371-5 | NMEA 0183 | ICAO Doc 9684,Claim 14,1.0
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,FLEET,fleet_coordination,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
@@ -469,6 +494,7 @@ Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,PANPAN,urgency_signal,1,IT
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,PORT,port_of_call,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,POS,vehicle_position,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,ROUTE,routing_instruction — UTIL spec: V:ROUTE,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
+Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,SERIAL,vehicle_serial_number — unique vehicle identifier for Remote ID compliance and fleet management; Part 89.305 required element,2,14 CFR Part 89.305 | 49 CFR FMVSS,Claims 14 | 19; CIP-21,1.0
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,SPEED,speed_over_ground — UTIL spec: V:SPEED,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,STATUS,vessel_status — slot values: A=active U=underway M=moored D=degraded E=emergency I=idle O=offline (see Section 2),1,ITU-R M.1371-5,Claim 14,1.0
 Vehicle / Transport Fleet,V,Vehicle / Transport Fleet,UNDOCK,undocking_operation,1,ITU-R M.1371-5 | NMEA 0183,Claim 14,1.0

@@ -50,7 +50,7 @@ var (
 	frameNsOpRe   = regexp.MustCompile(`^([A-Z]{1,2}):([A-Z§][A-Z0-9§]*)`)
 )
 
-// ValidateComposition validates a composed SAL instruction against the seven
+// ValidateComposition validates a composed SAL instruction against eight
 // deterministic rules (Section 12.5 of OSMP-SPEC-v1):
 //   1. Hallucination check — every opcode must exist in the ASD
 //   2. Namespace-as-target — @ must not be followed by NS:OPCODE
@@ -59,7 +59,8 @@ var (
 //   5. Byte check — SAL bytes must not exceed NL bytes (exception: R safety chains)
 //   6. Slash rejection — / is not a SAL operator
 //   7. Mixed-mode check — no natural language text embedded in SAL frames
-func ValidateComposition(sal, nl string, asd *AdaptiveSharedDictionary, rSafetyExempt bool) *CompositionResult {
+//   8. Regulatory dependency — REQUIRES rules from MDR corpora
+func ValidateComposition(sal, nl string, asd *AdaptiveSharedDictionary, rSafetyExempt bool, depRules []DependencyRule) *CompositionResult {
 	if asd == nil {
 		asd = NewASD()
 	}
@@ -190,6 +191,12 @@ func ValidateComposition(sal, nl string, asd *AdaptiveSharedDictionary, rSafetyE
 				})
 			}
 		}
+	}
+
+	// ── Rule 8: Regulatory dependency grammar ─────────────────────────────
+	if len(depRules) > 0 {
+		depIssues := ValidateRegulatoryDependencies(sal, depRules)
+		issues = append(issues, depIssues...)
 	}
 
 	var errors []CompositionIssue

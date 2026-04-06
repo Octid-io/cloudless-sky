@@ -1,79 +1,94 @@
 # OSMP Python SDK
 
-Reference implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, and validates agentic AI instructions using SAL (Structured Agent Language). 342 opcodes across 26 namespaces. Inference-free decode by table lookup.
+Reference implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, and validates agentic AI instructions using SAL (Semantic Assembly Language). 342 opcodes across 26 namespaces. Inference-free decode by table lookup.
 
 ## Install
 
-The SDK is bundled with the MCP server:
-
 ```
-pip install osmp-mcp
+pip install osmp
 ```
 
-Or import directly from the repo:
+Zero dependencies beyond Python standard library (optional `zstandard` for D:PACK).
+
+## Tier 1: Two Functions, Zero Setup
 
 ```python
-import sys
-sys.path.insert(0, "sdk/python/src")
-from osmp import SALEncoder, SALDecoder, AdaptiveSharedDictionary, validate_composition
+from osmp import encode, decode
+
+sal = encode(["H:HR@NODE1>120", "H:CASREP", "M:EVA@*"])
+# "H:HR@NODE1>120;H:CASREP;M:EVA@*"
+
+text = decode("H:HR@NODE1>120;H:CASREP;M:EVA@*")
+# "heart_rate at NODE1 priority 120; casualty_report; evacuation at broadcast"
 ```
 
-## Encode
+Three lines. No instantiation. Module-level singleton, cached on first call.
+
+### Additional Tier 1 Functions
 
 ```python
-enc = SALEncoder()
-sal = enc.encode(namespace="H", opcode="HR", target="NODE1", slots={"threshold": "130"})
-# "H:HR@NODE1[130]"
-```
+from osmp import validate, lookup, byte_size
 
-## Decode
+result = validate("R:MOV@BOT1⚠")
+print(result.valid)    # False -- ⚠ requires I:§ precondition
 
-```python
-dec = SALDecoder()
-result = dec.decode_frame("H:HR@NODE1[130]")
-# result.namespace = "H"
-# result.opcode = "HR"
-# result.opcode_meaning = "heart_rate"
-# result.target = "NODE1"
-```
-
-## Validate Composition
-
-Always validate before emitting composed SAL:
-
-```python
-from osmp import validate_composition
-
-result = validate_composition("R:MOV@BOT1", nl="Move the robot to BOT1")
-print(result.valid)   # False
-print(result.errors)  # [CONSEQUENCE_CLASS_OMISSION: R:MOV requires ⚠/↺/⊘]
-
-result = validate_composition("I:§→R:MOV@BOT1⚠", nl="Move the robot to BOT1")
-print(result.valid)   # True
-```
-
-Seven rules enforced:
-
-1. **Hallucination check** — every opcode must exist in the ASD
-2. **Namespace-as-target** — `@` must not be followed by `NS:OPCODE`
-3. **R namespace consequence class** — mandatory except `R:ESTOP`
-4. **I:§ precondition** — `⚠` and `⊘` require `I:§` in the chain
-5. **Byte check** — SAL bytes must not exceed NL bytes (exception: R safety chains)
-6. **Slash rejection** — `/` is not a SAL operator
-7. **Mixed-mode check** — no natural language embedded in SAL frames
-
-## Dictionary Lookup
-
-```python
-asd = AdaptiveSharedDictionary()
-definition = asd.lookup("R", "WPT")
+definition = lookup("R:WPT")
 # "waypoint"
+
+print(byte_size("H:HR@NODE1>120"))
+# 15
 ```
+
+## Tier 2: Class-Based Interface
+
+For configuration beyond defaults (custom ASD floor, pre-loaded dependency rules, direct ASD access):
+
+```python
+from osmp.core import OSMP
+
+o = OSMP()
+sal = o.encode(["H:HR@NODE1>120", "H:CASREP"])
+text = o.decode(sal)
+result = o.validate(sal)
+definition = o.lookup("H", "HR")
+```
+
+## Tier 3: Full Protocol Access
+
+Direct access to encoder, decoder, ASD, and all protocol internals:
+
+```python
+from osmp.protocol import SALEncoder, SALDecoder, AdaptiveSharedDictionary, validate_composition
+
+asd = AdaptiveSharedDictionary()
+enc = SALEncoder(asd)
+dec = SALDecoder(asd)
+
+sal = enc.encode_frame("R", "MOV", target="BOT1", cc="↺")
+result = dec.decode_frame(sal)
+# result.namespace = "R"
+# result.opcode = "MOV"
+# result.opcode_meaning = "move"
+# result.consequence_class_name = "REVERSIBLE"
+```
+
+## Composition Validation
+
+Eight deterministic rules enforced before any instruction hits the wire:
+
+1. **Hallucination check** -- every opcode must exist in the ASD
+2. **Namespace-as-target** -- `@` must not be followed by `NS:OPCODE`
+3. **R namespace consequence class** -- mandatory except `R:ESTOP`
+4. **I:§ precondition** -- ⚠ and ⊘ require `I:§` in the chain
+5. **Byte check** -- SAL bytes must not exceed NL bytes (exception: R safety chains)
+6. **Slash rejection** -- `/` is not a SAL operator
+7. **Mixed-mode check** -- no natural language embedded in SAL frames
+8. **Regulatory dependency** -- REQUIRES rules from loaded MDR corpora
 
 ## Domain Code Resolution
 
 ```python
-from osmp import BlockCompressor
+from osmp.protocol import BlockCompressor
 
 bc = BlockCompressor()
 bc.load("mdr/icd10cm/MDR-ICD10CM-FY2026-blk.dpack")
@@ -83,16 +98,17 @@ result = bc.resolve("J93.0")
 
 Three corpora bundled: ICD-10-CM (74,719 codes), ISO 20022 (47,835 codes), MITRE ATT&CK (1,661 codes).
 
-## Benchmark
+## MCP Server
 
-```python
-from osmp import run_benchmark
+The MCP server is a separate package that wraps this SDK:
 
-report = run_benchmark("protocol/test-vectors/canonical-test-vectors.json")
-print(f"Mean reduction: {report.mean_reduction_pct:.1f}%")
-print(f"Conformant: {report.conformant}")
 ```
+pip install osmp-mcp
+osmp-mcp
+```
+
+Nine tools for AI client integration. Connect from Claude Code (`claude mcp add osmp -- osmp-mcp`), Claude Desktop, Cursor, or any MCP-compatible client.
 
 ## License
 
-Apache 2.0. Patent pending (Application #64/007,684).
+Apache 2.0. Patent pending. Filed March 17, 2026.

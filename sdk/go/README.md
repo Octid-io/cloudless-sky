@@ -1,6 +1,6 @@
 # OSMP Go SDK
 
-Go implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, and validates agentic AI instructions using SAL (Structured Agent Language). 342 opcodes across 26 namespaces. Inference-free decode by table lookup.
+Go implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, and validates agentic AI instructions using SAL (Semantic Assembly Language). 342 opcodes across 26 namespaces. Inference-free decode by table lookup. ASD compiled-in; D:PACK/BLK via `klauspost/compress/zstd`.
 
 ## Install
 
@@ -8,57 +8,62 @@ Go implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, and val
 go get github.com/octid-io/cloudless-sky/sdk/go/osmp
 ```
 
-## Encode
+## Tier 1: Package-Level Functions, Zero Setup
 
 ```go
 import "github.com/octid-io/cloudless-sky/sdk/go/osmp"
 
-enc := osmp.NewEncoder()
-sal := enc.Encode("H", "HR", "NODE1", map[string]string{"threshold": "130"})
-// "H:HR@NODE1[130]"
+sal := osmp.Encode([]string{"H:HR@NODE1>120", "H:CASREP", "M:EVA@*"})
+// "H:HR@NODE1>120;H:CASREP;M:EVA@*"
+
+text := osmp.Decode("H:HR@NODE1>120;H:CASREP;M:EVA@*")
+// "H:heart_rate →NODE1 >120; H:casualty_report; M:evacuation →*"
 ```
 
-## Decode
+No constructors. Singleton ASD initialized on first call via `sync.Once`. Thread-safe.
+
+### Additional Tier 1 Functions
 
 ```go
-dec := osmp.NewDecoder(nil)
-result, err := dec.DecodeFrame("H:HR@NODE1[130]")
+result := osmp.Validate("R:MOV@BOT1⚠")
+fmt.Println(result.Valid)   // false -- ⚠ requires I:§ precondition
+
+definition := osmp.Lookup("R:WPT")
+// "waypoint"
+
+fmt.Println(osmp.ByteSize("H:HR@NODE1>120"))
+// 15
+```
+
+## Tier 2: Struct-Based Interface
+
+For explicit ASD control, custom dependency rules, or concurrent instances with different configurations:
+
+```go
+asd := osmp.NewASD()
+enc := osmp.NewEncoder(asd)
+dec := osmp.NewDecoder(asd)
+
+sal := enc.EncodeSequence([]string{"H:HR@NODE1>120", "H:CASREP"})
+result, err := dec.DecodeFrame("H:HR@NODE1>120")
 // result.Namespace = "H"
 // result.Opcode = "HR"
 // result.OpcodeMeaning = "heart_rate"
 // result.Target = "NODE1"
 ```
 
-## Validate Composition
+## Composition Validation
 
-Always validate before emitting composed SAL:
+Eight deterministic rules enforced before any instruction hits the wire:
 
-```go
-result := osmp.ValidateComposition("R:MOV@BOT1", "Move the robot to BOT1", nil, true)
-fmt.Println(result.Valid)   // false
-fmt.Println(result.Errors()) // [CONSEQUENCE_CLASS_OMISSION: R:MOV requires ⚠/↺/⊘]
-
-ok := osmp.ValidateComposition("I:§→R:MOV@BOT1⚠", "Move the robot to BOT1", nil, true)
-fmt.Println(ok.Valid)       // true
-```
-
-Seven rules enforced:
-
-1. **Hallucination check** — every opcode must exist in the ASD
-2. **Namespace-as-target** — `@` must not be followed by `NS:OPCODE`
-3. **R namespace consequence class** — mandatory except `R:ESTOP`
-4. **I:§ precondition** — `⚠` and `⊘` require `I:§` in the chain
-5. **Byte check** — SAL bytes must not exceed NL bytes (exception: R safety chains)
-6. **Slash rejection** — `/` is not a SAL operator
-7. **Mixed-mode check** — no natural language embedded in SAL frames
-
-## Dictionary Lookup
-
-```go
-asd := osmp.NewASD()
-definition := asd.Lookup("R", "WPT")
-// "waypoint"
-```
+1. **Hallucination check** -- every opcode must exist in the ASD
+2. **Namespace-as-target** -- `@` must not be followed by `NS:OPCODE`
+3. **R namespace consequence class** -- mandatory except `R:ESTOP`
+4. **I:§ precondition** -- ⚠ and ⊘ require `I:§` in the chain
+5. **Byte check** -- SAL bytes must not exceed NL bytes (exception: R safety chains)
+6. **Slash rejection** -- `/` is not a SAL operator
+7. **Mixed-mode check** -- no natural language embedded in SAL frames
+8. **Regulatory dependency** -- REQUIRES rules from loaded MDR corpora
 
 ## Domain Code Resolution
 
@@ -71,14 +76,6 @@ result, err := bc.Resolve("J93.0")
 
 Three corpora bundled: ICD-10-CM (74,719 codes), ISO 20022 (47,835 codes), MITRE ATT&CK (1,661 codes).
 
-## Benchmark
-
-```go
-report, err := osmp.RunBenchmark("protocol/test-vectors/canonical-test-vectors.json")
-fmt.Printf("Mean reduction: %.1f%%\n", report.MeanReductionPct)
-fmt.Printf("Conformant: %v\n", report.Conformant)
-```
-
 ## Test
 
 ```
@@ -88,4 +85,4 @@ go test ./osmp/ -v
 
 ## License
 
-Apache 2.0. Patent pending (Application #64/007,684).
+Apache 2.0. Patent pending. Filed March 17, 2026.

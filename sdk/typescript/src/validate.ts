@@ -6,6 +6,7 @@
  * License: Apache 2.0
  */
 import { AdaptiveSharedDictionary } from "./asd.js";
+import { validateRegulatoryDependencies, DependencyRule } from "./regulatory_dependency.js";
 
 export interface CompositionIssue {
   rule: string;        // e.g. "HALLUCINATED_OPCODE", "NAMESPACE_AS_TARGET"
@@ -38,12 +39,14 @@ const FRAME_NS_OP_RE = /^([A-Z]{1,2}):([A-Z§][A-Z0-9§]*)/;
  *   5. Byte check — SAL bytes must not exceed NL bytes (exception: R safety chains)
  *   6. Slash rejection — / is not a SAL operator
  *   7. Mixed-mode check — no natural language text embedded in SAL frames
+ *   8. Regulatory dependency — REQUIRES rules from MDR corpora
  */
 export function validateComposition(
   sal: string,
   nl: string = "",
   asd?: AdaptiveSharedDictionary,
   rSafetyExempt: boolean = true,
+  dependencyRules?: DependencyRule[],
 ): CompositionResult {
   if (!asd) {
     asd = new AdaptiveSharedDictionary();
@@ -168,6 +171,12 @@ export function validateComposition(
         });
       }
     }
+  }
+
+  // ── Rule 8: Regulatory dependency grammar ─────────────────────────────
+  if (dependencyRules && dependencyRules.length > 0) {
+    const depIssues = validateRegulatoryDependencies(sal, dependencyRules);
+    issues.push(...depIssues);
   }
 
   const errors = issues.filter(i => i.severity === "error");

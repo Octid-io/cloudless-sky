@@ -16,22 +16,40 @@ from mcp.server.fastmcp import FastMCP
 
 # -- Resolve repo root and import the Python SDK --------------------------
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SDK_PATH = REPO_ROOT / "sdk" / "python" / "src"
+SDK_PATH = REPO_ROOT / "sdk" / "python"
+SDK_PATH_LEGACY = REPO_ROOT / "sdk" / "python" / "src"
 sys.path.insert(0, str(SDK_PATH))
+sys.path.insert(0, str(SDK_PATH_LEGACY))
 
-from osmp import (  # noqa: E402
-    SALEncoder,
-    SALDecoder,
-    BlockCompressor,
-    AdaptiveSharedDictionary,
-    DAGFragmenter,
-    DAGReassembler,
-    LossPolicy,
-    run_benchmark,
-    validate_composition,
-    CompositionResult,
-    CompositionIssue,
-)
+try:
+    from osmp.protocol import (  # noqa: E402
+        SALEncoder,
+        SALDecoder,
+        BlockCompressor,
+        AdaptiveSharedDictionary,
+        DAGFragmenter,
+        DAGReassembler,
+        LossPolicy,
+        run_benchmark,
+        validate_composition,
+        CompositionResult,
+        CompositionIssue,
+    )
+except ImportError:
+    # Fallback: legacy single-file layout (sdk/python/src/osmp.py)
+    from osmp import (  # noqa: E402
+        SALEncoder,
+        SALDecoder,
+        BlockCompressor,
+        AdaptiveSharedDictionary,
+        DAGFragmenter,
+        DAGReassembler,
+        LossPolicy,
+        run_benchmark,
+        validate_composition,
+        CompositionResult,
+        CompositionIssue,
+    )
 
 # -- Paths ----------------------------------------------------------------
 MDR_DIR = REPO_ROOT / "mdr"
@@ -117,7 +135,13 @@ def osmp_encode(
     query_slot: str | None = None,
     consequence_class: str | None = None,
 ) -> str:
-    """Encode structured fields into a SAL instruction. Use osmp_lookup to find valid namespaces and opcodes."""
+    """Encode structured fields into a SAL instruction frame.
+
+    Example: osmp_encode(namespace="R", opcode="MOV", target="BOT1", consequence_class="⚠")
+    Returns: "R:MOV@BOT1⚠"
+
+    consequence_class values: "⚠" (HAZARDOUS), "↺" (REVERSIBLE), "⊘" (IRREVERSIBLE).
+    Required for R namespace. Use osmp_lookup to find valid namespaces and opcodes."""
     return _encoder.encode_frame(
         namespace=namespace, opcode=opcode, target=target,
         query_slot=query_slot, consequence_class=consequence_class,
@@ -126,7 +150,10 @@ def osmp_encode(
 
 @mcp.tool()
 def osmp_decode(sal: str) -> str:
-    """Decode SAL to structured fields. Handles compound instructions."""
+    """Decode a SAL instruction string to structured fields and natural language. Handles compound instructions with operators (→ ∧ ∨ ; ∥ ↔).
+
+    Example: osmp_decode(sal="H:HR@NODE1>120→H:CASREP")
+    Returns JSON with each frame decoded: namespace, opcode, meaning, target, consequence class, and natural language expansion."""
     normalized = sal.strip().replace("->", "→").replace("<->", "↔").replace("||", "∥")
     parts = re.split(r'([→∧∨↔∥;])', normalized)
     frames = []
@@ -156,7 +183,10 @@ def osmp_decode(sal: str) -> str:
 
 @mcp.tool()
 def osmp_compound_decode(sal: str) -> str:
-    """Analyze DAG topology and loss tolerance behavior of a compound SAL instruction."""
+    """Analyze DAG topology and loss tolerance behavior of a compound SAL instruction. Shows fragment dependencies, wire-format sizes, and what executes when fragments are dropped under each loss policy (Phi/fail-safe, Gamma/graceful-degradation, Lambda/atomic).
+
+    Example: osmp_compound_decode(sal="I:§→R:MOV@BOT1⚠∧E:GPS@BOT1")
+    Returns JSON with DAG nodes, wire fragments, and per-policy drop simulations."""
     fragmenter = DAGFragmenter()
     nodes = fragmenter.parse(sal)
 
@@ -227,7 +257,13 @@ def osmp_compound_decode(sal: str) -> str:
 
 @mcp.tool()
 def osmp_lookup(namespace: str = "", keyword: str = "") -> str:
-    """Search the opcode dictionary by namespace and/or keyword."""
+    """Search the ASD opcode dictionary by namespace and/or keyword. Returns matching opcodes with definitions.
+
+    Examples:
+      osmp_lookup(namespace="R") -- all opcodes in the Robotics namespace
+      osmp_lookup(keyword="heart") -- all opcodes containing "heart" in name or definition
+      osmp_lookup(namespace="H", keyword="rate") -- H namespace opcodes matching "rate"
+      osmp_lookup() -- dump entire dictionary (342 opcodes across 26 namespaces)"""
     asd = AdaptiveSharedDictionary()
     results = []
     kw = keyword.lower().strip()
@@ -245,7 +281,11 @@ def osmp_lookup(namespace: str = "", keyword: str = "") -> str:
 
 @mcp.tool()
 def osmp_resolve(code: str, corpus: str = "icd") -> str:
-    """Resolve a domain code from D:PACK/BLK. Corpora: icd (74,719), iso (47,835), attack (1,661)."""
+    """Resolve a single domain code from a D:PACK/BLK corpus to its description.
+
+    Example: osmp_resolve(code="J93.0", corpus="icd") returns "J93.0: Spontaneous tension pneumothorax"
+
+    corpus values: "icd" (ICD-10-CM, 74,719 codes), "iso" (ISO 20022, 47,835 codes), "attack" (MITRE ATT&CK, 1,661 codes)."""
     try:
         data = _load_mdr(corpus)
     except (ValueError, FileNotFoundError) as e:
@@ -258,7 +298,12 @@ def osmp_resolve(code: str, corpus: str = "icd") -> str:
 
 @mcp.tool()
 def osmp_batch_resolve(codes: str, corpus: str = "icd") -> str:
-    """Resolve multiple comma-separated domain codes in one call."""
+    """Resolve multiple domain codes in one call. Codes are comma-separated.
+
+    Example: osmp_batch_resolve(codes="J93.0,R00.1,I25.10", corpus="icd")
+    Returns JSON array with each code and its description.
+
+    corpus values: "icd" (ICD-10-CM), "iso" (ISO 20022), "attack" (MITRE ATT&CK)."""
     try:
         data = _load_mdr(corpus)
     except (ValueError, FileNotFoundError) as e:
@@ -276,7 +321,15 @@ _corpus_cache: dict[str, dict[str, str]] = {}
 @mcp.tool()
 def osmp_discover(keyword: str, corpus: str = "icd",
                   code_prefix: str = "", max_results: int = 10) -> str:
-    """Search a domain corpus by keyword and/or code prefix. Use when you don't know the exact code."""
+    """Search a domain corpus by keyword and/or code prefix when you do not know the exact code.
+
+    Examples:
+      osmp_discover(keyword="pneumothorax", corpus="icd") -- find ICD-10 codes for pneumothorax
+      osmp_discover(keyword="phishing", corpus="attack") -- find MITRE ATT&CK techniques for phishing
+      osmp_discover(code_prefix="J93", corpus="icd") -- all ICD-10 codes starting with J93
+      osmp_discover(keyword="payment", corpus="iso", max_results=20) -- ISO 20022 payment messages
+
+    corpus values: "icd" (ICD-10-CM), "iso" (ISO 20022), "attack" (MITRE ATT&CK)."""
     try:
         data = _load_mdr(corpus)
     except (ValueError, FileNotFoundError) as e:
@@ -308,7 +361,7 @@ def osmp_discover(keyword: str, corpus: str = "icd",
 
 @mcp.tool()
 def osmp_benchmark() -> str:
-    """Run the canonical conformance suite."""
+    """Run the canonical conformance test suite (55 vectors). Returns per-vector byte reduction and overall conformance status. Use to verify SDK correctness."""
     if not VECTORS_PATH.exists():
         return f"Test vectors not found at {VECTORS_PATH}"
     import io, os
@@ -330,9 +383,14 @@ def osmp_benchmark() -> str:
 
 @mcp.tool()
 def osmp_validate(sal: str, nl_input: str = "") -> str:
-    """Validate a composed SAL instruction against composition rules before emission.
-    Checks: hallucinated opcodes, namespace-as-target, consequence class, I:§ precondition,
-    byte inflation, slash operator, mixed-mode. Returns violations or PASS."""
+    """Validate a composed SAL instruction against all eight composition rules before emission. Always call this before transmitting any SAL instruction.
+
+    Example: osmp_validate(sal="R:MOV@BOT1⚠", nl_input="Move BOT1 to waypoint")
+    Returns JSON with PASS/FAIL status and any violations.
+
+    Rules checked: hallucinated opcodes, namespace-as-target, consequence class requirement,
+    I:§ precondition for ⚠/⊘, byte inflation vs NL input, slash operator rejection,
+    mixed-mode detection, regulatory dependency prerequisites."""
     asd = AdaptiveSharedDictionary()
     result = validate_composition(sal, nl=nl_input, asd=asd)
     if result.valid:
@@ -603,5 +661,9 @@ Operators: -> THEN  ^ AND  v OR  ; SEQUENCE  @ target  ? query  * broadcast  [] 
 
 
 # -- Entry point ----------------------------------------------------------
-if __name__ == "__main__":
+def main():
     mcp.run(transport="stdio")
+
+
+if __name__ == "__main__":
+    main()
