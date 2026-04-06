@@ -112,3 +112,26 @@ Nine tools for AI client integration. Connect from Claude Code (`claude mcp add 
 ## License
 
 Apache 2.0. Patent pending. Filed March 17, 2026.
+
+## SALBridge: Mixed Environment Integration
+
+When your agents communicate with non-OSMP peers, the bridge handles boundary translation.
+
+```python
+from osmp import bridge
+
+b = bridge("MY_NODE")
+b.register_peer("GPT_AGENT", attempt_fnp=False)
+
+# Outbound: SAL decoded to NL, annotated with SAL equivalent
+out = b.send("H:HR@NODE1>120", "GPT_AGENT")
+
+# Inbound: scanned for SAL acquisition
+result = b.receive("A:ACK", "GPT_AGENT")
+
+# Metrics and comparison
+metrics = b.get_metrics("GPT_AGENT")
+comparison = b.get_comparison("GPT_AGENT")
+```
+
+The bridge annotates outbound messages with SAL, seeding the remote agent's context. When the remote agent starts producing valid SAL through exposure, FNP transitions from FALLBACK to ACQUIRED. OSMP spreads by contact, not installation.

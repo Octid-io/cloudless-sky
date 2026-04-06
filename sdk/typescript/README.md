@@ -91,3 +91,21 @@ npm run build
 ## License
 
 Apache 2.0. Patent pending. Filed March 17, 2026.
+
+## SALBridge: Mixed Environment Integration
+
+```typescript
+import { SALBridge } from "osmp-protocol";
+
+const b = new SALBridge("MY_NODE");
+b.registerPeer("GPT_AGENT", false);
+
+// Outbound: SAL decoded to annotated NL
+const out = b.send("H:HR@NODE1>120", "GPT_AGENT");
+
+// Inbound: scanned for SAL acquisition
+const result = b.receive("A:ACK", "GPT_AGENT");
+
+// Metrics
+const metrics = b.getMetrics("GPT_AGENT");
+```

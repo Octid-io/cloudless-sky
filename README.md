@@ -114,6 +114,29 @@ text = decode(sal)
 ```
 
 The decode is identical across all three SDKs. Python, TypeScript, and Go produce field-for-field identical results from the same SAL input.
+
+### Mixed Environments: The SALBridge
+
+Not every agent in your system will speak OSMP. The SALBridge handles the boundary.
+
+```python
+from osmp import bridge
+
+b = bridge("MY_NODE")
+b.register_peer("GPT_AGENT", attempt_fnp=False)
+
+# Outbound: SAL decoded to natural language, annotated with SAL equivalent
+out = b.send("H:HR@NODE1>120;H:CASREP", "GPT_AGENT")
+# "heart_rate at NODE1 exceeds 120; casualty_report
+#  [SAL: H:HR@NODE1>120;H:CASREP]"
+
+# Inbound: scanned for SAL acquisition
+result = b.receive("A:ACK", "GPT_AGENT")
+```
+
+The bridge annotates outbound messages with SAL equivalents, seeding the remote agent's context window. When the remote agent starts producing valid SAL through exposure, the bridge detects it and transitions from FALLBACK to ACQUIRED. OSMP spreads by contact, not installation.
+
+The MCP server includes five bridge tools (`osmp_bridge_register`, `osmp_bridge_send`, `osmp_bridge_receive`, `osmp_bridge_status`, `osmp_bridge_comparison`) for agents operating in mixed environments.
 ---
 
 ## Where OSMP Sits
@@ -273,7 +296,7 @@ Run it yourself. The numbers are real and independently reproducible across all 
 | **ADP** — ASD Distribution Protocol | Dictionary delta synchronization across nodes |
 | **ASD** — Adaptive Shared Dictionary | 342-opcode version-pinned compression dictionary |
 | **BAEL** — Bandwidth-Agnostic Efficiency Layer | Adaptive encoding across any channel capacity |
-| **FNP** — Frame Negotiation Protocol | Capability negotiation and session handshake |
+| **FNP** — Frame Negotiation Protocol | Capability negotiation, session handshake, FALLBACK/ACQUIRED states for non-OSMP peers |
 | **OP** — Overflow Protocol | Message fragmentation, priority, graceful degradation |
 | **SAIL** — Semantic Assembly Isomorphic Language | Binary wire encoding, isomorphic to SAL |
 | **SAL** — Semantic Assembly Language | Human-readable symbolic instruction format |
@@ -305,7 +328,7 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 
 **SAL/SAIL isomorphic encoding** — every SAL instruction compiles to a SAIL binary representation and every SAIL payload decompiles back to the identical SAL instruction. The mapping is bijective: no information is lost in either direction. A developer composes and debugs in SAL (human-readable), deploys in SAIL (binary, maximum compression), and can always decompile the wire payload back to readable SAL for inspection. The encoding a node transmits and the encoding an operator reads are the same instruction in two forms.
 
-**FNP handshake** — Two-message capability advertisement + acknowledgment (40B + 38B = 78 bytes total). Negotiates dictionary alignment, namespace intersection, and channel capacity in two LoRa packets. Implemented in all three SDKs with byte-identical wire format. Channel capacity negotiation selects the LCD of both nodes, so the mesh scales within the most constrained link.
+**FNP handshake and SALBridge** — Two-message capability advertisement + acknowledgment (40B + 38B = 78 bytes total). Negotiates dictionary alignment, namespace intersection, and channel capacity in two LoRa packets. Implemented in all three SDKs with byte-identical wire format. Channel capacity negotiation selects the LCD of both nodes, so the mesh scales within the most constrained link. When FNP detects a non-OSMP peer (timeout or invalid response), the session transitions to FALLBACK. The SALBridge then handles boundary translation: outbound SAL is decoded to annotated natural language, inbound messages are scanned for SAL acquisition. Peers that learn SAL through contextual exposure transition to ACQUIRED. Regression detection drops acquired peers back to FALLBACK if they stop producing valid SAL.
 
 **ADP dictionary synchronization** — The ASD Distribution Protocol keeps dictionaries aligned across nodes after initial FNP handshake. Delta-based updates decompose dictionary changes into independently parseable units, each carrying a version pointer and a tripartite resolution flag (additive, superseding replacement with mandatory retransmission, or deprecation). Nodes apply deltas as they arrive and operate in a partially updated but internally consistent state during synchronization. Instructions referencing opcodes whose defining delta has not yet arrived are held in a semantic pending queue and resolved on receipt. MAJOR.MINOR version signaling detects breaking changes. The guaranteed minimum operational vocabulary floor ensures every node can decode baseline instructions regardless of synchronization state. Implemented in the Python SDK with 69 tests passing.
 

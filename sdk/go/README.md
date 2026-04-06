@@ -86,3 +86,19 @@ go test ./osmp/ -v
 ## License
 
 Apache 2.0. Patent pending. Filed March 17, 2026.
+
+## SALBridge: Mixed Environment Integration
+
+```go
+b := osmp.NewSALBridge("MY_NODE")
+b.RegisterPeer("GPT_AGENT", false)
+
+// Outbound: SAL decoded to annotated NL
+out := b.Send("H:HR@NODE1>120", "GPT_AGENT")
+
+// Inbound: scanned for SAL acquisition
+result := b.Receive("A:ACK", "GPT_AGENT")
+
+// Metrics
+metrics := b.GetMetrics("GPT_AGENT")
+```
