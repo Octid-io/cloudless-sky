@@ -57,36 +57,74 @@ H:HR@NODE1>120→H:CASREP∧M:EVA@*
 ---
 
 
+
+---
+
+## Using OSMP in Your Agent
+
+Installing the SDK gives you encode, decode, and validate. Making your agents speak SAL requires wiring those into your agent loop. Here is the end-to-end pattern.
+
+### Step 1: Give Your LLM the Composition Doctrine
+
+The LLM needs to know the SAL grammar, the opcode dictionary, and the composition rules before it can compose SAL.
+
+**Path A (MCP):** This happens automatically. When an MCP-native agent connects to the OSMP server, it reads the `osmp://system_prompt` resource (~390 tokens, under 0.3% of a 200K context window). The agent learns the grammar, the dictionary, and the composition rules on connect. No manual prompt engineering required.
+
+**Path B (SDK):** Add the [Usage Doctrine](docs/SAL-usage-doctrine-v1.md) to your LLM's system prompt. The doctrine teaches the LLM when to compose SAL, when to fall back to natural language, and how to select the right opcode for a given intent.
+
+### Step 2: Compose
+
+The LLM composes a SAL instruction from natural language input. It uses the dictionary to select opcodes and the grammar to structure them.
+
+```
+Natural language: "If heart rate exceeds 120, file a casualty report and evacuate all nodes."
+LLM output:       H:HR@NODE1>120→H:CASREP∧M:EVA@*
+```
+
+### Step 3: Validate Before Transmitting
+
+Every composed instruction passes through the validator before it hits the wire. Eight rules. No exceptions.
+
+```python
+from osmp import encode, decode, validate
+
+sal = "H:HR@NODE1>120→H:CASREP∧M:EVA@*"
+result = validate(sal, nl="If heart rate exceeds 120, file casualty report and evacuate all nodes.")
+
+if result.valid:
+    transmit(sal)  # your transport layer
+else:
+    for issue in result.issues:
+        print(f"{issue.rule}: {issue.message}")
+```
+
+The validator catches hallucinated opcodes, missing consequence classes, namespace-as-target errors, byte inflation (BAEL floor guarantee), and regulatory dependency violations.
+
+### Step 4: Decode at the Receiving Node
+
+The receiving node decodes by dictionary lookup. No inference. No model. No ambiguity.
+
+```python
+from osmp import decode
+
+sal = receive()  # your transport layer
+text = decode(sal)
+# "H:heart_rate →NODE1>120; H:casualty_report; M:evacuation →*"
+# The agent acts on the decoded instruction.
+```
+
+The decode is identical across all three SDKs. Python, TypeScript, and Go produce field-for-field identical results from the same SAL input.
 ---
 
 ## Where OSMP Sits
 
 OSMP is not a framework. It is an encoding layer. MCP, A2A, and ACP define how agents discover and invoke each other. OSMP defines how the instructions themselves are encoded once composed. An MCP client using OSMP encodes its tool calls in SAL instead of JSON. The framework stays the same. The wire format changes.
 
-```
-+--------------------------------------------------+
-|  APPLICATION LAYER                               |
-|  MCP, A2A, ACP, CrewAI, AutoGen, LangGraph,      |
-|  or any custom orchestrator                      |
-|  The LLM lives here. It composes instructions.   |
-+--------------------------------------------------+
-|  ENCODING LAYER  (OSMP replaces JSON here)       |
-|                                                  |
-|  SAL  (human-readable wire format)               |
-|    H:HR@NODE1>120→H:CASREP∧M:EVA@*             |
-|                                                  |
-|  SAIL (binary wire format, same instruction)     |
-|    [0x82 0x48 0x08 0x40 ...] (opaque bytes)      |
-|                                                  |
-|  Composition Validator (8 deterministic rules)   |
-|  ASD (dictionary for encode + decode)            |
-|  BAEL (selects SAL, SAIL, or NL passthrough)     |
-+--------------------------------------------------+
-|  TRANSPORT LAYER                                 |
-|  HTTP, LoRa, BLE, WiFi, Meshtastic mesh,         |
-|  satellite, wired serial, MQTT, raw TCP/UDP      |
-+--------------------------------------------------+
-```
+| Layer | What it does | Components |
+|---|---|---|
+| **Application** | Agent framework and LLM composition | MCP, A2A, ACP, CrewAI, AutoGen, LangGraph |
+| **Encoding** | Instruction serialization (OSMP replaces JSON here) | SAL (human-readable), SAIL (binary), Composition Validator, ASD, BAEL |
+| **Transport** | Byte delivery | HTTP, LoRa, BLE, WiFi, Meshtastic, satellite, serial, MQTT, TCP/UDP |
 
 Today, every framework above the line serializes to JSON-RPC over HTTP. That works when your transport is an unconstrained internet connection. It fails at 51 bytes. OSMP replaces that serialization step. JSON-RPC requires HTTP. Protocol Buffers require a schema compiler and a reliable transport. SAL and SAIL encode to raw bytes that fit any channel, from a 51-byte LoRa packet at maximum-range spreading factor to a high-throughput cloud pipeline. Two agents using different frameworks that share the OSMP grammar and dictionary can communicate with no modification to either framework.
 
@@ -123,6 +161,18 @@ SEC is the security envelope: node ID + monotonic sequence counter + AEAD tag + 
 
 Compression claims are measured, not estimated. The [29-vector SAL vs JSON benchmark](benchmarks/sal-vs-json/) uses real wire-format payloads from MCP, OpenAI, Google A2A, CrewAI, and AutoGen. Full methodology and adversarial review in the [whitepaper](docs/SAL-efficiency-analysis.md).
 
+### Behavioral Compliance
+
+Smaller on the wire means nothing if the LLM can't use it correctly. Cross-model testing confirms it can.
+
+| Model | JSON Compliance | SAL Compliance | Delta | Wire Reduction |
+|---|---|---|---|---|
+| Claude Sonnet 4 | 90% | 95% | +5% | 72% |
+| GPT-4o | 85% | 88% | +3% | 72% |
+| GPT-4o-mini | 88% | 88% | 0% | 72% |
+
+SAL delivers 88-95% behavioral compliance across three models at 72% less wire cost. JSON delivers 85-90% at full cost. SAL's advantage is concentrated in safety classification: JSON models identify the correct consequence class 75% of the time. SAL models identify it 100% of the time, across every model tested. The glyph is a universal signal.
+
 ---
 
 ## Quick Start
@@ -141,17 +191,18 @@ Three lines. Zero setup. Zero dependencies. The SDK handles dictionary initializ
 
 ### Install
 
-Pick the path that matches your architecture.
+Four production paths. All four are real integration options, not tiers.
 
-**Python (reference implementation, zero dependencies):**
+**Python SDK** (reference implementation, zero dependencies)
 ```bash
 pip install osmp
 ```
 ```python
 from osmp import encode, decode
 ```
+Wire encode/decode into your agent framework's serialization pipeline. Add the [Usage Doctrine](docs/SAL-usage-doctrine-v1.md) to your LLM's system prompt. The agent composes SAL instead of JSON. The receiving node decodes by dictionary lookup.
 
-**TypeScript:**
+**TypeScript SDK**
 ```bash
 npm install osmp-protocol
 ```
@@ -159,7 +210,7 @@ npm install osmp-protocol
 import { encode, decode } from "osmp-protocol";
 ```
 
-**Go:**
+**Go SDK**
 ```go
 import "github.com/octid-io/cloudless-sky/sdk/go/osmp"
 
@@ -167,14 +218,14 @@ sal := osmp.Encode([]string{"H:HR@NODE1>120", "H:CASREP", "M:EVA@*"})
 text := osmp.Decode(sal)
 ```
 
-**MCP Server (for AI client integration):**
+**MCP Server** (Claude Desktop, Cursor, Claude Code, any MCP client)
 ```bash
 pip install osmp-mcp
 osmp-mcp
 ```
-The MCP server wraps the Python SDK. It gives AI clients (Claude Desktop, Cursor, Claude Code) nine tools for encode, decode, validate, lookup, discover, resolve, batch_resolve, compound_decode, and benchmark. Connect from Claude Code: `claude mcp add osmp -- osmp-mcp`. Listed on the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.Octid-io/osmp`.
+The MCP server is not an evaluation tool. It is a production integration. The agent connects, reads the `osmp://system_prompt` resource, learns the SAL grammar and dictionary, and composes SAL natively from that point forward. The server stays running as the encode/decode/validate layer underneath. Nine tools, three MDR corpora, composition doctrine included. Connect from Claude Code: `claude mcp add osmp -- osmp-mcp`. Listed on the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.Octid-io/osmp`.
 
-Use the MCP server when your agent runs inside an MCP client and you want to give it OSMP tools without writing code. Use the SDK directly when you are building a sending or receiving node.
+The three SDKs are for agents and frameworks that manage their own transport (CrewAI, AutoGen, LangGraph, custom orchestrators, embedded nodes). The MCP server is for agents that already speak MCP. Both approaches run OSMP in production. The difference is who manages the connection.
 
 For platform-specific install notes (Termux, Raspberry Pi, constrained hardware), see [KNOWN-ISSUES.md](KNOWN-ISSUES.md).
 
@@ -214,6 +265,23 @@ Run it yourself. The numbers are real and independently reproducible across all 
 
 ---
 
+## Architecture
+
+| Component | Function |
+|---|---|
+| **ADP** — ASD Distribution Protocol | Dictionary delta synchronization across nodes |
+| **ASD** — Adaptive Shared Dictionary | 342-opcode version-pinned compression dictionary |
+| **BAEL** — Bandwidth-Agnostic Efficiency Layer | Adaptive encoding across any channel capacity |
+| **FNP** — Frame Negotiation Protocol | Capability negotiation and session handshake |
+| **OP** — Overflow Protocol | Message fragmentation, priority, graceful degradation |
+| **SAIL** — Semantic Assembly Isomorphic Language | Binary wire encoding, isomorphic to SAL |
+| **SAL** — Semantic Assembly Language | Human-readable symbolic instruction format |
+| **SEC** — Security Envelope | AEAD + Ed25519 authentication for mesh networks |
+| **SNA** — Sovereign Node Architecture | Autonomous edge node, air-gapped operation |
+| **TCL** — Translational Compression Layer | Semantic serialization and transcoding |
+
+---
+
 ## What OSMP Delivers Today
 
 Everything here is operational from the floor ASD without MDR, cloud access, or additional tooling.
@@ -234,6 +302,8 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 
 **BAEL floor guarantee** — the protocol never makes an instruction longer than its natural language input. When the encoded form exceeds the natural language form, BAEL selects NL_PASSTHROUGH and transmits the original with a flags bit. Compression is never negative.
 
+**SAL/SAIL isomorphic encoding** — every SAL instruction compiles to a SAIL binary representation and every SAIL payload decompiles back to the identical SAL instruction. The mapping is bijective: no information is lost in either direction. A developer composes and debugs in SAL (human-readable), deploys in SAIL (binary, maximum compression), and can always decompile the wire payload back to readable SAL for inspection. The encoding a node transmits and the encoding an operator reads are the same instruction in two forms.
+
 **FNP handshake** — Two-message capability advertisement + acknowledgment (40B + 38B = 78 bytes total). Negotiates dictionary alignment, namespace intersection, and channel capacity in two LoRa packets. Implemented in all three SDKs with byte-identical wire format. Channel capacity negotiation selects the LCD of both nodes, so the mesh scales within the most constrained link.
 
 **ADP dictionary synchronization** — The ASD Distribution Protocol keeps dictionaries aligned across nodes after initial FNP handshake. Delta-based updates decompose dictionary changes into independently parseable units, each carrying a version pointer and a tripartite resolution flag (additive, superseding replacement with mandatory retransmission, or deprecation). Nodes apply deltas as they arrive and operate in a partially updated but internally consistent state during synchronization. Instructions referencing opcodes whose defining delta has not yet arrived are held in a semantic pending queue and resolved on receipt. MAJOR.MINOR version signaling detects breaking changes. The guaranteed minimum operational vocabulary floor ensures every node can decode baseline instructions regardless of synchronization state. Implemented in the Python SDK with 69 tests passing.
@@ -247,23 +317,6 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 **C++ firmware-level OSMP nodes** — OSMP integration with Meshtastic via the Python SDK and Meshtastic Python library is operational today (see CONTRIBUTING.md). The C++ contribution target is a firmware-level encoder/decoder enabling ESP32 and nRF52 Meshtastic devices to operate as sovereign OSMP nodes without a companion device, with the ASD compiled into flash.
 
 **Additional MDR namespaces** — SNOMED CT, RxNorm, LOINC, and other open registries are future namespace targets.
-
----
-
-## Architecture
-
-| Component | Function |
-|---|---|
-| **SAL** — Semantic Assembly Language | Domain-specific symbolic instruction format |
-| **ASD** — Adaptive Shared Dictionary | 342-opcode version-pinned compression dictionary |
-| **FNP** — Frame Negotiation Protocol | Capability negotiation and session handshake |
-| **ADP** — ASD Distribution Protocol | Dictionary delta synchronization across nodes |
-| **SNA** — Sovereign Node Architecture | Autonomous edge node, air-gapped operation |
-| **TCL** — Translational Compression Layer | Semantic serialization and transcoding |
-| **OP** — Overflow Protocol | Message fragmentation, priority, graceful degradation |
-| **BAEL** — Bandwidth-Agnostic Efficiency Layer | Adaptive encoding across any channel capacity |
-| **SAIL** — Semantic Assembly Isomorphic Language | Binary wire encoding (isomorphic to SAL) |
-| **SEC** — Security Envelope | AEAD + Ed25519 authentication for mesh networks |
 
 ---
 
