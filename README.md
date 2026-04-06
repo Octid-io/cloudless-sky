@@ -154,6 +154,7 @@ SEC is the security envelope: node ID + monotonic sequence counter + AEAD tag + 
 <table>
 <tr>
 <td align="center"><h1>86.8%</h1><b>byte reduction vs JSON</b><br>29 real-world vectors from 5 frameworks</td>
+<td align="center"><h1>84.5%</h1><b>byte reduction vs MessagePack</b><br>binary serialization baseline</td>
 <td align="center"><h1>70.5%</h1><b>byte reduction vs protobuf</b><br>compiled schemas, protoc 3.21.12</td>
 <td align="center"><h1>76.0%</h1><b>fewer tokens (GPT-4)</b><br>cl100k_base tokenizer, 1,809 → 434</td>
 </tr>
