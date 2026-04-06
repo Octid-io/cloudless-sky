@@ -11,13 +11,27 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
+    "prepublishOnly": "tsc",
     "benchmark": "node dist/benchmark.js"
+  },
+  "keywords": [
+    "osmp", "agentic", "mesh", "protocol", "semantic", "encoding",
+    "lora", "ai", "sal", "dictionary", "compression"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Octid-io/cloudless-sky",
+    "directory": "sdk/typescript"
   },
   "author": "Clay Holberg <clay@octid.io>",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/octid-io/cloudless-sky",
+  "homepage": "https://github.com/Octid-io/cloudless-sky",
   "engines": {
     "node": ">=18.0.0"
   },
