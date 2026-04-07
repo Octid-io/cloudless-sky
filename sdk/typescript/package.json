@@ -1,6 +1,6 @@
 {
   "name": "osmp-protocol",
-  "version": "1.0.0",
+  "version": "2.0.1",
   "description": "OSMP — Octid Semantic Mesh Protocol. Agentic AI instruction encoding for any channel.",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,12 +17,23 @@
   ],
   "scripts": {
     "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepublishOnly": "tsc",
     "benchmark": "node dist/benchmark.js"
   },
   "keywords": [
-    "osmp", "agentic", "mesh", "protocol", "semantic", "encoding",
-    "lora", "ai", "sal", "dictionary", "compression"
+    "osmp",
+    "agentic",
+    "mesh",
+    "protocol",
+    "semantic",
+    "encoding",
+    "lora",
+    "ai",
+    "sal",
+    "dictionary",
+    "compression"
   ],
   "repository": {
     "type": "git",
@@ -37,7 +48,8 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^2.1.9"
   },
   "dependencies": {
     "fzstd": "^0.1.1"

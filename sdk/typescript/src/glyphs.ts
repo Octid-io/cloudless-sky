@@ -1,6 +1,10 @@
 /**
  * OSMP Glyph Tables and ASD Basis Set
- * AUTO-GENERATED from osmp.py (which is generated from canonical dictionary v13)
+ * AUTO-GENERATED from sdk/python/osmp/protocol.py (dictionary v14)
+ *
+ * DO NOT EDIT — regenerate via: python3 tools/gen_asd.py
+ * Edits to this file will be silently overwritten on the next generation run.
+ *
  * Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
  * License: Apache 2.0
  */
@@ -53,7 +57,6 @@ export const PARAMETER_DESIGNATORS: Record<string, { unicode: string; name: stri
 };
 
 // Category 5 — Loss Tolerance Policy Designators
-// Greek uppercase letters whose pre-existing mathematical meanings map to policy semantics.
 // Configuration syntax: N:CFG@[nodeID]:FRAG[Phi|Gamma|Lambda]:tau[n]
 export const LOSS_POLICIES: Record<string, { unicode: string; name: string; bytes: number; legacy: string }> = {
   "Φ": { unicode: "U+03A6", name: "FAIL-SAFE", bytes: 2, legacy: "FS" },
@@ -62,14 +65,15 @@ export const LOSS_POLICIES: Record<string, { unicode: string; name: string; byte
 };
 
 // Category 6 — Dictionary Update Mode Designators
-// Used exclusively in dictionary delta payload mode fields.
-// REPLACE operations require mandatory FLAGS[C] — retransmit on loss, no graceful degradation.
+// REPLACE (←) requires mandatory FLAGS[C]: retransmit on loss, no graceful degradation.
 export const DICT_UPDATE_MODES: Record<string, { unicode: string; name: string; bytes: number }> = {
   "+": { unicode: "U+002B", name: "ADDITIVE", bytes: 1 },
   "←": { unicode: "U+2190", name: "REPLACE", bytes: 3 },
   "†": { unicode: "U+2020", name: "DEPRECATE", bytes: 3 },
 };
 
+// ASD_BASIS — 26 namespaces, 342 opcodes
+// Source: dictionary v14
 export const ASD_BASIS: Record<string, Record<string, string>> = {
   "A": {
     "ACCEPT": "accept_proposed_action",

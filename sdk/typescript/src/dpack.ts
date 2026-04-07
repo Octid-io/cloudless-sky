@@ -5,7 +5,7 @@
  * only the containing block.  Uses fzstd (82KB, pure JS, zero native deps)
  * for zstd decompression.
  *
- * DBLK v1 format: see OSMP-SPEC-v1.md §10.4.1
+ * DBLK v1 format: see OSMP-SPEC-v1.0.2.md §10.4.1
  *
  * Dependency: fzstd (npm install fzstd)
  *   Dict-free DBLK binaries only.  fzstd does not support external

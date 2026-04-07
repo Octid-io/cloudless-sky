@@ -271,7 +271,7 @@ All three SDKs are independently verified against the canonical test suite. Wire
 ### Benchmark
 
 ```
-$ python3 sdk/python/src/osmp.py
+$ python3 -m osmp.protocol
 
 OSMP BENCHMARK — Cloudless Sky Protocol v1.0
 SDK: Python (reference)
@@ -409,7 +409,7 @@ J:GOAL∧Y:SEARCH∧Z:INF∧Q:GROUND
 ```
 cloudless-sky/
   protocol/
-    spec/           <- OSMP-SPEC-v1.md -- authoritative protocol specification
+    spec/           <- OSMP-SPEC-v1.0.2.md -- authoritative protocol specification
     grammar/        <- SAL-grammar.ebnf -- formal grammar (EBNF)
     test-vectors/   <- canonical-test-vectors.json -- conformance suite
   sdk/

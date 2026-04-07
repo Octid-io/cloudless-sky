@@ -2,7 +2,6 @@ package osmp
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 )
 
@@ -44,10 +43,13 @@ func (r *CompositionResult) Warnings() []CompositionIssue {
 	return out
 }
 
+// SAL regex building blocks live in sal_patterns.go.
+// Local aliases preserve the existing variable names used throughout this file
+// without changing the call sites.
 var (
-	frameSplitRe  = regexp.MustCompile(`([→∧∨↔∥;])`)
-	nsTargetRe    = regexp.MustCompile(`@([A-Z]{1,2}):([A-Z][A-Z0-9]+)`)
-	frameNsOpRe   = regexp.MustCompile(`^([A-Z]{1,2}):([A-Z§][A-Z0-9§]*)`)
+	frameSplitRe = salFrameSplitRe
+	nsTargetRe   = salNsTargetRe
+	frameNsOpRe  = salFrameNsOpRe
 )
 
 // ValidateComposition validates a composed SAL instruction against eight

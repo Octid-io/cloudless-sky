@@ -6,7 +6,7 @@ with conditional branches and dependency chains.
 Patent: OSMP-001-UTIL, spec §8.1 Tier 3.
 """
 import sys, struct
-sys.path.insert(0, "sdk/python/src")
+sys.path.insert(0, "sdk/python")
 
 import pytest
 from osmp import (

@@ -17,7 +17,11 @@ import type { FNPState } from "./fnp.js";
 
 // ── SAL frame detection ────────────────────────────────────────────
 
-const SAL_FRAME_RE = /\b([A-Z]):([A-Z]{2,})\b/g;
+import {
+  SAL_FRAME_RE_BRIDGE as SAL_FRAME_RE,
+  NS_PATTERN,
+  OPCODE_PATTERN,
+} from "./sal_patterns.js";
 
 const DEFAULT_ACQUISITION_THRESHOLD = 5;
 const DEFAULT_REGRESSION_THRESHOLD = 3;
@@ -321,9 +325,42 @@ export class SALBridge {
   }
 
   private isPureSal(message: string): boolean {
-    const trimmed = message.trim();
-    if (!trimmed) return false;
-    const frames = trimmed.split(";").map(f => f.trim()).filter(Boolean);
+    // Finding 48: a message is pure SAL if removing every valid SAL
+    // frame (with @target, slots, brackets, consequence class tail),
+    // every chain operator, and every whitespace character leaves
+    // nothing behind. The previous implementation used .test() on a
+    // substring regex, which returned true for natural-language
+    // messages that happened to contain a SAL frame anywhere in them.
+    const stripped = message.trim();
+    if (!stripped) return false;
+
+    // Comprehensive frame-with-tail pattern. Matches a single complete
+    // SAL frame including any @target, ?query, :slot, [bracket], and
+    // consequence class glyph tail.
+    const frameWithTail = new RegExp(
+      "\\b" + NS_PATTERN + ":" + OPCODE_PATTERN
+      + "(?:@[A-Za-z0-9_*\\-]+)?"
+      + "(?:\\?[A-Za-z0-9_]+)?"
+      + "(?:\\[[^\\]]*\\])?"
+      + "(?::[A-Za-z0-9_]+(?::[A-Za-z0-9_.\\-]+)?)*"
+      + "(?:[\\u26a0\\u21ba\\u2298])?",
+      "g",
+    );
+    let residue = stripped.replace(frameWithTail, "");
+    // Strip chain operators, parentheses, and whitespace
+    residue = residue.replace(
+      /[\u2227\u2228\u00ac\u2192\u2194\u2225\u27f3\u2260\u2295;\s()]/g,
+      "",
+    );
+    if (residue.length > 0) {
+      // NL prose remains — not pure SAL
+      return false;
+    }
+
+    // Second pass: every recognized frame must contain a real SAL
+    // frame regex match. This catches the trivial empty-string case
+    // and any pathological inputs the strip pass might let through.
+    const frames = stripped.split(";").map(f => f.trim()).filter(Boolean);
     for (const frame of frames) {
       if (!new RegExp(SAL_FRAME_RE.source).test(frame)) return false;
     }

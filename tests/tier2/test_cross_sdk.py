@@ -15,7 +15,7 @@ A single disagreement is a wire incompatibility and blocks release.
 Run: python3 tests/tier2/test_cross_sdk.py
 """
 import sys, json, subprocess, os, re
-sys.path.insert(0, "sdk/python/src")
+sys.path.insert(0, "sdk/python")
 from osmp import SALDecoder, utf8_bytes
 
 PASS = "\033[32mPASS\033[0m"

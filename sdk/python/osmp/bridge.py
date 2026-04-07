@@ -41,7 +41,8 @@ from osmp.protocol import (
 # ─────────────────────────────────────────────────────────────────────────────
 
 # SAL frame pattern: at least Namespace:Opcode (e.g., H:HR, A:ACK, M:EVA)
-_SAL_FRAME_RE = re.compile(r"\b([A-Z]):([A-Z]{2,})\b")
+from osmp.protocol import _SAL_FRAME_RE_BRIDGE as _SAL_FRAME_RE
+from osmp.protocol import _NS_PATTERN, _OPCODE_PATTERN
 
 # Default threshold: 5 consecutive messages with valid SAL before ACQUIRED
 DEFAULT_ACQUISITION_THRESHOLD = 5
@@ -404,11 +405,12 @@ class SALBridge:
     # ── internal ─────────────────────────────────────────────────────
 
     def _decode_to_nl(self, sal: str) -> str:
-        """Decode a SAL string to natural language using the ASD."""
-        frames = [f.strip() for f in sal.split(";") if f.strip()]
-        if len(frames) <= 1:
-            return self._decoder.decode_natural_language(sal)
-        return "; ".join(self._decoder.decode_natural_language(f) for f in frames)
+        """Decode a SAL string to natural language using the ASD.
+
+        Single-frame and ;-separated chains are both handled natively by
+        ``SALDecoder.decode_natural_language``. No splitting workaround needed.
+        """
+        return self._decoder.decode_natural_language(sal)
 
     def _detect_sal_frames(self, message: str) -> list[tuple[str, str]]:
         """Scan a message for valid SAL frames.
@@ -427,21 +429,65 @@ class SALBridge:
     def _is_pure_sal(self, message: str) -> bool:
         """Check if a message is entirely valid SAL (no NL mixed in).
 
-        A message is pure SAL if every non-whitespace, non-separator segment
-        parses as a valid SAL frame.
+        A message is pure SAL if removing every valid SAL frame, every
+        chain operator, and every whitespace character leaves nothing
+        behind. This is a stricter test than the substring search the
+        previous implementation used: an NL message containing a
+        ``"please use I:§ before proceeding"`` substring is NOT pure
+        SAL even though it contains a valid SAL frame.
+
+        Finding 48: previously this method used ``_SAL_FRAME_RE.search``
+        which returned True for any string containing a SAL match
+        anywhere, causing natural-language inbound messages to be
+        misclassified as pure SAL and routed through the wrong code
+        path in ``receive``.
         """
         stripped = message.strip()
         if not stripped:
             return False
+
+        # Strip every valid SAL frame from the message. After this,
+        # only operators, whitespace, and (if any) NL prose should
+        # remain. Pure SAL has nothing left after also stripping
+        # operators and whitespace.
+        residue = stripped
+        # Iteratively remove every match of the SAL frame regex with
+        # its surrounding @target, ?query, :slot, [bracket], and
+        # consequence class tail. We use a single comprehensive
+        # frame pattern for the strip step so we don't leave behind
+        # tail elements that would confuse the residue check.
+        frame_with_tail_re = re.compile(
+            r"\b" + _NS_PATTERN + r":" + _OPCODE_PATTERN
+            + r"(?:@[A-Za-z0-9_*\-]+)?"
+            + r"(?:\?[A-Za-z0-9_]+)?"
+            + r"(?:\[[^\]]*\])?"
+            + r"(?::[A-Za-z0-9_]+(?::[A-Za-z0-9_.\-]+)?)*"
+            + r"(?:[\u26a0\u21ba\u2298])?"
+        )
+        residue = frame_with_tail_re.sub("", residue)
+        # Strip chain operators, parentheses, and whitespace
+        residue = re.sub(r"[\u2227\u2228\u00ac\u2192\u2194\u2225\u27f3"
+                         r"\u2260\u2295;\s()]", "", residue)
+        if residue:
+            # Anything left is NL prose — not pure SAL
+            return False
+
+        # Second pass: every recognized frame must validate cleanly
+        # under the composition rules (no warnings either, since
+        # MIXED_MODE warnings indicate borderline cases the strip
+        # logic didn't catch).
         frames = [f.strip() for f in stripped.split(";") if f.strip()]
         for frame in frames:
-            # Must contain namespace:opcode pattern
             if not _SAL_FRAME_RE.search(frame):
                 return False
-            # Validate against composition rules
             result = validate_composition(frame, "", self.asd)
             if not result.valid:
                 return False
+            # MIXED_MODE warnings indicate the frame contains NL prose
+            # the strip pass didn't catch — treat as not pure SAL
+            for issue in result.warnings:
+                if issue.rule == "MIXED_MODE":
+                    return False
         return True
 
     def _emit(self, event_type: str, remote_id: str, **kwargs) -> None:

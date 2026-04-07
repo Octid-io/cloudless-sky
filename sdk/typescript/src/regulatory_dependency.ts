@@ -10,6 +10,7 @@
 
 import { readFileSync, existsSync } from "fs";
 import type { CompositionIssue } from "./validate.js";
+import { PREREQ_RE, CHAIN_FRAME_RE } from "./sal_patterns.js";
 
 // ─── Data Structures ────────────────────────────────────────────────────────
 
@@ -23,8 +24,6 @@ export interface DependencyRule {
 }
 
 // ─── Parser ─────────────────────────────────────────────────────────────────
-
-const PREREQ_RE = /([A-Z]{1,2}):([A-Z][A-Z0-9]*)(?:\[([^\]]+)\])?/;
 
 export function parseRequiresExpression(requires: string): string[][] {
   let expr = requires;
@@ -87,8 +86,6 @@ export function loadMDRDependencyRules(mdrPath: string): DependencyRule[] {
 }
 
 // ─── Chain Frame Extraction ─────────────────────────────────────────────────
-
-const CHAIN_FRAME_RE = /([A-Z]{1,2}):([A-Z][A-Z0-9]*)(?:\[([^\]]+)\]|:([A-Z0-9][A-Z0-9_.]+))?/g;
 
 export function extractChainFrames(sal: string): { frames: Set<string>; opcodes: Set<string> } {
   const frames = new Set<string>();

@@ -2,7 +2,7 @@
   "metadata": {
     "model": "claude-sonnet-4-20250514",
     "date": "2026-03-26",
-    "system_prompt": "Doctrine v2.1 with Principles 1 and 2, ACK collision entry, byte check R exemption",
+    "system_prompt": "Doctrine v1.0 with Principles 1 and 2, ACK collision entry, byte check R exemption",
     "test_mode": "Cold test. Fresh Sonnet conversation. No prior context. No osmp_lookup tool."
   },
   "responses": [

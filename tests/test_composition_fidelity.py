@@ -14,7 +14,7 @@ Usage:
 
 Requirements:
   - Python 3.10+
-  - OSMP SDK on path (sdk/python/src)
+  - OSMP SDK on path (sdk/python)
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ from typing import Optional
 
 # -- Resolve SDK path --------------------------------------------------------
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SDK_PATH = REPO_ROOT / "sdk" / "python" / "src"
+SDK_PATH = REPO_ROOT / "sdk" / "python"
 sys.path.insert(0, str(SDK_PATH))
 
 from osmp import AdaptiveSharedDictionary, SALDecoder

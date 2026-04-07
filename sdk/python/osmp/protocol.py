@@ -2,7 +2,7 @@
 OSMP Python Reference Implementation
 Octid Semantic Mesh Protocol — Cloudless Sky Project
 
-Source of truth: OSMP-semantic-dictionary-v14.csv | OSMP-SPEC-v1.md | SAL-grammar.ebnf
+Source of truth: OSMP-semantic-dictionary-v14.csv | OSMP-SPEC-v1.0.2.md | SAL-grammar.ebnf
 All opcode names, definitions, and namespace assignments are drawn directly from the
 canonical semantic dictionary v14.0, not from any prior implementation.
 
@@ -1608,12 +1608,29 @@ class SALEncoder:
 # COMPOSITION VALIDATION (Section 12.5 of OSMP-SPEC-v1)
 # ─────────────────────────────────────────────────────────────────────────────
 
+# ── SAL Regex Building Blocks ────────────────────────────────────────────────
+# Single source of truth for the namespace and opcode character classes used
+# across the validator (Rule 4) and the regulatory_dependency parser (Rule 8).
+# The § glyph is the human-authorization presence marker (I:§) and must be
+# accepted as a valid opcode character; any regex that excludes it would
+# silently miss frames involving I:§ and break dependency rules that
+# reference human authorization as a precondition.
+_NS_PATTERN     = r'[A-Z]{1,2}'           # Tier 1 (single char) and Tier 2 (two char)
+_OPCODE_PATTERN = r'[A-Z§][A-Z0-9§]*'     # Opcode body, includes § for I:§
+
 # Operators that split compound SAL instructions into frames
 _FRAME_SPLIT_RE = re.compile(r'([→∧∨↔∥;])')
 # Pattern matching namespace:opcode after @ (prohibited: namespace-as-target)
-_NS_TARGET_RE = re.compile(r'@([A-Z]{1,2}):([A-Z][A-Z0-9]+)')
+_NS_TARGET_RE = re.compile(rf'@({_NS_PATTERN}):({_OPCODE_PATTERN})')
 # Pattern extracting namespace:opcode from a SAL frame
-_FRAME_NS_OP_RE = re.compile(r'^([A-Z]{1,2}):([A-Z§][A-Z0-9§]*)')
+_FRAME_NS_OP_RE = re.compile(rf'^({_NS_PATTERN}):({_OPCODE_PATTERN})')
+# Pattern detecting SAL frames embedded in natural language (used by SALBridge).
+# Uses a leading word boundary and relies on the greedy opcode pattern to
+# absorb the full opcode body. No trailing boundary because § (the human-
+# authorization marker) is a Unicode non-word character that breaks symmetric
+# \b matching. This approach is cross-SDK identical: Python re, JavaScript,
+# and Go RE2 all behave the same way for this regex.
+_SAL_FRAME_RE_BRIDGE = re.compile(rf'\b({_NS_PATTERN}):({_OPCODE_PATTERN})')
 
 
 # ── Regulatory Dependency Grammar (Rule 8) ───────────────────────────────────
@@ -1623,10 +1640,10 @@ _FRAME_NS_OP_RE = re.compile(r'^([A-Z]{1,2}):([A-Z§][A-Z0-9§]*)')
 # Patent ref: OSMP-001-UTIL Claim 40 (pending)
 
 # Pattern for prerequisite expressions: NS:OPCODE or NS:OPCODE[SLOT]
-_PREREQ_RE = re.compile(r'([A-Z]{1,2}):([A-Z][A-Z0-9]*)(?:\[([^\]]+)\])?')
+_PREREQ_RE = re.compile(rf'({_NS_PATTERN}):({_OPCODE_PATTERN})(?:\[([^\]]+)\])?')
 # Chain frame extraction: captures bracket [VAL] and colon :VAL notation
 _CHAIN_FRAME_RE = re.compile(
-    r'([A-Z]{1,2}):([A-Z][A-Z0-9]*)(?:\[([^\]]+)\]|:([A-Z0-9][A-Z0-9_.]+))?'
+    rf'({_NS_PATTERN}):({_OPCODE_PATTERN})(?:\[([^\]]+)\]|:([A-Z0-9][A-Z0-9_.]+))?'
 )
 
 
@@ -2067,6 +2084,31 @@ class SALDecoder:
         )
 
     def decode_natural_language(self, encoded: str) -> str:
+        """Decode a SAL string (single frame or ;-separated chain) to natural language.
+
+        For chains, each frame is decoded independently and joined with "; ".
+        Empty frames (e.g. trailing semicolons) are dropped. Malformed individual
+        frames are wrapped as ``[malformed: ...]`` and the chain decode continues
+        rather than failing the whole sequence.
+
+        This is the single source of truth for SAL→NL conversion. The Tier 1
+        ``osmp.decode()`` wrapper and the ``SALBridge`` outbound translator both
+        delegate to this method without additional chain handling.
+        """
+        # Single frame fast path: no chain operator present
+        if ";" not in encoded:
+            return self._decode_single_frame(encoded)
+
+        # Chain: split on top-level ; and decode each frame independently
+        frames = [f.strip() for f in encoded.split(";") if f.strip()]
+        if not frames:
+            return ""
+        if len(frames) == 1:
+            return self._decode_single_frame(frames[0])
+        return "; ".join(self._decode_single_frame(f) for f in frames)
+
+    def _decode_single_frame(self, encoded: str) -> str:
+        """Decode exactly one SAL frame to its natural language form."""
         try:
             d = self.decode_frame(encoded)
         except Exception:
@@ -2810,6 +2852,16 @@ class BlockCompressor:
         is not found in the candidate block, the previous block is
         checked before returning None.
 
+        Input normalization
+        -------------------
+        For ICD-10-CM and similar code systems where the canonical CMS
+        format strips decimal points from codes (J93.0 -> J930), this
+        method tries the input verbatim first, then if not found and
+        the input contains a ``.``, retries with the dot removed. This
+        allows callers to pass either ``"J93.0"`` (the form a doctor or
+        an LLM trained on real ICD documentation will produce) or
+        ``"J930"`` (the canonical CMS dpack key) interchangeably.
+
         Parameters
         ----------
         data : bytes, the complete DBLK binary (or a memoryview/mmap).
@@ -2820,6 +2872,23 @@ class BlockCompressor:
         str or None : SAL description text, or None if not found.
         """
         hdr = self._parse_header(data)
+
+        result = self._lookup_exact(data, hdr, code)
+        if result is not None:
+            return result
+
+        # Dot normalization fallback: strip "." and retry. Covers the
+        # ICD-10-CM real-form -> CMS-form mapping (J93.0 -> J930) and
+        # any similar code system that uses dots for human readability
+        # but stores undotted keys in the canonical corpus.
+        if "." in code:
+            normalized = code.replace(".", "")
+            return self._lookup_exact(data, hdr, normalized)
+
+        return None
+
+    def _lookup_exact(self, data: bytes, hdr: dict, code: str) -> str | None:
+        """Internal: exact-match block search with truncation fallback."""
         blk_idx = self._find_block(data, hdr, code)
 
         raw = self._decompress_block(data, hdr, blk_idx)
@@ -2971,4 +3040,4 @@ if __name__ == "__main__":
     if vectors_path.exists():
         run_benchmark(str(vectors_path))
     else:
-        print(f"  Run from repo root: python3 sdk/python/src/osmp.py")
+        print(f"  Run from repo root: python3 -m osmp.protocol")

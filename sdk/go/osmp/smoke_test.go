@@ -6,7 +6,7 @@ import (
 )
 
 func TestCanonicalOpcodeNames(t *testing.T) {
-	// Verify opcodes match canonical dictionary v13
+	// Verify opcodes match canonical dictionary v14
 	asd := osmp.NewASD()
 	cases := []struct{ ns, op, want string }{
 		{"A","MACRO","registered_macro_invocation"},

@@ -13,13 +13,14 @@ package osmp
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 	"time"
 )
 
-// SAL frame pattern: Namespace:Opcode (e.g., H:HR, A:ACK, M:EVA)
-var salFrameRE = regexp.MustCompile(`\b([A-Z]):([A-Z]{2,})\b`)
+// SAL frame pattern: Namespace:Opcode (e.g., H:HR, A:ACK, M:EVA, I:§)
+// Aliases the shared salBridgeFrameRe from sal_patterns.go to preserve the
+// existing salFrameRE name used throughout this file.
+var salFrameRE = salBridgeFrameRe
 
 const (
 	DefaultAcquisitionThreshold = 5
@@ -330,12 +331,40 @@ func (b *SALBridge) detectSALFrames(message string) [][2]string {
 	return valid
 }
 
+// isPureSAL determines whether a message is entirely valid SAL with no
+// embedded natural language. A message is pure SAL if and only if
+// removing every valid SAL frame (with @target, slots, brackets, and
+// consequence class tail), every chain operator, and every whitespace
+// character leaves nothing behind.
+//
+// Finding 48: previously this method used salFrameRE.MatchString which
+// returned true for any string containing a SAL match anywhere, causing
+// natural-language inbound messages like "authorize via I:§ before
+// proceeding" to be misclassified as pure SAL and routed to the wrong
+// code path in Receive. Both Python and TypeScript SDKs had the
+// identical bug; all three are now fixed with the strip-and-residue
+// approach.
 func (b *SALBridge) isPureSAL(message string) bool {
-	trimmed := strings.TrimSpace(message)
-	if trimmed == "" {
+	stripped := strings.TrimSpace(message)
+	if stripped == "" {
 		return false
 	}
-	frames := strings.Split(trimmed, ";")
+
+	// Strip every valid SAL frame (with target/slots/brackets/CC tail)
+	// from the message. After this, only operators, whitespace, and
+	// possible NL prose should remain.
+	residue := salFrameWithTailRe.ReplaceAllString(stripped, "")
+	// Strip chain operators, parentheses, and whitespace
+	residue = salOperatorWhitespaceRe.ReplaceAllString(residue, "")
+	if residue != "" {
+		// Anything left is NL prose — not pure SAL
+		return false
+	}
+
+	// Second pass: every recognized frame must contain a real SAL
+	// frame regex match. This catches the trivial empty-string case
+	// and any pathological inputs the strip pass might let through.
+	frames := strings.Split(stripped, ";")
 	for _, f := range frames {
 		f = strings.TrimSpace(f)
 		if f == "" {

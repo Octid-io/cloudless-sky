@@ -107,7 +107,7 @@ class TestAgentDX:
 
     def test_osmp_encode_fields(self):
         """An agent given the osmp_encode schema should produce this call."""
-        sys.path.insert(0, "mcp")
+        sys.path.insert(0, "osmp_mcp")
         from server import osmp_encode
         result = osmp_encode(namespace="R", opcode="MOV", target="BOT1",
                              consequence_class="\u21ba")

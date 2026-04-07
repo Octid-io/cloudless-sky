@@ -12,7 +12,17 @@
  * Dictionary: OSMP-semantic-dictionary-v14.csv
  */
 
-import { createHmac, randomBytes, timingSafeEqual } from "crypto";
+import {
+  createCipheriv,
+  createDecipheriv,
+  createPrivateKey,
+  createPublicKey,
+  randomBytes,
+  sign as cryptoSign,
+  verify as cryptoVerify,
+  timingSafeEqual,
+  KeyObject,
+} from "crypto";
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 
@@ -498,40 +508,154 @@ export interface SecEnvelope {
 }
 
 export class SecCodec {
+  /**
+   * Security envelope encoder/decoder.
+   *
+   * Uses real cryptographic primitives via Node.js stdlib crypto:
+   *   - Ed25519 (RFC 8032) for sender authentication via 64-byte signatures
+   *   - ChaCha20-Poly1305 (RFC 7539, RFC 8439) for AEAD payload integrity
+   *     with a 16-byte authentication tag
+   *   - 12-byte nonces derived deterministically from the envelope header
+   *     padded with the canonical OSMP nonce salt
+   *
+   * The wire format is byte-identical to the Python and Go SecCodec
+   * implementations so cross-SDK envelopes interoperate natively.
+   *
+   * Key management is external (MDR node identity service). For ephemeral
+   * sessions or local testing, omit the key arguments and the constructor
+   * will generate fresh keys via crypto.randomBytes.
+   */
+
+  // 12 bytes — pads short headers up to ChaCha20-Poly1305 nonce length
+  private static readonly NONCE_SALT = Buffer.from("OSMP-SEC-v1\x00", "binary");
+
   private nodeId: Buffer;
-  private signingKey: Buffer;
+  private signingKeySeed: Buffer;
   private symmetricKey: Buffer;
+  private ed25519PrivateKey: KeyObject;
+  private ed25519PublicKey: KeyObject;
+  private verifyPublicKeyDefault: KeyObject;
   private seqCounter: number = 0;
 
-  constructor(nodeId: Buffer, signingKey?: Buffer, symmetricKey?: Buffer) {
-    if (nodeId.length !== 2 && nodeId.length !== 4) throw new Error("nodeId must be 2 or 4 bytes");
+  constructor(
+    nodeId: Buffer,
+    signingKey?: Buffer,
+    symmetricKey?: Buffer,
+    verifyKey?: Buffer,
+  ) {
+    if (nodeId.length !== 2 && nodeId.length !== 4) {
+      throw new Error("nodeId must be 2 or 4 bytes");
+    }
     this.nodeId = nodeId;
-    this.signingKey = signingKey ?? randomBytes(32);
-    this.symmetricKey = symmetricKey ?? randomBytes(32);
+
+    // Ed25519 signing key (32-byte seed)
+    const seed = signingKey ?? randomBytes(32);
+    if (seed.length !== 32) {
+      throw new Error(`signingKey must be 32 bytes (Ed25519 seed), got ${seed.length}`);
+    }
+    this.signingKeySeed = seed;
+    this.ed25519PrivateKey = SecCodec.ed25519PrivateFromSeed(seed);
+    this.ed25519PublicKey = createPublicKey(this.ed25519PrivateKey);
+
+    // ChaCha20-Poly1305 symmetric key (32 bytes)
+    const sym = symmetricKey ?? randomBytes(32);
+    if (sym.length !== 32) {
+      throw new Error(`symmetricKey must be 32 bytes (ChaCha20-Poly1305), got ${sym.length}`);
+    }
+    this.symmetricKey = sym;
+
+    // Default verify key: our own public key (loopback). For inter-node
+    // verification, callers pass the peer's public key.
+    if (verifyKey !== undefined) {
+      if (verifyKey.length !== 32) {
+        throw new Error(`verifyKey must be 32 bytes (Ed25519 public key), got ${verifyKey.length}`);
+      }
+      this.verifyPublicKeyDefault = SecCodec.ed25519PublicFromBytes(verifyKey);
+    } else {
+      this.verifyPublicKeyDefault = this.ed25519PublicKey;
+    }
+  }
+
+  /** Wrap a 32-byte raw Ed25519 seed in the PKCS#8 DER prefix Node expects. */
+  private static ed25519PrivateFromSeed(seed: Buffer): KeyObject {
+    // PKCS#8 v1 prefix for Ed25519: 0x302e020100300506032b657004220420 (16 bytes)
+    const PKCS8_PREFIX = Buffer.from(
+      "302e020100300506032b657004220420",
+      "hex",
+    );
+    const der = Buffer.concat([PKCS8_PREFIX, seed]);
+    return createPrivateKey({ key: der, format: "der", type: "pkcs8" });
+  }
+
+  /** Wrap a 32-byte raw Ed25519 public key in the SPKI DER prefix Node expects. */
+  private static ed25519PublicFromBytes(pub: Buffer): KeyObject {
+    // SPKI prefix for Ed25519: 0x302a300506032b6570032100 (12 bytes)
+    const SPKI_PREFIX = Buffer.from("302a300506032b6570032100", "hex");
+    const der = Buffer.concat([SPKI_PREFIX, pub]);
+    return createPublicKey({ key: der, format: "der", type: "spki" });
+  }
+
+  /** Return the 32-byte raw Ed25519 public key for distributing to peers. */
+  get publicSigningKey(): Buffer {
+    const der = this.ed25519PublicKey.export({ format: "der", type: "spki" }) as Buffer;
+    // SPKI DER for Ed25519 is 12 bytes of prefix + 32 bytes of public key
+    return Buffer.from(der.subarray(der.length - 32));
   }
 
   private nextSeq(): number { return ++this.seqCounter; }
 
+  /** Derive a 12-byte ChaCha20-Poly1305 nonce from the envelope header. */
+  private deriveNonce(header: Buffer): Buffer {
+    if (header.length >= 12) return Buffer.from(header.subarray(0, 12));
+    return Buffer.concat([header, SecCodec.NONCE_SALT]).subarray(0, 12);
+  }
+
   private seal(ad: Buffer, payload: Buffer): [Buffer, Buffer] {
-    const tag = createHmac("sha256", this.symmetricKey).update(Buffer.concat([ad, payload])).digest().subarray(0, 16);
-    return [payload, tag];
+    const nonce = this.deriveNonce(ad);
+    const cipher = createCipheriv("chacha20-poly1305", this.symmetricKey, nonce, {
+      authTagLength: 16,
+    });
+    cipher.setAAD(ad, { plaintextLength: payload.length });
+    const ciphertext = Buffer.concat([cipher.update(payload), cipher.final()]);
+    const tag = cipher.getAuthTag();
+    return [ciphertext, tag];
   }
 
   private open(ad: Buffer, payload: Buffer, authTag: Buffer): Buffer | null {
-    const expected = createHmac("sha256", this.symmetricKey).update(Buffer.concat([ad, payload])).digest().subarray(0, 16);
-    return timingSafeEqual(authTag, expected) ? payload : null;
+    try {
+      const nonce = this.deriveNonce(ad);
+      const decipher = createDecipheriv("chacha20-poly1305", this.symmetricKey, nonce, {
+        authTagLength: 16,
+      });
+      decipher.setAAD(ad, { plaintextLength: payload.length });
+      decipher.setAuthTag(authTag);
+      return Buffer.concat([decipher.update(payload), decipher.final()]);
+    } catch {
+      return null;
+    }
   }
 
   private sign(message: Buffer): Buffer {
-    const sig = createHmac("sha256", this.signingKey).update(message).digest();
-    return Buffer.concat([sig, sig]); // 64 bytes placeholder
+    // Ed25519 in Node: pass null algorithm, the key implies the algorithm
+    return cryptoSign(null, message, this.ed25519PrivateKey);
   }
 
   private verify(message: Buffer, signature: Buffer, verifyKey?: Buffer): boolean {
-    const key = verifyKey ?? this.signingKey;
-    const expected = createHmac("sha256", key).update(message).digest();
-    const expectedSig = Buffer.concat([expected, expected]);
-    return timingSafeEqual(signature, expectedSig);
+    let pub: KeyObject;
+    if (verifyKey !== undefined) {
+      try {
+        pub = SecCodec.ed25519PublicFromBytes(verifyKey);
+      } catch {
+        return false;
+      }
+    } else {
+      pub = this.verifyPublicKeyDefault;
+    }
+    try {
+      return cryptoVerify(null, message, pub, signature);
+    } catch {
+      return false;
+    }
   }
 
   pack(payload: Buffer, wireMode: WireMode = WireMode.SEC): Buffer {

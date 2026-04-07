@@ -6,9 +6,11 @@ The first build of this repo used `osmp.py` as the source of truth for the ASD b
 
 ## Decision
 
-The canonical semantic dictionary v12 (`protocol/OSMP-semantic-dictionary-v12.csv`) is the single source of truth. `sdk/python/src/osmp.py` is built from the dictionary. `sdk/typescript/src/glyphs.ts` is generated from `osmp.py`. `sdk/go/osmp/glyphs.go` is generated from `osmp.py`. No SDK file defines opcodes independently.
+The canonical semantic dictionary v12 (`protocol/OSMP-semantic-dictionary-v12.csv`) is the single source of truth. `sdk/python/osmp/protocol.py` is built from the dictionary. `sdk/typescript/src/glyphs.ts` is generated from the Python `ASD_BASIS`. `sdk/go/osmp/glyphs.go` is generated from the Python `ASD_BASIS`. No SDK file defines opcodes independently.
 
-The generation command is: `python3 tools/gen_asd.py` (produces `glyphs.ts` and `glyphs.go` from the Python ASD_BASIS, which was itself written from the dictionary).
+The generation command is: `python3 tools/gen_asd.py` (produces `glyphs.ts` and `glyphs.go` from the Python `ASD_BASIS`, which was itself written from the dictionary).
+
+> **Layout note (post-migration):** This ADR was authored when the Python SDK was a single flat file at `sdk/python/src/osmp.py`. The package was subsequently reorganized to `sdk/python/osmp/` with `protocol.py`, `wire.py`, `bridge.py`, etc. The normative source-of-truth relationship is unchanged: the dictionary CSV is the pin, the SDKs are derivations.
 
 ## Analog
 

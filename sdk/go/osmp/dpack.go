@@ -13,7 +13,7 @@
 // Dict binaries (flags bit 0 = 1) load the trained dictionary from
 // the binary header.
 //
-// DBLK v1 format: see OSMP-SPEC-v1.md section 10.4.1
+// DBLK v1 format: see OSMP-SPEC-v1.0.2.md section 10.4.1
 package osmp
 
 import (

@@ -6,7 +6,7 @@ Thank you for your interest in contributing to OSMP. This document explains how 
 
 ## The Spec Is Authoritative
 
-The protocol specification at `protocol/spec/OSMP-SPEC-v1.md` is the source of truth. The formal grammar at `protocol/grammar/SAL-grammar.ebnf` is the canonical SAL definition. The test vectors at `protocol/test-vectors/canonical-test-vectors.json` define what "correct" means.
+The protocol specification at `protocol/spec/OSMP-SPEC-v1.0.2.md` is the source of truth. The formal grammar at `protocol/grammar/SAL-grammar.ebnf` is the canonical SAL definition. The test vectors at `protocol/test-vectors/canonical-test-vectors.json` define what "correct" means.
 
 If there is a conflict between an SDK implementation and the spec, the spec wins. If there is a conflict between the spec and intuition, open an issue — do not resolve it by changing the implementation.
 

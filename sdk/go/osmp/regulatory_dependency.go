@@ -11,7 +11,6 @@ package osmp
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"strings"
 )
 
@@ -25,7 +24,9 @@ type DependencyRule struct {
 	Alternatives [][]string // parsed: [[prereq_pattern, ...], ...]
 }
 
-var prereqRe = regexp.MustCompile(`([A-Z]{1,2}):([A-Z][A-Z0-9]*)(?:\[([^\]]+)\])?`)
+// SAL regex building blocks live in sal_patterns.go.
+// Local alias preserves the existing name without changing call sites.
+var prereqRe = salPrereqRe
 
 // ParseRequiresExpression parses "REQUIRES:F:REMID[S]∧F:AV[Part107]∨F:REMID[M]" into alternatives.
 // Each ∨-split alternative is further split on ∧ for conjunctive prerequisites.
@@ -125,7 +126,8 @@ func LoadMDRDependencyRules(mdrPath string) ([]DependencyRule, error) {
 }
 
 // chain frame extraction regex: captures bracket [VAL] and colon :VAL notation
-var chainFrameRe = regexp.MustCompile(`([A-Z]{1,2}):([A-Z][A-Z0-9]*)(?:\[([^\]]+)\]|:([A-Z0-9][A-Z0-9_.]+))?`)
+// chainFrameRe aliases the shared salChainFrameRe from sal_patterns.go.
+var chainFrameRe = salChainFrameRe
 
 // ExtractChainFrames extracts all frames from a SAL instruction chain.
 // Returns (frames with slots normalized to bracket notation, bare opcodes).

@@ -7,6 +7,7 @@
  */
 import { AdaptiveSharedDictionary } from "./asd.js";
 import { validateRegulatoryDependencies, DependencyRule } from "./regulatory_dependency.js";
+import { FRAME_SPLIT_RE, NS_TARGET_RE, FRAME_NS_OP_RE } from "./sal_patterns.js";
 
 export interface CompositionIssue {
   rule: string;        // e.g. "HALLUCINATED_OPCODE", "NAMESPACE_AS_TARGET"
@@ -23,10 +24,6 @@ export interface CompositionResult {
   errors: CompositionIssue[];
   warnings: CompositionIssue[];
 }
-
-const FRAME_SPLIT_RE = /([→∧∨↔∥;])/;
-const NS_TARGET_RE = /@([A-Z]{1,2}):([A-Z][A-Z0-9]+)/g;
-const FRAME_NS_OP_RE = /^([A-Z]{1,2}):([A-Z§][A-Z0-9§]*)/;
 
 /**
  * Validate a composed SAL instruction against composition rules.

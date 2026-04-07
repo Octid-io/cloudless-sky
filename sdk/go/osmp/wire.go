@@ -6,10 +6,8 @@
 package osmp
 
 import (
-	"crypto/hmac"
+	"crypto/ed25519"
 	"crypto/rand"
-	"crypto/sha256"
-	"crypto/subtle"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -18,6 +16,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"golang.org/x/crypto/chacha20poly1305"
 )
 
 // WireMode selects the encoding mode for transmission.
@@ -652,52 +652,172 @@ type SecEnvelope struct {
 	Signature  []byte
 }
 
+// SecCodec is the security envelope encoder/decoder.
+//
+// Uses real cryptographic primitives:
+//   - Ed25519 (RFC 8032) for sender authentication via 64-byte signatures
+//     (crypto/ed25519 from the Go standard library)
+//   - ChaCha20-Poly1305 (RFC 7539, RFC 8439) for AEAD payload integrity
+//     with a 16-byte authentication tag
+//     (golang.org/x/crypto/chacha20poly1305)
+//   - 12-byte nonces derived deterministically from the envelope header
+//     padded with the canonical OSMP nonce salt
+//
+// The wire format is byte-identical to the Python and TypeScript SecCodec
+// implementations so cross-SDK envelopes interoperate natively.
+//
+// Key management is external (MDR node identity service). For ephemeral
+// sessions or local testing, omit the key arguments and the constructor
+// will generate fresh keys via crypto/rand.
 type SecCodec struct {
-	nodeID       []byte
-	signingKey   []byte
-	symmetricKey []byte
-	seqCounter   uint32
+	nodeID                   []byte
+	signingKeySeed           []byte
+	symmetricKey             []byte
+	ed25519Private           ed25519.PrivateKey
+	ed25519Public            ed25519.PublicKey
+	verifyPublicKeyDefault   ed25519.PublicKey
+	aead                     interface { // chacha20poly1305 AEAD interface
+		Seal(dst, nonce, plaintext, additionalData []byte) []byte
+		Open(dst, nonce, ciphertext, additionalData []byte) ([]byte, error)
+		NonceSize() int
+		Overhead() int
+	}
+	seqCounter uint32
 }
 
+// nonceSalt pads short envelope headers up to the 12-byte ChaCha20-Poly1305
+// nonce length. Identical across Python, TypeScript, and Go SDKs.
+var secNonceSalt = []byte("OSMP-SEC-v1\x00")
+
+// NewSecCodec constructs a SecCodec with the given node identity and keys.
+// signingKey must be 32 bytes (Ed25519 seed), symmetricKey must be 32 bytes
+// (ChaCha20-Poly1305 key). Pass nil for either to generate a fresh random key.
 func NewSecCodec(nodeID, signingKey, symmetricKey []byte) (*SecCodec, error) {
+	return NewSecCodecWithVerifyKey(nodeID, signingKey, symmetricKey, nil)
+}
+
+// NewSecCodecWithVerifyKey is the full constructor including a peer public
+// key for inter-node verification. If verifyKey is nil, the codec defaults
+// to verifying with its own public key (loopback / local-only).
+func NewSecCodecWithVerifyKey(nodeID, signingKey, symmetricKey, verifyKey []byte) (*SecCodec, error) {
 	if len(nodeID) != 2 && len(nodeID) != 4 {
 		return nil, errors.New("nodeID must be 2 or 4 bytes")
 	}
-	if signingKey == nil { signingKey = make([]byte, 32); rand.Read(signingKey) }
-	if symmetricKey == nil { symmetricKey = make([]byte, 32); rand.Read(symmetricKey) }
-	return &SecCodec{nodeID: nodeID, signingKey: signingKey, symmetricKey: symmetricKey}, nil
+	if signingKey == nil {
+		signingKey = make([]byte, 32)
+		if _, err := rand.Read(signingKey); err != nil {
+			return nil, fmt.Errorf("generate signing key: %w", err)
+		}
+	}
+	if len(signingKey) != 32 {
+		return nil, fmt.Errorf("signingKey must be 32 bytes (Ed25519 seed), got %d", len(signingKey))
+	}
+	if symmetricKey == nil {
+		symmetricKey = make([]byte, 32)
+		if _, err := rand.Read(symmetricKey); err != nil {
+			return nil, fmt.Errorf("generate symmetric key: %w", err)
+		}
+	}
+	if len(symmetricKey) != 32 {
+		return nil, fmt.Errorf("symmetricKey must be 32 bytes (ChaCha20-Poly1305), got %d", len(symmetricKey))
+	}
+
+	priv := ed25519.NewKeyFromSeed(signingKey)
+	pub := priv.Public().(ed25519.PublicKey)
+
+	var verifyPub ed25519.PublicKey
+	if verifyKey != nil {
+		if len(verifyKey) != 32 {
+			return nil, fmt.Errorf("verifyKey must be 32 bytes (Ed25519 public key), got %d", len(verifyKey))
+		}
+		verifyPub = ed25519.PublicKey(verifyKey)
+	} else {
+		verifyPub = pub
+	}
+
+	aead, err := chacha20poly1305.New(symmetricKey)
+	if err != nil {
+		return nil, fmt.Errorf("init ChaCha20-Poly1305: %w", err)
+	}
+
+	return &SecCodec{
+		nodeID:                 nodeID,
+		signingKeySeed:         signingKey,
+		symmetricKey:           symmetricKey,
+		ed25519Private:         priv,
+		ed25519Public:          pub,
+		verifyPublicKeyDefault: verifyPub,
+		aead:                   aead,
+	}, nil
+}
+
+// PublicSigningKey returns the 32-byte raw Ed25519 public key for
+// distributing to peers via the MDR identity service.
+func (c *SecCodec) PublicSigningKey() []byte {
+	out := make([]byte, ed25519.PublicKeySize)
+	copy(out, c.ed25519Public)
+	return out
+}
+
+// deriveNonce produces a 12-byte ChaCha20-Poly1305 nonce from the envelope
+// header. Per-envelope uniqueness comes from the monotonic seq counter.
+func (c *SecCodec) deriveNonce(header []byte) []byte {
+	if len(header) >= 12 {
+		out := make([]byte, 12)
+		copy(out, header)
+		return out
+	}
+	out := make([]byte, 0, 12)
+	out = append(out, header...)
+	out = append(out, secNonceSalt...)
+	return out[:12]
 }
 
 func (c *SecCodec) seal(ad, payload []byte) ([]byte, []byte) {
-	mac := hmac.New(sha256.New, c.symmetricKey)
-	mac.Write(ad)
-	mac.Write(payload)
-	tag := mac.Sum(nil)[:16]
-	return payload, tag
+	nonce := c.deriveNonce(ad)
+	sealed := c.aead.Seal(nil, nonce, payload, ad)
+	// chacha20poly1305.Seal returns ciphertext || tag; split into the two parts.
+	tagOff := len(sealed) - 16
+	ciphertext := make([]byte, tagOff)
+	copy(ciphertext, sealed[:tagOff])
+	authTag := make([]byte, 16)
+	copy(authTag, sealed[tagOff:])
+	return ciphertext, authTag
 }
 
 func (c *SecCodec) open(ad, payload, authTag []byte) ([]byte, bool) {
-	mac := hmac.New(sha256.New, c.symmetricKey)
-	mac.Write(ad)
-	mac.Write(payload)
-	expected := mac.Sum(nil)[:16]
-	if subtle.ConstantTimeCompare(authTag, expected) == 1 { return payload, true }
-	return nil, false
+	nonce := c.deriveNonce(ad)
+	combined := make([]byte, 0, len(payload)+len(authTag))
+	combined = append(combined, payload...)
+	combined = append(combined, authTag...)
+	plaintext, err := c.aead.Open(nil, nonce, combined, ad)
+	if err != nil {
+		return nil, false
+	}
+	return plaintext, true
 }
 
 func (c *SecCodec) sign(msg []byte) []byte {
-	mac := hmac.New(sha256.New, c.signingKey)
-	mac.Write(msg)
-	sig := mac.Sum(nil)
-	return append(sig, sig...) // 64 bytes
+	return ed25519.Sign(c.ed25519Private, msg)
 }
 
 func (c *SecCodec) verify(msg, signature []byte) bool {
-	mac := hmac.New(sha256.New, c.signingKey)
-	mac.Write(msg)
-	expected := mac.Sum(nil)
-	expectedSig := append(expected, expected...)
-	return subtle.ConstantTimeCompare(signature, expectedSig) == 1
+	return c.verifyWithKey(msg, signature, nil)
+}
+
+// verifyWithKey allows the caller to override the default verify public key.
+// Pass nil to use the codec's default (set at construction time).
+func (c *SecCodec) verifyWithKey(msg, signature, verifyKey []byte) bool {
+	var pub ed25519.PublicKey
+	if verifyKey != nil {
+		if len(verifyKey) != ed25519.PublicKeySize {
+			return false
+		}
+		pub = ed25519.PublicKey(verifyKey)
+	} else {
+		pub = c.verifyPublicKeyDefault
+	}
+	return ed25519.Verify(pub, msg, signature)
 }
 
 func (c *SecCodec) Pack(payload []byte, mode WireMode) ([]byte, error) {

@@ -8,7 +8,7 @@ semantic pending queue, delta operations, FNP wire compat.
 Run: python3 -m pytest tests/tier1/test_adp.py -v
 """
 import sys, struct, pytest
-sys.path.insert(0, "sdk/python/src")
+sys.path.insert(0, "sdk/python")
 
 from osmp import (
     AdaptiveSharedDictionary, FNPSession, ADPSession, ADPDeltaOp, ADPDelta,

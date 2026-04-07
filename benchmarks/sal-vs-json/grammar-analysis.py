@@ -141,7 +141,7 @@ def json_rpc_structural_bytes(n_params: int, chain_length: int = 1,
                      as structural because SAL has no key names at all)
     """
     # Base envelope per message
-    envelope = 79  # measured from minified MCP tools/call
+    envelope = 82  # measured from minified MCP tools/call (verified by protobuf-comparison.py)
 
     # Per-parameter structural cost
     # "key":"value" -> the quotes, colon, comma are structural
@@ -628,11 +628,11 @@ analysis. Every point below is a genuine weakness or limitation.
    comparison is incomplete.
    
    COUNTERARGUMENT: JSON is Turing-complete in the sense that any data
-   structure can be serialized. SAL is limited to 341 opcodes.
+   structure can be serialized. SAL is limited to 342 opcodes.
    
    REBUTTAL: SAL is an instruction encoding, not a general serialization
    format. It doesn't claim to replace JSON for arbitrary data. It claims
-   to replace JSON for agent instructions, where 341 opcodes + 124K MDR
+   to replace JSON for agent instructions, where 342 opcodes + 124K MDR
    domain codes cover the instruction space. Free-form data (images,
    documents, arbitrary blobs) stays in whatever format it's already in.
    
@@ -862,7 +862,7 @@ if __name__ == "__main__":
         "methodology": {
             "content_bytes_per_param": 8,
             "avg_key_length": 6,
-            "json_envelope_bytes": 79,
+            "json_envelope_bytes": 82,
             "param_range": "1-20",
             "chain_range": "1-10",
             "nesting_range": "1-5",

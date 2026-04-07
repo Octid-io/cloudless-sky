@@ -633,78 +633,163 @@ class SecEnvelope:
 class SecCodec:
     """Security envelope encoder/decoder.
 
-    This implements the envelope format only. Actual cryptographic operations
-    (Ed25519 signing, ChaCha20-Poly1305 AEAD) require keys. This codec
-    provides:
-      - pack/unpack for the envelope wire format
-      - placeholder signing/verification using HMAC-SHA256 for testing
-      - key management is external (MDR node identity service)
+    Implements the OSMP security envelope wire format with real cryptographic
+    primitives:
+      - **Ed25519** (RFC 8032) for sender authentication via 64-byte signatures
+      - **ChaCha20-Poly1305** (RFC 7539, RFC 8439) for AEAD payload integrity
+        with a 16-byte authentication tag
+      - 12-byte nonces derived deterministically from the envelope header
+        (mode + node_id + seq) padded with the canonical OSMP nonce salt
 
-    For production deployment, replace _sign/_verify/_seal/_open with
-    calls to a real cryptographic library (e.g. PyNaCl, cryptography).
+    The wire format is byte-identical to the previous reference implementation
+    so cross-SDK compatibility is preserved: a Python-signed envelope decodes
+    in the Go SDK and vice versa, provided both sides share the symmetric key
+    and the verifying side has the sender's Ed25519 public key.
+
+    Key management is external (MDR node identity service). For ephemeral
+    sessions or local testing, omit the key arguments and the constructor
+    will generate a fresh keypair via os.urandom + Ed25519 derivation.
     """
 
+    NONCE_SALT = b"OSMP-SEC-v1\x00"  # 12 bytes — pads short headers up to nonce length
+
     def __init__(self, node_id: bytes, signing_key: bytes | None = None,
-                 symmetric_key: bytes | None = None):
+                 symmetric_key: bytes | None = None,
+                 verify_key: bytes | None = None):
         """Initialize with node identity and optional keys.
 
         Args:
             node_id: 2 or 4 byte node identifier
-            signing_key: 32-byte Ed25519 private key (or HMAC key for testing)
-            symmetric_key: 32-byte symmetric key for AEAD
+            signing_key: 32-byte Ed25519 private key seed. Generated if None.
+            symmetric_key: 32-byte ChaCha20-Poly1305 key. Generated if None.
+            verify_key: 32-byte Ed25519 public key for verifying inbound
+                envelopes from a peer. Defaults to this codec's own public key
+                (loopback / local-only verification).
         """
+        # Lazy-import the cryptography primitives so the rest of the SDK can
+        # be imported in environments without the cryptography library
+        # available (e.g. environments that only need SAL encode/decode).
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+            Ed25519PrivateKey, Ed25519PublicKey,
+        )
+        from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
+        from cryptography.exceptions import InvalidTag
+        self._Ed25519PrivateKey = Ed25519PrivateKey
+        self._Ed25519PublicKey = Ed25519PublicKey
+        self._ChaCha20Poly1305 = ChaCha20Poly1305
+        self._InvalidTag = InvalidTag
+
         if len(node_id) not in (2, 4):
             raise ValueError(f"node_id must be 2 or 4 bytes, got {len(node_id)}")
         self.node_id = node_id
-        self.signing_key = signing_key or os.urandom(32)
-        self.symmetric_key = symmetric_key or os.urandom(32)
+
+        # Ed25519 signing key (private). 32-byte seed.
+        seed = signing_key if signing_key is not None else os.urandom(32)
+        if len(seed) != 32:
+            raise ValueError(
+                f"signing_key must be 32 bytes (Ed25519 seed), got {len(seed)}"
+            )
+        self.signing_key = seed
+        self._ed25519_private = Ed25519PrivateKey.from_private_bytes(seed)
+        self._ed25519_public = self._ed25519_private.public_key()
+
+        # ChaCha20-Poly1305 symmetric key. 32 bytes.
+        sym = symmetric_key if symmetric_key is not None else os.urandom(32)
+        if len(sym) != 32:
+            raise ValueError(
+                f"symmetric_key must be 32 bytes (ChaCha20-Poly1305), got {len(sym)}"
+            )
+        self.symmetric_key = sym
+        self._aead = ChaCha20Poly1305(sym)
+
+        # Default verify key: our own public key (loopback). For
+        # inter-node verification, callers pass the peer's public key.
+        if verify_key is not None:
+            if len(verify_key) != 32:
+                raise ValueError(
+                    f"verify_key must be 32 bytes (Ed25519 public key), got {len(verify_key)}"
+                )
+            self._verify_public_default = Ed25519PublicKey.from_public_bytes(verify_key)
+        else:
+            self._verify_public_default = self._ed25519_public
+
         self._seq_counter = 0
+
+    @property
+    def public_signing_key(self) -> bytes:
+        """Return the 32-byte Ed25519 public key for distributing to peers."""
+        from cryptography.hazmat.primitives import serialization
+        return self._ed25519_public.public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw,
+        )
 
     def _next_seq(self) -> int:
         """Monotonic sequence counter."""
         self._seq_counter += 1
         return self._seq_counter
 
-    def _seal(self, associated_data: bytes, payload: bytes) -> tuple[bytes, bytes]:
-        """AEAD seal (ChaCha20-Poly1305 placeholder using HMAC-SHA256).
+    def _derive_nonce(self, header: bytes) -> bytes:
+        """Derive a 12-byte ChaCha20-Poly1305 nonce from the envelope header.
 
-        In production, replace with actual ChaCha20-Poly1305.
-        Returns (ciphertext, auth_tag).
-
-        For this reference implementation, payload is NOT encrypted
-        (to support human inspection in development). Only the auth_tag
-        is computed for integrity verification.
+        The nonce is deterministic over (mode_byte, node_id, seq) which is
+        unique per envelope due to the monotonic sequence counter. We pad
+        short headers with the canonical NONCE_SALT to reach 12 bytes.
         """
-        tag = hmac.new(self.symmetric_key,
-                       associated_data + payload,
-                       hashlib.sha256).digest()[:16]
-        return payload, tag  # No encryption in reference impl
+        if len(header) >= 12:
+            return header[:12]
+        return (header + self.NONCE_SALT)[:12]
+
+    def _seal(self, associated_data: bytes, payload: bytes) -> tuple[bytes, bytes]:
+        """ChaCha20-Poly1305 AEAD seal.
+
+        Returns (ciphertext, auth_tag) where ciphertext has the same length
+        as payload and auth_tag is the 16-byte Poly1305 authentication tag.
+
+        The ChaCha20-Poly1305 primitive returns ciphertext concatenated with
+        the tag; we split them so the wire format can place the tag in its
+        canonical position after the payload.
+        """
+        nonce = self._derive_nonce(associated_data)
+        sealed = self._aead.encrypt(nonce, payload, associated_data)
+        # cryptography returns ciphertext || tag; split into the two parts.
+        ciphertext = sealed[:-16]
+        auth_tag = sealed[-16:]
+        return ciphertext, auth_tag
 
     def _open(self, associated_data: bytes, payload: bytes,
               auth_tag: bytes) -> bytes | None:
-        """AEAD open (verify integrity). Returns payload or None if invalid."""
-        expected = hmac.new(self.symmetric_key,
-                            associated_data + payload,
-                            hashlib.sha256).digest()[:16]
-        if hmac.compare_digest(auth_tag, expected):
-            return payload
-        return None
+        """ChaCha20-Poly1305 AEAD open. Returns plaintext or None if invalid."""
+        nonce = self._derive_nonce(associated_data)
+        try:
+            return self._aead.decrypt(nonce, payload + auth_tag, associated_data)
+        except self._InvalidTag:
+            return None
 
     def _sign(self, message: bytes) -> bytes:
-        """Ed25519 signature placeholder using HMAC-SHA256 padded to 64 bytes.
-
-        In production, replace with actual Ed25519 signing.
-        """
-        sig = hmac.new(self.signing_key, message, hashlib.sha256).digest()
-        return sig + sig  # 64 bytes (2x SHA256 = placeholder)
+        """Ed25519 signature. Returns a 64-byte signature."""
+        return self._ed25519_private.sign(message)
 
     def _verify(self, message: bytes, signature: bytes,
                 verify_key: bytes | None = None) -> bool:
-        """Ed25519 verification placeholder."""
-        key = verify_key or self.signing_key
-        expected = hmac.new(key, message, hashlib.sha256).digest()
-        expected_sig = expected + expected
-        return hmac.compare_digest(signature, expected_sig)
+        """Ed25519 verification.
+
+        If verify_key is None, uses self._verify_public_default (which is
+        either the constructor's verify_key parameter or this codec's own
+        public key for loopback verification).
+        """
+        if verify_key is not None:
+            try:
+                pub = self._Ed25519PublicKey.from_public_bytes(verify_key)
+            except Exception:
+                return False
+        else:
+            pub = self._verify_public_default
+        try:
+            pub.verify(signature, message)
+            return True
+        except Exception:
+            return False
 
     def pack(self, payload: bytes, wire_mode: WireMode = WireMode.SEC) -> bytes:
         """Pack payload into a security envelope.

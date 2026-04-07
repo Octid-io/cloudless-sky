@@ -1,11 +1,11 @@
 """
 OSMP Tier 1 Tests — Python Reference Implementation
-Built from canonical dictionary v12. Tests validate the IP, not the code against itself.
+Built from canonical dictionary v14. Tests validate the IP, not the code against itself.
 
 Run: python3 -m pytest tests/tier1/test_python.py -v
 """
 import sys, json, pytest
-sys.path.insert(0, "sdk/python/src")
+sys.path.insert(0, "sdk/python")
 from osmp import (
     SALEncoder, SALDecoder, AdaptiveSharedDictionary, BAELEncoder, BAELMode,
     OverflowProtocol, LossPolicy, Fragment, TwoTierCompressor,
@@ -58,7 +58,7 @@ class TestCanonicalOpcodes:
 
     def test_total_opcode_count(self):
         total = sum(len(v) for v in ASD_BASIS.values())
-        assert total >= 341, f"Expected ≥341 opcodes, got {total}"
+        assert total == 342, f"Expected 342 opcodes, got {total}"
 
     def test_all_26_namespaces(self):
         assert set(ASD_BASIS.keys()) == set("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
