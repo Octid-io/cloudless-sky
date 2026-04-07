@@ -23,7 +23,18 @@ Patent pending. Inventor: Clay Holberg. License: Apache 2.0.
 
 from __future__ import annotations
 
-__version__ = "2.0.1"
+# Single source of truth: read the version from the installed package
+# metadata so __version__ always tracks what pip actually installed.
+# Falls back to a sentinel string when running from a source tree that
+# was never installed (e.g. pre-commit hooks, ad-hoc imports).
+try:
+    from importlib.metadata import version as _pkg_version, PackageNotFoundError
+    try:
+        __version__ = _pkg_version("osmp")
+    except PackageNotFoundError:
+        __version__ = "0.0.0+local"
+except ImportError:
+    __version__ = "0.0.0+local"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TIER 1 — Lazy singleton, two functions
