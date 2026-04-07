@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "osmp"
-version = "2.0.2"
+version = "2.0.3"
 description = "OSMP -- Octid Semantic Mesh Protocol. Deterministic agentic instruction encoding."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -24,10 +24,20 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 requires-python = ">=3.9"
+
+# OSMP is designed so that consumers who only need SAL encode/decode/validate
+# get a zero-dependency install. Optional features pull their own deps:
+#   - SEC envelope (real cryptography):  pip install osmp[crypto]
+#   - dpack block-compressed corpora:    pip install osmp[dpack]
+#   - everything (development install):  pip install osmp[all]
+# CI installs osmp[test] which is the superset needed to run the test suite.
 dependencies = []
 
 [project.optional-dependencies]
+crypto = ["cryptography>=42.0"]
 dpack = ["zstandard>=0.21"]
+all = ["cryptography>=42.0", "zstandard>=0.21"]
+test = ["cryptography>=42.0", "zstandard>=0.21", "pytest>=7.0"]
 
 [project.scripts]
 osmp-benchmark = "osmp.protocol:run_benchmark_entry"

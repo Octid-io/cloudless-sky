@@ -52,11 +52,18 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      - name: Install both packages from their pyproject.toml files
+        # Editable installs of osmp[test] (the SDK with all test extras) and
+        # osmp_mcp (the MCP server) pull in their declared dependencies
+        # automatically. The "test" extras group in sdk/python/pyproject.toml
+        # is the canonical source of truth for what the test suite needs --
+        # if a new test dep is required, add it to that group, not here.
+        # CI always matches what real users get from PyPI plus exactly the
+        # extras the test suite covers.
         run: |
           python -m pip install --upgrade pip
-          pip install pytest cryptography zstandard
-          pip install -e sdk/python
+          pip install -e "sdk/python[test]"
+          pip install -e osmp_mcp
       - name: Run pytest
         run: |
           python -m pytest tests/ -v --tb=short
