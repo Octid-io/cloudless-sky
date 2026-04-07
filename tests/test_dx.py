@@ -82,8 +82,18 @@ class TestTier1DX:
         assert "heart_rate" in text and "casualty_report" in text and "evacuation" in text
 
     def test_version(self):
+        # Single source of truth: __version__ must match what
+        # importlib.metadata reports for the installed package, and must
+        # be a valid PEP 440 version string. No hardcoded literals --
+        # bumping the version in pyproject.toml should never require a
+        # test update.
         from osmp import __version__
-        assert __version__ == "2.0.1"
+        from importlib.metadata import version as pkg_version
+        assert __version__ == pkg_version("osmp")
+        assert isinstance(__version__, str)
+        assert len(__version__) > 0
+        # Sanity check: version starts with a digit (PEP 440 form).
+        assert __version__[0].isdigit(), f"version {__version__!r} not PEP 440"
 
     def test_tier2_class_api(self):
         """Tier 2: class-based, same results."""
