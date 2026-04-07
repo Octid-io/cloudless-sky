@@ -1,0 +1,848 @@
+{
+  "version": "1.0",
+  "description": "OSMP canonical test vectors. Every conformant implementation must pass all vectors.",
+  "measurement_basis": "UTF-8 byte count: len(s.encode('utf-8'))",
+  "vectors": [
+    {
+      "id": "TV-001",
+      "category": "basic_encoding",
+      "description": "Environmental query — single node, single sensor",
+      "natural_language": "Node 4A, report temperature at offset zero.",
+      "encoded": "EQ@4A?TH:0",
+      "nl_bytes": 43,
+      "osmp_bytes": 10,
+      "reduction_pct": 76.7,
+      "namespace": "E",
+      "operators_used": [
+        "@",
+        "?",
+        ":"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-002",
+      "category": "basic_encoding",
+      "description": "Building alert — sector broadcast",
+      "natural_language": "Alert all building sector nodes.",
+      "encoded": "BA@BS!",
+      "nl_bytes": 32,
+      "osmp_bytes": 6,
+      "reduction_pct": 81.2,
+      "namespace": "B",
+      "operators_used": [
+        "@"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-003",
+      "category": "basic_encoding",
+      "description": "Agentic request — named protocol with priority",
+      "natural_language": "Request emergency protocol, priority 1.",
+      "encoded": "AR@EP:1",
+      "nl_bytes": 39,
+      "osmp_bytes": 7,
+      "reduction_pct": 82.1,
+      "namespace": "A",
+      "operators_used": [
+        "@",
+        ":"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-004",
+      "category": "compound_operator",
+      "description": "AND operator — dual condition",
+      "natural_language": "Alert building sector AND request emergency protocol priority 1.",
+      "encoded": "BA@BS!∧AR@EP:1",
+      "nl_bytes": 64,
+      "osmp_bytes": 16,
+      "reduction_pct": 75.0,
+      "namespace": "B,A",
+      "operators_used": [
+        "@",
+        "!",
+        "∧",
+        ":"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-005",
+      "category": "compound_operator",
+      "description": "THEN operator — conditional dependency",
+      "natural_language": "If temperature exceeds 38 then alert building sector.",
+      "encoded": "E@T>38→BA@BS!",
+      "nl_bytes": 53,
+      "osmp_bytes": 15,
+      "reduction_pct": 71.7,
+      "namespace": "E,B",
+      "operators_used": [
+        "@",
+        ">",
+        "→",
+        "!"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-006",
+      "category": "compound_operator",
+      "description": "PARALLEL operator — simultaneous multi-query",
+      "natural_language": "Simultaneously query weather, news, and calendar.",
+      "encoded": "A∥[?WEA∧?NEWS∧?CAL]",
+      "nl_bytes": 49,
+      "osmp_bytes": 25,
+      "reduction_pct": 49.0,
+      "namespace": "A",
+      "operators_used": [
+        "∥",
+        "?",
+        "∧"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-007",
+      "category": "compound_operator",
+      "description": "FOR-ALL operator — universal quantification",
+      "natural_language": "For all action items, create a PM task.",
+      "encoded": "∀AI:CRT@PM",
+      "nl_bytes": 39,
+      "osmp_bytes": 12,
+      "reduction_pct": 69.2,
+      "namespace": "A",
+      "operators_used": [
+        "∀",
+        ":",
+        "@"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-008",
+      "category": "compound_operator",
+      "description": "EXISTS operator — capability-addressed routing",
+      "natural_language": "Route to any node that has GPS capability.",
+      "encoded": "∃[node?CAP:GPS]",
+      "nl_bytes": 42,
+      "osmp_bytes": 17,
+      "reduction_pct": 59.5,
+      "namespace": "N",
+      "operators_used": [
+        "∃",
+        "?",
+        ":"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-009",
+      "category": "compound_operator",
+      "description": "NOT operator — exclusion constraint",
+      "natural_language": "Must not access parent directories and must not make network requests.",
+      "encoded": "¬A[../]∧¬A[NET]",
+      "nl_bytes": 70,
+      "osmp_bytes": 19,
+      "reduction_pct": 72.9,
+      "namespace": "A",
+      "operators_used": [
+        "¬",
+        "∧"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-010",
+      "category": "compound_operator",
+      "description": "IFF operator — biconditional authorization",
+      "natural_language": "Authorize X if and only if Y is confirmed.",
+      "encoded": "A:AUTH[X]↔A:CONF[Y]",
+      "nl_bytes": 42,
+      "osmp_bytes": 21,
+      "reduction_pct": 50.0,
+      "namespace": "A",
+      "operators_used": [
+        ":",
+        "↔"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-011",
+      "category": "sequence",
+      "description": "SEQUENCE operator — ordered pipeline",
+      "natural_language": "Summarize document, then extract action items, then create PM task for each.",
+      "encoded": "A:SUM[doc];EX[AI];∀AI:CRT@PM",
+      "nl_bytes": 76,
+      "osmp_bytes": 30,
+      "reduction_pct": 60.5,
+      "namespace": "A",
+      "operators_used": [
+        ";",
+        "∀",
+        ":",
+        "@"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-012",
+      "category": "wildcard_broadcast",
+      "description": "WILDCARD — broadcast to all nodes",
+      "natural_language": "Broadcast emergency evacuation to all nodes.",
+      "encoded": "MA@*!EVA",
+      "nl_bytes": 44,
+      "osmp_bytes": 8,
+      "reduction_pct": 81.8,
+      "namespace": "M",
+      "operators_used": [
+        "@",
+        "*",
+        "!"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-013",
+      "category": "health_namespace",
+      "description": "MEDEVAC biometric threshold alert assembly",
+      "natural_language": "If heart rate at node 1 exceeds 120, assemble casualty report and broadcast evacuation to all nodes.",
+      "encoded": "H:HR@NODE1>120→H:CASREP∧M:EVA@*",
+      "nl_bytes": 100,
+      "osmp_bytes": 35,
+      "reduction_pct": 65.0,
+      "namespace": "H,M",
+      "operators_used": [
+        ":",
+        "@",
+        ">",
+        "→",
+        "∧",
+        "*"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-014",
+      "category": "identity_namespace",
+      "description": "KYC workflow with outcome states",
+      "natural_language": "Run KYC check on subject, return pass or fail.",
+      "encoded": "I:KYC@SUBJ→I:⊤∨I:⊥",
+      "nl_bytes": 46,
+      "osmp_bytes": 26,
+      "reduction_pct": 43.5,
+      "namespace": "I",
+      "operators_used": [
+        ":",
+        "@",
+        "→",
+        "∨"
+      ],
+      "outcome_states_used": [
+        "⊤",
+        "⊥"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-015",
+      "category": "financial_namespace",
+      "description": "Atomic payment with human confirmation gate",
+      "natural_language": "Execute payment to receiver if and only if human operator confirmation received, then transfer asset.",
+      "encoded": "K:PAY@RECV↔I:§→K:XFR[AMT]",
+      "nl_bytes": 101,
+      "osmp_bytes": 30,
+      "reduction_pct": 70.3,
+      "namespace": "K,I",
+      "operators_used": [
+        ":",
+        "@",
+        "↔",
+        "→"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-016",
+      "category": "robotic_namespace",
+      "description": "UAV waypoint navigation — reversible consequence class",
+      "natural_language": "Navigate UAV to waypoint WP1 then return to home.",
+      "encoded": "R:WPT[WP1]↺→R:RTH@⌂↺",
+      "nl_bytes": 49,
+      "osmp_bytes": 28,
+      "reduction_pct": 42.9,
+      "namespace": "R",
+      "operators_used": [
+        ":",
+        "→",
+        "@"
+      ],
+      "consequence_classes_used": [
+        "↺"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-017",
+      "category": "robotic_namespace",
+      "description": "Emergency stop — overrides all policies",
+      "natural_language": "Emergency stop all robotic agents immediately.",
+      "encoded": "R:ESTOP@*",
+      "nl_bytes": 46,
+      "osmp_bytes": 9,
+      "reduction_pct": 80.4,
+      "namespace": "R",
+      "operators_used": [
+        ":",
+        "@",
+        "*"
+      ],
+      "note": "R:ESTOP executes on any single fragment receipt. Overrides Atomic policy.",
+      "must_pass": true
+    },
+    {
+      "id": "TV-018",
+      "category": "network_namespace",
+      "description": "Loss tolerance policy configuration — Graceful Degradation",
+      "natural_language": "Configure node ALPHA to use graceful degradation with 30 unit timeout.",
+      "encoded": "N:CFG@ALPHA:FRAG[Γ]:τ[30]",
+      "nl_bytes": 70,
+      "osmp_bytes": 27,
+      "reduction_pct": 61.4,
+      "namespace": "N",
+      "operators_used": [
+        ":",
+        "@"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-019",
+      "category": "network_namespace",
+      "description": "Atomic policy — K namespace financial enforcement",
+      "natural_language": "Configure node VAULT to require atomic execution for all K namespace financial instructions with 60 unit timeout.",
+      "encoded": "N:CFG@VAULT:NS[K]:FRAG[Λ]:τ[60]",
+      "nl_bytes": 113,
+      "osmp_bytes": 33,
+      "reduction_pct": 70.8,
+      "namespace": "N,K",
+      "operators_used": [
+        ":",
+        "@"
+      ],
+      "parameter_designators_used": [
+        "τ"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-020",
+      "category": "cdsafe",
+      "description": "CDSAFE — UAV return-to-home on comms denial",
+      "natural_language": "Configure node UAV1 to execute return to home if communications denied for 120 units.",
+      "encoded": "N:CFG@UAV1:COMMS[⊗]:τ[120]:EXEC[R:RTH@⌂]",
+      "nl_bytes": 85,
+      "osmp_bytes": 45,
+      "reduction_pct": 47.1,
+      "namespace": "N,R",
+      "operators_used": [
+        ":",
+        "@"
+      ],
+      "parameter_designators_used": [
+        "⊗",
+        "τ",
+        "⌂"
+      ],
+      "must_pass": true
+    },
+    {
+      "id": "TV-021",
+      "category": "cognitive_execution_state",
+      "description": "Goal declaration with task decomposition",
+      "natural_language": "Declare goal to analyze quarterly report, decompose into subtasks.",
+      "encoded": "J:GOAL[QTR_RPT]→J:DECOMP",
+      "must_pass": true,
+      "nl_bytes": 66,
+      "osmp_bytes": 26,
+      "reduction_pct": 60.6
+    },
+    {
+      "id": "TV-022",
+      "category": "cognitive_execution_state",
+      "description": "Execution handoff with state transfer to peer agent",
+      "natural_language": "Transfer execution of current plan to agent BETA, current status active.",
+      "encoded": "J:HANDOFF@BETA∧J:STATUS:A",
+      "must_pass": true,
+      "nl_bytes": 72,
+      "osmp_bytes": 27,
+      "reduction_pct": 62.5
+    },
+    {
+      "id": "TV-023",
+      "category": "memory_retrieval",
+      "description": "Semantic search then promote to long-term memory",
+      "natural_language": "Search memory for prior Q3 revenue analysis, promote result to long-term memory.",
+      "encoded": "Y:SEARCH[Q3_REV];Y:PROMOTE[result]",
+      "must_pass": true,
+      "nl_bytes": 80,
+      "osmp_bytes": 34,
+      "reduction_pct": 57.5
+    },
+    {
+      "id": "TV-024",
+      "category": "memory_retrieval",
+      "description": "Store to episodic memory then clear working memory",
+      "natural_language": "Store current session context to episodic memory then clear working memory.",
+      "encoded": "Y:STORE[CTX]:tier:episodic→Y:CLEAR",
+      "must_pass": true,
+      "nl_bytes": 75,
+      "osmp_bytes": 36,
+      "reduction_pct": 52.0
+    },
+    {
+      "id": "TV-025",
+      "category": "model_inference",
+      "description": "Route to reasoning-capable model with inference parameters",
+      "natural_language": "Route to a model with reasoning capability, temperature 0.1, max 2000 tokens.",
+      "encoded": "Z:ROUTE[CAP:REASON]∧Z:TEMP:0.1∧Z:MAXT:2000",
+      "must_pass": true,
+      "nl_bytes": 77,
+      "osmp_bytes": 46,
+      "reduction_pct": 40.3
+    },
+    {
+      "id": "TV-026",
+      "category": "model_inference",
+      "description": "Report confidence and context window utilization",
+      "natural_language": "Report agent confidence and current context window utilization.",
+      "encoded": "Z:CONF?∧Z:CTX?",
+      "must_pass": true,
+      "nl_bytes": 63,
+      "osmp_bytes": 16,
+      "reduction_pct": 74.6
+    },
+    {
+      "id": "TV-027",
+      "category": "quality_evaluation",
+      "description": "Grounding assertion with confidence score",
+      "natural_language": "Assert output is grounded in source document DOC1 with confidence 0.92.",
+      "encoded": "Q:GROUND[DOC1]∧Q:CONF:0.92",
+      "must_pass": true,
+      "nl_bytes": 71,
+      "osmp_bytes": 28,
+      "reduction_pct": 60.6
+    },
+    {
+      "id": "TV-028",
+      "category": "quality_evaluation",
+      "description": "Flag unreliable output and request revision",
+      "natural_language": "Flag this output as potentially unreliable and request revision.",
+      "encoded": "Q:FLAG∧Q:REVISE",
+      "must_pass": true,
+      "nl_bytes": 64,
+      "osmp_bytes": 17,
+      "reduction_pct": 73.4
+    },
+    {
+      "id": "TV-029",
+      "category": "cognitive_stack_chain",
+      "description": "Full AI cognitive stack chain — memory retrieval gates plan execution",
+      "natural_language": "Search memory for prior context, if found commit to plan, else replan.",
+      "encoded": "Y:SEARCH[CTX]→J:COMMIT∨J:REPLAN",
+      "must_pass": true,
+      "nl_bytes": 70,
+      "osmp_bytes": 35,
+      "reduction_pct": 50.0
+    },
+    {
+      "id": "TV-030",
+      "category": "cognitive_stack_chain",
+      "description": "Inter-agent negotiation with quality gate — A and Q namespace composition",
+      "natural_language": "Propose action to agent ALPHA, if accepted verify quality of result.",
+      "encoded": "A:PROPOSE@ALPHA→A:ACCEPT∧Q:VERIFY",
+      "must_pass": true,
+      "nl_bytes": 68,
+      "osmp_bytes": 37,
+      "reduction_pct": 45.6
+    },
+    {
+      "id": "TV-031",
+      "category": "new_operators",
+      "description": "REPEAT-EVERY — recurring sensor query",
+      "natural_language": "Query temperature at node 4A every 30 seconds.",
+      "encoded": "EQ@4A?TH:0⟳T:DUR:30",
+      "must_pass": true,
+      "nl_bytes": 46,
+      "osmp_bytes": 21,
+      "reduction_pct": 54.3
+    },
+    {
+      "id": "TV-032",
+      "category": "new_operators",
+      "description": "NOT-EQUAL — slot value exclusion filter",
+      "natural_language": "Alert building sector when temperature is not equal to baseline 20.",
+      "encoded": "E@T≠20→BA@BS!",
+      "must_pass": true,
+      "nl_bytes": 67,
+      "osmp_bytes": 17,
+      "reduction_pct": 74.6
+    },
+    {
+      "id": "TV-033",
+      "category": "new_operators",
+      "description": "PRIORITY-ORDER — ranked parallel execution",
+      "natural_language": "Execute tasks 1, 2, and 3 in priority order if parallel execution not possible.",
+      "encoded": "A∥[TASK1⊕TASK2⊕TASK3]",
+      "must_pass": true,
+      "nl_bytes": 79,
+      "osmp_bytes": 27,
+      "reduction_pct": 65.8
+    },
+    {
+      "id": "TV-034",
+      "category": "device_peripheral",
+      "description": "Flashlight activation — reversible consequence class",
+      "natural_language": "Activate flashlight on node PHONE1.",
+      "encoded": "R:TORCH@PHONE1:ON↺",
+      "must_pass": true,
+      "nl_bytes": 35,
+      "osmp_bytes": 20,
+      "reduction_pct": 42.9
+    },
+    {
+      "id": "TV-035",
+      "category": "device_peripheral",
+      "description": "Camera activation — hazardous consequence class with human confirmation",
+      "natural_language": "Activate camera on node PHONE2 only if human operator confirms.",
+      "encoded": "I:§→R:CAM@PHONE2:ON⚠",
+      "must_pass": true,
+      "nl_bytes": 63,
+      "osmp_bytes": 25,
+      "reduction_pct": 60.3
+    },
+    {
+      "id": "TV-036",
+      "category": "file_transfer",
+      "description": "Initiate file transfer then verify checksum",
+      "natural_language": "Initiate transfer of map tile file to node EDGE1 then verify checksum.",
+      "encoded": "D:XFER@EDGE1[MAP_TILE];D:CSUM",
+      "must_pass": true,
+      "nl_bytes": 70,
+      "osmp_bytes": 29,
+      "reduction_pct": 58.6
+    },
+    {
+      "id": "TV-037",
+      "category": "acknowledgment",
+      "description": "Atomic policy positive acknowledgment",
+      "natural_language": "Acknowledge successful receipt and execution of financial instruction.",
+      "encoded": "A:ACK∧K:TXN[confirmed]",
+      "must_pass": true,
+      "nl_bytes": 70,
+      "osmp_bytes": 24,
+      "reduction_pct": 65.7
+    },
+    {
+      "id": "TV-038",
+      "category": "inference_response",
+      "description": "Inference response envelope",
+      "natural_language": "Inference complete, 847 tokens used, 230ms latency, model claude-sonnet, finish reason stop.",
+      "encoded": "Z:RESP∧Z:TOKENS:847∧Z:LATENCY:230∧Z:MDLUSED[claude-sonnet]∧Z:FINISH[stop]",
+      "must_pass": true,
+      "nl_bytes": 92,
+      "osmp_bytes": 81,
+      "reduction_pct": 12.0
+    },
+    {
+      "id": "TV-039",
+      "category": "user_interaction",
+      "description": "Escalate to human decision maker",
+      "natural_language": "Escalate this decision to the human operator with request for approval.",
+      "encoded": "U:ESCALATE∧U:APPROVE",
+      "must_pass": true,
+      "nl_bytes": 71,
+      "osmp_bytes": 22,
+      "reduction_pct": 69.0
+    },
+    {
+      "id": "TV-040",
+      "category": "protocol_gap",
+      "description": "FNP capability advertisement — I:§ availability check",
+      "natural_language": "Query whether target node has human confirmation infrastructure available.",
+      "encoded": "N:Q@TARGET?CAP:I:§",
+      "must_pass": true,
+      "nl_bytes": 74,
+      "osmp_bytes": 19,
+      "reduction_pct": 74.3
+    },
+    {
+      "id": "TV-041",
+      "category": "operational_context",
+      "description": "Declare emergency mode with mass casualty incident type",
+      "natural_language": "Declare emergency operational mode, incident type 1, mass casualty event.",
+      "encoded": "O:MODE:E∧O:TYPE:1",
+      "must_pass": true,
+      "nl_bytes": 73,
+      "osmp_bytes": 19,
+      "reduction_pct": 74.0
+    },
+    {
+      "id": "TV-042",
+      "category": "operational_context",
+      "description": "Emission control silent with readiness condition elevated",
+      "natural_language": "Set emission control to silent and elevate readiness condition.",
+      "encoded": "O:EMCON:S∧O:READY:3",
+      "must_pass": true,
+      "nl_bytes": 63,
+      "osmp_bytes": 21,
+      "reduction_pct": 66.7
+    },
+    {
+      "id": "TV-043",
+      "category": "operational_context",
+      "description": "Operational context governs subsequent instruction interpretation",
+      "natural_language": "Set operational mode to search and rescue, then execute triage at all nodes.",
+      "encoded": "O:MODE:E→H:TRIAGE@*",
+      "must_pass": true,
+      "nl_bytes": 76,
+      "osmp_bytes": 21,
+      "reduction_pct": 72.4
+    },
+    {
+      "id": "TV-044",
+      "category": "operational_context_channel",
+      "description": "Declare LoRa channel at SF12 floor — BAEL encoding context",
+      "natural_language": "Declare active channel LoRa, payload floor 51 bytes, link quality marginal.",
+      "encoded": "O:CHAN:L∧O:FLOOR:51∧O:LINK:3",
+      "must_pass": true,
+      "nl_bytes": 75,
+      "osmp_bytes": 32,
+      "reduction_pct": 57.3
+    },
+    {
+      "id": "TV-045",
+      "category": "operational_context_channel",
+      "description": "Query uplink availability before routing instruction off-mesh",
+      "natural_language": "Query uplink availability at node RELAY1 then route instruction if available.",
+      "encoded": "O:UPLINK?@RELAY1→A:DA@RELAY1",
+      "must_pass": true,
+      "nl_bytes": 77,
+      "osmp_bytes": 30,
+      "reduction_pct": 61.0
+    },
+    {
+      "id": "TV-046",
+      "category": "bael_smart_compression_passthrough",
+      "description": "NL passthrough — 'Stop' is shorter than R:ESTOP@*, BAEL selects NL",
+      "natural_language": "Stop",
+      "encoded": "Stop",
+      "bael_mode": "NL_PASSTHROUGH",
+      "flags": "0x04",
+      "must_pass": true,
+      "note": "BAEL floor guarantee — compression is never negative",
+      "nl_bytes": 4,
+      "osmp_bytes": 4,
+      "reduction_pct": 0.0,
+      "bael_selected_bytes": 4,
+      "bael_reduction_pct": 0.0
+    },
+    {
+      "id": "TV-047",
+      "category": "k_namespace_direction_debit",
+      "description": "K namespace debit with -$ direction designator",
+      "natural_language": "Pay 500 USD to receiver node",
+      "encoded": "K:-$[500]@RECV",
+      "must_pass": true,
+      "nl_bytes": 28,
+      "osmp_bytes": 14,
+      "reduction_pct": 50.0,
+      "bael_selected_bytes": 14,
+      "bael_reduction_pct": 50.0
+    },
+    {
+      "id": "TV-048",
+      "category": "k_namespace_direction_credit",
+      "description": "K namespace credit with +$ direction designator",
+      "natural_language": "Received payment of 500 USD from sender",
+      "encoded": "K:+$[500]@SEND",
+      "must_pass": true,
+      "nl_bytes": 39,
+      "osmp_bytes": 14,
+      "reduction_pct": 64.1,
+      "bael_selected_bytes": 14,
+      "bael_reduction_pct": 64.1
+    },
+    {
+      "id": "TV-049",
+      "description": "Approximate match conditional — exercises APPROX (~) operator",
+      "natural_language": "If temperature approximately 25, alert building sector.",
+      "encoded": "E@T~25→BA@BS!",
+      "must_pass": true,
+      "notes": "Ensures ~ (U+007E APPROX) is exercised. Structural analog to TV-005 (PRIORITY >) and TV-032 (NOT-EQUAL ≠).",
+      "nl_bytes": 55,
+      "osmp_bytes": 15,
+      "reduction_pct": 72.7,
+      "category": "environmental",
+      "namespace": "E",
+      "operators_used": [
+        "~",
+        "→"
+      ]
+    },
+    {
+      "id": "TV-050",
+      "description": "UNLESS compound operator — exercises ¬→ (negated conditional)",
+      "natural_language": "Maintain heading unless obstacle detected, then stop.",
+      "encoded": "R:HDNG@UAV1¬→E:OBS→R:STOP@UAV1↺",
+      "must_pass": true,
+      "notes": "Exercises ¬→ (UNLESS) compound. Consequence class ↺ on both R instructions.",
+      "nl_bytes": 53,
+      "osmp_bytes": 38,
+      "reduction_pct": 28.3,
+      "category": "robotic",
+      "namespace": "R",
+      "operators_used": [
+        "¬→",
+        "→"
+      ]
+    },
+    {
+      "id": "TV-051",
+      "description": "IRREVERSIBLE consequence class — exercises ⊘ with I:§ precondition",
+      "natural_language": "Deploy anchor at current position, irreversible operation, requires human confirmation.",
+      "encoded": "I:§→R:DPTH@UUV1:ANCHOR⊘",
+      "must_pass": true,
+      "notes": "Exercises ⊘ (IRREVERSIBLE). I:§ precondition required per spec §5.",
+      "nl_bytes": 87,
+      "osmp_bytes": 28,
+      "reduction_pct": 67.8,
+      "category": "identity_robotic",
+      "namespace": "I",
+      "operators_used": [
+        "→",
+        "⊘"
+      ]
+    },
+    {
+      "id": "TV-052",
+      "description": "DELTA parameter designator — exercises Δ as offset query",
+      "natural_language": "Report temperature change from baseline at node 4A.",
+      "encoded": "E:TH@4A?Δ:0",
+      "must_pass": true,
+      "notes": "Exercises Δ (U+0394 DELTA, 2 bytes) as a query parameter for difference/offset.",
+      "nl_bytes": 51,
+      "osmp_bytes": 12,
+      "reduction_pct": 76.5,
+      "category": "environmental",
+      "namespace": "E",
+      "operators_used": [
+        "?",
+        "Δ"
+      ]
+    },
+    {
+      "id": "TV-053",
+      "description": "SCOPE/WITHIN parameter designator — exercises ∈ as permission boundary",
+      "natural_language": "Agent authorized within project scope only, must not access external resources.",
+      "encoded": "A:AUTH∈[PROJ]∧¬A:AUTH[EXT]",
+      "must_pass": true,
+      "notes": "Exercises ∈ (U+2208 SCOPE/WITHIN) as a set membership scope constraint.",
+      "nl_bytes": 79,
+      "osmp_bytes": 31,
+      "reduction_pct": 60.8,
+      "category": "agentic",
+      "namespace": "A",
+      "operators_used": [
+        "∈",
+        "∧",
+        "¬"
+      ]
+    },
+    {
+      "id": "TV-054",
+      "description": "NACK with MISSING fragment indicator — exercises ∖ in NACK payload",
+      "natural_language": "Negative acknowledgment for message 42, fragments 2 and 5 missing.",
+      "encoded": "A:NACK[MSG:42∖[2,5]]",
+      "must_pass": true,
+      "notes": "Exercises ∖ (U+2216 MISSING/set-minus) per EBNF nack_payload production.",
+      "nl_bytes": 66,
+      "osmp_bytes": 22,
+      "reduction_pct": 66.7,
+      "category": "agentic",
+      "namespace": "A",
+      "operators_used": [
+        "∖"
+      ]
+    },
+    {
+      "id": "TV-055",
+      "description": "FAIL-SAFE policy configuration — exercises Φ loss tolerance designator",
+      "natural_language": "Configure node SENSOR3 with fail-safe fragmentation policy, 45 second timeout.",
+      "encoded": "N:CFG@SENSOR3:FRAG[Φ]:τ[45]",
+      "must_pass": true,
+      "notes": "Exercises Φ (U+03A6 FAIL-SAFE). Structural analog to TV-018 (Γ) and TV-019 (Λ).",
+      "nl_bytes": 78,
+      "osmp_bytes": 29,
+      "reduction_pct": 62.8,
+      "category": "network",
+      "namespace": "N",
+      "operators_used": [
+        "Φ",
+        "τ"
+      ]
+    }
+  ],
+  "compression_summary": {
+    "vectors_count": 20,
+    "min_reduction_pct": 12.0,
+    "max_reduction_pct": 82.1,
+    "mean_reduction_pct": 60.8,
+    "conformance_threshold_pct": 60.0,
+    "note": "Implementations must achieve >= 60% MEAN UTF-8 byte reduction across all must_pass vectors to be listed as conformant. Individual vectors using complex multi-byte glyph combinations (PARALLEL, IFF, CDSAFE) may fall below 60% while the corpus mean exceeds the threshold.",
+    "vector_count": 55
+  },
+  "byte_counting": {
+    "method": "UTF-8 encoding",
+    "python_reference": "len(s.encode('utf-8'))",
+    "multi_byte_glyphs": {
+      "3_byte": [
+        "∧",
+        "∨",
+        "¬",
+        "→",
+        "↔",
+        "∀",
+        "∃",
+        "∥",
+        "⚠",
+        "↺",
+        "⊘",
+        "⊤",
+        "⊥",
+        "⌂",
+        "⊗",
+        "∈",
+        "∖"
+      ],
+      "2_byte": [
+        "§",
+        "τ",
+        "Δ"
+      ],
+      "1_byte": [
+        "@",
+        ">",
+        "~",
+        "*",
+        ":",
+        ";",
+        "?",
+        "!"
+      ]
+    }
+  }
+}

@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "osmp-mcp"
+version = "1.0.27"
+description = "OSMP MCP Server -- Agentic AI instruction encoding. 86.8% byte reduction vs JSON. Inference-free decode. Any channel."
+readme = {text = """<!-- mcp-name: io.github.Octid-io/osmp -->
+# OSMP MCP Server
+
+MCP server for the [Octid Semantic Mesh Protocol (OSMP)](https://octid.io). Gives any MCP-compatible AI client native OSMP capability: encode, decode, validate, and resolve agentic instructions by table lookup. No inference at decode.
+
+## Install
+
+```
+pip install osmp-mcp
+```
+
+## What it does
+
+- **osmp_encode** -- Encode structured fields into a SAL instruction
+- **osmp_decode** -- Decode SAL to structured fields and natural language
+- **osmp_validate** -- Check composed SAL against all eight composition rules before emission
+- **osmp_lookup** -- Search the opcode dictionary by namespace/keyword
+- **osmp_resolve** -- Resolve a domain code from D:PACK/BLK (ICD-10, ISO 20022, MITRE ATT&CK)
+- **osmp_discover** -- Search domain corpora by keyword
+- **osmp_benchmark** -- Run the canonical conformance suite
+- **osmp_compound_decode** -- Analyze DAG topology and loss tolerance
+- **osmp_batch_resolve** -- Multiple domain codes in one call
+
+342 opcodes. 26 namespaces. Three MDR corpora (124,215 resolvable codes).
+
+For the standalone SDK (no MCP dependency): `pip install osmp`
+
+[octid.io](https://octid.io) | [GitHub](https://github.com/octid-io/cloudless-sky)
+""", content-type = "text/markdown"}
+license = {file = "LICENSE"}
+authors = [{name = "Clay Holberg", email = "clay@octid.io"}]
+keywords = ["agentic", "ai", "encoding", "lora", "mcp", "mesh", "osmp", "protocol", "semantic"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Communications",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "osmp>=2.0.2",
+    "mcp[cli]>=1.0.0",
+    "zstandard>=0.20.0",
+]
+
+[project.scripts]
+osmp-mcp = "osmp_mcp.server:main"
+
+[project.urls]
+Homepage = "https://octid.io"
+Repository = "https://github.com/octid-io/cloudless-sky"
+Documentation = "https://github.com/octid-io/cloudless-sky/blob/main/protocol/spec/OSMP-SPEC-v1.0.2.md"
+
+[tool.setuptools.packages.find]
+include = ["osmp_mcp*"]
+
+[tool.setuptools.package-data]
+osmp_mcp = ["data/*"]

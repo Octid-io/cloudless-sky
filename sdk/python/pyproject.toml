@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "osmp"
-version = "2.0.1"
+version = "2.0.2"
 description = "OSMP -- Octid Semantic Mesh Protocol. Deterministic agentic instruction encoding."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -34,7 +34,7 @@ osmp-benchmark = "osmp.protocol:run_benchmark_entry"
 
 [project.urls]
 Homepage = "https://github.com/Octid-io/cloudless-sky"
-Documentation = "https://github.com/Octid-io/cloudless-sky/blob/main/protocol/spec/OSMP-SPEC-v1.md"
+Documentation = "https://github.com/Octid-io/cloudless-sky/blob/main/protocol/spec/OSMP-SPEC-v1.0.2.md"
 Repository = "https://github.com/Octid-io/cloudless-sky"
 Issues = "https://github.com/Octid-io/cloudless-sky/issues"
 

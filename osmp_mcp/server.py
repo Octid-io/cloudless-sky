@@ -14,12 +14,8 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
-# -- Resolve repo root and import the Python SDK --------------------------
-REPO_ROOT = Path(__file__).resolve().parent.parent
-SDK_PATH = REPO_ROOT / "sdk" / "python"
-sys.path.insert(0, str(SDK_PATH))
-
-from osmp.protocol import (  # noqa: E402
+# -- Import the OSMP Python SDK (real PyPI dependency) --------------------
+from osmp.protocol import (
     SALEncoder,
     SALDecoder,
     BlockCompressor,
@@ -34,24 +30,30 @@ from osmp.protocol import (  # noqa: E402
 )
 
 # -- Paths ----------------------------------------------------------------
-MDR_DIR = REPO_ROOT / "mdr"
-VECTORS_PATH = REPO_ROOT / "protocol" / "test-vectors" / "canonical-test-vectors.json"
+# When pip-installed, package data lives next to this file in osmp_mcp/data/.
+# When run from a repo clone, the same layout works because the repo also
+# has osmp_mcp/data/ populated by the build pipeline.
+PKG_DIR = Path(__file__).resolve().parent
+DATA_DIR = PKG_DIR / "data"
+REPO_ROOT = PKG_DIR.parent  # only used for the optional grammar resource
+MDR_DIR = DATA_DIR
+VECTORS_PATH = DATA_DIR / "canonical-test-vectors.json"
 
 MDR_CORPORA = {
-    "icd": MDR_DIR / "icd10cm" / "MDR-ICD10CM-FY2026-blk.dpack",
-    "icd10cm": MDR_DIR / "icd10cm" / "MDR-ICD10CM-FY2026-blk.dpack",
+    "icd": MDR_DIR / "MDR-ICD10CM-FY2026-blk.dpack",
+    "icd10cm": MDR_DIR / "MDR-ICD10CM-FY2026-blk.dpack",
     # ISO 20022 has two complementary corpora: K-ISO (atomic element definitions)
     # and MSG (full message catalog like pacs.008.001.13). The K-ISO corpus is
     # the default "iso" alias for backward compatibility; the MSG corpus is
     # exposed under "iso_msg" / "iso20022_msg" for payment workflows.
-    "iso": MDR_DIR / "iso20022" / "MDR-ISO20022-K-ISO-blk.dpack",
-    "iso20022": MDR_DIR / "iso20022" / "MDR-ISO20022-K-ISO-blk.dpack",
-    "iso_def": MDR_DIR / "iso20022" / "MDR-ISO20022-K-ISO-blk.dpack",
-    "iso20022_def": MDR_DIR / "iso20022" / "MDR-ISO20022-K-ISO-blk.dpack",
-    "iso_msg": MDR_DIR / "iso20022" / "MDR-ISO20022-MSG-blk.dpack",
-    "iso20022_msg": MDR_DIR / "iso20022" / "MDR-ISO20022-MSG-blk.dpack",
-    "attack": MDR_DIR / "mitre-attack" / "MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack",
-    "mitre": MDR_DIR / "mitre-attack" / "MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack",
+    "iso": MDR_DIR / "MDR-ISO20022-K-ISO-blk.dpack",
+    "iso20022": MDR_DIR / "MDR-ISO20022-K-ISO-blk.dpack",
+    "iso_def": MDR_DIR / "MDR-ISO20022-K-ISO-blk.dpack",
+    "iso20022_def": MDR_DIR / "MDR-ISO20022-K-ISO-blk.dpack",
+    "iso_msg": MDR_DIR / "MDR-ISO20022-MSG-blk.dpack",
+    "iso20022_msg": MDR_DIR / "MDR-ISO20022-MSG-blk.dpack",
+    "attack": MDR_DIR / "MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack",
+    "mitre": MDR_DIR / "MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack",
 }
 
 # -- Singleton instances --------------------------------------------------
