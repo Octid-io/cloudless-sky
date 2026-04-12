@@ -297,6 +297,7 @@ Run it yourself. The numbers are real and independently reproducible across all 
 | **ASD** — Adaptive Shared Dictionary | 342-opcode version-pinned compression dictionary |
 | **BAEL** — Bandwidth-Agnostic Efficiency Layer | Adaptive encoding across any channel capacity |
 | **FNP** — Frame Negotiation Protocol | Capability negotiation, session handshake, FALLBACK/ACQUIRED states for non-OSMP peers |
+| **MDR** — Managed Dictionary Registry | Domain-specific controlled vocabulary corpora (ICD-10-CM, ISO 20022, MITRE ATT&CK) packaged as D:PACK/BLK binaries for edge-local resolution without network access |
 | **OP** — Overflow Protocol | Message fragmentation, priority, graceful degradation |
 | **SAIL** — Semantic Assembly Isomorphic Language | Binary wire encoding, isomorphic to SAL |
 | **SAL** — Semantic Assembly Language | Human-readable symbolic instruction format |
