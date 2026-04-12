@@ -24,21 +24,21 @@ FAIL = "\033[31mFAIL\033[0m"
 CORPUS = [
     # ── Canonical test vectors ───────────────────────────────────────────────
     ("EQ@4A?TH:0",                                   "TV-001 env query"),
-    ("BA@BS!",                                        "TV-002 building alert"),
+    ("ALRM@AREA!",                                     "TV-002 building alert"),
     ("AR@EP:1",                                       "TV-003 agentic request"),
-    ("BA@BS!\u2227AR@EP:1",                           "TV-004 AND compound"),
-    ("E@T>38\u2192BA@BS!",                            "TV-005 THEN conditional"),
+    ("ALRM@AREA!\u2227AR@EP:1",                        "TV-004 AND compound"),
+    ("E@T>38\u2192ALRM@AREA!",                         "TV-005 THEN conditional"),
     ("A\u2225[?WEA\u2227?NEWS\u2227?CAL]",            "TV-006 parallel block"),
     ("\u2200AI:CRT@PM",                               "TV-007 FOR-ALL"),
-    ("MA@*!EVA",                                      "TV-012 wildcard broadcast"),
+    ("ALRT@*!EVA",                                     "TV-012 wildcard broadcast"),
     ("H:HR@NODE1>120\u2192H:CASREP\u2227M:EVA@*",    "TV-013 MEDEVAC chain"),
     ("I:KYC@SUBJ\u2192I:\u22a4\u2228I:\u22a5",       "TV-014 KYC outcome states"),
     ("K:PAY@RECV\u2194I:\u00a7\u2192K:XFR[AMT]",     "TV-015 financial IFF"),
     # ── All 26 namespaces — explicit form ────────────────────────────────────
-    ("A:SUM","A namespace"), ("B:BA","B namespace"), ("C:SPAWN","C namespace"),
+    ("A:SUM","A namespace"), ("B:ALRM","B namespace"), ("C:SPAWN","C namespace"),
     ("D:PACK","D:PACK two-tier encoding"), ("D:UNPACK","D:UNPACK inference-free"),
     ("D:XFER","D:XFER file transfer"), ("E:TH","E namespace"),
-    ("F:Q","F namespace"), ("G:POS","G namespace"),
+    ("F:QRY","F namespace"), ("G:POS","G namespace"),
     ("H:HR","H:HR heart rate"), ("H:ICD","H:ICD layer2 accessor"),
     ("H:SNOMED","H:SNOMED layer2 accessor"), ("H:CPT","H:CPT layer2 accessor"),
     ("I:KYC","I namespace"), ("J:GOAL","J namespace"), ("K:PAY","K namespace"),
@@ -54,7 +54,7 @@ CORPUS = [
     ("U:DISPLAY","U:DISPLAY"), ("U:INPUT","U:INPUT"),
     ("V:POS","V namespace"), ("V:HDG","V:HDG canonical"),
     ("V:ROUTE","V:ROUTE canonical"), ("W:METAR","W namespace"),
-    ("X:GEN","X namespace"), ("Y:SEARCH","Y namespace"),
+    ("X:PROD","X namespace"), ("Y:SEARCH","Y namespace"),
     ("Y:RETRIEVE","Y:RETRIEVE canonical"), ("Z:INF","Z:INF canonical"),
     ("Z:ROUTE","Z:ROUTE canonical"),
     # ── All three consequence classes ────────────────────────────────────────
@@ -74,7 +74,7 @@ CORPUS = [
     ("Y:SEARCH","Y vector search"), ("Y:STORE","Y memory store"),
     ("J:GOAL","J cognitive state"), ("J:HANDOFF","J handoff"),
     # ── Operational context ──────────────────────────────────────────────────
-    ("O:MODE:E\u2227O:TYPE:1","O emergency mode"),
+    ("O:MODE:E\u2227O:TYP:1","O emergency mode"),
     ("O:EMCON:S\u2227O:READY:3","O EMCON silent"),
     ("O:CHAN:L\u2227O:FLOOR:51","O LoRa channel floor"),
     # ── BAEL passthrough ─────────────────────────────────────────────────────
@@ -83,9 +83,9 @@ CORPUS = [
     ("OK","BAEL passthrough OK"),
     # ── Short-form frames ────────────────────────────────────────────────────
     ("EQ@4A?TH:0","short-form EQ"),
-    ("BA@BS!","short-form BA"),
+    ("ALRM@AREA!","short-form ALRM"),
     ("AR@EP:1","short-form AR"),
-    ("MA@*!EVA","short-form MA"),
+    ("ALRT@*!EVA","short-form ALRT"),
     # ── Sovereign extension ──────────────────────────────────────────────────
     ("\u03a9:MYOP@TARGET","sovereign extension"),
     # ── Device peripherals ───────────────────────────────────────────────────

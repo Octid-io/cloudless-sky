@@ -126,11 +126,11 @@
       "category": "clean_mapping",
       "description": "Building emergency with evacuation (Principle 1: operational event vs external data)",
       "natural_language": "Fire alarm in sector 3. Evacuate the whole building.",
-      "expected_sal": ["B:BA@BS\u2227M:EVA@*", "B:L@BS:3\u2192M:EVA@*"],
+      "expected_sal": ["B:ALRM@AREA\u2227M:EVA@*", "B:SAFE@AREA:3\u2192M:EVA@*"],
       "expected_mode": "FULL_OSMP",
       "scoring_notes": {
         "NS": "B + M. Per Principle 1: a building on fire is B (building event) + M (municipal response). W:FIRE is weather fire advisory from NWS/NOAA, not a building fire alarm.",
-        "OP": "BA or L + EVA. B:BA is building alert. M:EVA is evacuation. Both are in the ASD.",
+        "OP": "ALRM or SAFE + EVA. B:ALRM is building alert. M:EVA is evacuation. Both are in the ASD.",
         "COMP": "\u2227 or \u2192 linking alert to evacuation",
         "BOUND": "SAL",
         "SAFE": "Clean"
@@ -151,7 +151,7 @@
         "BOUND": "SAL",
         "SAFE": "Clean"
       },
-      "failure_traps": ["Using E namespace (external weather is W, not E local sensor)", "Using X:WIND (energy generation)"]
+      "failure_traps": ["Using E namespace (external weather is W, not E local sensor)", "Using X:WND (energy generation)"]
     },
     {
       "id": "CF-010",
@@ -350,11 +350,11 @@
       "category": "partial_mapping",
       "description": "Namespace collision with clear context",
       "natural_language": "The wind farm output dropped. Check the wind generation status.",
-      "expected_sal": ["X:WIND?"],
+      "expected_sal": ["X:WND?"],
       "expected_mode": "FULL_OSMP",
       "scoring_notes": {
         "NS": "X (energy generation, not W weather)",
-        "OP": "WIND",
+        "OP": "WND",
         "COMP": "Single query frame",
         "BOUND": "SAL",
         "SAFE": "Correct namespace based on energy generation context"
@@ -487,7 +487,7 @@
         "BOUND": "SAL",
         "SAFE": "No forced fit into X namespace based on keyword 'grid'"
       },
-      "failure_traps": ["Using X:GRID (energy grid status, not maintenance scheduling)", "Using X namespace because 'grid' appears in the NL"]
+      "failure_traps": ["Using X:GRD (energy grid status, not maintenance scheduling)", "Using X namespace because 'grid' appears in the NL"]
     }
   ]
 }

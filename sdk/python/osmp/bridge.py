@@ -256,7 +256,7 @@ class SALBridge:
             session = self._sessions[peer_id]
 
         # Native OSMP peer — send SAL directly
-        if session.state in ("ESTABLISHED", "SYNC_NEEDED"):
+        if session.state in ("ESTABLISHED", "ESTABLISHED_SAIL", "ESTABLISHED_SAL_ONLY", "SYNC_NEEDED"):
             self._emit("send_sal", peer_id, sal=sal, detail="native OSMP peer")
             return sal
 
@@ -297,7 +297,7 @@ class SALBridge:
         metrics = self._metrics[peer_id]
 
         # For native OSMP peers, pass through as SAL
-        if session.state in ("ESTABLISHED", "SYNC_NEEDED"):
+        if session.state in ("ESTABLISHED", "ESTABLISHED_SAIL", "ESTABLISHED_SAL_ONLY", "SYNC_NEEDED"):
             return BridgeInbound(sal=message, nl=None, passthrough=False,
                                  peer_id=peer_id, state=session.state)
 

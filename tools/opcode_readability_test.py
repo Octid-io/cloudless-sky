@@ -34,7 +34,7 @@ Usage
     export ANTHROPIC_API_KEY=sk-ant-...
     python3 tools/opcode_readability_test.py --model claude-sonnet-4-6
     python3 tools/opcode_readability_test.py --namespace M --verbose
-    python3 tools/opcode_readability_test.py --opcode E:OBS
+    python3 tools/opcode_readability_test.py --opcode E:HAZ
     python3 tools/opcode_readability_test.py --flagged-only
     python3 tools/opcode_readability_test.py --output reports/readability-v14.csv
 
@@ -357,20 +357,20 @@ def collect_opcodes(
 
     # Opcodes flagged by the first-pass static analysis. When
     # --flagged-only is passed, only these are tested (faster, cheaper
-    # than running the full 342).
+    # than running the full 356).
     FLAGGED = {
         # CONFLICT-level
-        "E:OBS", "M:MA", "M:IT", "F:PRO", "F:W", "B:L", "B:X",
+        "E:HAZ", "M:MA", "M:IT", "F:PRO", "F:W", "B:SAFE", "B:X",
         "N:PR", "N:S", "D:Q", "F:Q", "N:Q", "M:A", "O:AUTH",
-        "D:RT", "O:TYPE",
+        "D:RTN", "O:TYP",
         # MATCH-level that might need verification
         "M:RT", "H:HR", "H:BP", "H:RR", "H:TEMP", "G:POS", "V:POS",
         "C:STAT", "D:STAT", "P:STAT", "R:STAT", "Z:TEMP", "W:WIND",
-        "X:GRID", "L:SEV", "O:MODE", "X:GEN", "Y:PROMOTE",
+        "X:GRID", "L:SEV", "O:MODE", "X:GEN", "Y:COMMIT",
         # RELATED-level
-        "B:BA", "B:BS", "G:DR", "X:DR", "X:EV", "X:WIND", "Y:STAT",
+        "B:ALRM", "B:AREA", "G:DR", "X:DR", "X:EV", "X:WND", "Y:STAT",
         "A:AUTH", "G:CONF", "R:DISP", "R:FORM", "O:ESC", "Q:CRIT",
-        "Y:PAGE", "Z:CAP", "Q:CONF", "Z:CONF",
+        "Y:PAGEOUT", "Z:CAPS", "Q:CONF", "Z:CONF",
     }
 
     opcodes: list[tuple[str, str, str]] = []
@@ -512,7 +512,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--opcode", default=None,
-        help="Test only a specific opcode (e.g. 'E:OBS')",
+        help="Test only a specific opcode (e.g. 'E:HAZ')",
     )
     parser.add_argument(
         "--flagged-only", action="store_true",

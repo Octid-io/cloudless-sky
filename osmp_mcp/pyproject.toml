@@ -29,7 +29,7 @@ pip install osmp-mcp
 - **osmp_compound_decode** -- Analyze DAG topology and loss tolerance
 - **osmp_batch_resolve** -- Multiple domain codes in one call
 
-342 opcodes. 26 namespaces. Three MDR corpora (124,215 resolvable codes).
+356 opcodes. 26 namespaces. Three MDR corpora (124,215 resolvable codes).
 
 For the standalone SDK (no MCP dependency): `pip install osmp`
 

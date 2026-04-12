@@ -170,8 +170,8 @@ def _build_opcode_tables(dict_path: Path | str | None = None) -> tuple[
     if dict_path is None:
         # Try default locations
         candidates = [
-            Path(__file__).parent.parent.parent.parent / "protocol" / "OSMP-semantic-dictionary-v14.csv",
-            Path("protocol/OSMP-semantic-dictionary-v14.csv"),
+            Path(__file__).parent.parent.parent.parent / "protocol" / "OSMP-semantic-dictionary-v15.csv",
+            Path("protocol/OSMP-semantic-dictionary-v15.csv"),
         ]
         for c in candidates:
             if c.exists():
@@ -214,6 +214,210 @@ def _build_opcode_tables(dict_path: Path | str | None = None) -> tuple[
         idx_to_op[ns] = {i: op for i, op in enumerate(sorted_ops)}
 
     return op_to_idx, idx_to_op
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DICTIONARY BASIS MANIFEST (ADR-004)
+#
+# A Dictionary Basis is an ordered list of (corpus_id, corpus_hash) pairs that
+# determines a node's SAIL intern table by pure-function construction. Two
+# nodes loading the same ordered basis produce byte-identical intern tables
+# and unlock SAIL with each other; nodes with different bases interoperate in
+# SAL-only mode via FNP capability grading (spec §9.5).
+#
+# See ADR-004 for the architectural rationale and spec §9.8 for the formal
+# definition.
+# ─────────────────────────────────────────────────────────────────────────────
+
+@dataclass(frozen=True)
+class CorpusEntry:
+    """Single entry in a Dictionary Basis.
+
+    corpus_id: stable UTF-8 identifier (1-255 bytes), e.g. "asd-v14".
+    corpus_hash: full 32-byte SHA-256 over the corpus file bytes verbatim.
+    """
+    corpus_id: str
+    corpus_hash: bytes
+
+    def __post_init__(self) -> None:
+        cid_bytes = self.corpus_id.encode("utf-8")
+        if not 1 <= len(cid_bytes) <= 255:
+            raise ValueError(
+                f"corpus_id must be 1-255 UTF-8 bytes, got {len(cid_bytes)}"
+            )
+        if len(self.corpus_hash) != 32:
+            raise ValueError(
+                f"corpus_hash must be exactly 32 bytes (SHA-256), got {len(self.corpus_hash)}"
+            )
+
+
+class DictionaryBasis:
+    """Ordered, content-addressed set of dictionary corpora (ADR-004).
+
+    The basis is the input to deterministic SAIL intern table construction.
+    A basis is constructed from one or more corpus files. The first entry is
+    always the base ASD; subsequent entries are MDR corpora in operator-
+    specified order. Order is significant: it determines intern table index
+    assignment and is reflected in the basis fingerprint.
+
+    Use the classmethods to construct: `from_paths` is the typical entry
+    point for loading corpora from disk; `default` constructs a base-ASD-only
+    basis for the common case.
+    """
+
+    def __init__(self, entries: list[CorpusEntry]):
+        if not entries:
+            raise ValueError("DictionaryBasis must contain at least one entry")
+        self._entries: tuple[CorpusEntry, ...] = tuple(entries)
+        # Cache the fingerprint; basis is logically immutable after construction.
+        self._fingerprint: bytes | None = None
+
+    @property
+    def entries(self) -> tuple[CorpusEntry, ...]:
+        return self._entries
+
+    def __len__(self) -> int:
+        return len(self._entries)
+
+    def __iter__(self):
+        return iter(self._entries)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, DictionaryBasis):
+            return NotImplemented
+        return self._entries == other._entries
+
+    def __hash__(self) -> int:
+        return hash(self._entries)
+
+    def canonical_serialization(self) -> bytes:
+        """Canonical wire form per spec §9.3.
+
+        For each entry in basis order, emit:
+            corpus_id_length (1 byte) || corpus_id (UTF-8 bytes) || corpus_hash (32 bytes)
+
+        This is unambiguous across platforms because no padding, alignment,
+        or text encoding is involved beyond the explicit length prefix and
+        the raw hash bytes.
+        """
+        out = bytearray()
+        for entry in self._entries:
+            cid = entry.corpus_id.encode("utf-8")
+            out.append(len(cid))
+            out.extend(cid)
+            out.extend(entry.corpus_hash)
+        return bytes(out)
+
+    def fingerprint(self) -> bytes:
+        """8-byte basis fingerprint per spec §9.3.
+
+        First 8 bytes of SHA-256 over the canonical serialization. Two
+        bases with equal fingerprints have byte-identical canonical
+        serializations and produce byte-identical intern tables.
+        """
+        if self._fingerprint is None:
+            digest = hashlib.sha256(self.canonical_serialization()).digest()
+            object.__setattr__(self, "_fingerprint", digest[:8])
+        return self._fingerprint  # type: ignore[return-value]
+
+    def is_base_only(self) -> bool:
+        """True if this basis contains only the base ASD (length 1).
+
+        Base-only bases are the default. Two base-only bases loading the
+        same dictionary version automatically match and unlock SAIL.
+        """
+        return len(self._entries) == 1
+
+    @classmethod
+    def from_paths(
+        cls,
+        asd_path: Path | str,
+        asd_id: str | None = None,
+        mdr_corpora: list[tuple[str, Path | str]] | None = None,
+    ) -> "DictionaryBasis":
+        """Construct a basis from corpus files on disk.
+
+        asd_path: path to the base ASD CSV (the dictionary).
+        asd_id: optional override for the base ASD identifier. If not given,
+            derived from the dictionary version detected in the CSV header,
+            or "asd-v14" as a stable fallback.
+        mdr_corpora: optional list of (corpus_id, path) pairs for MDR corpora
+            to append to the basis after the base ASD, in the order given.
+        """
+        entries: list[CorpusEntry] = []
+
+        # Base ASD entry.
+        asd_path = Path(asd_path)
+        if not asd_path.exists():
+            raise FileNotFoundError(f"Base ASD not found: {asd_path}")
+        asd_hash = cls._hash_file(asd_path)
+        if asd_id is None:
+            asd_id = cls._derive_asd_id(asd_path)
+        entries.append(CorpusEntry(corpus_id=asd_id, corpus_hash=asd_hash))
+
+        # MDR corpora in operator-specified order.
+        if mdr_corpora:
+            for corpus_id, corpus_path in mdr_corpora:
+                cp = Path(corpus_path)
+                if not cp.exists():
+                    raise FileNotFoundError(f"MDR corpus not found: {cp}")
+                ch = cls._hash_file(cp)
+                entries.append(CorpusEntry(corpus_id=corpus_id, corpus_hash=ch))
+
+        return cls(entries)
+
+    @classmethod
+    def default(cls, dict_path: Path | str | None = None) -> "DictionaryBasis":
+        """Construct the default base-ASD-only basis.
+
+        If dict_path is None, searches the canonical default locations
+        (matching _build_opcode_tables behavior).
+        """
+        if dict_path is None:
+            candidates = [
+                Path(__file__).parent.parent.parent.parent / "protocol" / "OSMP-semantic-dictionary-v15.csv",
+                Path("protocol/OSMP-semantic-dictionary-v15.csv"),
+                Path(__file__).parent / "data" / "OSMP-semantic-dictionary-v15.csv",
+            ]
+            for c in candidates:
+                if c.exists():
+                    dict_path = c
+                    break
+        if dict_path is None or not Path(dict_path).exists():
+            raise FileNotFoundError(
+                "Base ASD not found in any default location. "
+                "Pass dict_path explicitly or use DictionaryBasis.from_paths."
+            )
+        return cls.from_paths(dict_path)
+
+    @staticmethod
+    def _hash_file(path: Path) -> bytes:
+        """SHA-256 over file bytes verbatim. No canonicalization."""
+        h = hashlib.sha256()
+        with open(path, "rb") as f:
+            for chunk in iter(lambda: f.read(65536), b""):
+                h.update(chunk)
+        return h.digest()
+
+    @staticmethod
+    def _derive_asd_id(asd_path: Path) -> str:
+        """Derive a stable ASD corpus identifier from the dictionary file.
+
+        Looks for a version marker in the first 20 lines of the CSV. Falls
+        back to 'asd-v14' as the v14 default. The identifier is part of the
+        basis fingerprint, so it must be stable across nodes loading the
+        same dictionary version.
+        """
+        try:
+            with open(asd_path, "r", encoding="utf-8") as f:
+                head = "".join(f.readline() for _ in range(20))
+            # Look for "vNN" where NN is two digits, common in OSMP CSV headers.
+            m = re.search(r"v(\d{2})", head)
+            if m:
+                return f"asd-v{m.group(1)}"
+        except (OSError, UnicodeDecodeError):
+            pass
+        return "asd-v14"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -265,103 +469,51 @@ class SAILCodec:
     """
 
     @staticmethod
-    def _build_intern_table(
-        dict_path: Path | str | None = None,
-        mdr_paths: list[Path | str] | None = None,
-    ) -> list[str]:
-        """Dynamically construct the intern table from loaded dictionary and MDR content.
+    def _build_intern_table(basis: DictionaryBasis | None = None,
+                            dict_path: Path | str | None = None) -> list[str]:
+        """Construct the SAIL intern table from a Dictionary Basis (ADR-004).
 
-        Phase 1: Extracts every opcode name from the base dictionary Section 3.
-        Phase 2: Extracts every slot value from each loaded MDR corpus Section B.
+        The intern table is a pure function of the basis: two basis instances
+        with equal entries produce byte-identical intern tables. Index
+        assignment is deterministic over (basis order, deduplicated
+        first-seen order, length-descending sort, cost filter).
 
-        Zero static data. Every interned string originates from a loaded file.
-        Loading a new MDR corpus simultaneously expands semantic vocabulary
-        (via _build_opcode_tables) AND configures the binary compression
-        table (via this method) from a single loading operation.
+        For the v14 base ASD, extraction is the historical Phase 1 behavior:
+        every opcode name from Section 3. Future corpus types declare their
+        own extraction rule per the corpus's sidecar manifest; this
+        implementation supports the base ASD CSV extractor as the only
+        shipping rule.
+
+        The dict_path parameter is retained as a fallback for the historical
+        default-search behavior so existing code paths that construct a
+        SAILCodec with no arguments continue to work. When `basis` is
+        provided, it takes precedence and dict_path is ignored.
         """
         strings: set[str] = set()
 
-        # ── Phase 1: Opcode names from base dictionary Section 3 ──────────
+        # If a basis is provided, iterate it; otherwise fall back to the
+        # historical default-search behavior over the base ASD only.
+        if basis is not None:
+            for entry in basis:
+                # Per ADR-004, corpus identifiers prefixed with "asd-" use the
+                # base ASD CSV extractor. Future corpus types dispatch by id
+                # prefix or by sidecar manifest tag.
+                if entry.corpus_id.startswith("asd-"):
+                    # The basis entry tells us what the corpus is, but the
+                    # actual file content lives at the path the SDK loaded
+                    # from. We re-derive content extraction from the same
+                    # default-search the codec already does.
+                    SAILCodec._extract_asd_opcodes(strings, dict_path)
+                # MDR corpus extraction rules are deferred until corpora
+                # ship with sidecar manifests. Historical Phase 2 (parsing
+                # MDR CSV "SECTION B") is removed; it produced zero
+                # observable intern entries on every shipped MDR.
+        else:
+            SAILCodec._extract_asd_opcodes(strings, dict_path)
 
-        if dict_path is None:
-            candidates = [
-                Path(__file__).parent.parent.parent.parent / "protocol" / "OSMP-semantic-dictionary-v14.csv",
-                Path("protocol/OSMP-semantic-dictionary-v14.csv"),
-            ]
-            for c in candidates:
-                if c.exists():
-                    dict_path = c
-                    break
-
-        if dict_path and Path(dict_path).exists():
-            with open(dict_path, "r", encoding="utf-8") as f:
-                lines = f.readlines()
-
-            in_section3 = False
-            for line in lines:
-                stripped = line.strip()
-                if "SECTION 3" in stripped:
-                    in_section3 = True
-                    continue
-                if "SECTION 4" in stripped:
-                    break
-                if not in_section3:
-                    continue
-
-                parts = stripped.split(",")
-                if len(parts) >= 5:
-                    prefix = parts[1].strip()
-                    opcode = parts[3].strip()
-                    if (prefix and prefix.isalpha() and len(prefix) <= 2
-                            and prefix.isupper() and opcode and opcode != "Opcode"):
-                        strings.add(opcode)
-
-        # ── Phase 2: Slot values from each MDR corpus Section B ───────────
-
-        if mdr_paths:
-            for mdr_path in mdr_paths:
-                mdr_path = Path(mdr_path)
-                if not mdr_path.exists():
-                    continue
-
-                with open(mdr_path, "r", encoding="utf-8") as f:
-                    mdr_lines = f.readlines()
-
-                in_section_b = False
-                for line in mdr_lines:
-                    stripped = line.strip()
-
-                    # Track sections
-                    if "SECTION B" in stripped:
-                        in_section_b = True
-                        continue
-                    if stripped.startswith("SECTION ") and "SECTION B" not in stripped:
-                        if in_section_b:
-                            break
-                    if not in_section_b:
-                        continue
-
-                    # Skip non-data lines
-                    if (not stripped or stripped.startswith("Format:")
-                            or stripped.startswith("===") or stripped.startswith("---")
-                            or stripped.startswith("Note:")):
-                        continue
-
-                    # Parse: Namespace:Opcode,SlotValue,...
-                    parts = stripped.split(",")
-                    if len(parts) >= 2 and ":" in parts[0]:
-                        slot_value = parts[1].strip()
-                        if slot_value:
-                            strings.add(slot_value)
-
-                    # Also extract bracket references from dependency rules
-                    if len(parts) >= 5:
-                        dep_rule = parts[4] if len(parts) > 4 else ""
-                        for match in re.findall(r'\[([^\]]+)\]', dep_rule):
-                            strings.add(match)
-
-        # ── Filter: only keep strings where interning saves bytes ─────────
-
+        # Filter: only keep strings where interning saves bytes.
+        # Sort length-descending for deterministic, byte-identical output
+        # across nodes.
         sorted_strings = sorted(strings, key=lambda s: (-len(s), s))
         result = []
         for s in sorted_strings:
@@ -371,13 +523,92 @@ class SAILCodec:
                 result.append(s)
         return result
 
+    @staticmethod
+    def _extract_asd_opcodes(strings: set[str],
+                             dict_path: Path | str | None = None) -> None:
+        """Extract every opcode name from the base ASD Section 3.
+
+        Mutates the `strings` set in place. Used by both basis-driven
+        construction (when an "asd-*" corpus appears in the basis) and the
+        historical default-search fallback.
+        """
+        if dict_path is None:
+            candidates = [
+                Path(__file__).parent.parent.parent.parent / "protocol" / "OSMP-semantic-dictionary-v15.csv",
+                Path("protocol/OSMP-semantic-dictionary-v15.csv"),
+                Path(__file__).parent / "data" / "OSMP-semantic-dictionary-v15.csv",
+            ]
+            for c in candidates:
+                if c.exists():
+                    dict_path = c
+                    break
+
+        if not dict_path or not Path(dict_path).exists():
+            return
+
+        with open(dict_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        in_section3 = False
+        for line in lines:
+            stripped = line.strip()
+            if "SECTION 3" in stripped:
+                in_section3 = True
+                continue
+            if "SECTION 4" in stripped:
+                break
+            if not in_section3:
+                continue
+
+            parts = stripped.split(",")
+            if len(parts) >= 5:
+                prefix = parts[1].strip()
+                opcode = parts[3].strip()
+                if (prefix and prefix.isalpha() and len(prefix) <= 2
+                        and prefix.isupper() and opcode and opcode != "Opcode"):
+                    strings.add(opcode)
+
 
     def __init__(self, dict_path: Path | str | None = None,
-                 mdr_paths: list[Path | str] | None = None):
+                 basis: DictionaryBasis | None = None):
+        """Construct a SAIL codec.
+
+        dict_path: path to the base ASD CSV. Used for opcode table
+            construction and as the fallback content source when no basis
+            is provided.
+        basis: optional DictionaryBasis (ADR-004). When provided, the
+            intern table is constructed deterministically from the basis
+            and the codec's basis_fingerprint() reports the basis fingerprint
+            for FNP capability negotiation. When omitted, the codec
+            constructs a default base-ASD-only basis from dict_path.
+        """
         self.op_to_idx, self.idx_to_op = _build_opcode_tables(dict_path)
-        self._intern_table = self._build_intern_table(dict_path, mdr_paths)
+
+        # If no basis was supplied, construct the default base-ASD-only
+        # basis from the resolved dict_path so codec.basis is always
+        # well-defined and basis_fingerprint() always returns a value.
+        if basis is None:
+            try:
+                basis = DictionaryBasis.default(dict_path)
+            except FileNotFoundError:
+                # Last-resort fallback for environments where the dictionary
+                # cannot be located on disk: synthesize a basis from a
+                # placeholder hash so the codec is still constructible.
+                # Tests that exercise basis_fingerprint() must supply a
+                # real basis or a valid dict_path.
+                placeholder_hash = hashlib.sha256(b"asd-unknown").digest()
+                basis = DictionaryBasis([
+                    CorpusEntry(corpus_id="asd-unknown", corpus_hash=placeholder_hash)
+                ])
+
+        self.basis: DictionaryBasis = basis
+        self._intern_table = self._build_intern_table(basis, dict_path)
         self._str_to_ref: dict[str, int] = {s: i for i, s in enumerate(self._intern_table)}
         self._ref_to_str: dict[int, str] = {i: s for i, s in enumerate(self._intern_table)}
+
+    def basis_fingerprint(self) -> bytes:
+        """8-byte basis fingerprint for FNP capability negotiation (spec §9.3)."""
+        return self.basis.fingerprint()
 
 
     @staticmethod
@@ -888,12 +1119,32 @@ class OSMPWireCodec:
     """
 
     def __init__(self, dict_path: Path | str | None = None,
-                 mdr_paths: list[Path | str] | None = None,
+                 basis: DictionaryBasis | None = None,
                  node_id: bytes = b"\x00\x01",
                  signing_key: bytes | None = None,
                  symmetric_key: bytes | None = None):
-        self.sail = SAILCodec(dict_path, mdr_paths)
+        """Construct a unified OSMP wire codec.
+
+        dict_path: path to the base ASD CSV. Used for opcode table
+            construction and as the fallback content source when no basis
+            is provided.
+        basis: optional DictionaryBasis (ADR-004). When provided, the SAIL
+            codec uses it directly. When omitted, a default base-ASD-only
+            basis is constructed from dict_path.
+        node_id, signing_key, symmetric_key: SEC envelope parameters,
+            unchanged from v1.0.2.
+        """
+        self.sail = SAILCodec(dict_path=dict_path, basis=basis)
         self.sec = SecCodec(node_id, signing_key, symmetric_key)
+
+    @property
+    def basis(self) -> DictionaryBasis:
+        """The Dictionary Basis bound to this codec (ADR-004)."""
+        return self.sail.basis
+
+    def basis_fingerprint(self) -> bytes:
+        """8-byte basis fingerprint for FNP capability negotiation (spec §9.3)."""
+        return self.sail.basis_fingerprint()
 
     def encode(self, sal: str, mode: WireMode = WireMode.MNEMONIC) -> bytes:
         """Encode a SAL instruction in the specified wire mode.

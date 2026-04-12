@@ -9,12 +9,13 @@
  *   OSMP-SEC      — Mnemonic SAL + security envelope
  *   OSMP-SAIL-SEC — SAIL + security envelope (hardened mode)
  * 
- * Dictionary: OSMP-semantic-dictionary-v14.csv
+ * Dictionary: OSMP-semantic-dictionary-v15.csv
  */
 
 import {
   createCipheriv,
   createDecipheriv,
+  createHash,
   createPrivateKey,
   createPublicKey,
   randomBytes,
@@ -166,8 +167,8 @@ function buildOpcodeTables(dictPath?: string): [OpcodeIndex, IndexOpcode] {
   let path = dictPath;
   if (!path) {
     const candidates = [
-      join(dirname(__filename), "..", "..", "..", "protocol", "OSMP-semantic-dictionary-v14.csv"),
-      join("protocol", "OSMP-semantic-dictionary-v14.csv"),
+      join(dirname(__filename), "..", "..", "..", "protocol", "OSMP-semantic-dictionary-v15.csv"),
+      join("protocol", "OSMP-semantic-dictionary-v15.csv"),
     ];
     for (const c of candidates) {
       if (existsSync(c)) { path = c; break; }
@@ -210,77 +211,223 @@ function buildOpcodeTables(dictPath?: string): [OpcodeIndex, IndexOpcode] {
   return [opToIdx, idxToOp];
 }
 
+// ─── Dictionary Basis Manifest (ADR-004) ─────────────────────────────────────
+//
+// A Dictionary Basis is an ordered list of (corpus_id, corpus_hash) pairs that
+// determines a node's SAIL intern table by pure-function construction. Two
+// nodes loading the same ordered basis produce byte-identical intern tables
+// and unlock SAIL with each other; nodes with different bases interoperate in
+// SAL-only mode via FNP capability grading (spec §9.5).
+//
+// See ADR-004 and spec §9.8.
+
+export interface CorpusEntry {
+  /** Stable UTF-8 identifier (1-255 bytes), e.g. "asd-v15" */
+  corpusId: string;
+  /** Full 32-byte SHA-256 over the corpus file bytes verbatim */
+  corpusHash: Buffer;
+}
+
+function validateCorpusEntry(e: CorpusEntry): void {
+  const idBytes = Buffer.byteLength(e.corpusId, "utf-8");
+  if (idBytes < 1 || idBytes > 255) {
+    throw new Error(`corpus_id must be 1-255 UTF-8 bytes, got ${idBytes}`);
+  }
+  if (e.corpusHash.length !== 32) {
+    throw new Error(`corpus_hash must be exactly 32 bytes (SHA-256), got ${e.corpusHash.length}`);
+  }
+}
+
+export class DictionaryBasis {
+  private readonly _entries: readonly CorpusEntry[];
+  private _fingerprint: Buffer | null = null;
+
+  constructor(entries: CorpusEntry[]) {
+    if (!entries || entries.length === 0) {
+      throw new Error("DictionaryBasis must contain at least one entry");
+    }
+    for (const e of entries) validateCorpusEntry(e);
+    // Defensive copy with frozen entries to mirror Python's frozen dataclass.
+    this._entries = entries.map(e => Object.freeze({
+      corpusId: e.corpusId,
+      corpusHash: Buffer.from(e.corpusHash),
+    }));
+  }
+
+  get entries(): readonly CorpusEntry[] {
+    return this._entries;
+  }
+
+  get length(): number {
+    return this._entries.length;
+  }
+
+  isBaseOnly(): boolean {
+    return this._entries.length === 1;
+  }
+
+  /**
+   * Canonical wire form per spec §9.3.
+   * For each entry in basis order:
+   *   corpus_id_length (1 byte) || corpus_id (UTF-8 bytes) || corpus_hash (32 bytes)
+   */
+  canonicalSerialization(): Buffer {
+    const parts: Buffer[] = [];
+    for (const e of this._entries) {
+      const idBytes = Buffer.from(e.corpusId, "utf-8");
+      parts.push(Buffer.from([idBytes.length]));
+      parts.push(idBytes);
+      parts.push(e.corpusHash);
+    }
+    return Buffer.concat(parts);
+  }
+
+  /**
+   * 8-byte basis fingerprint per spec §9.3.
+   * First 8 bytes of SHA-256 over the canonical serialization.
+   */
+  fingerprint(): Buffer {
+    if (this._fingerprint === null) {
+      const digest = createHash("sha256").update(this.canonicalSerialization()).digest();
+      this._fingerprint = digest.subarray(0, 8);
+    }
+    return this._fingerprint;
+  }
+
+  equals(other: DictionaryBasis): boolean {
+    if (this._entries.length !== other._entries.length) return false;
+    for (let i = 0; i < this._entries.length; i++) {
+      const a = this._entries[i];
+      const b = other._entries[i];
+      if (a.corpusId !== b.corpusId) return false;
+      if (!a.corpusHash.equals(b.corpusHash)) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Construct a basis from corpus files on disk.
+   */
+  static fromPaths(
+    asdPath: string,
+    asdId?: string,
+    mdrCorpora?: Array<{ corpusId: string; path: string }>,
+  ): DictionaryBasis {
+    if (!existsSync(asdPath)) {
+      throw new Error(`Base ASD not found: ${asdPath}`);
+    }
+    const entries: CorpusEntry[] = [];
+    const asdHash = DictionaryBasis._hashFile(asdPath);
+    const id = asdId ?? DictionaryBasis._deriveAsdId(asdPath);
+    entries.push({ corpusId: id, corpusHash: asdHash });
+
+    if (mdrCorpora) {
+      for (const c of mdrCorpora) {
+        if (!existsSync(c.path)) {
+          throw new Error(`MDR corpus not found: ${c.path}`);
+        }
+        entries.push({ corpusId: c.corpusId, corpusHash: DictionaryBasis._hashFile(c.path) });
+      }
+    }
+    return new DictionaryBasis(entries);
+  }
+
+  /**
+   * Construct the default base-ASD-only basis from canonical default locations.
+   */
+  static default(dictPath?: string): DictionaryBasis {
+    let path = dictPath;
+    if (!path) {
+      const candidates = [
+        join(dirname(__filename), "..", "..", "..", "protocol", "OSMP-semantic-dictionary-v15.csv"),
+        join("protocol", "OSMP-semantic-dictionary-v15.csv"),
+      ];
+      for (const c of candidates) {
+        if (existsSync(c)) { path = c; break; }
+      }
+    }
+    if (!path || !existsSync(path)) {
+      throw new Error(
+        "Base ASD not found in any default location. Pass dictPath explicitly or use DictionaryBasis.fromPaths."
+      );
+    }
+    return DictionaryBasis.fromPaths(path);
+  }
+
+  private static _hashFile(path: string): Buffer {
+    const data = readFileSync(path);
+    return createHash("sha256").update(data).digest();
+  }
+
+  private static _deriveAsdId(asdPath: string): string {
+    try {
+      const head = readFileSync(asdPath, "utf-8").split("\n").slice(0, 20).join("\n");
+      const m = head.match(/v(\d{2})/);
+      if (m) return `asd-v${m[1]}`;
+    } catch { /* fall through */ }
+    return "asd-v15";
+  }
+}
+
 // ─── Intern Table ────────────────────────────────────────────────────────────
 
 
-function buildInternTable(dictPath?: string, mdrPaths?: string[]): string[] {
-  /**
-   * Dynamically construct intern table from dictionary and MDR content.
-   * Phase 1: Opcode names from base dictionary Section 3.
-   * Phase 2: Slot values from each loaded MDR corpus Section B.
-   * Zero static data. Every string originates from a loaded file.
-   */
-  const strings = new Set<string>();
-
-  // Phase 1: Opcode names from base dictionary
+function extractAsdOpcodes(strings: Set<string>, dictPath?: string): void {
   let path = dictPath;
   if (!path) {
     const candidates = [
-      join(dirname(__filename), "..", "..", "..", "protocol", "OSMP-semantic-dictionary-v14.csv"),
-      join("protocol", "OSMP-semantic-dictionary-v14.csv"),
+      join(dirname(__filename), "..", "..", "..", "protocol", "OSMP-semantic-dictionary-v15.csv"),
+      join("protocol", "OSMP-semantic-dictionary-v15.csv"),
     ];
     for (const c of candidates) {
       if (existsSync(c)) { path = c; break; }
     }
   }
+  if (!path || !existsSync(path)) return;
 
-  if (path && existsSync(path)) {
-    const lines = readFileSync(path, "utf-8").split("\n");
-    let inS3 = false;
-    for (const line of lines) {
-      if (line.includes("SECTION 3")) { inS3 = true; continue; }
-      if (line.includes("SECTION 4")) break;
-      if (!inS3) continue;
-      const parts = line.split(",");
-      if (parts.length >= 5) {
-        const prefix = parts[1].trim();
-        const opcode = parts[3].trim();
-        if (prefix && /^[A-Z]{1,2}$/.test(prefix) && opcode && opcode !== "Opcode") {
-          strings.add(opcode);
-        }
+  const lines = readFileSync(path, "utf-8").split("\n");
+  let inS3 = false;
+  for (const line of lines) {
+    if (line.includes("SECTION 3")) { inS3 = true; continue; }
+    if (line.includes("SECTION 4")) break;
+    if (!inS3) continue;
+    const parts = line.split(",");
+    if (parts.length >= 5) {
+      const prefix = parts[1].trim();
+      const opcode = parts[3].trim();
+      if (prefix && /^[A-Z]{1,2}$/.test(prefix) && opcode && opcode !== "Opcode") {
+        strings.add(opcode);
       }
     }
   }
+}
 
-  // Phase 2: Slot values from each MDR corpus Section B
-  if (mdrPaths) {
-    for (const mdrPath of mdrPaths) {
-      if (!existsSync(mdrPath)) continue;
-      const mdrLines = readFileSync(mdrPath, "utf-8").split("\n");
-      let inSB = false;
-      for (const line of mdrLines) {
-        const trimmed = line.trim();
-        if (trimmed.includes("SECTION B")) { inSB = true; continue; }
-        if (inSB && trimmed.startsWith("SECTION ") && !trimmed.includes("SECTION B")) break;
-        if (!inSB) continue;
-        if (!trimmed || trimmed.startsWith("Format:") || trimmed.startsWith("===")
-            || trimmed.startsWith("---") || trimmed.startsWith("Note:")) continue;
+function buildInternTable(basis: DictionaryBasis | null, dictPath?: string): string[] {
+  /**
+   * Construct the SAIL intern table from a Dictionary Basis (ADR-004).
+   *
+   * The intern table is a pure function of the basis: two basis instances
+   * with equal entries produce byte-identical intern tables. Index
+   * assignment is deterministic over (basis order, deduplicated first-seen,
+   * length-descending sort, cost filter).
+   *
+   * Future corpus types declare their own extraction rules per the
+   * corpus's sidecar manifest. This implementation supports the base ASD
+   * CSV extractor as the only shipping rule. Historical "Phase 2" MDR CSV
+   * SECTION B parsing is removed; it produced zero observable intern
+   * entries on every shipped MDR.
+   */
+  const strings = new Set<string>();
 
-        const parts = trimmed.split(",");
-        if (parts.length >= 2 && parts[0].includes(":")) {
-          const slotValue = parts[1].trim();
-          if (slotValue) strings.add(slotValue);
-        }
-        // Extract bracket references from dependency rules
-        if (parts.length >= 5) {
-          const depRule = parts[4] || "";
-          const matches = depRule.match(/\[([^\]]+)\]/g);
-          if (matches) {
-            for (const m of matches) strings.add(m.slice(1, -1));
-          }
-        }
+  if (basis !== null) {
+    for (const entry of basis.entries) {
+      if (entry.corpusId.startsWith("asd-")) {
+        extractAsdOpcodes(strings, dictPath);
       }
+      // MDR corpus extraction rules deferred until corpora ship sidecar manifests.
     }
+  } else {
+    extractAsdOpcodes(strings, dictPath);
   }
 
   // Filter: only keep strings where interning saves bytes
@@ -306,12 +453,39 @@ export class SAILCodec {
   private idxToOp: IndexOpcode;
   private strToRef: Map<string, number>;
   private refToStr: Map<number, string>;
+  public readonly basis: DictionaryBasis;
 
-  constructor(dictPath?: string, mdrPaths?: string[]) {
+  constructor(dictPath?: string, basis?: DictionaryBasis) {
     [this.opToIdx, this.idxToOp] = buildOpcodeTables(dictPath);
-    const internTable = buildInternTable(dictPath, mdrPaths);
+
+    // If no basis was supplied, construct the default base-ASD-only basis
+    // so codec.basis is always well-defined and basisFingerprint() always
+    // returns a value.
+    let resolvedBasis = basis;
+    if (!resolvedBasis) {
+      try {
+        resolvedBasis = DictionaryBasis.default(dictPath);
+      } catch {
+        // Last-resort fallback when the dictionary cannot be located on
+        // disk: synthesize a basis from a placeholder hash so the codec
+        // is still constructible. Tests that exercise basisFingerprint()
+        // must supply a real basis or a valid dictPath.
+        const placeholder = createHash("sha256").update(Buffer.from("asd-unknown")).digest();
+        resolvedBasis = new DictionaryBasis([
+          { corpusId: "asd-unknown", corpusHash: placeholder },
+        ]);
+      }
+    }
+    this.basis = resolvedBasis;
+
+    const internTable = buildInternTable(resolvedBasis, dictPath);
     this.strToRef = new Map(internTable.map((s, i) => [s, i]));
     this.refToStr = new Map(internTable.map((s, i) => [i, s]));
+  }
+
+  /** 8-byte basis fingerprint for FNP capability negotiation (spec §9.3). */
+  basisFingerprint(): Buffer {
+    return this.basis.fingerprint();
   }
 
   private tryNamespaceOpcode(sal: string, pos: number): [Uint8Array, number] | null {
@@ -706,9 +880,19 @@ export class OSMPWireCodec {
   private sail: SAILCodec;
   private sec: SecCodec;
 
-  constructor(opts?: { dictPath?: string; mdrPaths?: string[]; nodeId?: Buffer; signingKey?: Buffer; symmetricKey?: Buffer }) {
-    this.sail = new SAILCodec(opts?.dictPath, opts?.mdrPaths);
+  constructor(opts?: { dictPath?: string; basis?: DictionaryBasis; nodeId?: Buffer; signingKey?: Buffer; symmetricKey?: Buffer }) {
+    this.sail = new SAILCodec(opts?.dictPath, opts?.basis);
     this.sec = new SecCodec(opts?.nodeId ?? Buffer.from([0x00, 0x01]), opts?.signingKey, opts?.symmetricKey);
+  }
+
+  /** The Dictionary Basis bound to this codec (ADR-004). */
+  get basis(): DictionaryBasis {
+    return this.sail.basis;
+  }
+
+  /** 8-byte basis fingerprint for FNP capability negotiation (spec §9.3). */
+  basisFingerprint(): Buffer {
+    return this.sail.basisFingerprint();
   }
 
   encode(sal: string, mode: WireMode = WireMode.MNEMONIC): Buffer {

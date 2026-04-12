@@ -140,21 +140,23 @@ The OSMP glyph system comprises six functionally distinct symbol categories. Cat
 
 ### 3.6 SAIL (Semantic Assembly Isomorphic Language)
 
-SAIL is the binary wire encoding of SAL. Every valid SAL instruction has exactly one SAIL encoding. Every valid SAIL payload decodes to exactly one SAL instruction. The mapping is bijective: no information is lost in either direction.
+SAIL is the binary wire encoding of SAL. The mapping between SAL and SAIL is bijective for any peer pair sharing an equal Dictionary Basis Fingerprint (§9.8): every valid SAL instruction has exactly one SAIL encoding under that basis, every valid SAIL payload decodes to exactly one SAL instruction under that basis, and no information is lost in either direction. The bijection is anchored to basis equality, not assumed across heterogeneous loadouts.
 
-SAL is the human-readable encoding (Unicode glyphs, inspectable at every hop). SAIL is the binary encoding (opaque bytes, maximum compression for constrained channels). The decode path is encoding-agnostic: whether the wire carries UTF-8 SAL or packed SAIL, the receiving node performs the same dictionary lookup and produces the same decoded instruction.
+SAL is the human-readable encoding (Unicode glyphs, inspectable at every hop). SAIL is the binary encoding (opaque bytes, maximum compression for constrained channels). The decode path is encoding-agnostic for any peer pair within a basis: whether the wire carries UTF-8 SAL or packed SAIL, the receiving node performs the same dictionary lookup against its local intern table and produces the same decoded instruction.
 
 SAIL encoding operates on the SAL instruction structure:
 
 1. Each namespace prefix (A-Z) encodes to a single byte (0x41-0x5A).
-2. Each opcode encodes to a 2-byte value: the namespace byte followed by a dictionary index byte.
+2. Each opcode encodes to a 2-byte value: the namespace byte followed by a dictionary index byte derived from the base ASD. Opcode index assignment is deterministic across all conforming nodes that share a base ASD fingerprint and is independent of the broader basis composition.
 3. Glyph operators encode to single bytes from a fixed operator table.
-4. Target identifiers, slot values, and Layer 2 accessor content encode as length-prefixed UTF-8 strings.
+4. Interned strings (target identifiers, slot values, Layer 2 accessor content that appears in the basis intern table) encode as a one-byte reference token followed by a varint index into the intern table. Strings absent from the intern table encode as length-prefixed UTF-8.
 5. The sequence separator (;) encodes as 0x3B, preserving frame boundaries.
 
-The SAIL codec is shipped in all three SDKs (Python, TypeScript, Go). Round-trip fidelity is verified on all 55 canonical test vectors: SAL to SAIL to SAL produces the identical input string.
+The SAIL intern table is a pure function of the Dictionary Basis (§9.8). Two nodes with equal basis fingerprints construct byte-identical intern tables and produce byte-identical SAIL encodings of any given SAL instruction. Two nodes with unequal basis fingerprints do not, and FNP capability negotiation (§9.5) prevents them from attempting SAIL exchange with each other; such peer pairs operate in SAL-only mode for all session traffic.
 
-The development workflow: compose and debug in SAL (human-readable), deploy in SAIL (binary, maximum compression), decompile the wire payload back to readable SAL for inspection at any point.
+The SAIL codec is shipped in all three SDKs (Python, TypeScript, Go). Round-trip fidelity is verified on every canonical test vector under the default base-ASD-only basis: SAL to SAIL to SAL produces the identical input string. Cross-basis round-trip fidelity is verified by `tests/test_dictionary_basis.py`, which constructs codecs from arbitrary basis combinations and asserts that intern table equality follows basis fingerprint equality in both directions.
+
+The development workflow: compose and debug in SAL (human-readable), deploy in SAIL (binary, maximum compression) for any peer pair with a matching basis, decompile the wire payload back to readable SAL for inspection at any point. Peer pairs that do not share a basis fall through to SAL on the wire — bijective and inspectable, with the marginal compression difference between SAL and SAIL traded for unconditional cross-basis interop.
 
 
 ## 4. Namespace Architecture
@@ -406,33 +408,56 @@ SEC is designed for sovereign mesh networks operating without internet connectiv
 
 FNP establishes session state between two sovereign nodes in two packets totaling 78 bytes. It negotiates three properties: dictionary alignment, namespace intersection, and channel capacity.
 
-### 9.1 Message 1: Capability Advertisement (40 bytes)
+### 9.1 Message 1: Capability Advertisement (40 bytes, base or extended form)
 
 | Offset | Size | Field | Description |
 |---|---|---|---|
-| 0 | 1B | msg_type | 0x01 (ADV) |
+| 0 | 1B | msg_type | 0x01 (ADV base form) or 0x81 (ADV extended form — bit 7 signals `basis_fingerprint` present, `node_id` field narrowed) |
 | 1 | 1B | protocol_version | 0x01 |
-| 2 | 8B | fingerprint | First 8 bytes of SHA-256(canonical ASD JSON) |
+| 2 | 8B | asd_fingerprint | First 8 bytes of SHA-256(canonical ASD JSON) |
 | 10 | 2B | asd_version | ASD version, big-endian u16 |
 | 12 | 4B | namespace_bitmap | Bit 0=A, bit 1=B, ..., bit 25=Z, bit 26=Omega. Big-endian u32 |
 | 16 | 1B | channel_capacity | 0x00=51B (LoRa floor), 0x01=255B, 0x02=512B (BLE), 0x03=unconstrained |
-| 17 | 23B | node_id | UTF-8, null-padded |
+| 17 | variable | node_id | UTF-8, null-padded. 23 bytes in base form (msg_type 0x01); 15 bytes in extended form (msg_type 0x81) |
+| (17+N) | 8B | basis_fingerprint | *Extended form only.* Offset 32 when node_id is 15 bytes. First 8 bytes of SHA-256(canonical basis serialization) per §9.3 |
+
+**Total message size: 40 bytes in both base and extended form.** The extended form reclaims 8 bytes from the `node_id` field reservation (23 to 15 bytes) to carry the 8-byte `basis_fingerprint` without growing the wire footprint.
+
+**Base form (msg_type 0x01):** The advertising node has loaded only the base ASD. Its basis is of length one and the basis fingerprint is implicit in the asd_fingerprint field. The `node_id` field reserves the full 23 bytes. Backward compatible with all v1.0.2 implementations.
+
+**Extended form (msg_type 0x81):** The advertising node has loaded one or more dictionary corpora beyond the base ASD. The `node_id` field is narrowed to 15 bytes. The `basis_fingerprint` field at offset 32 carries the 8-byte basis fingerprint computed per §9.3.
+
+**Receiver behavior.** A receiver inspects `msg_type` at offset 0. If the high bit is clear (0x01), the receiver parses the base form. If the high bit is set (0x81), the receiver parses the extended form. A v1.0.2 receiver that does not understand the high bit reads the message as base form, successfully extracting all fields up through `node_id` (truncated at 15 bytes of content), and processes the session as base-ASD-only — gracefully degrading to SAL-only mode via §9.5 match_status 0x03.
 
 ### 9.2 Message 2: Capability Acknowledgment (38 bytes)
 
 | Offset | Size | Field | Description |
 |---|---|---|---|
 | 0 | 1B | msg_type | 0x02 (ACK) or 0x03 (NACK) |
-| 1 | 1B | match_status | 0x00=exact, 0x01=version mismatch, 0x02=fingerprint mismatch |
-| 2 | 8B | echo_fingerprint | Fingerprint from received ADV (echo for verification) |
-| 10 | 8B | own_fingerprint | Responder's own ASD fingerprint |
+| 1 | 1B | match_status | 0x00=exact match (SAIL-capable), 0x01=ASD version mismatch, 0x02=ASD fingerprint mismatch, 0x03=basis mismatch (SAL-only), 0x04=base form meets extended basis (SAL-only) |
+| 2 | 8B | echo_asd_fingerprint | ASD fingerprint from received ADV (echo for verification) |
+| 10 | 8B | own_asd_fingerprint | Responder's own ASD fingerprint |
 | 18 | 4B | common_namespaces | Intersection of both namespace bitmaps. Big-endian u32 |
-| 22 | 1B | neg_capacity | Negotiated capacity = min(adv, own). LCD of the link. |
+| 22 | 1B | neg_capacity | Negotiated capacity = min(adv, own). LCD of the link |
 | 23 | 15B | node_id | UTF-8, null-padded |
+
+**match_status semantics:**
+
+- `0x00` exact: ASD fingerprints match AND basis agreement established. Session establishes SAIL-capable.
+- `0x01` ASD version mismatch: delta sync required (§10).
+- `0x02` ASD fingerprint mismatch: delta sync required (§10).
+- `0x03` basis mismatch: ASD fingerprints match, both sides sent extended form, basis fingerprints differ. Session establishes in SAL-only mode (§9.5). Not an error — graded capability.
+- `0x04` base meets extended: ASD fingerprints match, one side sent base form and the other has loaded an extended basis. Session establishes in SAL-only mode (§9.5). Not an error — graded capability.
 
 ### 9.3 Fingerprint Computation
 
-The ASD fingerprint is the first 8 bytes of SHA-256 over the canonical JSON serialization of the ASD data. Canonical JSON matches Python `json.dumps(data, sort_keys=True)`: keys sorted alphabetically, separators `", "` and `": "`, non-ASCII escaped to `\uXXXX`. All three SDKs (Python, TypeScript, Go) produce identical fingerprints for identical dictionary state.
+OSMP defines two related fingerprints, computed by the same hash truncation rule over different inputs.
+
+**ASD Fingerprint.** The ASD fingerprint is the first 8 bytes of SHA-256 over the canonical JSON serialization of the ASD data. Canonical JSON matches Python `json.dumps(data, sort_keys=True)`: keys sorted alphabetically, separators `", "` and `": "`, non-ASCII escaped to `\uXXXX`. All three SDKs (Python, TypeScript, Go) produce identical ASD fingerprints for identical dictionary state.
+
+**Corpus Hash.** The corpus hash for any dictionary corpus (base ASD CSV, MDR CSV, MDR DBLK, or any future corpus format) is the full 32-byte SHA-256 over the corpus file bytes verbatim, with no canonicalization transform.
+
+**Basis Fingerprint.** The basis fingerprint is the first 8 bytes of SHA-256 over the canonical serialization of the ordered basis list. Canonical basis serialization is the concatenation, in basis order, of `corpus_id_length || corpus_id || corpus_hash` for each entry in the basis, where `corpus_id_length` is a single byte giving the length of the UTF-8 `corpus_id` in bytes (1-255), `corpus_id` is the UTF-8 bytes of the identifier, and `corpus_hash` is the 32-byte SHA-256 of the corpus file. All three SDKs produce identical basis fingerprints for identical inputs. Cross-SDK fingerprint equivalence is verified by `tests/test_dictionary_basis.py`.
 
 ### 9.4 Channel Capacity Negotiation
 
@@ -449,23 +474,51 @@ The session byte budget is the minimum of what both nodes declare. An ESP32 on L
 
 ```
 IDLE -> initiate() -> ADV_SENT
-ADV_SENT -> receive ACK (match) -> ESTABLISHED
-ADV_SENT -> receive ACK (mismatch) -> SYNC_NEEDED
+ADV_SENT -> receive ACK (match_status 0x00) -> ESTABLISHED_SAIL
+ADV_SENT -> receive ACK (match_status 0x03) -> ESTABLISHED_SAL_ONLY
+ADV_SENT -> receive ACK (match_status 0x01 or 0x02) -> SYNC_NEEDED
 ADV_SENT -> timeout or invalid response -> FALLBACK
 IDLE -> register non-OSMP peer -> FALLBACK
-IDLE -> receive ADV -> send ACK -> ESTABLISHED or SYNC_NEEDED
+IDLE -> receive ADV -> send ACK -> ESTABLISHED_* or SYNC_NEEDED
 FALLBACK -> peer produces valid SAL (acquisition) -> ACQUIRED
 ACQUIRED -> peer stops producing valid SAL (regression) -> FALLBACK
-ACQUIRED -> peer responds to SAL-level negotiation -> ESTABLISHED
+ACQUIRED -> peer responds to SAL-level negotiation -> ESTABLISHED_SAL_ONLY
 ```
 
-**ESTABLISHED:** Dictionaries match, session active. Both nodes speak SAL natively.
+**ESTABLISHED_SAIL:** ASD fingerprints match AND basis fingerprints match. Session active. Both nodes can exchange SAL or SAIL freely. BAEL (§8.5) selects encoding mode per instruction based on channel capacity and consequence class.
 
-**SYNC_NEEDED:** Fingerprint or version mismatch detected, delta synchronization required (see section 10).
+**ESTABLISHED_SAL_ONLY:** ASD fingerprints match, basis fingerprints differ (or one or both nodes are base-form-only with the other carrying an extended basis). Session active. Both nodes exchange SAL on the wire for all traffic. SAIL is unavailable for this peer pair until basis convergence.
 
-**FALLBACK:** The remote peer does not speak OSMP. Entered when FNP negotiation fails (timeout, invalid response, non-FNP packet received) or when a peer is registered as known non-OSMP. In FALLBACK, outbound SAL is decoded to natural language at the boundary. Inbound natural language is tagged NL_PASSTHROUGH (FLAGS bit 2). The SALBridge (Section 9.7) manages the translation.
+**SYNC_NEEDED:** ASD fingerprint or version mismatch detected. Delta synchronization required (see §10) before any further traffic. Distinct from ESTABLISHED_SAL_ONLY: a SYNC_NEEDED session has incompatible base dictionaries and cannot exchange any traffic until reconciled, whereas an ESTABLISHED_SAL_ONLY session has compatible base dictionaries and exchanges SAL traffic immediately.
 
-**ACQUIRED:** The remote peer has learned SAL through contextual exposure and is producing parseable SAL fragments. The bridge detected consistent valid SAL production and transitioned from FALLBACK. In ACQUIRED, outbound messages are sent as pure SAL. Regression detection monitors for consecutive failures; if the peer stops producing valid SAL, the session drops back to FALLBACK.
+**FALLBACK:** The remote peer does not speak OSMP. Entered when FNP negotiation fails (timeout, invalid response, non-FNP packet received) or when a peer is registered as known non-OSMP. In FALLBACK, outbound SAL is decoded to natural language at the boundary. Inbound natural language is tagged NL_PASSTHROUGH (FLAGS bit 2). SALBridge (§9.7) manages the translation.
+
+**ACQUIRED:** The remote peer has learned SAL through contextual exposure and is producing parseable SAL fragments. The bridge detected consistent valid SAL production and transitioned from FALLBACK. In ACQUIRED, outbound messages are sent as pure SAL. Regression detection monitors for consecutive failures; if the peer stops producing valid SAL, the session drops back to FALLBACK. ACQUIRED transitions to ESTABLISHED_SAL_ONLY (not ESTABLISHED_SAIL) because acquisition cannot establish basis equality without an explicit FNP handshake.
+
+**Operator policy: `require_sail`.** A node operator MAY configure a `require_sail: true` policy flag. With this flag set, a session that would otherwise enter ESTABLISHED_SAL_ONLY is refused, and the local FNP state machine returns to IDLE. The flag is local-only and intended for homogeneous deployments where any basis mismatch indicates a misconfiguration.
+
+**Session degradation event.** When a session establishes in ESTABLISHED_SAL_ONLY because the peer's basis fingerprint differs from the local node's expected basis fingerprint, the local node logs a session-degradation event. Operator monitoring infrastructure subscribes to these events to detect drift. The event is informational and does not affect session establishment or traffic flow.
+
+### 9.8 Dictionary Basis Manifest
+
+The Dictionary Basis Manifest is the formal specification of the ordered set of dictionary corpora that determines a node's SAIL intern table. It is the runtime representation of the build-time pin established by ADR-001 and extended by ADR-004.
+
+**Structure.** A Dictionary Basis is an ordered list of entries, each entry an `(corpus_id, corpus_hash)` pair where:
+
+- `corpus_id` is a UTF-8 string identifier between 1 and 255 bytes in length, assigned at corpus build time and stable across reissues of the same corpus content.
+- `corpus_hash` is the full 32-byte SHA-256 over the corpus file bytes verbatim, computed per §9.3.
+
+Order is significant. The first entry in every basis is the base ASD corpus, with canonical identifier `"asd-vNN"` where NN is the two-digit zero-padded dictionary version. Subsequent entries are MDR corpora in the order specified by the node operator at codec construction time.
+
+**Intern table derivation.** The SAIL intern table is constructed by iterating the basis in order, extracting stringable content from each corpus per the corpus type's extraction rules, deduplicating in first-seen order, and applying the existing intern cost filter.
+
+**Capability gate.** The basis fingerprint is exchanged in the FNP handshake (§9.1, §9.2) and gates SAIL availability for the session. Sessions with equal basis fingerprints establish in ESTABLISHED_SAIL. Sessions with unequal basis fingerprints establish in ESTABLISHED_SAL_ONLY. The capability gate is enforced before the first traffic byte.
+
+**Determinism guarantee.** For any two nodes A and B with equal basis fingerprints: `A.intern_table == B.intern_table` byte-for-byte, `A.encode_sail(s) == B.encode_sail(s)` for any SAL instruction `s`, and `A.decode_sail(B.encode_sail(s)) == s` for any SAL instruction `s`. The bijection is a structural consequence of the basis being a pure-function input to deterministic intern table construction.
+
+**Default basis.** A node that loads only the base ASD has a basis of length one and a well-defined basis fingerprint. This is the default configuration and the configuration assumed by every test vector in `protocol/test-vectors/canonical-test-vectors.json`.
+
+**Forward compatibility.** New corpus types may be added to the basis architecture without changing this section. The basis fingerprint computation depends only on the corpus identifier and the SHA-256 of the corpus file bytes, so new corpus types do not require a basis fingerprint format revision.
 
 ### 9.6 Gossip Propagation
 

@@ -95,8 +95,8 @@ MCP_VECTORS = [
                 "isError": False
             }
         }, separators=(',', ':')),
-        sal_equivalent="D:RT[E:EQ@New_York:72F:partly_cloudy]",
-        notes="MCP spec example: tools/call response. SAL uses D:RT (return transmit) wrapping the query result."
+        sal_equivalent="D:RTN[E:EQ@New_York:72F:partly_cloudy]",
+        notes="MCP spec example: tools/call response. SAL uses D:RTN (return transmit) wrapping the query result."
     ),
     JSONvsSALVector(
         id="MCP-03",
@@ -196,8 +196,8 @@ OPENAI_VECTORS = [
             "call_id": "call_12345xyz",
             "output": "{\"temperature\":\"25\",\"unit\":\"C\"}"
         }, separators=(',', ':')),
-        sal_equivalent="D:RT[E:EQ:25C]",
-        notes="OpenAI docs: function output. SAL uses D:RT wrapping result."
+        sal_equivalent="D:RTN[E:EQ:25C]",
+        notes="OpenAI docs: function output. SAL uses D:RTN wrapping result."
     ),
     JSONvsSALVector(
         id="OAI-03",
@@ -262,8 +262,8 @@ OPENAI_VECTORS = [
             "tool_call_id": "call_62136354",
             "content": "{\"delivery_date\":\"2025-09-15\"}"
         }, separators=(',', ':')),
-        sal_equivalent="D:RT[2025-09-15]",
-        notes="OpenAI docs: tool response. SAL uses D:RT with the return value."
+        sal_equivalent="D:RTN[2025-09-15]",
+        notes="OpenAI docs: tool response. SAL uses D:RTN with the return value."
     ),
 ]
 
@@ -329,8 +329,8 @@ A2A_VECTORS = [
                 ]
             }
         }, separators=(',', ':')),
-        sal_equivalent="J:DONE@task-456;D:RT[BA117:1830:0645:489USD]",
-        notes="A2A spec: task completion with artifact. SAL uses J:DONE then D:RT with structured result."
+        sal_equivalent="J:DONE@task-456;D:RTN[BA117:1830:0645:489USD]",
+        notes="A2A spec: task completion with artifact. SAL uses J:DONE then D:RTN with structured result."
     ),
     JSONvsSALVector(
         id="A2A-03",
@@ -438,8 +438,8 @@ CREWAI_VECTORS = [
             },
             "agent": "AI Technology Researcher"
         }, separators=(',', ':')),
-        sal_equivalent="J:DONE@researcher;D:RT[AI_news:3items]",
-        notes="CrewAI docs: TaskOutput object. SAL uses J:DONE with D:RT for result payload."
+        sal_equivalent="J:DONE@researcher;D:RTN[AI_news:3items]",
+        notes="CrewAI docs: TaskOutput object. SAL uses J:DONE with D:RTN for result payload."
     ),
     JSONvsSALVector(
         id="CREW-03",

@@ -44,9 +44,9 @@ func TestCanonicalOpcodeNames(t *testing.T) {
 func TestDecodeAllNamespaces(t *testing.T) {
 	dec := osmp.NewDecoder(nil)
 	cases := []struct{ encoded, ns, op string }{
-		{"A:SUM","A","SUM"}, {"B:BA","B","BA"}, {"C:SPAWN","C","SPAWN"},
+		{"A:SUM","A","SUM"}, {"B:ALRM","B","ALRM"}, {"C:SPAWN","C","SPAWN"},
 		{"D:XFER","D","XFER"}, {"D:PACK","D","PACK"}, {"D:UNPACK","D","UNPACK"},
-		{"E:TH","E","TH"}, {"F:Q","F","Q"}, {"G:POS","G","POS"},
+		{"E:TH","E","TH"}, {"F:QRY","F","QRY"}, {"G:POS","G","POS"},
 		{"H:HR","H","HR"}, {"H:ICD","H","ICD"}, {"H:SNOMED","H","SNOMED"},
 		{"I:KYC","I","KYC"}, {"J:GOAL","J","GOAL"}, {"K:PAY","K","PAY"},
 		{"L:AUDIT","L","AUDIT"}, {"M:EVA","M","EVA"}, {"N:CFG","N","CFG"},
@@ -56,7 +56,7 @@ func TestDecodeAllNamespaces(t *testing.T) {
 		{"T:BEFORE","T","BEFORE"}, {"U:ESCALATE","U","ESCALATE"},
 		{"U:ALERT","U","ALERT"}, {"U:DISPLAY","U","DISPLAY"},
 		{"V:POS","V","POS"}, {"V:HDG","V","HDG"}, {"V:ROUTE","V","ROUTE"},
-		{"W:METAR","W","METAR"}, {"X:GEN","X","GEN"}, {"Y:SEARCH","Y","SEARCH"},
+		{"W:METAR","W","METAR"}, {"X:PROD","X","PROD"}, {"Y:SEARCH","Y","SEARCH"},
 		{"Y:RETRIEVE","Y","RETRIEVE"}, {"Z:INF","Z","INF"}, {"Z:ROUTE","Z","ROUTE"},
 	}
 	for _, c := range cases {

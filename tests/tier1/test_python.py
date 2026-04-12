@@ -58,7 +58,7 @@ class TestCanonicalOpcodes:
 
     def test_total_opcode_count(self):
         total = sum(len(v) for v in ASD_BASIS.values())
-        assert total == 342, f"Expected 342 opcodes, got {total}"
+        assert total == 356, f"Expected 356 opcodes, got {total}"
 
     def test_all_26_namespaces(self):
         assert set(ASD_BASIS.keys()) == set("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -81,9 +81,9 @@ class TestCanonicalOpcodes:
 # ── SECTION 2: DECODER ────────────────────────────────────────────────────────
 class TestDecoder:
     @pytest.mark.parametrize("encoded,ns,op", [
-        ("A:SUM","A","SUM"), ("B:BA","B","BA"), ("C:SPAWN","C","SPAWN"),
+        ("A:SUM","A","SUM"), ("B:ALRM","B","ALRM"), ("C:SPAWN","C","SPAWN"),
         ("D:PACK","D","PACK"), ("D:UNPACK","D","UNPACK"), ("D:XFER","D","XFER"),
-        ("E:TH","E","TH"), ("F:Q","F","Q"), ("G:POS","G","POS"),
+        ("E:TH","E","TH"), ("F:QRY","F","QRY"), ("G:POS","G","POS"),
         ("H:HR","H","HR"), ("H:ICD","H","ICD"), ("H:SNOMED","H","SNOMED"),
         ("I:KYC","I","KYC"), ("J:GOAL","J","GOAL"), ("K:PAY","K","PAY"),
         ("L:AUDIT","L","AUDIT"), ("M:EVA","M","EVA"), ("N:CFG","N","CFG"),
@@ -93,7 +93,7 @@ class TestDecoder:
         ("T:BEFORE","T","BEFORE"), ("U:ESCALATE","U","ESCALATE"),
         ("U:ALERT","U","ALERT"), ("U:DISPLAY","U","DISPLAY"),
         ("V:POS","V","POS"), ("V:HDG","V","HDG"), ("V:ROUTE","V","ROUTE"),
-        ("W:METAR","W","METAR"), ("X:GEN","X","GEN"), ("Y:SEARCH","Y","SEARCH"),
+        ("W:METAR","W","METAR"), ("X:PROD","X","PROD"), ("Y:SEARCH","Y","SEARCH"),
         ("Y:RETRIEVE","Y","RETRIEVE"), ("Z:INF","Z","INF"), ("Z:ROUTE","Z","ROUTE"),
     ])
     def test_all_namespaces(self, encoded, ns, op):
@@ -105,9 +105,9 @@ class TestDecoder:
         r = SALDecoder().decode_frame("EQ@4A?TH:0")
         assert r.namespace == "E" and r.opcode == "EQ" and r.target == "4A"
 
-    def test_short_form_ba(self):
-        r = SALDecoder().decode_frame("BA@BS!")
-        assert r.namespace == "B" and r.opcode == "BA"
+    def test_short_form_alrm(self):
+        r = SALDecoder().decode_frame("ALRM@AREA!")
+        assert r.namespace == "B" and r.opcode == "ALRM"
 
     def test_medevac_chain(self):
         r = SALDecoder().decode_frame("H:HR@NODE1>120→H:CASREP∧M:EVA@*")
@@ -157,7 +157,7 @@ class TestDecoder:
         assert r.opcode == "INET" or r.namespace is not None
 
     def test_operational_context(self):
-        r = SALDecoder().decode_frame("O:MODE:E∧O:TYPE:1")
+        r = SALDecoder().decode_frame("O:MODE:E∧O:TYP:1")
         assert r.namespace == "O" and r.opcode == "MODE"
 
     def test_bael_passthrough(self):

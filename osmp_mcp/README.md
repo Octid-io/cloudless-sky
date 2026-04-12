@@ -80,7 +80,7 @@ The bridge annotates outbound messages with SAL equivalents, seeding the remote 
 |---|---|
 | `osmp://system_prompt` | SAL grammar, composition rules, and reference (~390 tokens) |
 | `osmp://about` | Protocol design philosophy |
-| `osmp://dictionary` | Full ASD (342 opcodes, 26 namespaces) |
+| `osmp://dictionary` | Full ASD (356 opcodes, 26 namespaces) |
 | `osmp://grammar` | SAL formal grammar (EBNF) |
 | `osmp://corpora` | Available D:PACK/BLK domain corpus stats |
 | `osmp://examples` | 11 annotated SAL examples |

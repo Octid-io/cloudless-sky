@@ -153,7 +153,7 @@ export class SALBridge {
     }
 
     // Native OSMP or ACQUIRED peer — send SAL directly
-    if (session.state === "ESTABLISHED" || session.state === "SYNC_NEEDED") {
+    if (session.state === "ESTABLISHED" || session.state === "ESTABLISHED_SAIL" || session.state === "ESTABLISHED_SAL_ONLY" || session.state === "SYNC_NEEDED") {
       this.emit("send_sal", peerId, { sal, detail: "native OSMP peer" });
       return sal;
     }
@@ -188,7 +188,7 @@ export class SALBridge {
     const m = this.metrics.get(peerId)!;
 
     // Native OSMP peer — pass through as SAL
-    if (session.state === "ESTABLISHED" || session.state === "SYNC_NEEDED") {
+    if (session.state === "ESTABLISHED" || session.state === "ESTABLISHED_SAIL" || session.state === "ESTABLISHED_SAL_ONLY" || session.state === "SYNC_NEEDED") {
       return { sal: message, nl: null, passthrough: false, peerId, state: session.state, detectedFrames: [] };
     }
 

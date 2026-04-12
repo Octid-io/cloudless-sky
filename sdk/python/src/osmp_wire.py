@@ -170,8 +170,8 @@ def _build_opcode_tables(dict_path: Path | str | None = None) -> tuple[
     if dict_path is None:
         # Try default locations
         candidates = [
-            Path(__file__).parent.parent.parent.parent / "protocol" / "OSMP-semantic-dictionary-v14.csv",
-            Path("protocol/OSMP-semantic-dictionary-v14.csv"),
+            Path(__file__).parent.parent.parent.parent / "protocol" / "OSMP-semantic-dictionary-v15.csv",
+            Path("protocol/OSMP-semantic-dictionary-v15.csv"),
         ]
         for c in candidates:
             if c.exists():
@@ -285,8 +285,8 @@ class SAILCodec:
 
         if dict_path is None:
             candidates = [
-                Path(__file__).parent.parent.parent.parent / "protocol" / "OSMP-semantic-dictionary-v14.csv",
-                Path("protocol/OSMP-semantic-dictionary-v14.csv"),
+                Path(__file__).parent.parent.parent.parent / "protocol" / "OSMP-semantic-dictionary-v15.csv",
+                Path("protocol/OSMP-semantic-dictionary-v15.csv"),
             ]
             for c in candidates:
                 if c.exists():

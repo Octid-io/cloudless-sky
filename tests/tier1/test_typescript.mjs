@@ -74,9 +74,9 @@ describe("Canonical Opcodes from Dictionary v12", () => {
 // ── SECTION 2: DECODER ────────────────────────────────────────────────────────
 describe("Decoder — All Namespaces", () => {
   const cases = [
-    ["A:SUM","A","SUM"], ["B:BA","B","BA"], ["C:SPAWN","C","SPAWN"],
+    ["A:SUM","A","SUM"], ["B:ALRM","B","ALRM"], ["C:SPAWN","C","SPAWN"],
     ["D:PACK","D","PACK"], ["D:UNPACK","D","UNPACK"], ["D:XFER","D","XFER"],
-    ["E:TH","E","TH"], ["F:Q","F","Q"], ["G:POS","G","POS"],
+    ["E:TH","E","TH"], ["F:QRY","F","QRY"], ["G:POS","G","POS"],
     ["H:HR","H","HR"], ["H:ICD","H","ICD"], ["H:SNOMED","H","SNOMED"],
     ["I:KYC","I","KYC"], ["J:GOAL","J","GOAL"], ["K:PAY","K","PAY"],
     ["L:AUDIT","L","AUDIT"], ["M:EVA","M","EVA"], ["N:CFG","N","CFG"],
@@ -86,7 +86,7 @@ describe("Decoder — All Namespaces", () => {
     ["T:BEFORE","T","BEFORE"], ["U:ESCALATE","U","ESCALATE"],
     ["U:ALERT","U","ALERT"], ["U:DISPLAY","U","DISPLAY"],
     ["V:POS","V","POS"], ["V:HDG","V","HDG"], ["V:ROUTE","V","ROUTE"],
-    ["W:METAR","W","METAR"], ["X:GEN","X","GEN"], ["Y:SEARCH","Y","SEARCH"],
+    ["W:METAR","W","METAR"], ["X:PROD","X","PROD"], ["Y:SEARCH","Y","SEARCH"],
     ["Y:RETRIEVE","Y","RETRIEVE"], ["Z:INF","Z","INF"], ["Z:ROUTE","Z","ROUTE"],
   ];
   for (const [encoded,ns,op] of cases) {
@@ -107,9 +107,9 @@ describe("Decoder — Core Behaviors", () => {
     const r = new OSMPDecoder().decodeFrame("EQ@4A?TH:0");
     assert.equal(r.namespace,"E"); assert.equal(r.opcode,"EQ"); assert.equal(r.target,"4A");
   });
-  test("short-form BA", () => {
-    const r = new OSMPDecoder().decodeFrame("BA@BS!");
-    assert.equal(r.namespace,"B"); assert.equal(r.opcode,"BA");
+  test("short-form ALRM", () => {
+    const r = new OSMPDecoder().decodeFrame("ALRM@AREA!");
+    assert.equal(r.namespace,"B"); assert.equal(r.opcode,"ALRM");
   });
   test("consequence class REVERSIBLE", () => {
     const r = new OSMPDecoder().decodeFrame(`R:TORCH@PHONE1:ON${CC.REV}`);
@@ -136,7 +136,7 @@ describe("Decoder — Core Behaviors", () => {
     assert.ok(r.opcodeMeaning?.includes("inference_free"));
   });
   test("operational context", () => {
-    const r = new OSMPDecoder().decodeFrame(`O:MODE:E${OP.AND}O:TYPE:1`);
+    const r = new OSMPDecoder().decodeFrame(`O:MODE:E${OP.AND}O:TYP:1`);
     assert.equal(r.namespace,"O"); assert.equal(r.opcode,"MODE");
   });
   test("BAEL passthrough raw preserved", () =>

@@ -198,17 +198,17 @@ class TestASDContentMatch:
                 )
 
     def test_opcode_counts_match(self):
-        """The 342 opcode count appears in docs, the whitepaper, the MCP
+        """The 356 opcode count appears in docs, the whitepaper, the MCP
         `osmp://about` resource, and the system prompt. Lock it in as a
         test assertion so changes to the dictionary force a coordinated
         update across all those reference sites."""
         total = sum(len(ops) for ops in ASD_BASIS.values())
-        assert total == 342, (
+        assert total == 356, (
             f"ASD_BASIS opcode count changed to {total}. If this was an "
             f"intentional addition or removal, update the whitepaper, "
             f"the osmp://about MCP resource, the system prompt in "
             f"osmp_mcp/server.py, and any patent claim text that "
-            f"references the 342 figure."
+            f"references the 356 figure."
         )
 
     def test_namespace_count_matches(self):

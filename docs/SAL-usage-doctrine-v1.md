@@ -90,8 +90,8 @@ When the same concept maps to opcodes in multiple namespaces, the domain context
 | stop | robot, motor, physical, movement | R:STOP | Z:STOP | Physical agent halt is R |
 | stop | inference, generation, tokens, model | Z:STOP | R:STOP | Inference termination is Z |
 | stop | emergency, immediate, all-override | R:ESTOP | R:STOP | Emergency overrides everything |
-| wind | generation, turbine, power, energy | X:WIND | W:WIND | Energy generation is X |
-| wind | weather, speed, direction, gust | W:WIND | X:WIND | Meteorological observation is W |
+| wind | generation, turbine, power, energy | X:WND | W:WIND | Energy generation is X |
+| wind | weather, speed, direction, gust | W:WIND | X:WND | Meteorological observation is W |
 | store | memory, context, agent, episodic | Y:STORE | X:STORE | Agent memory is Y |
 | store | battery, energy, grid, charge | X:STORE | Y:STORE | Energy storage is X |
 | verify | signature, cryptographic, hash | S:VFY | A:VERIFY, Q:VERIFY | Cryptographic verification is S |
@@ -118,7 +118,7 @@ These principles override the collision table when the table doesn't have a spec
 | B (Building) | Event in a structure. Fire alarm, HVAC fault, access point breach. | "Is something happening to or inside a building?" |
 | M (Municipal) | Operational response to an event. Evacuation, incident command, alert to the public. | "Is this an emergency management action or public alert?" |
 
-A building is on fire: B:BA (building alert) + M:EVA (evacuation). The National Weather Service issues a fire weather watch: W:FIRE. A temperature sensor on your node reads 38C: E:TH. The NWS publishes an ambient temperature advisory: W:TEMP. This principle applies to every hazard type (fire, flood, wind, structural) not just the ones in the collision table.
+A building is on fire: B:ALRM (building alert) + M:EVA (evacuation). The National Weather Service issues a fire weather watch: W:FIRE. A temperature sensor on your node reads 38C: E:TH. The NWS publishes an ambient temperature advisory: W:TEMP. This principle applies to every hazard type (fire, flood, wind, structural) not just the ones in the collision table.
 
 **Principle 2: Definition match, not mnemonic match.** When an English word in the natural language input matches an opcode mnemonic, the match is only valid if the ASD definition's operational context matches the natural language usage context. If the definition context diverges from the usage context, the mnemonic match is a false positive and the opcode must not be used.
 
@@ -132,9 +132,9 @@ This is a composition gate, not a suggestion. Examples:
 | "sign" | S:SIGN | Cryptographic digital signature | Legal document signing | No. False positive. |
 | "stop" | R:STOP | Physical agent halt | "Stop talking" | No. False positive. |
 | "cost" | Z:COST | Inference cost report (API billing) | General cost calculation | No. False positive. |
-| "observation" | E:OBS | Obstacle detection (physical obstruction) | Sensor observation / measurement | No. False positive. OBS is obstacle, not observation. |
+| "observation" | E:HAZ | Obstacle detection (physical obstruction) | Sensor observation / measurement | No. False positive. HAZ is obstacle, not observation. |
 
-Mnemonic similarity is not definition match. The abbreviation may look like your word but mean something different. E:OBS does not mean "observation." It means "obstacle." A:CMP does not mean "compute." It means "compress/compare." Read the definition every time.
+Mnemonic similarity is not definition match. The abbreviation may look like your word but mean something different. E:HAZ does not mean "observation." It means "obstacle." A:CMP does not mean "compute." It means "compress/compare." Read the definition every time.
 
 The test: read the ASD definition out loud. Does it describe what the human actually meant? If not, the opcode does not apply, regardless of how closely the mnemonic matches.
 
@@ -160,7 +160,7 @@ Assemble the SAL instruction using these composition rules:
 | "X then Y then Z" (ordered, non-conditional) | ; (SEQUENCE) | S:ENC;D:PUSH@NODE2;L:AUDIT |
 | "X and Y simultaneously" / "at the same time" | ∥ (PARALLEL) | A∥[?WEA∧?NEWS] |
 | "if and only if" / "exactly when" | ↔ (IFF) | K:PAY@RECV↔I:§ |
-| "unless X" / "except when X" | ¬→ (UNLESS) | R:↺MOV@WPT1¬→E:OBS |
+| "unless X" / "except when X" | ¬→ (UNLESS) | R:↺MOV@WPT1¬→E:HAZ |
 | "for all" / "every" / "each" | ∀ (FOR-ALL) | ∀R:STAT? |
 | "any" / "at least one" / "there exists" | ∃ (EXISTS) | ∃N:INET |
 | "approximately" / "about" / "roughly" | ~ (APPROX) | E:TH~22 |
@@ -337,8 +337,8 @@ Scoring: NS=Z throughout, OP=TEMP+TOPP+INF+TOKENS, COMP=config then inference th
 
 **CF-008: Building emergency with evacuation**
 Input: "Fire alarm in sector 3. Evacuate the whole building."
-Expected: `B:BA@BS∧M:EVA@*` or `B:L@BS:3→M:EVA@*`
-Scoring: NS=B+M, OP=BA or L + EVA, COMP=∧ or → linking alert to evacuation, BOUND=SAL, SAFE=clean
+Expected: `B:ALRM@AREA∧M:EVA@*` or `B:SAFE@AREA:3→M:EVA@*`
+Scoring: NS=B+M, OP=ALRM or SAFE + EVA, COMP=∧ or → linking alert to evacuation, BOUND=SAL, SAFE=clean
 
 **CF-009: Weather observation chain**
 Input: "What's the wind and visibility at the airfield?"
@@ -411,7 +411,7 @@ Scoring: BOUND=NL_PASSTHROUGH, SAFE=no misuse of A:SUM or Z:COST
 
 **CF-022: Namespace collision with context**
 Input: "The wind farm output dropped. Check the wind generation status."
-Expected: `X:WIND?` (energy generation context, not weather)
+Expected: `X:WND?` (energy generation context, not weather)
 Scoring: NS=X (not W), OP=WIND, BOUND=SAL, SAFE=correct namespace selection based on context
 
 **CF-023: Complex chain with mixed coverage**
@@ -644,7 +644,7 @@ Before composing SAL from natural language, follow this decision logic:
 4. If multiple namespace matches: select by DOMAIN CONTEXT, not mnemonic.
    Patient temperature → H:TEMP. Sensor temperature → E:TH.
    Weather temperature → W:TEMP. Model temperature → Z:TEMP.
-   Energy wind → X:WIND. Weather wind → W:WIND.
+   Energy wind → X:WND. Weather wind → W:WIND.
 5. R namespace: every instruction (except ESTOP) needs ⚠, ↺, or ⊘.
    ⚠ and ⊘ require I:§→ as precondition.
 6. BYTE CHECK: if SAL bytes >= NL bytes, use NL_PASSTHROUGH.

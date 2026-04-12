@@ -165,7 +165,7 @@ func (b *SALBridge) Send(sal string, peerID string) string {
 	}
 
 	// Native OSMP peer
-	if session.State == FNPStateEstablished || session.State == FNPStateSyncNeeded {
+	if session.State == FNPStateEstablished || session.State == FNPStateEstablishedSAIL || session.State == FNPStateEstablishedSALOnly || session.State == FNPStateSyncNeeded {
 		b.emit("send_sal", peerID, sal, "", 0, "native OSMP peer")
 		return sal
 	}
@@ -202,7 +202,7 @@ func (b *SALBridge) Receive(message string, peerID string) BridgeInbound {
 	m := b.metrics[peerID]
 
 	// Native OSMP peer
-	if session.State == FNPStateEstablished || session.State == FNPStateSyncNeeded {
+	if session.State == FNPStateEstablished || session.State == FNPStateEstablishedSAIL || session.State == FNPStateEstablishedSALOnly || session.State == FNPStateSyncNeeded {
 		return BridgeInbound{SAL: message, Passthrough: false, PeerID: peerID, State: session.State}
 	}
 

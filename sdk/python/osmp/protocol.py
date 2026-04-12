@@ -2,9 +2,9 @@
 OSMP Python Reference Implementation
 Octid Semantic Mesh Protocol — Cloudless Sky Project
 
-Source of truth: OSMP-semantic-dictionary-v14.csv | OSMP-SPEC-v1.0.2.md | SAL-grammar.ebnf
+Source of truth: OSMP-semantic-dictionary-v15.csv | OSMP-SPEC-v1.0.2.md | SAL-grammar.ebnf
 All opcode names, definitions, and namespace assignments are drawn directly from the
-canonical semantic dictionary v14.0, not from any prior implementation.
+canonical semantic dictionary v15.0, not from any prior implementation.
 
 Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
 License: Apache 2.0
@@ -31,7 +31,7 @@ except ImportError:
 
 # ─────────────────────────────────────────────────────────────────────────────
 # GLYPH OPERATOR TABLE — Category 1 (18 operators)
-# Source: OSMP-semantic-dictionary-v14.csv Section 1, Category 1
+# Source: OSMP-semantic-dictionary-v15.csv Section 1, Category 1
 # ─────────────────────────────────────────────────────────────────────────────
 
 GLYPH_OPERATORS: dict[str, dict] = {
@@ -61,7 +61,7 @@ COMPOUND_OPERATORS: dict[str, dict] = {
 
 # ─────────────────────────────────────────────────────────────────────────────
 # CATEGORY 2 — CONSEQUENCE CLASS DESIGNATORS
-# Source: dictionary v14 Section 1 Category 2
+# Source: dictionary v15Section 1 Category 2
 # ─────────────────────────────────────────────────────────────────────────────
 
 CONSEQUENCE_CLASSES: dict[str, dict] = {
@@ -165,7 +165,7 @@ FLAG_EXTENDED_DEP     = 0b00001000   # Tier 3: payload prefix is u32 dependency 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SLOT VALUE ENCODING TABLE
-# Source: dictionary v14 Section 2
+# Source: dictionary v15Section 2
 # Single-character codes for all finite enumerated slot value sets.
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -175,7 +175,7 @@ SLOT_VALUES: dict[str, dict[str, str]] = {
     "J:STATUS":    {"A": "active", "B": "blocked", "C": "complete", "F": "failed", "P": "paused"},
     "L:SEV":       {"0": "emergency", "1": "alert", "2": "critical", "3": "error",
                     "4": "warning", "5": "notice", "6": "informational", "7": "debug"},
-    "O:AUTH":      {"O": "OPCON", "T": "TACON", "A": "ADCON", "S": "support"},
+    "O:LVL":       {"O": "OPCON", "T": "TACON", "A": "ADCON", "S": "support"},
     "O:BW_CLASS":  {"1": "51_bytes_SF12", "2": "127_bytes_SF11", "3": "255_bytes_LongFast",
                     "4": "1500_bytes_BLE", "5": "unlimited"},
     "O:CHAN":       {"L": "LoRa", "B": "BLE", "W": "WiFi", "C": "cellular",
@@ -193,7 +193,7 @@ SLOT_VALUES: dict[str, dict[str, str]] = {
                     "2": "next_step_nuclear_war", "1": "maximum_readiness"},
     "O:SCOPE":     {"G": "global", "N": "national", "R": "regional", "L": "local"},
     "O:TEMPO":     {"1": "routine", "2": "elevated", "3": "urgent", "4": "critical"},
-    "O:TYPE":      {"1": "national", "2": "regional_major", "3": "regional",
+    "O:TYP":       {"1": "national", "2": "regional_major", "3": "regional",
                     "4": "local_extended", "5": "minor_local"},
     "O:UPLINK":    {"A": "available", "U": "unavailable", "I": "intermittent"},
     "P:STAT":      {"C": "complete", "P": "pending", "F": "failed", "S": "skipped"},
@@ -209,7 +209,7 @@ SLOT_VALUES: dict[str, dict[str, str]] = {
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ASD BASIS SET — Guaranteed minimum operational vocabulary floor v1.0
-# Source of truth: OSMP-semantic-dictionary-v14.csv Section 3
+# Source of truth: OSMP-semantic-dictionary-v15.csv Section 3
 # Every opcode name and definition drawn directly from the canonical dictionary.
 # DO NOT MODIFY opcode names or definitions — they are protocol wire format.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -220,10 +220,12 @@ ASD_BASIS: dict[str, dict[str, str]] = {
     "A": {
         "ACCEPT":  "accept_proposed_action",
         "ACK":     "positive_acknowledgment",
+        "ADJ":     "adjust_agent_behavior",
         "AR":      "agentic_request",
         "ASD":     "asd_version_identity_or_delta",
         "AUTH":    "authorization_assertion",
         "CMP":     "compress_compare",
+        "CMPLY":   "comply_with_proposed_action",
         "CMPR":    "structured_comparison_returning_result",
         "COMP":    "compliance_gate_assertion",
         "DA":      "delegate_to_agent",
@@ -232,6 +234,7 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "MDR":     "mdr_corpus_version_identity_or_delta",
         "MEM":     "memory_operation",
         "NACK":    "negative_acknowledgment",
+        "PERM":    "permission_grant",
         "PING":    "liveness_check",
         "PONG":    "liveness_response",
         "PROPOSE": "propose_action_for_negotiation",
@@ -243,11 +246,11 @@ ASD_BASIS: dict[str, dict[str, str]] = {
     },
     "B": {
         "AP":   "access_point",
-        "BA":   "building_alert",
-        "BS":   "building_sector",
+        "ALRM": "building_alarm",
+        "AREA": "building_sector_or_area",
         "HVAC": "hvac_system",
-        "L":    "life_safety",
-        "X":    "structural",
+        "SAFE": "life_safety",
+        "STRC": "structural",
     },
     "C": {
         "ALLOC": "resource_allocation",
@@ -276,7 +279,7 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "PUSH":   "push_payload_to_node",
         "Q":      "query",
         "RESUME": "resume_interrupted_transfer",
-        "RT":     "return_transmit",
+        "RTN":    "return_transmit",
         "STAT":   "transfer_status_query",
         "UNPACK": "inference_free_semantic_retrieval_from_encoded_corpus",
         "XFER":   "initiate_file_transfer",
@@ -285,20 +288,21 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "EQ":  "environmental_query",
         "GPS": "gps_coordinates",
         "HU":  "humidity",
-        "OBS": "obstacle",
+        "HAZ": "obstacle_or_hazard",
         "PU":  "pressure",
         "TH":  "temperature_humidity_composite",
         "UV":  "ultraviolet",
     },
     "F": {
         "AV":  "authorization",
-        "PRO": "proceed_protocol",
-        "Q":   "query_request",
-        "W":   "wait",
+        "PRCD": "proceed_protocol",
+        "QRY":  "query_request",
+        "WAIT": "wait_pause",
     },
     "G": {
         "BEARING": "heading_bearing",
         "CONF":    "position_confidence_rating",
+        "DOP":     "dilution_of_precision",
         "DR":      "dead_reckoning_state",
         "ELEV":    "elevation_query",
         "POS":     "position_coordinates",
@@ -379,30 +383,30 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "TRAIL":  "audit_trail_query",
     },
     "M": {
-        "A":   "alert_alarm",
-        "EVA": "evacuation",
-        "IT":  "incident_type",
-        "MA":  "municipal_alert",
-        "RT":  "route",
+        "ALRT": "municipal_alert_alarm",
+        "EVA":  "evacuation",
+        "TYP":  "incident_type",
+        "RTE":  "route",
     },
     "N": {
         "BK":   "backup_node",
         "CFG":  "configure",
         "CMD":  "command_node",
         "INET": "internet_uplink_capability_query",
-        "PR":   "primary_relay",
+        "RLY":  "primary_relay",
         "Q":    "query_discovery",
-        "S":    "status",
+        "STS":  "status",
     },
     "O": {
-        "AUTH":       "authority_level",
+        "ADJ":        "adjust_operational_parameter",
         "BW":         "available_bandwidth",
+        "LVL":        "authority_level",
         "CHAN":        "active_channel_type",
         "CONOPS":     "concept_of_operations",
         "CONSTRAINT": "active_constraint_declaration",
         "DESC":        "operational_deescalation",
         "EMCON":      "emission_control_level",
-        "ESC":        "operational_escalation",
+        "ESCL":       "operational_escalation",
         "FLOOR":      "payload_floor_bytes",
         "IAP":        "incident_action_plan",
         "LATENCY":    "link_latency_class",
@@ -415,7 +419,7 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "READY":      "readiness_condition",
         "SCOPE":      "operational_scope",
         "TEMPO":      "operational_tempo",
-        "TYPE":       "incident_type",
+        "TYP":        "incident_or_operation_type",
         "UPLINK":     "uplink_availability",
     },
     "P": {
@@ -427,6 +431,7 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "STEP":   "step_index_within_guide",
     },
     "Q": {
+        "ANL":     "analysis_of_agent_output",
         "BENCH":   "benchmark_assertion",
         "CITE":    "cite_source_for_claim",
         "CONF":    "confidence_interval_assertion",
@@ -434,18 +439,25 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "CRIT":    "structured_critique_of_agent_output",
         "EVAL":    "evaluation_result",
         "FAIL":    "quality_gate_fail",
+        "FB":      "feedback_on_agent_output",
         "FLAG":    "flag_output_unreliable",
         "GROUND":  "grounding_assertion_against_source_document",
         "HALLU":   "hallucination_detection_flag",
+        "JDG":     "judgment_of_agent_output",
         "PASS":    "quality_gate_pass",
         "REFLECT": "self_reflection_on_output_quality",
         "REVISE":  "request_revision_based_on_critique",
+        "RPRT":    "structured_report_of_agent_output",
         "SCORE":   "quality_score_assertion",
         "VERIFY":  "request_verification_of_claim_by_another_agent",
     },
     "R": {
         # Physical agent opcodes — consequence class mandatory on all R instructions
+        "ACC":     "accelerate_behavioral",
+        "ADJ":     "adjust_physical_calibration",
+        "BRK":     "brake_actuator",
         "COLLAB":  "collaborative_mode",
+        "DECEL":   "decelerate_behavioral",
         "DPTH":    "depth_control",
         "DRVE":    "drive",
         "ESTOP":   "emergency_stop",
@@ -458,6 +470,7 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "SRFC":    "surface_command_UUV",
         "STAT":    "status",
         "STOP":    "stop",
+        "THR":     "throttle_actuator",
         "TKOF":    "takeoff",
         "WPT":     "waypoint",
         "ZONE":    "safety_zone_declaration",
@@ -563,11 +576,10 @@ ASD_BASIS: dict[str, dict[str, str]] = {
     },
     "X": {
         "DR":      "demand_response_signal",
-        "EV":      "ev_charging_state",
+        "CHG":     "ev_charging_state",
         "FAULT":   "fault_event",
         "FREQ":    "grid_frequency",
-        "GEN":     "generation_output",
-        "GRID":    "grid_connection_status",
+        "GRD":     "grid_connection_status",
         "ISLND":   "islanding_operation",
         "LOAD":    "load_reading",
         "METER":   "meter_reading",
@@ -576,8 +588,9 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "SHED":    "load_shedding_instruction",
         "SOLAR":   "solar_generation",
         "STORE":   "storage_state",
+        "PROD":    "generation_output",
         "VOLT":    "voltage_level",
-        "WIND":    "wind_generation",
+        "WND":     "wind_generation",
     },
     "Y": {
         "CLEAR":    "clear_memory_tier",
@@ -585,22 +598,23 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "FETCH":    "retrieve_by_key",
         "FORGET":   "delete_from_memory",
         "INDEX":    "index_document_for_retrieval",
-        "PAGE":     "page_out_working_memory_to_external_store",
-        "PROMOTE":  "promote_working_to_long_term_memory",
+        "COMMIT":   "commit_working_to_long_term_memory",
+        "PAGEOUT":  "page_out_working_memory_to_external_store",
         "RECALL":   "retrieve_episodic_memory_by_context",
         "RETRIEVE": "retrieve_from_LCS",
         "SEARCH":   "semantic_vector_search",
         "SHARE":    "share_memory_segment_with_another_agent",
-        "STAT":     "report_memory_utilization",
+        "USG":      "report_memory_utilization",
         "STORE":    "store_to_memory",
         "SUMM":     "summarize_and_compress_memory_segment",
         "SYNC":     "synchronize_memory_state_with_peer",
     },
     "Z": {
         # Z:INF is the canonical opcode — invoke_inference
+        "ADJ":     "adjust_inference_parameter",
         "BATCH":   "batch_inference_request",
         "CACHE":   "kv_cache_utilization_instruction",
-        "CAP":     "capability_query",
+        "CAPS":    "capability_query",
         "CONF":    "agent_reported_confidence",
         "COST":    "inference_cost_report",
         "CTX":     "context_window_utilization",
@@ -726,9 +740,18 @@ FNP_MSG_ADV  = 0x01
 FNP_MSG_ACK  = 0x02
 FNP_MSG_NACK = 0x03
 
-FNP_MATCH_EXACT       = 0x00
-FNP_MATCH_VERSION     = 0x01
-FNP_MATCH_FINGERPRINT = 0x02
+# ADR-004: extended-form ADV signaled by msg_type bit 7 (high bit set).
+# Extended form narrows node_id from 23 to 15 bytes and carries an 8-byte
+# basis_fingerprint at offset 32. Total ADV size remains 40 bytes in both
+# forms; only the field layout differs. See spec §9.1.
+FNP_MSG_ADV_EXTENDED = 0x81
+FNP_ADV_EXT_FLAG     = 0x80  # bit mask for the extended-form flag
+
+FNP_MATCH_EXACT                = 0x00
+FNP_MATCH_VERSION              = 0x01
+FNP_MATCH_FINGERPRINT          = 0x02
+FNP_MATCH_BASIS_MISMATCH       = 0x03  # ADR-004: ASD matches, bases differ (both extended)
+FNP_MATCH_BASIS_EXT_VS_BASE    = 0x04  # ADR-004: ASD matches, base form vs extended (length mismatch)
 
 # Channel capacity classes
 FNP_CAP_FLOOR        = 0x00  # 51 bytes (LoRa SF12 BW125kHz)
@@ -803,40 +826,118 @@ class FNPSession:
 
     def __init__(self, asd: AdaptiveSharedDictionary, node_id: str,
                  asd_version: int = 1,
-                 channel_capacity: int = FNP_CAP_FLOOR):
+                 channel_capacity: int = FNP_CAP_FLOOR,
+                 basis_fingerprint: bytes | None = None,
+                 expected_basis_fingerprint: bytes | None = None,
+                 require_sail: bool = False):
+        """Construct an FNP session.
+
+        Parameters
+        ----------
+        asd : AdaptiveSharedDictionary
+            Local ASD instance, used for fingerprint and namespace bitmap.
+        node_id : str
+            Local node identifier (UTF-8). In base-form ADV the field
+            reserves 23 bytes; in extended-form ADV (when basis_fingerprint
+            is set) the field reserves 15 bytes. See spec §9.1.
+        asd_version : int
+            ASD version, big-endian u16 in the wire format.
+        channel_capacity : int
+            FNP_CAP_FLOOR / STANDARD / BLE / UNCONSTRAINED selector.
+        basis_fingerprint : bytes | None
+            ADR-004: 8-byte basis fingerprint for SAIL capability negotiation.
+            When provided, this session uses extended-form ADV (msg_type
+            0x81) and exchanges basis fingerprints with peers. When None,
+            this session uses base-form ADV (msg_type 0x01) and is treated
+            as base-ASD-only. Extended-form sessions interoperate with
+            base-form peers via match_status 0x04 (ext-vs-base).
+        expected_basis_fingerprint : bytes | None
+            Optional: the basis fingerprint this node EXPECTS its peers to
+            present. If a peer presents a different basis fingerprint, the
+            session establishes in SAL-only mode and a degradation event
+            is logged via `degradation_event`. Used for operator monitoring
+            in homogeneous deployments.
+        require_sail : bool
+            ADR-004 operator policy flag. When True, sessions that would
+            establish in SAL-only mode (basis mismatch) are refused
+            locally. The flag does not propagate to peers.
+        """
         self.asd = asd
         self.node_id = node_id
         self.asd_version = asd_version
         self.channel_capacity = channel_capacity
+        self.basis_fingerprint = basis_fingerprint
+        self.expected_basis_fingerprint = expected_basis_fingerprint
+        self.require_sail = require_sail
         self.state = "IDLE"
         self.remote_node_id: str | None = None
         self.remote_fingerprint: bytes | None = None
+        self.remote_basis_fingerprint: bytes | None = None
         self.common_namespaces: list[str] | None = None
         self.match_status: int | None = None
         self.negotiated_capacity: int | None = None
+        self.degradation_event: dict | None = None
         self._own_fp = _fingerprint_bytes(asd)
         self._own_bitmap = _namespace_bitmap(asd.namespaces())
+
+    @property
+    def is_extended_form(self) -> bool:
+        """True if this session uses extended-form ADV (basis_fingerprint set)."""
+        return self.basis_fingerprint is not None
+
+    @property
+    def is_sail_capable(self) -> bool:
+        """True if the negotiated session supports SAIL wire mode.
+
+        Per ADR-004, SAIL is available only when the session reaches
+        ESTABLISHED_SAIL — i.e., both ends agree on either base-form or a
+        matching extended-form basis fingerprint.
+        """
+        return self.state == "ESTABLISHED_SAIL"
 
     # ── packet construction ──────────────────────────────────────────
 
     def _build_adv(self) -> bytes:
-        """Build a 40-byte FNP_ADV packet."""
+        """Build a 40-byte FNP_ADV packet (base or extended form per ADR-004)."""
         buf = bytearray(FNP_ADV_SIZE)
-        buf[0] = FNP_MSG_ADV
         buf[1] = FNP_PROTOCOL_VERSION
         buf[2:10] = self._own_fp
         struct.pack_into(">H", buf, 10, self.asd_version)
         struct.pack_into(">I", buf, 12, self._own_bitmap)
         buf[16] = self.channel_capacity
-        nid = self.node_id.encode("utf-8")[:23]
-        buf[17 : 17 + len(nid)] = nid
+
+        if self.is_extended_form:
+            # Extended form: msg_type bit 7 set, node_id narrowed to 15 bytes,
+            # basis_fingerprint at offset 32. Spec §9.1.
+            buf[0] = FNP_MSG_ADV_EXTENDED
+            nid = self.node_id.encode("utf-8")[:15]
+            buf[17 : 17 + len(nid)] = nid
+            buf[32:40] = self.basis_fingerprint  # type: ignore[index]
+        else:
+            # Base form: msg_type 0x01, node_id reserves full 23 bytes.
+            buf[0] = FNP_MSG_ADV
+            nid = self.node_id.encode("utf-8")[:23]
+            buf[17 : 17 + len(nid)] = nid
+
         return bytes(buf)
 
     def _build_ack(self, remote_fp: bytes, match: int,
                    common_bitmap: int, neg_cap: int) -> bytes:
-        """Build a 38-byte FNP_ACK packet."""
+        """Build a 38-byte FNP_ACK packet.
+
+        ACK is unchanged in size from v1.0.2: the responder does not carry
+        its own basis fingerprint on the wire (spec §9.2). Basis agreement
+        is computed locally and reported via match_status.
+        """
         buf = bytearray(FNP_ACK_SIZE)
-        msg_type = FNP_MSG_ACK if match == FNP_MATCH_EXACT else FNP_MSG_NACK
+        # SAIL-capable bases (match_status 0x00) send ACK; everything else
+        # is a NACK in the original two-state model. Under ADR-004, basis
+        # mismatches (0x03 / 0x04) are not failures — they are graded
+        # capability — so they send ACK with the appropriate match_status.
+        if match in (FNP_MATCH_EXACT, FNP_MATCH_BASIS_MISMATCH, FNP_MATCH_BASIS_EXT_VS_BASE):
+            msg_type = FNP_MSG_ACK
+        else:
+            msg_type = FNP_MSG_NACK
         buf[0] = msg_type
         buf[1] = match
         buf[2:10] = remote_fp
@@ -851,16 +952,27 @@ class FNPSession:
 
     @staticmethod
     def _parse_adv(data: bytes) -> dict:
-        if len(data) < FNP_ADV_SIZE or data[0] != FNP_MSG_ADV:
+        if len(data) < FNP_ADV_SIZE or (data[0] & ~FNP_ADV_EXT_FLAG) != FNP_MSG_ADV:
             raise ValueError("Invalid FNP_ADV packet")
-        return {
+        is_extended = bool(data[0] & FNP_ADV_EXT_FLAG)
+        result: dict = {
+            "msg_type": data[0],
+            "is_extended": is_extended,
             "protocol_version": data[1],
             "fingerprint": bytes(data[2:10]),
             "asd_version": struct.unpack(">H", data[10:12])[0],
             "namespace_bitmap": struct.unpack(">I", data[12:16])[0],
             "channel_capacity": data[16],
-            "node_id": data[17:40].rstrip(b"\x00").decode("utf-8"),
         }
+        if is_extended:
+            # Extended form: node_id is 15 bytes, basis_fingerprint follows.
+            result["node_id"] = data[17:32].rstrip(b"\x00").decode("utf-8")
+            result["basis_fingerprint"] = bytes(data[32:40])
+        else:
+            # Base form: node_id reserves the full 23 bytes.
+            result["node_id"] = data[17:40].rstrip(b"\x00").decode("utf-8")
+            result["basis_fingerprint"] = None
+        return result
 
     @staticmethod
     def _parse_ack(data: bytes) -> dict:
@@ -912,37 +1024,51 @@ class FNPSession:
                         or None (when processing a received ACK).
         """
         msg_type = data[0]
+        msg_type_base = msg_type & ~FNP_ADV_EXT_FLAG  # strip extended-form flag
 
-        if msg_type == FNP_MSG_ADV and self.state == "IDLE":
+        if msg_type_base == FNP_MSG_ADV and self.state == "IDLE":
             adv = self._parse_adv(data)
             self.remote_node_id = adv["node_id"]
             self.remote_fingerprint = adv["fingerprint"]
+            self.remote_basis_fingerprint = adv["basis_fingerprint"]
 
-            # determine match status
-            if adv["fingerprint"] == self._own_fp:
-                if adv["asd_version"] == self.asd_version:
-                    match = FNP_MATCH_EXACT
-                else:
-                    match = FNP_MATCH_VERSION
-            else:
+            # Stage 1: ASD fingerprint match.
+            if adv["fingerprint"] != self._own_fp:
                 match = FNP_MATCH_FINGERPRINT
+            elif adv["asd_version"] != self.asd_version:
+                match = FNP_MATCH_VERSION
+            else:
+                # Stage 2: ADR-004 basis fingerprint capability grading.
+                # ASD matches; now check basis agreement.
+                remote_ext = adv["basis_fingerprint"] is not None
+                local_ext = self.is_extended_form
+                if remote_ext and local_ext:
+                    # Both extended: compare basis fingerprints directly.
+                    if adv["basis_fingerprint"] == self.basis_fingerprint:
+                        match = FNP_MATCH_EXACT
+                    else:
+                        match = FNP_MATCH_BASIS_MISMATCH
+                elif remote_ext != local_ext:
+                    # Mixed: one side base form, other extended. Bases
+                    # cannot match by length. Graded SAL-only.
+                    match = FNP_MATCH_BASIS_EXT_VS_BASE
+                else:
+                    # Both base form: implicit single-corpus basis,
+                    # determined entirely by the (matching) ASD fingerprint.
+                    match = FNP_MATCH_EXACT
 
             common = self._own_bitmap & adv["namespace_bitmap"]
             self.common_namespaces = _bitmap_to_namespaces(common)
             self.match_status = match
-
-            # negotiate capacity: LCD of both nodes
-            # lower class = fewer bytes = more constrained
             neg_cap = min(adv["channel_capacity"], self.channel_capacity)
             self.negotiated_capacity = neg_cap
 
-            self.state = "ESTABLISHED" if match == FNP_MATCH_EXACT else "SYNC_NEEDED"
+            self._apply_match_to_state(match, adv["basis_fingerprint"])
             return self._build_ack(adv["fingerprint"], match, common, neg_cap)
 
-        if msg_type in (FNP_MSG_ACK, FNP_MSG_NACK) and self.state == "ADV_SENT":
+        if msg_type_base in (FNP_MSG_ACK, FNP_MSG_NACK) and self.state == "ADV_SENT":
             ack = self._parse_ack(data)
 
-            # verify echo fingerprint matches our own
             if ack["echo_fingerprint"] != self._own_fp:
                 raise ValueError("FNP_ACK echo fingerprint mismatch")
 
@@ -951,13 +1077,59 @@ class FNPSession:
             self.common_namespaces = _bitmap_to_namespaces(ack["common_bitmap"])
             self.match_status = ack["match_status"]
             self.negotiated_capacity = ack["negotiated_capacity"]
-            self.state = ("ESTABLISHED" if ack["match_status"] == FNP_MATCH_EXACT
-                          else "SYNC_NEEDED")
+            # Note: the ACK does not carry the responder's basis fingerprint
+            # (ADR-004 wire-cost decision in spec §9.2). The initiator
+            # learns basis agreement via match_status, not via comparison.
+            self._apply_match_to_state(ack["match_status"], None)
             return None
 
         raise ValueError(
             f"Unexpected msg_type 0x{msg_type:02x} in state {self.state}"
         )
+
+    def _apply_match_to_state(self, match: int,
+                               peer_basis_fp: bytes | None) -> None:
+        """ADR-004 capability grading: choose ESTABLISHED_SAIL,
+        ESTABLISHED_SAL_ONLY, SYNC_NEEDED, or refuse.
+
+        Also records a degradation event when the peer's basis fingerprint
+        differs from the locally configured `expected_basis_fingerprint`,
+        for operator monitoring.
+        """
+        if match == FNP_MATCH_EXACT:
+            self.state = "ESTABLISHED_SAIL"
+        elif match in (FNP_MATCH_BASIS_MISMATCH, FNP_MATCH_BASIS_EXT_VS_BASE):
+            # ADR-004 graded capability. Optional require_sail policy
+            # converts this into a local refusal.
+            if self.require_sail:
+                self.state = "IDLE"
+                self.degradation_event = {
+                    "reason": "require_sail policy refused basis-mismatched session",
+                    "match_status": match,
+                    "remote_node_id": self.remote_node_id,
+                    "remote_basis_fingerprint": (
+                        peer_basis_fp.hex() if peer_basis_fp else None
+                    ),
+                }
+                return
+            self.state = "ESTABLISHED_SAL_ONLY"
+            # Operator monitoring: log a degradation event when the
+            # remote basis differs from the expected one.
+            if (self.expected_basis_fingerprint is not None
+                    and peer_basis_fp is not None
+                    and peer_basis_fp != self.expected_basis_fingerprint):
+                self.degradation_event = {
+                    "reason": "remote basis fingerprint differs from expected",
+                    "match_status": match,
+                    "remote_node_id": self.remote_node_id,
+                    "remote_basis_fingerprint": peer_basis_fp.hex(),
+                    "expected_basis_fingerprint": (
+                        self.expected_basis_fingerprint.hex()
+                    ),
+                }
+        else:
+            # FNP_MATCH_VERSION or FNP_MATCH_FINGERPRINT
+            self.state = "SYNC_NEEDED"
 
     def timeout(self) -> None:
         """Handle handshake timeout.  Transitions ADV_SENT -> IDLE."""

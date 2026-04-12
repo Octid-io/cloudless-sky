@@ -22,11 +22,11 @@
       "description": "MCP tools/call response: weather result",
       "domain": "Environmental / Sensor",
       "json_payload": "{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Current weather in New York:\\nTemperature: 72\\u00b0F\\nConditions: Partly cloudy\"}],\"isError\":false}}",
-      "sal_equivalent": "D:RT[E:EQ@New_York:72F:partly_cloudy]",
+      "sal_equivalent": "D:RTN[E:EQ@New_York:72F:partly_cloudy]",
       "json_bytes": 168,
       "sal_bytes": 37,
       "reduction_pct": 78.0,
-      "notes": "MCP spec example: tools/call response. SAL uses D:RT (return transmit) wrapping the query result."
+      "notes": "MCP spec example: tools/call response. SAL uses D:RTN (return transmit) wrapping the query result."
     },
     {
       "id": "MCP-03",
@@ -92,11 +92,11 @@
       "description": "OpenAI function call output: weather result returned to model",
       "domain": "Environmental / Sensor",
       "json_payload": "{\"type\":\"function_call_output\",\"call_id\":\"call_12345xyz\",\"output\":\"{\\\"temperature\\\":\\\"25\\\",\\\"unit\\\":\\\"C\\\"}\"}",
-      "sal_equivalent": "D:RT[E:EQ:25C]",
+      "sal_equivalent": "D:RTN[E:EQ:25C]",
       "json_bytes": 108,
       "sal_bytes": 14,
       "reduction_pct": 87.0,
-      "notes": "OpenAI docs: function output. SAL uses D:RT wrapping result."
+      "notes": "OpenAI docs: function output. SAL uses D:RTN wrapping result."
     },
     {
       "id": "OAI-03",
@@ -134,11 +134,11 @@
       "description": "OpenAI tool result: function response message",
       "domain": "Data / Query / File Transfer",
       "json_payload": "{\"role\":\"tool\",\"tool_call_id\":\"call_62136354\",\"content\":\"{\\\"delivery_date\\\":\\\"2025-09-15\\\"}\"}",
-      "sal_equivalent": "D:RT[2025-09-15]",
+      "sal_equivalent": "D:RTN[2025-09-15]",
       "json_bytes": 93,
       "sal_bytes": 16,
       "reduction_pct": 82.8,
-      "notes": "OpenAI docs: tool response. SAL uses D:RT with the return value."
+      "notes": "OpenAI docs: tool response. SAL uses D:RTN with the return value."
     },
     {
       "id": "A2A-01",
@@ -162,11 +162,11 @@
       "description": "A2A task response: agent returns completed task with artifact",
       "domain": "Agentic / OSMP-Native",
       "json_payload": "{\"jsonrpc\":\"2.0\",\"id\":\"abc123\",\"result\":{\"id\":\"task-456\",\"status\":{\"state\":\"completed\",\"timestamp\":\"2025-12-01T10:30:00Z\"},\"artifacts\":[{\"artifactId\":\"art-001\",\"parts\":[{\"type\":\"text\",\"text\":\"Found 3 flights. Best: BA117 departing 18:30, arriving 06:45+1, $489\"}]}]}}",
-      "sal_equivalent": "J:DONE@task-456;D:RT[BA117:1830:0645:489USD]",
+      "sal_equivalent": "J:DONE@task-456;D:RTN[BA117:1830:0645:489USD]",
       "json_bytes": 267,
       "sal_bytes": 44,
       "reduction_pct": 83.5,
-      "notes": "A2A spec: task completion with artifact. SAL uses J:DONE then D:RT with structured result."
+      "notes": "A2A spec: task completion with artifact. SAL uses J:DONE then D:RTN with structured result."
     },
     {
       "id": "A2A-03",
@@ -218,11 +218,11 @@
       "description": "CrewAI task output: structured JSON result",
       "domain": "Cognitive Execution State",
       "json_payload": "{\"description\":\"Find and summarize the latest AI news\",\"summary\":\"Top 5 AI developments: GPT-5 launch, Claude 4 release, Gemini 2.0, Llama 4, Mistral Large 3\",\"raw\":\"## Top 5 AI News\\n1. GPT-5 launched with...\",\"json_dict\":{\"main_points\":[\"GPT-5 launch\",\"Claude 4\",\"Gemini 2.0\"],\"key_technologies\":[\"transformers\",\"MoE\",\"RLHF\"]},\"agent\":\"AI Technology Researcher\"}",
-      "sal_equivalent": "J:DONE@researcher;D:RT[AI_news:3items]",
+      "sal_equivalent": "J:DONE@researcher;D:RTN[AI_news:3items]",
       "json_bytes": 364,
       "sal_bytes": 38,
       "reduction_pct": 89.6,
-      "notes": "CrewAI docs: TaskOutput object. SAL uses J:DONE with D:RT for result payload."
+      "notes": "CrewAI docs: TaskOutput object. SAL uses J:DONE with D:RTN for result payload."
     },
     {
       "id": "CREW-03",

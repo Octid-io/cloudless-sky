@@ -237,7 +237,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "B:BA[5]"
+    "sal": "B:ALRM[5]"
   },
   {
     "id": "B-003",
@@ -247,7 +247,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "B:BS?[3]"
+    "sal": "B:AREA?[3]"
   },
   {
     "id": "B-004",
@@ -267,7 +267,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "B:L"
+    "sal": "B:SAFE"
   },
   {
     "id": "B-006",
@@ -277,7 +277,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "B:X"
+    "sal": "B:STRC"
   },
   {
     "id": "C-001",
@@ -527,7 +527,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "D:RT"
+    "sal": "D:RTN"
   },
   {
     "id": "D-012",
@@ -597,7 +597,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "E:OBS"
+    "sal": "E:HAZ"
   },
   {
     "id": "E-005",
@@ -1357,7 +1357,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "M:RT"
+    "sal": "M:RTE"
   },
   {
     "id": "N-001",
@@ -1427,7 +1427,7 @@
     "op_match": false,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "N:PR"
+    "sal": "N:RLY"
   },
   {
     "id": "O-001",
@@ -1437,7 +1437,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "O:AUTH"
+    "sal": "O:LVL"
   },
   {
     "id": "O-002",
@@ -1637,7 +1637,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "O:TYPE"
+    "sal": "O:TYP"
   },
   {
     "id": "O-022",
@@ -1657,7 +1657,7 @@
     "op_match": false,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "L:LOG→M:A"
+    "sal": "L:LOG→M:ALRT"
   },
   {
     "id": "P-002",
@@ -2417,7 +2417,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "T:SCHED[sat0200]→M:MA"
+    "sal": "T:SCHED[sat0200]→M:ALRT"
   },
   {
     "id": "T-012",
@@ -2917,7 +2917,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "X:EV[4]"
+    "sal": "X:CHG[4]"
   },
   {
     "id": "X-003",
@@ -2947,7 +2947,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "X:GEN"
+    "sal": "X:PROD"
   },
   {
     "id": "X-006",
@@ -2957,7 +2957,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "X:GRID"
+    "sal": "X:GRD"
   },
   {
     "id": "X-007",
@@ -3057,7 +3057,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "X:WIND"
+    "sal": "X:WND"
   },
   {
     "id": "Y-001",
@@ -3117,7 +3117,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "Y:PAGE"
+    "sal": "Y:PAGEOUT"
   },
   {
     "id": "Y-007",
@@ -3127,7 +3127,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "Y:PROMOTE"
+    "sal": "Y:COMMIT"
   },
   {
     "id": "Y-008",
@@ -3177,7 +3177,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "Y:STAT"
+    "sal": "Y:USG"
   },
   {
     "id": "Y-013",
@@ -3237,7 +3237,7 @@
     "op_match": true,
     "mode": "FULL_OSMP",
     "expected": "FULL_OSMP",
-    "sal": "Z:CAP"
+    "sal": "Z:CAPS"
   },
   {
     "id": "Z-004",

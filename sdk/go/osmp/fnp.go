@@ -16,6 +16,7 @@ package osmp
 import (
 	"crypto/sha256"
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"fmt"
 )
@@ -25,13 +26,22 @@ const (
 	FNPMsgADV  = 0x01
 	FNPMsgACK  = 0x02
 	FNPMsgNACK = 0x03
+
+	// ADR-004: extended-form ADV signaled by msg_type bit 7 (high bit set).
+	// Extended form narrows node_id from 23 to 15 bytes and carries an
+	// 8-byte basis_fingerprint at offset 32. Total ADV size remains 40
+	// bytes in both forms; only the field layout differs. See spec §9.1.
+	FNPMsgADVExtended = 0x81
+	FNPADVExtFlag     = 0x80
 )
 
 // FNP match status codes
 const (
-	FNPMatchExact       = 0x00
-	FNPMatchVersion     = 0x01
-	FNPMatchFingerprint = 0x02
+	FNPMatchExact            = 0x00
+	FNPMatchVersion          = 0x01
+	FNPMatchFingerprint      = 0x02
+	FNPMatchBasisMismatch    = 0x03 // ADR-004: ASD matches, bases differ (both extended)
+	FNPMatchBasisExtVsBase   = 0x04 // ADR-004: ASD matches, base form vs extended (length mismatch)
 )
 
 // FNP channel capacity classes
@@ -62,12 +72,14 @@ const nsLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 type FNPState string
 
 const (
-	FNPStateIdle        FNPState = "IDLE"
-	FNPStateADVSent     FNPState = "ADV_SENT"
-	FNPStateEstablished FNPState = "ESTABLISHED"
-	FNPStateSyncNeeded  FNPState = "SYNC_NEEDED"
-	FNPStateFallback    FNPState = "FALLBACK"
-	FNPStateAcquired    FNPState = "ACQUIRED"
+	FNPStateIdle             FNPState = "IDLE"
+	FNPStateADVSent          FNPState = "ADV_SENT"
+	FNPStateEstablished      FNPState = "ESTABLISHED"
+	FNPStateEstablishedSAIL  FNPState = "ESTABLISHED_SAIL"
+	FNPStateEstablishedSALOnly FNPState = "ESTABLISHED_SAL_ONLY"
+	FNPStateSyncNeeded       FNPState = "SYNC_NEEDED"
+	FNPStateFallback         FNPState = "FALLBACK"
+	FNPStateAcquired         FNPState = "ACQUIRED"
 )
 
 // FNPSession manages the two-message handshake between sovereign nodes.
@@ -94,6 +106,13 @@ type FNPSession struct {
 	MatchStatus         int
 	NegotiatedCapacity  int
 
+	// ADR-004 basis manifest support
+	BasisFingerprint         []byte // 8 bytes when set; nil for base-form sessions
+	ExpectedBasisFingerprint []byte
+	RequireSail              bool
+	RemoteBasisFingerprint   []byte
+	DegradationEvent         map[string]interface{}
+
 	asd             *AdaptiveSharedDictionary
 	nodeID          string
 	asdVersion      uint16
@@ -115,6 +134,59 @@ func NewFNPSession(asd *AdaptiveSharedDictionary, nodeID string, asdVersion uint
 		ownFp:           fingerprintBytesGo(asd),
 		ownBitmap:       namespaceBitmapGo(asd.Namespaces()),
 	}
+}
+
+// FNPSessionOptions configures ADR-004 basis manifest behavior on a session.
+type FNPSessionOptions struct {
+	// BasisFingerprint, when set to an 8-byte value, switches the session
+	// to extended-form ADV (msg_type 0x81) with the basis fingerprint
+	// carried in the wire packet at offset 32. When nil, the session uses
+	// base-form ADV and is treated as base-ASD-only.
+	BasisFingerprint []byte
+
+	// ExpectedBasisFingerprint, when set, causes the session to record a
+	// degradation event when a peer presents a different basis fingerprint
+	// than expected. Used for operator monitoring.
+	ExpectedBasisFingerprint []byte
+
+	// RequireSail is the operator policy flag that converts SAL-only
+	// sessions (basis mismatch) into local refusals.
+	RequireSail bool
+}
+
+// NewFNPSessionWithOptions creates a new FNP session with ADR-004 basis
+// manifest support. Pass nil for opts to behave like NewFNPSession.
+func NewFNPSessionWithOptions(asd *AdaptiveSharedDictionary, nodeID string, asdVersion uint16, channelCapacity byte, opts *FNPSessionOptions) *FNPSession {
+	s := NewFNPSession(asd, nodeID, asdVersion, channelCapacity)
+	if opts != nil {
+		if opts.BasisFingerprint != nil {
+			if len(opts.BasisFingerprint) != 8 {
+				// Defensive: silently ignore malformed inputs would mask
+				// configuration bugs. Caller is expected to pass exactly
+				// 8 bytes.
+				panic("BasisFingerprint must be exactly 8 bytes")
+			}
+			s.BasisFingerprint = append([]byte{}, opts.BasisFingerprint...)
+		}
+		if opts.ExpectedBasisFingerprint != nil {
+			s.ExpectedBasisFingerprint = append([]byte{}, opts.ExpectedBasisFingerprint...)
+		}
+		s.RequireSail = opts.RequireSail
+	}
+	return s
+}
+
+// IsExtendedForm reports whether this session uses extended-form ADV
+// (basis fingerprint set).
+func (s *FNPSession) IsExtendedForm() bool {
+	return s.BasisFingerprint != nil
+}
+
+// IsSailCapable reports whether the negotiated session supports SAIL wire
+// mode. Per ADR-004, SAIL is available only when the session reaches
+// ESTABLISHED_SAIL.
+func (s *FNPSession) IsSailCapable() bool {
+	return s.State == FNPStateEstablishedSAIL
 }
 
 func namespaceBitmapGo(namespaces []string) uint32 {
@@ -174,23 +246,39 @@ func bytesEqual(a, b []byte) bool {
 
 func (s *FNPSession) buildADV() []byte {
 	buf := make([]byte, fnpADVSize)
-	buf[0] = FNPMsgADV
 	buf[1] = fnpProtocolVersion
 	copy(buf[2:10], s.ownFp)
 	binary.BigEndian.PutUint16(buf[10:12], s.asdVersion)
 	binary.BigEndian.PutUint32(buf[12:16], s.ownBitmap)
 	buf[16] = s.channelCapacity
-	nid := []byte(s.nodeID)
-	if len(nid) > 23 {
-		nid = nid[:23]
+
+	if s.IsExtendedForm() {
+		// Extended form: msg_type bit 7 set, node_id narrowed to 15 bytes,
+		// basis_fingerprint at offset 32. Spec §9.1.
+		buf[0] = FNPMsgADVExtended
+		nid := []byte(s.nodeID)
+		if len(nid) > 15 {
+			nid = nid[:15]
+		}
+		copy(buf[17:32], nid)
+		copy(buf[32:40], s.BasisFingerprint)
+	} else {
+		// Base form: msg_type 0x01, node_id reserves the full 23 bytes.
+		buf[0] = FNPMsgADV
+		nid := []byte(s.nodeID)
+		if len(nid) > 23 {
+			nid = nid[:23]
+		}
+		copy(buf[17:], nid)
 	}
-	copy(buf[17:], nid)
 	return buf
 }
 
 func (s *FNPSession) buildACK(remoteFp []byte, match int, commonBitmap uint32, negCap byte) []byte {
 	buf := make([]byte, fnpACKSize)
-	if match == FNPMatchExact {
+	// ADR-004: basis-graded matches (0x03 / 0x04) are NOT failures, they
+	// are graded capability and use ACK rather than NACK.
+	if match == FNPMatchExact || match == FNPMatchBasisMismatch || match == FNPMatchBasisExtVsBase {
 		buf[0] = FNPMsgACK
 	} else {
 		buf[0] = FNPMsgNACK
@@ -211,12 +299,15 @@ func (s *FNPSession) buildACK(remoteFp []byte, match int, commonBitmap uint32, n
 // ── packet parsing ──────────────────────────────────────────────────
 
 type fnpADVParsed struct {
+	msgType          byte
+	isExtended       bool
 	protocolVersion  byte
 	fingerprint      []byte
 	asdVersion       uint16
 	namespaceBitmap  uint32
 	channelCapacity  byte
 	nodeID           string
+	basisFingerprint []byte
 }
 
 type fnpACKParsed struct {
@@ -230,22 +321,44 @@ type fnpACKParsed struct {
 }
 
 func parseADV(data []byte) (*fnpADVParsed, error) {
-	if len(data) < fnpADVSize || data[0] != FNPMsgADV {
+	if len(data) < fnpADVSize {
 		return nil, errors.New("invalid FNP_ADV packet")
 	}
-	nid := data[17:40]
-	end := len(nid)
-	for end > 0 && nid[end-1] == 0 {
-		end--
+	baseType := data[0] &^ FNPADVExtFlag
+	if baseType != FNPMsgADV {
+		return nil, errors.New("invalid FNP_ADV packet")
 	}
-	return &fnpADVParsed{
+	isExtended := (data[0] & FNPADVExtFlag) != 0
+
+	out := &fnpADVParsed{
+		msgType:         data[0],
+		isExtended:      isExtended,
 		protocolVersion: data[1],
 		fingerprint:     append([]byte{}, data[2:10]...),
 		asdVersion:      binary.BigEndian.Uint16(data[10:12]),
 		namespaceBitmap: binary.BigEndian.Uint32(data[12:16]),
 		channelCapacity: data[16],
-		nodeID:          string(nid[:end]),
-	}, nil
+	}
+
+	if isExtended {
+		// Extended: 15-byte node_id, basis_fingerprint at offset 32.
+		nid := data[17:32]
+		end := len(nid)
+		for end > 0 && nid[end-1] == 0 {
+			end--
+		}
+		out.nodeID = string(nid[:end])
+		out.basisFingerprint = append([]byte{}, data[32:40]...)
+	} else {
+		// Base: full 23-byte node_id reservation.
+		nid := data[17:40]
+		end := len(nid)
+		for end > 0 && nid[end-1] == 0 {
+			end--
+		}
+		out.nodeID = string(nid[:end])
+	}
+	return out, nil
 }
 
 func parseACK(data []byte) (*fnpACKParsed, error) {
@@ -289,24 +402,38 @@ func (s *FNPSession) Receive(data []byte) ([]byte, error) {
 		return nil, errors.New("empty packet")
 	}
 	msgType := data[0]
+	msgTypeBase := msgType &^ FNPADVExtFlag
 
-	if msgType == FNPMsgADV && s.State == FNPStateIdle {
+	if msgTypeBase == FNPMsgADV && s.State == FNPStateIdle {
 		adv, err := parseADV(data)
 		if err != nil {
 			return nil, err
 		}
 		s.RemoteNodeID = adv.nodeID
 		s.RemoteFingerprint = adv.fingerprint
+		s.RemoteBasisFingerprint = adv.basisFingerprint
 
 		var match int
-		if bytesEqual(adv.fingerprint, s.ownFp) {
-			if adv.asdVersion == s.asdVersion {
-				match = FNPMatchExact
-			} else {
-				match = FNPMatchVersion
-			}
-		} else {
+		if !bytesEqual(adv.fingerprint, s.ownFp) {
 			match = FNPMatchFingerprint
+		} else if adv.asdVersion != s.asdVersion {
+			match = FNPMatchVersion
+		} else {
+			// ADR-004 basis fingerprint capability grading.
+			remoteExt := adv.basisFingerprint != nil
+			localExt := s.IsExtendedForm()
+			switch {
+			case remoteExt && localExt:
+				if bytesEqual(adv.basisFingerprint, s.BasisFingerprint) {
+					match = FNPMatchExact
+				} else {
+					match = FNPMatchBasisMismatch
+				}
+			case remoteExt != localExt:
+				match = FNPMatchBasisExtVsBase
+			default:
+				match = FNPMatchExact
+			}
 		}
 
 		common := s.ownBitmap & adv.namespaceBitmap
@@ -319,15 +446,11 @@ func (s *FNPSession) Receive(data []byte) ([]byte, error) {
 		}
 		s.NegotiatedCapacity = int(negCap)
 
-		if match == FNPMatchExact {
-			s.State = FNPStateEstablished
-		} else {
-			s.State = FNPStateSyncNeeded
-		}
+		s.applyMatchToState(match, adv.basisFingerprint)
 		return s.buildACK(adv.fingerprint, match, common, negCap), nil
 	}
 
-	if (msgType == FNPMsgACK || msgType == FNPMsgNACK) && s.State == FNPStateADVSent {
+	if (msgTypeBase == FNPMsgACK || msgTypeBase == FNPMsgNACK) && s.State == FNPStateADVSent {
 		ack, err := parseACK(data)
 		if err != nil {
 			return nil, err
@@ -343,15 +466,56 @@ func (s *FNPSession) Receive(data []byte) ([]byte, error) {
 		s.MatchStatus = int(ack.matchStatus)
 		s.NegotiatedCapacity = int(ack.negotiatedCapacity)
 
-		if ack.matchStatus == FNPMatchExact {
-			s.State = FNPStateEstablished
-		} else {
-			s.State = FNPStateSyncNeeded
-		}
+		// ACK does not carry remote basis fingerprint per ADR-004 spec §9.2;
+		// initiator learns basis agreement via match_status.
+		s.applyMatchToState(int(ack.matchStatus), nil)
 		return nil, nil
 	}
 
 	return nil, fmt.Errorf("unexpected msg_type 0x%02x in state %s", msgType, s.State)
+}
+
+// applyMatchToState is the ADR-004 capability grading helper.
+// It chooses ESTABLISHED_SAIL, ESTABLISHED_SAL_ONLY, SYNC_NEEDED, or
+// (with require_sail) refuses the session locally. It also records a
+// degradation event when the peer's basis fingerprint differs from the
+// locally configured ExpectedBasisFingerprint.
+func (s *FNPSession) applyMatchToState(match int, peerBasisFp []byte) {
+	if match == FNPMatchExact {
+		s.State = FNPStateEstablishedSAIL
+		return
+	}
+	if match == FNPMatchBasisMismatch || match == FNPMatchBasisExtVsBase {
+		if s.RequireSail {
+			s.State = FNPStateIdle
+			s.DegradationEvent = map[string]interface{}{
+				"reason":         "require_sail policy refused basis-mismatched session",
+				"match_status":   match,
+				"remote_node_id": s.RemoteNodeID,
+				"remote_basis_fingerprint": func() interface{} {
+					if peerBasisFp != nil {
+						return hex.EncodeToString(peerBasisFp)
+					}
+					return nil
+				}(),
+			}
+			return
+		}
+		s.State = FNPStateEstablishedSALOnly
+		if s.ExpectedBasisFingerprint != nil && peerBasisFp != nil &&
+			!bytesEqual(peerBasisFp, s.ExpectedBasisFingerprint) {
+			s.DegradationEvent = map[string]interface{}{
+				"reason":                    "remote basis fingerprint differs from expected",
+				"match_status":              match,
+				"remote_node_id":            s.RemoteNodeID,
+				"remote_basis_fingerprint":  hex.EncodeToString(peerBasisFp),
+				"expected_basis_fingerprint": hex.EncodeToString(s.ExpectedBasisFingerprint),
+			}
+		}
+		return
+	}
+	// FNPMatchVersion or FNPMatchFingerprint
+	s.State = FNPStateSyncNeeded
 }
 
 // Timeout handles handshake timeout. ADV_SENT -> IDLE.

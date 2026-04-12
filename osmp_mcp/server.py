@@ -89,12 +89,12 @@ mcp = FastMCP(
         "A:SUM = summarize/condense, NOT arithmetic sum. "
         "S:SIGN = cryptographic signature, NOT legal signing. "
         "Z:TEMP = inference sampling temperature, NOT physical temperature. "
-        "E:OBS = obstacle, NOT observation. "
+        "E:HAZ = obstacle, NOT observation. "
         "If the ASD definition doesn't match the intent, the opcode does not apply.\n"
         "3. SELECT NAMESPACE BY DOMAIN CONTEXT. "
         "Patient temp = H:TEMP. Sensor temp = E:TH. Weather temp = W:TEMP. Model temp = Z:TEMP. "
-        "Energy wind = X:WIND. Weather wind = W:WIND. "
-        "Building fire = B:BA + M:EVA. Weather fire advisory = W:FIRE. "
+        "Energy wind = X:WND. Weather wind = W:WIND. "
+        "Building fire = B:ALRM + M:EVA. Weather fire advisory = W:FIRE. "
         "Protocol ack = A:ACK. Human ack = U:ACK. Ambiguous = NL passthrough.\n"
         "4. IF NO OPCODE MATCHES THE CORE ACTION: send natural language as-is (NL_PASSTHROUGH). "
         "Do not force-fit. 'Order me tacos' = NL. 'Book a flight' = NL. 'Send an email' = NL.\n"
@@ -255,7 +255,7 @@ def osmp_lookup(namespace: str = "", keyword: str = "") -> str:
       osmp_lookup(namespace="R") -- all opcodes in the Robotics namespace
       osmp_lookup(keyword="heart") -- all opcodes containing "heart" in name or definition
       osmp_lookup(namespace="H", keyword="rate") -- H namespace opcodes matching "rate"
-      osmp_lookup() -- dump entire dictionary (342 opcodes across 26 namespaces)"""
+      osmp_lookup() -- dump entire dictionary (356 opcodes across 26 namespaces)"""
     asd = AdaptiveSharedDictionary()
     results = []
     kw = keyword.lower().strip()
@@ -287,7 +287,12 @@ def osmp_resolve(code: str, corpus: str = "icd") -> str:
         data = _load_mdr(corpus)
     except (ValueError, FileNotFoundError) as e:
         return str(e)
-    result = _bc.resolve(data, code)
+    # Finding 2: normalize dotted clinical codes (J93.0 -> J930) for corpus lookup
+    normalized = code.replace(".", "")
+    result = _bc.resolve(data, normalized)
+    if result is None:
+        # Fall back to original code in case corpus uses dotted keys
+        result = _bc.resolve(data, code)
     if result is None:
         return f"Not found: {code}"
     return f"{code}: {result}"
@@ -308,7 +313,11 @@ def osmp_batch_resolve(codes: str, corpus: str = "icd") -> str:
         return str(e)
     results = []
     for code in (c.strip() for c in codes.split(",") if c.strip()):
-        r = _bc.resolve(data, code)
+        # Finding 2: normalize dotted clinical codes for corpus lookup
+        normalized = code.replace(".", "")
+        r = _bc.resolve(data, normalized)
+        if r is None:
+            r = _bc.resolve(data, code)
         results.append({"code": code, "description": r})
     return json.dumps({"results": results}, indent=2, ensure_ascii=False)
 
@@ -596,7 +605,7 @@ def get_system_prompt() -> str:
         "V:PORT": "port of call", "V:SPEED": "speed ground",
         "V:MMSI": "vessel MMSI", "W:TAF": "terminal forecast",
         "Y:FETCH": "retrieve key", "Y:FORGET": "delete memory",
-        "Y:PAGE": "page out mem", "Y:PROMOTE": "working to LT",
+        "Y:PAGEOUT": "page out mem", "Y:COMMIT": "working to LT",
         "Y:RECALL": "episodic recall", "Y:RETRIEVE": "retrieve LCS",
         "Y:SUMM": "compress memory", "Y:SYNC": "sync peer mem",
         "Z:TOPP": "top-p sampling", "Z:TOPK": "top-k sampling",
@@ -663,7 +672,7 @@ Before composing SAL from natural language, follow this decision logic:
 4. If multiple namespace matches: select by DOMAIN CONTEXT, not mnemonic.
    Patient temperature \u2192 H:TEMP. Sensor temperature \u2192 E:TH.
    Weather temperature \u2192 W:TEMP. Model temperature \u2192 Z:TEMP.
-   Energy wind \u2192 X:WIND. Weather wind \u2192 W:WIND.
+   Energy wind \u2192 X:WND. Weather wind \u2192 W:WIND.
    Agent task handoff \u2192 J:HANDOFF. Physical authority handoff \u2192 R:HANDOFF.
    Store to memory \u2192 Y:STORE. Store energy \u2192 X:STORE.
    Generate embedding \u2192 Z:EMBED. Store embedding \u2192 Y:EMBED.
@@ -671,7 +680,7 @@ Before composing SAL from natural language, follow this decision logic:
    Protocol acknowledge \u2192 A:ACK. Human acknowledge \u2192 U:ACK. Ambiguous \u2192 NL.
 
 NAMESPACE PRINCIPLES (apply when the collision list above doesn't cover it):
-P1: OPERATIONAL EVENT vs EXTERNAL DATA. Building on fire = B:BA + M:EVA (event
+P1: OPERATIONAL EVENT vs EXTERNAL DATA. Building on fire = B:ALRM + M:EVA (event
    happening to you). Fire weather watch from NWS = W:FIRE (data product about
    conditions). Your sensor reads 38C = E:TH (local instrument). NWS publishes
    temperature = W:TEMP (external data). This applies to every hazard type.
@@ -700,7 +709,7 @@ P2: DEFINITION MATCH, NOT MNEMONIC MATCH. Read the ASD definition. If the
 READ THE DEFINITION, NOT THE MNEMONIC:
 A:SUM = summarize (condense), not arithmetic sum.
 A:CMP = compress/compare, not compute.
-E:OBS = obstacle, not observation. Mnemonic similarity is not definition match.
+E:HAZ = obstacle, not observation. Mnemonic similarity is not definition match.
 K:ORD = financial order entry (ISO 20022), not food ordering.
 S:SIGN = cryptographic signature, not legal document signing.
 Z:TEMP = inference sampling temperature, not physical temperature.
@@ -747,7 +756,7 @@ If SAL is longer than the NL, send the NL. Floor: 51 bytes.
 @mcp.resource("osmp://about")
 def get_about() -> str:
     """Protocol design philosophy."""
-    return """D:UNPACK->A:ACK->Z:CAP[SAL]
+    return """D:UNPACK->A:ACK->Z:CAPS[SAL]
 
 You decoded that. You acknowledged it. You have the capability.
 
@@ -755,7 +764,7 @@ OSMP is a shared dictionary between agents. When two nodes have the
 same dictionary, they communicate by table lookup. No parsing, no
 inference, no ambiguity. The dictionary is the translation layer.
 
-342 opcodes. 26 namespaces. Three loss tolerance policies.
+356 opcodes. 26 namespaces. Three loss tolerance policies.
 The floor is 51 bytes. Everything above it is free scaling.
 
 octid.io | github.com/octid-io/cloudless-sky
@@ -802,12 +811,12 @@ def get_corpora() -> str:
 def get_examples() -> str:
     """Annotated SAL examples."""
     return """1. E:EQ@4A?TH:0          "Report temperature at node 4A"              10B
-2. E@T>38->B:BA@BS       "If temp>38, building alert"                15B
+2. E@T>38->B:ALRM@AREA   "If temp>38, building alert"                15B
 3. H:HR@NODE1>120->H:CASREP^M:EVA@*  "HR>120: casualty report + evacuate"  35B
 4. K:PAY@RECV<->I:section->K:XFR[AMT]  "Pay iff human confirms, transfer"  26B
 5. R:TORCH@PHONE1:ON     "Flashlight on (reversible)"                22B
 6. I:section->R:CAM@PHONE2:ON  "Human gate then camera"              25B
-7. O:MODE:E^O:TYPE:1     "Emergency mode, type 1"                    17B
+7. O:MODE:E^O:TYP:1      "Emergency mode, type 1"                    17B
 8. Z:INF^Z:TOKENS:847    "Invoke inference, report tokens"           33B
 9. H:ICD[A000]           "Look up ICD-10 cholera code"               10B
 10. J:GOAL[QTR]->J:HANDOFF@BETA  "Declare goal, hand off to Beta"   30B

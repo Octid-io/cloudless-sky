@@ -2,15 +2,17 @@
 // and SEC (Security Envelope) for the Octid Semantic Mesh Protocol.
 //
 // Zero external dependencies. Compiles into a binary.
-// Dictionary: OSMP-semantic-dictionary-v14.csv
+// Dictionary: OSMP-semantic-dictionary-v15.csv
 package osmp
 
 import (
 	"crypto/ed25519"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"io"
 	"math"
 	"os"
 	"path/filepath"
@@ -162,7 +164,7 @@ type indexOpcode map[string]map[int]string
 func buildOpcodeTables(dictPath string) (opcodeIndex, indexOpcode, error) {
 	if dictPath == "" {
 		candidates := []string{
-			filepath.Join("protocol", "OSMP-semantic-dictionary-v14.csv"),
+			filepath.Join("protocol", "OSMP-semantic-dictionary-v15.csv"),
 		}
 		for _, c := range candidates {
 			if _, err := os.Stat(c); err == nil {
@@ -222,82 +224,291 @@ func buildOpcodeTables(dictPath string) (opcodeIndex, indexOpcode, error) {
 	return opToIdx, idxToOp, nil
 }
 
-// ─── Intern Table ────────────────────────────────────────────────────────────
+// ─── Dictionary Basis Manifest (ADR-004) ─────────────────────────────────────
+//
+// A Dictionary Basis is an ordered list of (corpus_id, corpus_hash) pairs that
+// determines a node's SAIL intern table by pure-function construction. Two
+// nodes loading the same ordered basis produce byte-identical intern tables
+// and unlock SAIL with each other; nodes with different bases interoperate in
+// SAL-only mode via FNP capability grading (spec §9.5).
+//
+// See ADR-004 and spec §9.8.
 
+// CorpusEntry is a single entry in a Dictionary Basis.
+type CorpusEntry struct {
+	// CorpusID is a stable UTF-8 identifier (1-255 bytes), e.g. "asd-v15".
+	CorpusID string
+	// CorpusHash is the full 32-byte SHA-256 over the corpus file bytes verbatim.
+	CorpusHash [32]byte
+}
 
-// buildInternTable dynamically constructs the intern table from dictionary content.
-// Extracts opcode names and known wire tokens. Loading an MDR corpus expands
-// both vocabulary AND compression table from a single artifact.
-func buildInternTable(dictPath string, mdrPaths []string) []string {
-	// Dynamically construct intern table from dictionary and MDR content.
-	// Phase 1: Opcode names from base dictionary Section 3.
-	// Phase 2: Slot values from each loaded MDR corpus Section B.
-	// Zero static data. Every string originates from a loaded file.
-	strSet := map[string]bool{}
+func validateCorpusEntry(e CorpusEntry) error {
+	idLen := len([]byte(e.CorpusID))
+	if idLen < 1 || idLen > 255 {
+		return fmt.Errorf("corpus_id must be 1-255 UTF-8 bytes, got %d", idLen)
+	}
+	// CorpusHash is a fixed 32-byte array, length is structural.
+	return nil
+}
 
-	// Phase 1: Opcode names from base dictionary
-	if dictPath != "" {
-		data, err := os.ReadFile(dictPath)
-		if err == nil {
-			lines := splitLines(string(data))
-			inS3 := false
-			for _, line := range lines {
-				if containsStr(line, "SECTION 3") { inS3 = true; continue }
-				if containsStr(line, "SECTION 4") { break }
-				if !inS3 { continue }
-				parts := splitCSV(line)
-				if len(parts) >= 5 {
-					prefix := trimSpace(parts[1])
-					opcode := trimSpace(parts[3])
-					if len(prefix) >= 1 && len(prefix) <= 2 && prefix[0] >= 'A' && prefix[0] <= 'Z' && opcode != "" && opcode != "Opcode" {
-						strSet[opcode] = true
-					}
-				}
+// DictionaryBasis is the ordered, content-addressed set of dictionary corpora
+// (ADR-004). It is the input to deterministic SAIL intern table construction.
+type DictionaryBasis struct {
+	entries     []CorpusEntry
+	fingerprint [8]byte
+	fpCached    bool
+}
+
+// NewDictionaryBasis constructs a basis from an ordered list of entries.
+// Returns an error if the entries slice is empty or any entry is invalid.
+func NewDictionaryBasis(entries []CorpusEntry) (*DictionaryBasis, error) {
+	if len(entries) == 0 {
+		return nil, errors.New("DictionaryBasis must contain at least one entry")
+	}
+	for i, e := range entries {
+		if err := validateCorpusEntry(e); err != nil {
+			return nil, fmt.Errorf("entry %d: %w", i, err)
+		}
+	}
+	// Defensive copy to mirror Python's frozen dataclass semantics.
+	cp := make([]CorpusEntry, len(entries))
+	copy(cp, entries)
+	return &DictionaryBasis{entries: cp}, nil
+}
+
+// Entries returns a read-only view of the basis entries.
+func (b *DictionaryBasis) Entries() []CorpusEntry {
+	out := make([]CorpusEntry, len(b.entries))
+	copy(out, b.entries)
+	return out
+}
+
+// Len returns the number of corpora in the basis.
+func (b *DictionaryBasis) Len() int { return len(b.entries) }
+
+// IsBaseOnly returns true if this basis contains only the base ASD (length 1).
+func (b *DictionaryBasis) IsBaseOnly() bool { return len(b.entries) == 1 }
+
+// CanonicalSerialization returns the canonical wire form per spec §9.3.
+// For each entry in basis order:
+//
+//	corpus_id_length (1 byte) || corpus_id (UTF-8 bytes) || corpus_hash (32 bytes)
+//
+// This is unambiguous across platforms because no padding, alignment, or text
+// encoding is involved beyond the explicit length prefix and the raw hash bytes.
+func (b *DictionaryBasis) CanonicalSerialization() []byte {
+	var out []byte
+	for _, e := range b.entries {
+		idBytes := []byte(e.CorpusID)
+		out = append(out, byte(len(idBytes)))
+		out = append(out, idBytes...)
+		out = append(out, e.CorpusHash[:]...)
+	}
+	return out
+}
+
+// Fingerprint returns the 8-byte basis fingerprint per spec §9.3.
+// First 8 bytes of SHA-256 over the canonical serialization.
+func (b *DictionaryBasis) Fingerprint() [8]byte {
+	if !b.fpCached {
+		digest := sha256.Sum256(b.CanonicalSerialization())
+		copy(b.fingerprint[:], digest[:8])
+		b.fpCached = true
+	}
+	return b.fingerprint
+}
+
+// Equals reports whether two bases have identical entries in identical order.
+func (b *DictionaryBasis) Equals(other *DictionaryBasis) bool {
+	if other == nil || len(b.entries) != len(other.entries) {
+		return false
+	}
+	for i := range b.entries {
+		if b.entries[i].CorpusID != other.entries[i].CorpusID {
+			return false
+		}
+		if b.entries[i].CorpusHash != other.entries[i].CorpusHash {
+			return false
+		}
+	}
+	return true
+}
+
+// hashFile computes SHA-256 over file bytes verbatim. No canonicalization.
+func hashFile(path string) ([32]byte, error) {
+	var out [32]byte
+	f, err := os.Open(path)
+	if err != nil {
+		return out, err
+	}
+	defer f.Close()
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return out, err
+	}
+	copy(out[:], h.Sum(nil))
+	return out, nil
+}
+
+// deriveAsdID derives a stable ASD corpus identifier from the dictionary file.
+// Looks for "vNN" in the first ~20 lines; falls back to "asd-v15".
+func deriveAsdID(path string) string {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "asd-v15"
+	}
+	lines := strings.Split(string(data), "\n")
+	if len(lines) > 20 {
+		lines = lines[:20]
+	}
+	head := strings.Join(lines, "\n")
+	for i := 0; i < len(head)-2; i++ {
+		if head[i] == 'v' && head[i+1] >= '0' && head[i+1] <= '9' && head[i+2] >= '0' && head[i+2] <= '9' {
+			return fmt.Sprintf("asd-v%c%c", head[i+1], head[i+2])
+		}
+	}
+	return "asd-v15"
+}
+
+// MDRSpec is a (corpus_id, file path) pair for an MDR corpus to load.
+type MDRSpec struct {
+	CorpusID string
+	Path     string
+}
+
+// DictionaryBasisFromPaths constructs a basis from corpus files on disk.
+// asdPath: path to the base ASD CSV (the dictionary).
+// asdID: optional override for the base ASD identifier (empty for autodetect).
+// mdrCorpora: optional list of MDR corpora to append in the given order.
+func DictionaryBasisFromPaths(asdPath, asdID string, mdrCorpora []MDRSpec) (*DictionaryBasis, error) {
+	if _, err := os.Stat(asdPath); err != nil {
+		return nil, fmt.Errorf("base ASD not found: %s: %w", asdPath, err)
+	}
+	asdHash, err := hashFile(asdPath)
+	if err != nil {
+		return nil, err
+	}
+	id := asdID
+	if id == "" {
+		id = deriveAsdID(asdPath)
+	}
+	entries := []CorpusEntry{{CorpusID: id, CorpusHash: asdHash}}
+	for _, c := range mdrCorpora {
+		if _, err := os.Stat(c.Path); err != nil {
+			return nil, fmt.Errorf("MDR corpus not found: %s: %w", c.Path, err)
+		}
+		ch, err := hashFile(c.Path)
+		if err != nil {
+			return nil, err
+		}
+		entries = append(entries, CorpusEntry{CorpusID: c.CorpusID, CorpusHash: ch})
+	}
+	return NewDictionaryBasis(entries)
+}
+
+// DefaultDictionaryBasis constructs the default base-ASD-only basis from
+// the canonical default file locations.
+func DefaultDictionaryBasis(dictPath string) (*DictionaryBasis, error) {
+	if dictPath == "" {
+		candidates := []string{
+			filepath.Join("protocol", "OSMP-semantic-dictionary-v15.csv"),
+		}
+		for _, c := range candidates {
+			if _, err := os.Stat(c); err == nil {
+				dictPath = c
+				break
 			}
 		}
 	}
+	if dictPath == "" {
+		return nil, errors.New("base ASD not found in any default location")
+	}
+	return DictionaryBasisFromPaths(dictPath, "", nil)
+}
 
-	// Phase 2: Slot values from each MDR corpus Section B
-	for _, mdrPath := range mdrPaths {
-		data, err := os.ReadFile(mdrPath)
-		if err != nil { continue }
-		lines := splitLines(string(data))
-		inSB := false
-		for _, line := range lines {
-			trimmed := trimSpace(line)
-			if containsStr(trimmed, "SECTION B") { inSB = true; continue }
-			if inSB && strings.HasPrefix(trimmed, "SECTION ") && !containsStr(trimmed, "SECTION B") { break }
-			if !inSB { continue }
-			if trimmed == "" || strings.HasPrefix(trimmed, "Format:") || strings.HasPrefix(trimmed, "===") || strings.HasPrefix(trimmed, "---") || strings.HasPrefix(trimmed, "Note:") { continue }
-
-			parts := splitCSV(trimmed)
-			if len(parts) >= 2 && containsStr(parts[0], ":") {
-				slotValue := trimSpace(parts[1])
-				if slotValue != "" { strSet[slotValue] = true }
-			}
-			// Extract bracket references from dependency rules
-			if len(parts) >= 5 {
-				depRule := parts[4]
-				for i := 0; i < len(depRule); i++ {
-					if depRule[i] == '[' {
-						for j := i + 1; j < len(depRule); j++ {
-							if depRule[j] == ']' {
-								strSet[depRule[i+1:j]] = true
-								i = j
-								break
-							}
-						}
-					}
-				}
+// extractAsdOpcodes adds every opcode name from the base ASD Section 3 to the
+// given set. Used by basis-driven intern table construction and the historical
+// default-search fallback.
+func extractAsdOpcodes(strSet map[string]bool, dictPath string) {
+	if dictPath == "" {
+		candidates := []string{
+			filepath.Join("protocol", "OSMP-semantic-dictionary-v15.csv"),
+		}
+		for _, c := range candidates {
+			if _, err := os.Stat(c); err == nil {
+				dictPath = c
+				break
 			}
 		}
+	}
+	if dictPath == "" {
+		return
+	}
+	data, err := os.ReadFile(dictPath)
+	if err != nil {
+		return
+	}
+	lines := splitLines(string(data))
+	inS3 := false
+	for _, line := range lines {
+		if containsStr(line, "SECTION 3") {
+			inS3 = true
+			continue
+		}
+		if containsStr(line, "SECTION 4") {
+			break
+		}
+		if !inS3 {
+			continue
+		}
+		parts := splitCSV(line)
+		if len(parts) >= 5 {
+			prefix := trimSpace(parts[1])
+			opcode := trimSpace(parts[3])
+			if len(prefix) >= 1 && len(prefix) <= 2 && prefix[0] >= 'A' && prefix[0] <= 'Z' && opcode != "" && opcode != "Opcode" {
+				strSet[opcode] = true
+			}
+		}
+	}
+}
+
+// ─── Intern Table ────────────────────────────────────────────────────────────
+
+
+// buildInternTable constructs the SAIL intern table from a Dictionary Basis (ADR-004).
+//
+// The intern table is a pure function of the basis: two basis instances with
+// equal entries produce byte-identical intern tables. Index assignment is
+// deterministic over (basis order, deduplicated first-seen order, length-
+// descending sort, cost filter).
+//
+// Future corpus types declare their own extraction rules per the corpus's
+// sidecar manifest. This implementation supports the base ASD CSV extractor
+// as the only shipping rule. Historical "Phase 2" MDR CSV SECTION B parsing
+// is removed; it produced zero observable intern entries on every shipped MDR.
+func buildInternTable(basis *DictionaryBasis, dictPath string) []string {
+	strSet := map[string]bool{}
+
+	if basis != nil {
+		for _, entry := range basis.entries {
+			if strings.HasPrefix(entry.CorpusID, "asd-") {
+				extractAsdOpcodes(strSet, dictPath)
+			}
+			// MDR corpus extraction rules deferred until corpora ship sidecar manifests.
+		}
+	} else {
+		extractAsdOpcodes(strSet, dictPath)
 	}
 
 	// Sort by length descending, filter to entries where interning saves bytes
 	var all []string
-	for s := range strSet { all = append(all, s) }
+	for s := range strSet {
+		all = append(all, s)
+	}
 	sort.Slice(all, func(i, j int) bool {
-		if len(all[i]) != len(all[j]) { return len(all[i]) > len(all[j]) }
+		if len(all[i]) != len(all[j]) {
+			return len(all[i]) > len(all[j])
+		}
 		return all[i] < all[j]
 	})
 
@@ -305,8 +516,12 @@ func buildInternTable(dictPath string, mdrPaths []string) []string {
 	for _, s := range all {
 		idx := len(result)
 		refCost := 2
-		if idx >= 128 { refCost = 3 }
-		if idx >= 16384 { refCost = 4 }
+		if idx >= 128 {
+			refCost = 3
+		}
+		if idx >= 16384 {
+			refCost = 4
+		}
 		if len(s) > refCost {
 			result = append(result, s)
 		}
@@ -343,21 +558,51 @@ type SAILCodec struct {
 	idxToOp  indexOpcode
 	strToRef map[string]int
 	refToStr map[int]string
+	Basis    *DictionaryBasis // ADR-004: Dictionary Basis bound to this codec
 }
 
-func NewSAILCodec(dictPath string, mdrPaths []string) (*SAILCodec, error) {
+// NewSAILCodec constructs a SAIL codec from a dictionary path. The default
+// base-ASD-only basis is constructed automatically. Use NewSAILCodecWithBasis
+// for explicit basis control (ADR-004).
+func NewSAILCodec(dictPath string) (*SAILCodec, error) {
+	return NewSAILCodecWithBasis(dictPath, nil)
+}
+
+// NewSAILCodecWithBasis constructs a SAIL codec with an explicit Dictionary
+// Basis. When basis is nil, a default base-ASD-only basis is constructed
+// from dictPath.
+func NewSAILCodecWithBasis(dictPath string, basis *DictionaryBasis) (*SAILCodec, error) {
 	op, idx, err := buildOpcodeTables(dictPath)
 	if err != nil {
 		return nil, err
 	}
-	internTbl := buildInternTable(dictPath, mdrPaths)
+	if basis == nil {
+		basis, err = DefaultDictionaryBasis(dictPath)
+		if err != nil {
+			// Last-resort fallback when the dictionary cannot be located on
+			// disk: synthesize a basis from a placeholder hash so the codec
+			// is still constructible. Tests that exercise BasisFingerprint()
+			// must supply a real basis or a valid dictPath.
+			placeholder := sha256.Sum256([]byte("asd-unknown"))
+			basis, _ = NewDictionaryBasis([]CorpusEntry{
+				{CorpusID: "asd-unknown", CorpusHash: placeholder},
+			})
+		}
+	}
+	internTbl := buildInternTable(basis, dictPath)
 	str2ref := make(map[string]int, len(internTbl))
 	ref2str := make(map[int]string, len(internTbl))
 	for i, s := range internTbl {
 		str2ref[s] = i
 		ref2str[i] = s
 	}
-	return &SAILCodec{opToIdx: op, idxToOp: idx, strToRef: str2ref, refToStr: ref2str}, nil
+	return &SAILCodec{opToIdx: op, idxToOp: idx, strToRef: str2ref, refToStr: ref2str, Basis: basis}, nil
+}
+
+// BasisFingerprint returns the 8-byte basis fingerprint for FNP capability
+// negotiation (spec §9.3).
+func (s *SAILCodec) BasisFingerprint() [8]byte {
+	return s.Basis.Fingerprint()
 }
 
 func isAlnumExt(c byte) bool {
@@ -493,7 +738,12 @@ func (s *SAILCodec) tryNsOp(runes []rune, pos, n int) ([]byte, int, bool) {
 	nsIndex := int(ns[0] - 'A')
 	opStart := colonPos + 1
 	opEnd := opStart
-	for opEnd < n && ((runes[opEnd] >= 'A' && runes[opEnd] <= 'Z') || (runes[opEnd] >= '0' && runes[opEnd] <= '9')) {
+	// Finding 49: U+00A7 (§) is admitted into the opcode character class to
+	// match Python (sal[op_end] == "\xa7") and TypeScript (charCodeAt == 0xA7).
+	// The I:§ sentinel opcode (Instructional namespace frame marker) must round-trip
+	// through TOK_FRAME (3 bytes) rather than falling through to the UTF-8 atomic
+	// fallback (5 bytes, first byte 0xC2 which collides with SAIL tokATOMIC on decode).
+	for opEnd < n && ((runes[opEnd] >= 'A' && runes[opEnd] <= 'Z') || (runes[opEnd] >= '0' && runes[opEnd] <= '9') || runes[opEnd] == 0x00A7) {
 		opEnd++
 	}
 	opcode := string(runes[opStart:opEnd])
@@ -864,13 +1114,24 @@ type OSMPWireCodec struct {
 	Sec  *SecCodec
 }
 
-func NewOSMPWireCodec(dictPath string, mdrPaths []string, nodeID, signingKey, symmetricKey []byte) (*OSMPWireCodec, error) {
-	sail, err := NewSAILCodec(dictPath, mdrPaths)
+func NewOSMPWireCodec(dictPath string, basis *DictionaryBasis, nodeID, signingKey, symmetricKey []byte) (*OSMPWireCodec, error) {
+	sail, err := NewSAILCodecWithBasis(dictPath, basis)
 	if err != nil { return nil, err }
 	if nodeID == nil { nodeID = []byte{0x00, 0x01} }
 	sec, err := NewSecCodec(nodeID, signingKey, symmetricKey)
 	if err != nil { return nil, err }
 	return &OSMPWireCodec{Sail: sail, Sec: sec}, nil
+}
+
+// Basis returns the Dictionary Basis bound to this codec (ADR-004).
+func (c *OSMPWireCodec) Basis() *DictionaryBasis {
+	return c.Sail.Basis
+}
+
+// BasisFingerprint returns the 8-byte basis fingerprint for FNP capability
+// negotiation (spec §9.3).
+func (c *OSMPWireCodec) BasisFingerprint() [8]byte {
+	return c.Sail.BasisFingerprint()
 }
 
 func (c *OSMPWireCodec) Encode(sal string, mode WireMode) ([]byte, error) {

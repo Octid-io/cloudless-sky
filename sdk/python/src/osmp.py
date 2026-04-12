@@ -2,9 +2,9 @@
 OSMP Python Reference Implementation
 Octid Semantic Mesh Protocol — Cloudless Sky Project
 
-Source of truth: OSMP-semantic-dictionary-v14.csv | OSMP-SPEC-v1.md | SAL-grammar.ebnf
+Source of truth: OSMP-semantic-dictionary-v15.csv | OSMP-SPEC-v1.md | SAL-grammar.ebnf
 All opcode names, definitions, and namespace assignments are drawn directly from the
-canonical semantic dictionary v14.0, not from any prior implementation.
+canonical semantic dictionary v15.0, not from any prior implementation.
 
 Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
 License: Apache 2.0
@@ -31,7 +31,7 @@ except ImportError:
 
 # ─────────────────────────────────────────────────────────────────────────────
 # GLYPH OPERATOR TABLE — Category 1 (18 operators)
-# Source: OSMP-semantic-dictionary-v14.csv Section 1, Category 1
+# Source: OSMP-semantic-dictionary-v15.csv Section 1, Category 1
 # ─────────────────────────────────────────────────────────────────────────────
 
 GLYPH_OPERATORS: dict[str, dict] = {
@@ -61,7 +61,7 @@ COMPOUND_OPERATORS: dict[str, dict] = {
 
 # ─────────────────────────────────────────────────────────────────────────────
 # CATEGORY 2 — CONSEQUENCE CLASS DESIGNATORS
-# Source: dictionary v14 Section 1 Category 2
+# Source: dictionary v15Section 1 Category 2
 # ─────────────────────────────────────────────────────────────────────────────
 
 CONSEQUENCE_CLASSES: dict[str, dict] = {
@@ -165,7 +165,7 @@ FLAG_EXTENDED_DEP     = 0b00001000   # Tier 3: payload prefix is u32 dependency 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SLOT VALUE ENCODING TABLE
-# Source: dictionary v14 Section 2
+# Source: dictionary v15Section 2
 # Single-character codes for all finite enumerated slot value sets.
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -209,7 +209,7 @@ SLOT_VALUES: dict[str, dict[str, str]] = {
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ASD BASIS SET — Guaranteed minimum operational vocabulary floor v1.0
-# Source of truth: OSMP-semantic-dictionary-v14.csv Section 3
+# Source of truth: OSMP-semantic-dictionary-v15.csv Section 3
 # Every opcode name and definition drawn directly from the canonical dictionary.
 # DO NOT MODIFY opcode names or definitions — they are protocol wire format.
 # ─────────────────────────────────────────────────────────────────────────────
