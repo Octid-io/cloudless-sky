@@ -220,7 +220,6 @@ ASD_BASIS: dict[str, dict[str, str]] = {
     "A": {
         "ACCEPT":  "accept_proposed_action",
         "ACK":     "positive_acknowledgment",
-        "ADJ":     "adjust_agent_behavior",
         "AR":      "agentic_request",
         "ASD":     "asd_version_identity_or_delta",
         "AUTH":    "authorization_assertion",
@@ -398,7 +397,6 @@ ASD_BASIS: dict[str, dict[str, str]] = {
         "STS":  "status",
     },
     "O": {
-        "ADJ":        "adjust_operational_parameter",
         "BW":         "available_bandwidth",
         "LVL":        "authority_level",
         "CHAN":        "active_channel_type",
@@ -454,7 +452,6 @@ ASD_BASIS: dict[str, dict[str, str]] = {
     "R": {
         # Physical agent opcodes — consequence class mandatory on all R instructions
         "ACC":     "accelerate_behavioral",
-        "ADJ":     "adjust_physical_calibration",
         "BRK":     "brake_actuator",
         "COLLAB":  "collaborative_mode",
         "DECEL":   "decelerate_behavioral",
@@ -611,7 +608,6 @@ ASD_BASIS: dict[str, dict[str, str]] = {
     },
     "Z": {
         # Z:INF is the canonical opcode — invoke_inference
-        "ADJ":     "adjust_inference_parameter",
         "BATCH":   "batch_inference_request",
         "CACHE":   "kv_cache_utilization_instruction",
         "CAPS":    "capability_query",

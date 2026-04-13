@@ -72,13 +72,12 @@ export const DICT_UPDATE_MODES: Record<string, { unicode: string; name: string; 
   "†": { unicode: "U+2020", name: "DEPRECATE", bytes: 3 },
 };
 
-// ASD_BASIS — 26 namespaces, 356 opcodes
+// ASD_BASIS — 26 namespaces, 352 opcodes
 // Source: dictionary v15
 export const ASD_BASIS: Record<string, Record<string, string>> = {
   "A": {
     "ACCEPT": "accept_proposed_action",
     "ACK": "positive_acknowledgment",
-    "ADJ": "adjust_agent_behavior",
     "AR": "agentic_request",
     "ASD": "asd_version_identity_or_delta",
     "AUTH": "authorization_assertion",
@@ -250,7 +249,6 @@ export const ASD_BASIS: Record<string, Record<string, string>> = {
     "STS": "status",
   },
   "O": {
-    "ADJ": "adjust_operational_parameter",
     "BW": "available_bandwidth",
     "CHAN": "active_channel_type",
     "CONOPS": "concept_of_operations",
@@ -306,7 +304,6 @@ export const ASD_BASIS: Record<string, Record<string, string>> = {
   "R": {
     "ACC": "accelerate_behavioral",
     "ACCEL": "accelerometer_data_stream",
-    "ADJ": "adjust_physical_calibration",
     "BRK": "brake_actuator",
     "BT": "bluetooth_state",
     "CAM": "camera_activation",
@@ -460,7 +457,6 @@ export const ASD_BASIS: Record<string, Record<string, string>> = {
     "USG": "report_memory_utilization",
   },
   "Z": {
-    "ADJ": "adjust_inference_parameter",
     "BATCH": "batch_inference_request",
     "CACHE": "kv_cache_utilization_instruction",
     "CAPS": "capability_query",

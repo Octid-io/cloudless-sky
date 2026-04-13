@@ -220,7 +220,6 @@ Agentic / OSMP-Native,A,Agentic / OSMP-Native,TXN,transaction_gate,1,OSMP-define
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,VERIFY,request_output_verification,1,OSMP-defined,Claim 3,1.0
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,PERM,permission_grant — agent permission assertion; measurement-validated sibling of A:AUTH authorization_assertion,1,OSMP-defined,CIP-v15,1.0
 Agentic / OSMP-Native,A,Agentic / OSMP-Native,CMPLY,comply_with_proposed_action — commitment to execute a proposed action; mid-gradient between A:ACK (weakest) and A:ACCEPT (strongest),1,OSMP-defined; consent-gradient framing from LLM-as-judge literature,CIP-v15,1.0
-Agentic / OSMP-Native,A,Agentic / OSMP-Native,ADJ,adjust_agent_behavior — agent self-behavioral adjustment,1,OSMP-defined,CIP-v15,1.0
 Building / Construction,B,Building / Construction,AP,access_point,1,IBC | NFPA,Claim 3,1.0
 Building / Construction,B,Building / Construction,ALRM,building_alarm — NFPA 72 fire alarm or occupant alert; refined from v14 B:BA,1,IBC | NFPA,Claim 3,1.0
 Building / Construction,B,Building / Construction,AREA,building_sector_or_area — partition of a facility for alerting or routing; refined from v14 B:BS,1,IBC | NFPA,Claim 3,1.0
@@ -381,7 +380,6 @@ Operational Context / Environment,O,Operational Context / Environment,SCOPE,oper
 Operational Context / Environment,O,Operational Context / Environment,TEMPO,operational_tempo — 1=routine 2=elevated 3=urgent 4=critical,1,FEMA ICS/NIMS | MIL-STD-2525D,Claim 31; CIP-26,1.0
 Operational Context / Environment,O,Operational Context / Environment,TYP,incident_or_operation_type — categorical classifier; refined from v14 O:TYPE,1,FEMA ICS/NIMS,Claim 31; CIP-26,1.0
 Operational Context / Environment,O,Operational Context / Environment,UPLINK,uplink_availability — slot values: A=available U=unavailable I=intermittent,1,OSMP-defined,Claim 31; CIP-26,1.0
-Operational Context / Environment,O,Operational Context / Environment,ADJ,adjust_operational_parameter — operational parameter tuning,1,NIMS | ICS,CIP-v15,1.0
 Procedural / Maintenance,P,Procedural / Maintenance,CODE,maintenance_code_reference_for_compliance_logging,1,iFixit | CPT-adjacent codes,Claim 14,1.0
 Procedural / Maintenance,P,Procedural / Maintenance,DEVICE,device_class_being_maintained,1,iFixit | CPT-adjacent codes,Claim 14,1.0
 Procedural / Maintenance,P,Procedural / Maintenance,GUIDE,procedure_guide_reference,1,iFixit | CPT-adjacent codes,Claim 14,1.0
@@ -447,7 +445,6 @@ Robotic / Physical Agent,R,Robotic / Physical Agent,ACC,"accelerate_behavioral �
 Robotic / Physical Agent,R,Robotic / Physical Agent,THR,throttle_actuator — direct throttle actuator command; control-layer pair with R:ACC behavioral command,1,SAE J3016 | aerospace and automotive control systems,CIP-v15,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,DECEL,"decelerate_behavioral — reduce speed behavioral command; means unspecified, receiving system selects coast/engine-brake/friction-brake/regen",1,SAE J3016 OEDR | ISO 22736,CIP-v15,1.0
 Robotic / Physical Agent,R,Robotic / Physical Agent,BRK,brake_actuator — direct brake actuator engagement command; control-layer pair with R:DECEL behavioral command,1,SAE J3016 | automotive brake-by-wire,CIP-v15,1.0
-Robotic / Physical Agent,R,Robotic / Physical Agent,ADJ,adjust_physical_calibration — physical system calibration or parameter adjustment,1,ROS2 | servo control literature,CIP-v15,1.0
 Security / Cryptographic,S,Security / Cryptographic,ATST,attest,1,FIPS 140-3 | RFC 8446 (TLS 1.3) | RFC 8017 (RSA) | RFC 7748 (X25519) | RFC 9580 (OpenPGP) | NIST SP 800-131A,Claim 14,1.0
 Security / Cryptographic,S,Security / Cryptographic,CERT,certificate_operation,1,FIPS 140-3 | RFC 8446 (TLS 1.3) | RFC 8017 (RSA) | RFC 7748 (X25519) | RFC 9580 (OpenPGP) | NIST SP 800-131A,Claim 14,1.0
 Security / Cryptographic,S,Security / Cryptographic,DEC,decrypt — UTIL spec: S:DECRYPT,1,FIPS 140-3 | RFC 8446,Claim 14,1.0
@@ -577,7 +574,6 @@ Model / Inference Operations,Z,Model / Inference Operations,TEMP,temperature_par
 Model / Inference Operations,Z,Model / Inference Operations,TOKENS,token_count_report — UTIL spec: Z:TOKENS,1,OpenAI API | Anthropic API | Google Vertex AI,Claim 30; CIP-33,1.0
 Model / Inference Operations,Z,Model / Inference Operations,TOPK,top_k_sampling_parameter,1,OpenAI API | Anthropic API | Google Vertex AI | Hugging Face,Claim 30; CIP-33,1.0
 Model / Inference Operations,Z,Model / Inference Operations,TOPP,top_p_nucleus_sampling_parameter,1,OpenAI API | Anthropic API | Google Vertex AI | Hugging Face,Claim 30; CIP-33,1.0
-Model / Inference Operations,Z,Model / Inference Operations,ADJ,adjust_inference_parameter — model inference parameter adjustment (temperature/top_p/top_k/seed),1,MCP 2025-06-18 | LangChain | llama.cpp,CIP-v15,1.0
 Sovereign Extension,Ω:,Implementer-defined,<sovereign-opcode>,<sovereign-definition> — Tier 3; implementing party defines without registration or central approval; Ω selected because Omega is the last character of the Greek alphabet: the beyond-the-defined-set space,1,Implementing party authority,Claims 14 | 32; CIP-35,1.0
 
 SECTION 4: TIER 2 NAMESPACE ADDRESS SPACE

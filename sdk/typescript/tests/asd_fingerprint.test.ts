@@ -23,7 +23,7 @@ import { describe, it, expect } from "vitest";
 import { AdaptiveSharedDictionary } from "../src/asd.js";
 import { ASD_BASIS } from "../src/glyphs.js";
 
-// The canonical ASD fingerprint for dictionary v14 (356 opcodes, 26 namespaces).
+// The canonical ASD fingerprint for dictionary v14 (352 opcodes, 26 namespaces).
 // This value MUST match the output of the equivalent Python computation:
 //
 //   python3 -c "import sys; sys.path.insert(0, 'sdk/python'); \
@@ -57,12 +57,12 @@ describe("ASD Cross-SDK Fingerprint", () => {
     expect(Object.keys(ASD_BASIS).length).toBe(26);
   });
 
-  it("ASD_BASIS contains 356 opcodes total", () => {
+  it("ASD_BASIS contains 352 opcodes total", () => {
     let total = 0;
     for (const ops of Object.values(ASD_BASIS)) {
       total += Object.keys(ops).length;
     }
-    expect(total).toBe(356);
+    expect(total).toBe(352);
   });
 
   it("canonical JSON is deterministic", () => {

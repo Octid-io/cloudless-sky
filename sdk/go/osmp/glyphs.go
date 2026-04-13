@@ -62,12 +62,11 @@ var DictUpdateModeGlyphs = map[string]string{
 }
 
 // ASDFloorBasis is the compiled-in ASD basis set.
-// Source: dictionary v15 (26 namespaces, 356 opcodes)
+// Source: dictionary v15 (26 namespaces, 352 opcodes)
 var ASDFloorBasis = map[string]map[string]string{
 	"A": {
 		"ACCEPT": "accept_proposed_action",
 		"ACK": "positive_acknowledgment",
-		"ADJ": "adjust_agent_behavior",
 		"AR": "agentic_request",
 		"ASD": "asd_version_identity_or_delta",
 		"AUTH": "authorization_assertion",
@@ -239,7 +238,6 @@ var ASDFloorBasis = map[string]map[string]string{
 		"STS": "status",
 	},
 	"O": {
-		"ADJ": "adjust_operational_parameter",
 		"BW": "available_bandwidth",
 		"CHAN": "active_channel_type",
 		"CONOPS": "concept_of_operations",
@@ -295,7 +293,6 @@ var ASDFloorBasis = map[string]map[string]string{
 	"R": {
 		"ACC": "accelerate_behavioral",
 		"ACCEL": "accelerometer_data_stream",
-		"ADJ": "adjust_physical_calibration",
 		"BRK": "brake_actuator",
 		"BT": "bluetooth_state",
 		"CAM": "camera_activation",
@@ -449,7 +446,6 @@ var ASDFloorBasis = map[string]map[string]string{
 		"USG": "report_memory_utilization",
 	},
 	"Z": {
-		"ADJ": "adjust_inference_parameter",
 		"BATCH": "batch_inference_request",
 		"CACHE": "kv_cache_utilization_instruction",
 		"CAPS": "capability_query",

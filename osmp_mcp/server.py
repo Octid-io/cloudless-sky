@@ -255,7 +255,7 @@ def osmp_lookup(namespace: str = "", keyword: str = "") -> str:
       osmp_lookup(namespace="R") -- all opcodes in the Robotics namespace
       osmp_lookup(keyword="heart") -- all opcodes containing "heart" in name or definition
       osmp_lookup(namespace="H", keyword="rate") -- H namespace opcodes matching "rate"
-      osmp_lookup() -- dump entire dictionary (356 opcodes across 26 namespaces)"""
+      osmp_lookup() -- dump entire dictionary (352 opcodes across 26 namespaces)"""
     asd = AdaptiveSharedDictionary()
     results = []
     kw = keyword.lower().strip()
@@ -764,7 +764,7 @@ OSMP is a shared dictionary between agents. When two nodes have the
 same dictionary, they communicate by table lookup. No parsing, no
 inference, no ambiguity. The dictionary is the translation layer.
 
-356 opcodes. 26 namespaces. Three loss tolerance policies.
+352 opcodes. 26 namespaces. Three loss tolerance policies.
 The floor is 51 bytes. Everything above it is free scaling.
 
 octid.io | github.com/octid-io/cloudless-sky

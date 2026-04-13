@@ -156,11 +156,13 @@ func main() {
 '''
 
 def decode_ts_batch(encoded_list):
-    script = "/home/claude/cloudless-sky/sdk/typescript/dist/_runner.mjs"
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    ts_dist = os.path.join(repo_root, "sdk", "typescript", "dist")
+    script = os.path.join(ts_dist, "_runner.mjs")
     with open(script,"w") as f: f.write(TS_RUNNER)
     result = subprocess.run(["node", script, json.dumps(encoded_list)],
                             capture_output=True, text=True,
-                            cwd="/home/claude/cloudless-sky/sdk/typescript/dist")
+                            cwd=ts_dist)
     try: os.unlink(script)
     except: pass
     if result.returncode != 0: raise RuntimeError(f"TS runner failed: {result.stderr[:200]}")

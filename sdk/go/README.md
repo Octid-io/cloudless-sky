@@ -1,6 +1,6 @@
 # OSMP Go SDK
 
-Go implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, and validates agentic AI instructions using SAL (Semantic Assembly Language). 356 opcodes across 26 namespaces. Inference-free decode by table lookup. ASD compiled-in; D:PACK/BLK via `klauspost/compress/zstd`.
+Go implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, and validates agentic AI instructions using SAL (Semantic Assembly Language). 352 opcodes across 26 namespaces. Inference-free decode by table lookup. ASD compiled-in; D:PACK/BLK via `klauspost/compress/zstd`.
 
 ## Install
 
