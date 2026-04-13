@@ -42,10 +42,14 @@ Source constants (all from sdk/python/osmp/protocol.py):
   - ASD_BASIS
 
 Target files:
-  - sdk/typescript/src/glyphs.ts  (full record objects with nl arrays)
+  - sdk/typescript/src/glyphs.ts    (full record objects with nl arrays)
   - sdk/go/osmp/glyphs.go          (simpler maps: glyph -> name only
                                      for the glyph tables, and the
                                      full ASDFloorBasis)
+  - sdk/typescript/tests/asd_fingerprint.test.ts
+                                    (canonical fingerprint constant and
+                                     opcode count — auto-patched between
+                                     the AUTO-UPDATED markers)
 
 Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
 License: Apache 2.0
@@ -56,6 +60,7 @@ from __future__ import annotations
 import argparse
 import difflib
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -80,6 +85,7 @@ from osmp.protocol import (  # noqa: E402
 
 TS_OUTPUT = REPO_ROOT / "sdk" / "typescript" / "src" / "glyphs.ts"
 GO_OUTPUT = REPO_ROOT / "sdk" / "go" / "osmp" / "glyphs.go"
+TS_FINGERPRINT_TEST = REPO_ROOT / "sdk" / "typescript" / "tests" / "asd_fingerprint.test.ts"
 
 
 # ── Dictionary version detection ──────────────────────────────────────────
@@ -353,6 +359,68 @@ def generate_go() -> str:
     return "\n".join(lines)
 
 
+# ── Test constant patching ────────────────────────────────────────────────
+
+def patch_ts_fingerprint_test() -> str:
+    """Patch the auto-generated constants in the TS fingerprint test.
+
+    Reads the existing test file and replaces:
+      - the CANONICAL_FINGERPRINT_V{N} constant (value and version tag)
+      - the opcode-count comment in the auto-updated block
+      - the total-opcode toBe() assertion
+      - all references to the old variable name throughout the file
+
+    Returns the fully patched file content, suitable for comparison in
+    --check mode or writing in generation mode.
+    """
+    from osmp.protocol import AdaptiveSharedDictionary
+
+    content = TS_FINGERPRINT_TEST.read_text(encoding="utf-8")
+    fp = AdaptiveSharedDictionary().fingerprint()
+    n_opcodes = sum(len(ops) for ops in ASD_BASIS.values())
+    ver = DICT_VERSION          # e.g., "v15"
+    ver_num = ver[1:]           # e.g., "15"
+
+    # Replace the auto-updated block between markers
+    new_block = (
+        f"// --- AUTO-UPDATED by tools/gen_asd.py --- do not edit manually ---\n"
+        f"// The canonical ASD fingerprint for dictionary {ver} "
+        f"({n_opcodes} opcodes, {len(ASD_BASIS)} namespaces).\n"
+        f"// This value MUST match the output of the equivalent Python computation:\n"
+        f"//\n"
+        f"//   python3 -c \"import sys; sys.path.insert(0, 'sdk/python'); \\\\\n"
+        f"//     from osmp.protocol import AdaptiveSharedDictionary; \\\\\n"
+        f"//     print(AdaptiveSharedDictionary().fingerprint())\"\n"
+        f"//\n"
+        f"// If this test fails, run: python3 tools/gen_asd.py\n"
+        f"// That regenerates glyphs AND this constant from the canonical Python source.\n"
+        f"const CANONICAL_FINGERPRINT_V{ver_num} = \"{fp}\";\n"
+        f"// --- END AUTO-UPDATED ---"
+    )
+    content = re.sub(
+        r"// --- AUTO-UPDATED by tools/gen_asd\.py ---.*?// --- END AUTO-UPDATED ---",
+        new_block,
+        content,
+        flags=re.DOTALL,
+    )
+
+    # Update all references to old fingerprint variable names
+    content = re.sub(
+        r"CANONICAL_FINGERPRINT_V\d+",
+        f"CANONICAL_FINGERPRINT_V{ver_num}",
+        content,
+    )
+
+    # Update the total opcode count assertion
+    content = re.sub(
+        r"expect\(total\)\.toBe\(\d+\)",
+        f"expect(total).toBe({n_opcodes})",
+        content,
+    )
+
+    return content
+
+
 # ── Drift detection ───────────────────────────────────────────────────────
 
 def show_diff(path: Path, new_content: str) -> bool:
@@ -410,6 +478,8 @@ def main() -> int:
     targets: list[tuple[str, Path, str]] = []
     if not args.go_only:
         targets.append(("TypeScript", TS_OUTPUT, generate_ts()))
+        targets.append(("TS fingerprint test", TS_FINGERPRINT_TEST,
+                         patch_ts_fingerprint_test()))
     if not args.ts_only:
         targets.append(("Go", GO_OUTPUT, generate_go()))
 
