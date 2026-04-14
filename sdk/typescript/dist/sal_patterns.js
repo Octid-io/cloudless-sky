@@ -13,7 +13,7 @@
  * `osmp/protocol.py` and the Go `nsPattern` / `opcodePattern` constants in
  * `sdk/go/osmp/sal_patterns.go`.
  *
- * Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+ * Patent pending -- inventor Clay Holberg
  * License: Apache 2.0
  */
 // Tier 1 (single char) and Tier 2 (two char) namespaces

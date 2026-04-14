@@ -1,6 +1,6 @@
 /**
  * OSMP SAL Encoder
- * Patent: OSMP-001-UTIL (pending) | License: Apache 2.0
+ * Patent pending | License: Apache 2.0
  */
 import { AdaptiveSharedDictionary } from "./asd.js";
 import { GLYPH_OPERATORS, COMPOUND_OPERATORS, CONSEQUENCE_CLASSES } from "./glyphs.js";

@@ -4,7 +4,7 @@
  * instructions with conditional branches and dependency chains.
  * Analog: Kahn's algorithm (1962) applied to lossy radio fragment streams.
  *
- * Patent: OSMP-001-UTIL claims, spec §8.1 Tier 3 definition.
+ * Spec section 8.1 Tier 3 definition.
  * License: Apache 2.0
  */
 import { LossPolicy, FLAG_TERMINAL, FLAG_CRITICAL, FLAG_EXTENDED_DEP, LORA_STANDARD_BYTES } from "./types.js";

@@ -5,7 +5,7 @@
  * DO NOT EDIT — regenerate via: python3 tools/gen_asd.py
  * Edits to this file will be silently overwritten on the next generation run.
  *
- * Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
+ * Patent pending — inventor Clay Holberg
  * License: Apache 2.0
  */
 export declare const ASD_FLOOR_VERSION = "1.0";

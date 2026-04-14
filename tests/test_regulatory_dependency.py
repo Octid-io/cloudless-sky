@@ -18,7 +18,7 @@ CHAIN_FRAME_RE) so any future glyph additions only require one change
 and stay consistent across the validator and the regulatory_dependency
 parser.
 
-Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 

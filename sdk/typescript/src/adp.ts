@@ -5,7 +5,6 @@
  * version identity exchange, delta delivery, micro-delta, hash verification,
  * and MDR corpus version tracking.
  *
- * Patent ref: OSMP-001-UTIL Claims 20-21, Section VII.F, X-L
  * License: Apache 2.0
  */
 

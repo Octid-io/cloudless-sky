@@ -57,7 +57,7 @@ The ``--verify`` flag runs the build, then resolves a curated set of canonical
 test codes (J93.0, R00.1, I25.10, etc.) to confirm the lookup interface works
 end-to-end. Returns non-zero exit if any verification case fails.
 
-Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 

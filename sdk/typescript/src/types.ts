@@ -1,6 +1,6 @@
 /**
  * OSMP Type Definitions
- * Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg | License: Apache 2.0
+ * Patent pending — inventor Clay Holberg | License: Apache 2.0
  */
 export interface DecodedInstruction {
   namespace: string; opcode: string; opcodeMeaning: string | null;

@@ -17,7 +17,7 @@ The fix has two parts:
      either "J93.0" (the form an LLM trained on real ICD documentation
      produces) or "J930" (the canonical CMS dpack key) interchangeably.
 
-Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 

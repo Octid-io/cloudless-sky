@@ -13,7 +13,7 @@ the test suite so any divergence between the Python source and the
 on-disk TS/Go files triggers a test failure that names the specific
 file that drifted.
 
-Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 

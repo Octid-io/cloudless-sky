@@ -6,7 +6,7 @@ Source of truth: OSMP-semantic-dictionary-v15.csv | OSMP-SPEC-v1.0.2.md | SAL-gr
 All opcode names, definitions, and namespace assignments are drawn directly from the
 canonical semantic dictionary v15.0, not from any prior implementation.
 
-Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
+Patent pending — inventor Clay Holberg
 License: Apache 2.0
 """
 
@@ -729,7 +729,6 @@ class AdaptiveSharedDictionary:
 #   ADV_SENT -> timeout -> IDLE
 #   IDLE -> receive ADV -> send ACK -> ESTABLISHED or SYNC_NEEDED
 #
-# Patent ref: OSMP-001-UTIL Section II.C, FIG. 5
 # ─────────────────────────────────────────────────────────────────────────────
 
 FNP_MSG_ADV  = 0x01
@@ -1201,7 +1200,7 @@ class FNPSession:
 # MINOR increments on additive changes (ADD/DEPRECATE/EXTEND). Resets on MAJOR.
 # Breaking-change detection from version number alone: compare upper bytes.
 #
-# Patent ref: OSMP-001-UTIL Section VII.F (tripartite resolution flags)
+# Tripartite resolution flags
 # ─────────────────────────────────────────────────────────────────────────────
 
 def asd_version_pack(major: int, minor: int) -> int:
@@ -1254,7 +1253,6 @@ def asd_version_is_breaking(old_u16: int, new_u16: int) -> bool:
 #   3. Background delta (A:ASD:DELTA)
 #   4. Trickle charge request (A:ASD:REQ)
 #
-# Patent ref: OSMP-001-UTIL Claims 20-21, Section VII.F, X-L
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ADP instruction priorities (lower = higher priority)
@@ -1336,7 +1334,6 @@ class ADPSession:
         if result.pending:
             micro_req = result.micro_delta_request
 
-    Patent ref: OSMP-001-UTIL Claims 20-21, Section IV.C Step 4, X-L
     """
 
     def __init__(self, asd: AdaptiveSharedDictionary,
@@ -1627,7 +1624,7 @@ class ADPSession:
         """Check if an instruction's opcodes are resolvable. If not, pend it.
 
         This implements the semantic dependency resolution buffer from
-        UTIL Claim 20: instructions referencing undefined opcodes are held
+        Instructions referencing undefined opcodes are held
         as semantically pending until the defining delta unit arrives.
 
         Returns dict with 'resolved', 'pending', optionally 'micro_delta_request'.
@@ -1805,7 +1802,6 @@ _SAL_FRAME_RE_BRIDGE = re.compile(rf'\b({_NS_PATTERN}):({_OPCODE_PATTERN})')
 # Dependency rules are SAL expressions stored in MDR corpora. Enforcement
 # operates within the SAL grammar framework using the same glyph operators
 # as the instructions they govern. No separate rule engine.
-# Patent ref: OSMP-001-UTIL Claim 40 (pending)
 
 # Pattern for prerequisite expressions: NS:OPCODE or NS:OPCODE[SLOT]
 _PREREQ_RE = re.compile(rf'({_NS_PATTERN}):({_OPCODE_PATTERN})(?:\[([^\]]+)\])?')
@@ -2139,7 +2135,7 @@ def validate_composition(
         nl=nl,
     )
 
-# ── Registered Macro Architecture (Claims 37-39, 45) ──────────────────────
+# ── Registered Macro Architecture ──────────────────────────────────────────
 #
 # A registered macro is a pre-validated multi-step SAL instruction chain
 # template stored alongside regular opcodes. Macros eliminate the composition
@@ -2148,8 +2144,8 @@ def validate_composition(
 #
 # Composition priority hierarchy (spec Section 11):
 #   1. Macro invocation (pre-validated, no composition error surface)
-#   2. Individual opcode composition (grammar-constrained, Claim 34)
-#   3. Natural language passthrough (no compression, Claim 31)
+#   2. Individual opcode composition (grammar-constrained)
+#   3. Natural language passthrough (no compression)
 
 @dataclass(frozen=True)
 class SlotDefinition:
@@ -2161,7 +2157,7 @@ class SlotDefinition:
 
 @dataclass(frozen=True)
 class MacroTemplate:
-    """A pre-validated multi-step SAL instruction chain template (Claim 37).
+    """A pre-validated multi-step SAL instruction chain template.
 
     The chain_template contains namespace-prefixed opcodes connected by glyph
     operators, with {slot_name} placeholders at positions where the invoking
@@ -2181,7 +2177,7 @@ class MacroTemplate:
     triggers: tuple[str, ...] = ()
 
 
-# Consequence class severity ordering for inheritance (Claim 45)
+# Consequence class severity ordering for inheritance
 _CC_SEVERITY: dict[str, int] = {
     "\u21ba": 1,  # REVERSIBLE
     "\u26a0": 2,  # HAZARDOUS
@@ -2191,13 +2187,13 @@ _CC_BY_SEVERITY: dict[int, str] = {v: k for k, v in _CC_SEVERITY.items()}
 
 
 class MacroRegistry:
-    """Registry of pre-validated SAL instruction chain templates (Claims 37-39, 45).
+    """Registry of pre-validated SAL instruction chain templates.
 
     Macros are an ASD extension: stored alongside regular opcodes, queried
     through the same lookup path, but with template expansion triggered when
     A:MACRO is detected.
 
-    Patent: OSMP-001-UTIL Claims 37-39, 45
+    Patent pending
     License: Apache 2.0
     """
 
@@ -2206,7 +2202,7 @@ class MacroRegistry:
         self._macros: dict[str, MacroTemplate] = {}
 
     def register(self, template: MacroTemplate) -> None:
-        """Register a macro template (Claim 37).
+        """Register a macro template.
 
         Validates that every opcode in the chain exists in the ASD and that
         all slot placeholders have matching SlotDefinitions. Computes the
@@ -2246,7 +2242,7 @@ class MacroRegistry:
                 f"have no matching placeholder in chain template"
             )
 
-        # Compute inherited consequence class (Claim 45)
+        # Compute inherited consequence class
         cc = self._compute_inherited_cc(clean)
 
         # Store with computed CC if not explicitly set
@@ -2268,7 +2264,7 @@ class MacroRegistry:
 
     def expand(self, macro_id: str,
                slot_values: dict[str, str | int | float]) -> str:
-        """Expand a macro with slot values (Claim 37).
+        """Expand a macro with slot values.
 
         Returns the fully expanded SAL chain with all placeholders
         substituted. This is the "slot-fill" operation the patent describes.
@@ -2295,7 +2291,7 @@ class MacroRegistry:
 
     def encode_compact(self, macro_id: str,
                        slot_values: dict[str, str | int | float]) -> str:
-        """Encode a macro invocation in compact wire format (Claim 38).
+        """Encode a macro invocation in compact wire format.
 
         Compact format: A:MACRO[macro_id]:slot1[val1]:slot2[val2]...
         Used when both nodes share the macro definition.
@@ -2319,7 +2315,7 @@ class MacroRegistry:
 
     def encode_expanded(self, macro_id: str,
                         slot_values: dict[str, str | int | float]) -> str:
-        """Encode a macro invocation in expanded wire format (Claim 38).
+        """Encode a macro invocation in expanded wire format.
 
         Expanded format: the full chain with values substituted.
         Used when the receiving node doesn't have the macro definition.
@@ -2329,7 +2325,7 @@ class MacroRegistry:
     def encode_with_annotation(self, macro_id: str,
                                slot_values: dict[str, str | int | float]
                                ) -> str:
-        """Encode compact form with expansion annotation (Claim 39).
+        """Encode compact form with expansion annotation.
 
         The _EXP slot carries the fully expanded chain for monitoring.
         Non-authoritative: receiver always expands from local ASD.
@@ -2345,7 +2341,7 @@ class MacroRegistry:
         return f"{compact}:_EXP[{expanded}]"
 
     def inherited_consequence_class(self, macro_id: str) -> str | None:
-        """Get the inherited consequence class for a macro (Claim 45).
+        """Get the inherited consequence class for a macro.
 
         Scans the chain template for R namespace instructions and returns
         the highest severity consequence class found.
@@ -2721,7 +2717,7 @@ class OverflowProtocol:
 # instructions with conditional branches and dependency chains.
 # Analog: Kahn's algorithm (1962) applied to lossy radio fragment streams.
 #
-# Patent: OSMP-001-UTIL claims, spec §8.1 Tier 3 definition.
+# Spec section 8.1 Tier 3 definition.
 # ─────────────────────────────────────────────────────────────────────────────
 
 @dataclass

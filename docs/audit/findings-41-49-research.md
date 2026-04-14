@@ -251,7 +251,7 @@ for opEnd < n && ((runes[opEnd] >= 'A' && runes[opEnd] <= 'Z') || (runes[opEnd] 
 }
 ```
 
-The Python equivalent in `sdk/python/osmp/wire.py:_try_namespace_opcode` explicitly allows U+00A7 (`§`) as an opcode character to support the `I:§` human operator confirmation token defined in patent Claim 25:
+The Python equivalent in `sdk/python/osmp/wire.py:_try_namespace_opcode` explicitly allows U+00A7 (`§`) as an opcode character to support the `I:§` human operator confirmation token defined in the patent:
 
 ```python
 while op_end < n and (sal[op_end].isupper() or sal[op_end].isdigit() or sal[op_end] == "\xa7"):

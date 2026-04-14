@@ -20,7 +20,7 @@ eRepository (release 2025-04-24). The file format is::
     OSMP MDR - ISO 20022 Message Definitions (Full eRepository)
     Source: ISO 20022 eRepository 2025-04-24
     Messages: 810,...
-    Docket: OSMP-001-UTIL (patent pending),Inventor: Clay Holberg
+    Patent pending,Inventor: Clay Holberg
 
     message_id,message_name,definition
     acmt.001.001.08,AccountOpeningInstructionV08,"Scope The..."
@@ -64,7 +64,7 @@ canonical payment, statement, and account messages to confirm the
 lookup interface works end-to-end. Returns non-zero exit if any
 verification case fails.
 
-Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 

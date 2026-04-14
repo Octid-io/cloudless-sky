@@ -5,7 +5,6 @@ package osmp
 // Dependency rules are SAL expressions using the same glyph operators as
 // the instructions they govern.
 //
-// Patent ref: OSMP-001-UTIL Claim 40 (pending)
 // License: Apache 2.0
 
 import (

@@ -15,7 +15,7 @@ JavaScript, and Go RE2. The bridge regex no longer hardcodes character
 classes; it composes from the same building blocks as the validator and
 the regulatory_dependency parser.
 
-Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 

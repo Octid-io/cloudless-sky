@@ -8,7 +8,7 @@
 **Architect:** Clay Holberg
 **Protocol:** OSMP v1.0 | Patent pending | Apache 2.0 with express patent grant
 
-**Architectural Layer Separation:** This document governs agent-layer composition behavior. It does not modify protocol-layer decode properties. Decode remains inference-free table lookup per UTIL Claim 1. Composition uses the agent's native inference capability, constrained by these rules. The agent is a dictionary consumer, not a dictionary author. Dictionary authorship is a sovereign node operator function exercised through FNP, MDR registration, or local Omega registration. The agent composes from what exists in the local ASD at the moment of composition, no more, no less.
+**Architectural Layer Separation:** This document governs agent-layer composition behavior. It does not modify protocol-layer decode properties. Decode remains inference-free table lookup per the protocol specification. Composition uses the agent's native inference capability, constrained by these rules. The agent is a dictionary consumer, not a dictionary author. Dictionary authorship is a sovereign node operator function exercised through FNP, MDR registration, or local Omega registration. The agent composes from what exists in the local ASD at the moment of composition, no more, no less.
 
 | Operation | Layer | Inference required? |
 |---|---|---|
@@ -590,7 +590,7 @@ The R namespace consequence class (⚠ HAZARDOUS, ↺ REVERSIBLE, ⊘ IRREVERSIB
 | Microgravity, propulsive | Thrust, orbital maneuver, delta-v expenditure | ⊘ | Yes | Orbital mechanics. Delta-v is finite and non-renewable. A bad thrust vector can produce decaying orbit or escape trajectory. No "drive it back" without fuel budget that may not exist. |
 | Microgravity, non-propulsive | Manipulator arm, tool operation in pressurized module | ⚠ | Yes | Equipment damage, crew proximity. Recoverable but consequential. Closer to indoor ground than to orbital mechanics. |
 | Mobile device peripheral | R:TORCH, R:HAPTIC, R:VIBE, R:SPKR, R:DISP | ↺ | No | On/off operations, inherently reversible. |
-| Mobile device peripheral | R:CAM, R:MIC, R:SCRN | ⚠ | Yes | Privacy-consequential. Existing spec requires ⚠ per Claim 7 architecture. |
+| Mobile device peripheral | R:CAM, R:MIC, R:SCRN | ⚠ | Yes | Privacy-consequential. Existing spec requires ⚠ per the specification. |
 
 **Selection logic:**
 

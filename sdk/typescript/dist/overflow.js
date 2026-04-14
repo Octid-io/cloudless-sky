@@ -1,7 +1,7 @@
 /**
  * OSMP Overflow Protocol — fragmentation and loss tolerance
  * Analog: QUIC receive buffer (RFC 9000 §2.2)
- * Patent: OSMP-001-UTIL (pending) | License: Apache 2.0
+ * Patent pending | License: Apache 2.0
  */
 import { LossPolicy, FLAG_TERMINAL, FLAG_CRITICAL, FRAGMENT_HEADER_BYTES, LORA_STANDARD_BYTES } from "./types.js";
 export function packFragment(f) {

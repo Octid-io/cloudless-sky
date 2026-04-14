@@ -52,7 +52,7 @@ The behavioral/actuator distinction is not universally recognized across all aut
 
 The ADR does not prescribe slot value conventions for the new entries. Slot value schemas are orthogonal to the behavioral/actuator layer distinction and are addressed in separate specification sections.
 
-The ADR does not affect existing v14 Claim 7 scope. R:ACCEL remains as accelerometer_data_stream (backed by Claim 7). R:ACC is the new verb and occupies a different mnemonic slot. The two entries coexist in the R namespace without dictionary-level conflict.
+The ADR does not affect existing v14 scope. R:ACCEL remains as accelerometer_data_stream. R:ACC is the new verb and occupies a different mnemonic slot. The two entries coexist in the R namespace without dictionary-level conflict.
 
 ## Cross-References
 

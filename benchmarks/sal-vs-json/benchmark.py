@@ -2,7 +2,7 @@
 """
 OSMP SAL vs JSON Benchmark — Production Agent Framework Comparison
 Octid Semantic Mesh Protocol — Cloudless Sky Project
-Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
+Patent pending — inventor Clay Holberg
 License: Apache 2.0
 
 Measures byte reduction of SAL encoding vs real JSON-RPC/JSON payloads

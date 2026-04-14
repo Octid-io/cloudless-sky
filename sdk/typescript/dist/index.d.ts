@@ -8,7 +8,7 @@
  *     const sal = encode(["H:HR@NODE1>120", "H:CASREP", "M:EVA@*"]);
  *     const text = decode("H:HR@NODE1>120;H:CASREP;M:EVA@*");
  *
- * Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+ * Patent pending -- inventor Clay Holberg
  * License: Apache 2.0
  */
 import type { DependencyRule } from "./regulatory_dependency.js";

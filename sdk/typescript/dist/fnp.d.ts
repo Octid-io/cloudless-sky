@@ -9,7 +9,7 @@
  *   2. Namespace intersection (shared domain capabilities)
  *   3. Channel capacity (byte budget for the session)
  *
- * Patent ref: OSMP-001-UTIL Section II.C, FIG. 5
+ * FNP state machine reference
  */
 import { AdaptiveSharedDictionary } from "./asd.js";
 export declare const FNP_MSG_ADV = 1;

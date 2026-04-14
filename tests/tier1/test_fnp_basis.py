@@ -19,7 +19,7 @@ through the capability handshake. Covers:
   7. Mixed-form interop: an extended-form node negotiating with a
      base-form node lands in ESTABLISHED_SAL_ONLY without error.
 
-Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
+Patent pending — inventor Clay Holberg
 License: Apache 2.0
 """
 

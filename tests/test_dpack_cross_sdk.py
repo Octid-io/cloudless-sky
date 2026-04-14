@@ -18,7 +18,7 @@ dpacks for Python-only workflows. It only enforces the constraint on
 dpacks committed under ``mdr/`` which are part of the canonical corpus
 distribution.
 
-Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 

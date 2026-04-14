@@ -6,7 +6,7 @@ Source of truth: OSMP-semantic-dictionary-v15.csv | OSMP-SPEC-v1.md | SAL-gramma
 All opcode names, definitions, and namespace assignments are drawn directly from the
 canonical semantic dictionary v15.0, not from any prior implementation.
 
-Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
+Patent pending — inventor Clay Holberg
 License: Apache 2.0
 """
 
@@ -719,7 +719,7 @@ class AdaptiveSharedDictionary:
 #   ADV_SENT -> timeout -> IDLE
 #   IDLE -> receive ADV -> send ACK -> ESTABLISHED or SYNC_NEEDED
 #
-# Patent ref: OSMP-001-UTIL Section II.C, FIG. 5
+# FNP state machine reference
 # ─────────────────────────────────────────────────────────────────────────────
 
 FNP_MSG_ADV  = 0x01
@@ -1033,7 +1033,7 @@ class FNPSession:
 # MINOR increments on additive changes (ADD/DEPRECATE/EXTEND). Resets on MAJOR.
 # Breaking-change detection from version number alone: compare upper bytes.
 #
-# Patent ref: OSMP-001-UTIL Section VII.F (tripartite resolution flags)
+# ASD version packing (tripartite resolution flags)
 # ─────────────────────────────────────────────────────────────────────────────
 
 def asd_version_pack(major: int, minor: int) -> int:
@@ -1086,7 +1086,6 @@ def asd_version_is_breaking(old_u16: int, new_u16: int) -> bool:
 #   3. Background delta (A:ASD:DELTA)
 #   4. Trickle charge request (A:ASD:REQ)
 #
-# Patent ref: OSMP-001-UTIL Claims 20-21, Section VII.F, X-L
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ADP instruction priorities (lower = higher priority)
@@ -1168,7 +1167,6 @@ class ADPSession:
         if result.pending:
             micro_req = result.micro_delta_request
 
-    Patent ref: OSMP-001-UTIL Claims 20-21, Section IV.C Step 4, X-L
     """
 
     def __init__(self, asd: AdaptiveSharedDictionary,
@@ -1459,7 +1457,7 @@ class ADPSession:
         """Check if an instruction's opcodes are resolvable. If not, pend it.
 
         This implements the semantic dependency resolution buffer from
-        UTIL Claim 20: instructions referencing undefined opcodes are held
+        Instructions referencing undefined opcodes are held
         as semantically pending until the defining delta unit arrives.
 
         Returns dict with 'resolved', 'pending', optionally 'micro_delta_request'.
@@ -1620,7 +1618,6 @@ _FRAME_NS_OP_RE = re.compile(r'^([A-Z]{1,2}):([A-Z§][A-Z0-9§]*)')
 # Dependency rules are SAL expressions stored in MDR corpora. Enforcement
 # operates within the SAL grammar framework using the same glyph operators
 # as the instructions they govern. No separate rule engine.
-# Patent ref: OSMP-001-UTIL Claim 40 (pending)
 
 # Pattern for prerequisite expressions: NS:OPCODE or NS:OPCODE[SLOT]
 _PREREQ_RE = re.compile(r'([A-Z]{1,2}):([A-Z][A-Z0-9]*)(?:\[([^\]]+)\])?')
@@ -2238,7 +2235,7 @@ class OverflowProtocol:
 # instructions with conditional branches and dependency chains.
 # Analog: Kahn's algorithm (1962) applied to lossy radio fragment streams.
 #
-# Patent: OSMP-001-UTIL claims, spec §8.1 Tier 3 definition.
+# Spec section 8.1 Tier 3 definition.
 # ─────────────────────────────────────────────────────────────────────────────
 
 @dataclass

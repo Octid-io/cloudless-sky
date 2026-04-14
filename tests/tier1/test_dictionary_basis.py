@@ -19,7 +19,7 @@ covered by the FNP test suite. The focus here is the determinism guarantee
 of the basis manifest itself and the protection against the silent
 misdecode failure mode logged in Finding 41.
 
-Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
+Patent pending — inventor Clay Holberg
 License: Apache 2.0
 """
 

@@ -3,7 +3,7 @@
 
 **Status:** Draft for community review
 **Revision:** v1.0.2 (2026-04-07)
-**Docket:** OSMP-001-UTIL (patent pending)
+**Status:** Patent pending
 **Inventor:** Clay Holberg
 **License:** Apache 2.0
 
@@ -685,7 +685,7 @@ Upon receipt of a defining delta (via A:ASD:DELTA or A:ASD:DEF), the node re-eva
 
 The micro-delta request (`A:ASD:DEF?[NS:OP]`) is the trigger mechanism: when a node queues an instruction as pending, it simultaneously requests the specific opcode definition from the sending node.
 
-Patent ref: OSMP-001-UTIL Claim 20 (semantic dependency resolution buffer).
+Semantic dependency resolution buffer.
 
 #### 10.4.5 Priority Hierarchy
 
@@ -980,7 +980,7 @@ See `/protocol/test-vectors/` for the canonical test vector suite. Every conform
 
 ## 17. Patent Notice
 
-This protocol specification is provided under Apache 2.0 license. The underlying architecture is covered by pending US patent application OSMP-001-UTIL (inventor: Clay Holberg), filed March 17, 2026, with conception date August 7, 2025. A continuation-in-part application (OSMP-001-CIP) extends coverage to cloud-scale AI orchestration, non-RF channels, and the AI-native namespace architecture. Apache 2.0 includes an express patent grant for implementations of this specification.
+This protocol specification is provided under Apache 2.0 license. The underlying architecture is covered by pending US patent applications (inventor: Clay Holberg), filed March 17, 2026. Apache 2.0 includes an express patent grant for implementations of this specification.
 
 ---
 

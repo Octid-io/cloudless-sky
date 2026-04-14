@@ -8,7 +8,7 @@
  * message containing `I:§` is correctly detected as a SAL frame, which
  * is the end-to-end behavior Finding 13 was about.
  *
- * Patent: OSMP-001-UTIL (pending) | License: Apache 2.0
+ * Patent pending | License: Apache 2.0
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { SALBridge } from "../src/bridge.js";

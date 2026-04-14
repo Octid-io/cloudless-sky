@@ -1,11 +1,11 @@
 """
-Registered Macro Architecture Tests (Claims 37-39, 45)
-======================================================
+Registered Macro Architecture Tests
+====================================
 
 Tests for the MacroRegistry, MacroTemplate, and SlotDefinition classes
 implementing the pre-validated SAL instruction chain template architecture.
 
-Patent: OSMP-001-UTIL Claims 37-39, 45
+Patent pending
 License: Apache 2.0
 """
 
@@ -32,7 +32,7 @@ from osmp.protocol import (  # noqa: E402
 
 
 class TestMacroRegistration:
-    """Claim 37: registering a pre-validated multi-step SAL instruction
+    """Registering a pre-validated multi-step SAL instruction
     chain template as a single callable entry."""
 
     def test_register_and_lookup(self):
@@ -106,7 +106,7 @@ class TestMacroRegistration:
 
 
 class TestMacroExpansion:
-    """Claim 37: invoking the registered macro entry by dictionary lookup
+    """Invoking the registered macro entry by dictionary lookup
     and slot-fill, producing the complete multi-step instruction chain."""
 
     def test_expand_simple(self):
@@ -160,9 +160,8 @@ class TestMacroExpansion:
             reg.expand("NOPE", {"x": 1})
 
     def test_no_composition_validation_on_expansion(self):
-        """Claim 37: 'without applying the composition rules of claim 34
-        to the chain structure.' Macro expansion does NOT run
-        validate_composition on the expanded chain."""
+        """Macro expansion does NOT run validate_composition on the
+        expanded chain."""
         reg = MacroRegistry()
         reg.register(MacroTemplate(
             "TEST:CHAIN", "A:ACK\u2227A:NACK",
@@ -177,7 +176,7 @@ class TestMacroExpansion:
 
 
 class TestMacroWireFormat:
-    """Claim 38: compact vs expanded transmission format."""
+    """Compact vs expanded transmission format."""
 
     def test_encode_compact(self):
         reg = MacroRegistry()
@@ -211,7 +210,7 @@ class TestMacroWireFormat:
         assert result.index(":t[") < result.index(":p[")
 
     def test_encode_with_annotation(self):
-        """Claim 39: expansion annotation for monitoring."""
+        """Expansion annotation for monitoring."""
         reg = MacroRegistry()
         reg.register(MacroTemplate(
             "TEST:ANN", "A:ACK[m:{m}]",
@@ -226,7 +225,7 @@ class TestMacroWireFormat:
 
 
 class TestConsequenceClassInheritance:
-    """Claim 45: consequence class of the expanded chain is inherited
+    """Consequence class of the expanded chain is inherited
     by the compact macro invocation."""
 
     def test_no_r_namespace_no_cc(self):

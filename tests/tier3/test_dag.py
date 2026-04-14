@@ -3,7 +3,7 @@ OSMP Tier 3 Tests — DAG Decomposition
 Overflow Protocol Tier 3: dependency-resolved fragmentation for instructions
 with conditional branches and dependency chains.
 
-Patent: OSMP-001-UTIL, spec §8.1 Tier 3.
+Patent pending. Spec section 8.1 Tier 3.
 """
 import sys, struct
 sys.path.insert(0, "sdk/python")

@@ -12,7 +12,7 @@
 // slots, brackets, and consequence class tail), every chain operator,
 // and every whitespace character leaves nothing behind.
 //
-// Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+// Patent pending -- inventor Clay Holberg
 // License: Apache 2.0
 
 package osmp_test

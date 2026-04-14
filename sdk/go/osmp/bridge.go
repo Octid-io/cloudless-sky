@@ -7,7 +7,7 @@
 //
 // OSMP does not spread by installation. It spreads by contact.
 //
-// Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
+// Patent pending — inventor Clay Holberg
 // License: Apache 2.0
 package osmp
 

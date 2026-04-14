@@ -204,7 +204,7 @@ from osmp.protocol import (
     CompositionResult,
     validate_composition,
 
-    # Registered Macro Architecture (Claims 37-39, 45)
+    # Registered Macro Architecture
     SlotDefinition,
     MacroTemplate,
     MacroRegistry,

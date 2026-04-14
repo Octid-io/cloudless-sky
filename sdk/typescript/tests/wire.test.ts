@@ -10,7 +10,7 @@
  * locks in cross-SDK ASD compatibility; this file locks in cross-SDK
  * wire format compatibility.
  *
- * Patent: OSMP-001-UTIL (pending) | License: Apache 2.0
+ * Patent pending | License: Apache 2.0
  */
 import { describe, it, expect } from "vitest";
 import { SecCodec, SAILCodec, OSMPWireCodec, WireMode } from "../src/osmp_wire.js";

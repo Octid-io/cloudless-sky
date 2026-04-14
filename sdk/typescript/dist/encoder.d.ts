@@ -1,6 +1,6 @@
 /**
  * OSMP SAL Encoder
- * Patent: OSMP-001-UTIL (pending) | License: Apache 2.0
+ * Patent pending | License: Apache 2.0
  */
 import { AdaptiveSharedDictionary } from "./asd.js";
 export declare class OSMPEncoder {

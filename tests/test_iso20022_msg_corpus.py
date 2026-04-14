@@ -16,7 +16,7 @@ The fix has three parts:
   3. Resolver tools (osmp_resolve, osmp_batch_resolve, osmp_discover)
      accept the new corpus name and route to the new dpack
 
-Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 

@@ -19,7 +19,7 @@ Both Python and TypeScript SDKs had the identical bug. Both were fixed
 in the same session. This test pins the Python behavior; the equivalent
 TS test lives in sdk/typescript/tests/bridge.test.ts.
 
-Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 

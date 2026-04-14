@@ -5,7 +5,7 @@
  * Lock-in tests for the SAL encode/decode/validate path. Canonical
  * frames and expected behaviors mirror the Python tier1 test suite.
  *
- * Patent: OSMP-001-UTIL (pending) | License: Apache 2.0
+ * Patent pending | License: Apache 2.0
  */
 import { describe, it, expect } from "vitest";
 import { OSMPEncoder } from "../src/encoder.js";

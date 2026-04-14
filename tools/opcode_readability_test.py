@@ -48,7 +48,7 @@ works across vendors. A full multi-provider run produces an aggregated
 agreement matrix that IS the empirical evidence for the canonical form
 of each opcode.
 
-Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 

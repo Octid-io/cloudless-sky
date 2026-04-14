@@ -51,7 +51,7 @@ Target files:
                                      opcode count — auto-patched between
                                      the AUTO-UPDATED markers)
 
-Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 
@@ -159,7 +159,7 @@ def generate_ts() -> str:
     lines.append(" * Edits to this file will be silently overwritten on the "
                  "next generation run.")
     lines.append(" *")
-    lines.append(" * Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg")
+    lines.append(" * Patent pending — inventor Clay Holberg")
     lines.append(" * License: Apache 2.0")
     lines.append(" */")
     lines.append("")
@@ -282,7 +282,7 @@ def generate_go() -> str:
     lines.append("// Edits to this file will be silently overwritten on the "
                  "next generation run.")
     lines.append("//")
-    lines.append("// Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg")
+    lines.append("// Patent pending — inventor Clay Holberg")
     lines.append("// License: Apache 2.0")
     lines.append("package osmp")
     lines.append("")

@@ -10,7 +10,7 @@ package osmp
 // Singleton ASD, encoder, and decoder are initialized on first call
 // via sync.Once. Thread-safe.
 //
-// Patent: OSMP-001-UTIL (pending) -- inventor Clay Holberg
+// Patent pending -- inventor Clay Holberg
 // License: Apache 2.0
 
 import (

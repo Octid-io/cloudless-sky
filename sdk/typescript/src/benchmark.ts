@@ -1,6 +1,6 @@
 /**
  * OSMP Conformance Benchmark Runner — TypeScript SDK
- * Patent: OSMP-001-UTIL (pending) | License: Apache 2.0
+ * Patent pending | License: Apache 2.0
  */
 import * as fs from "fs";
 import * as path from "path";

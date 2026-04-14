@@ -1,6 +1,6 @@
 /**
  * OSMP BAEL — Bandwidth-Agnostic Efficiency Layer
- * Patent: OSMP-001-UTIL (pending) | License: Apache 2.0
+ * Patent pending | License: Apache 2.0
  */
 import { BAELMode, FLAG_NL_PASSTHROUGH } from "./types.js";
 export function utf8Bytes(s) { return Buffer.byteLength(s, "utf8"); }

@@ -12,7 +12,7 @@ The decode mechanism is encoding-agnostic by design. The described lookup
 cascade operates identically on binary-encoded, mnemonic-encoded, or any
 other token representation.
 
-Patent: OSMP-001-UTIL (pending) — inventor Clay Holberg
+Patent pending — inventor Clay Holberg
 License: Apache 2.0
 """
 

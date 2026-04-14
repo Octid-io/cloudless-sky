@@ -11,7 +11,7 @@
  * the explicit "trained dictionary" error from the dpack.ts guard
  * and the test would fail with a named file pointer.
  *
- * Patent: OSMP-001-UTIL (pending) | License: Apache 2.0
+ * Patent pending | License: Apache 2.0
  */
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, statSync } from "fs";
