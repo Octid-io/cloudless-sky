@@ -204,6 +204,11 @@ from osmp.protocol import (
     CompositionResult,
     validate_composition,
 
+    # Registered Macro Architecture (Claims 37-39, 45)
+    SlotDefinition,
+    MacroTemplate,
+    MacroRegistry,
+
     # SAL Decoder
     DecodedInstruction,
     SALDecoder,
@@ -279,6 +284,9 @@ __all__ = [
     # Validator
     "DependencyRule", "load_mdr_dependency_rules",
     "CompositionIssue", "CompositionResult", "validate_composition",
+
+    # Registered Macro Architecture
+    "SlotDefinition", "MacroTemplate", "MacroRegistry",
 
     # Decoder
     "DecodedInstruction", "SALDecoder",

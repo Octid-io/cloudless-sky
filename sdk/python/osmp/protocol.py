@@ -2139,6 +2139,279 @@ def validate_composition(
         nl=nl,
     )
 
+# ── Registered Macro Architecture (Claims 37-39, 45) ──────────────────────
+#
+# A registered macro is a pre-validated multi-step SAL instruction chain
+# template stored alongside regular opcodes. Macros eliminate the composition
+# step for deterministic workflows: the agent's task is dictionary lookup
+# and slot-fill, not opcode-by-opcode composition.
+#
+# Composition priority hierarchy (spec Section 11):
+#   1. Macro invocation (pre-validated, no composition error surface)
+#   2. Individual opcode composition (grammar-constrained, Claim 34)
+#   3. Natural language passthrough (no compression, Claim 31)
+
+@dataclass(frozen=True)
+class SlotDefinition:
+    """A typed parameter slot in a macro chain template."""
+    name: str
+    slot_type: str = "string"  # string, uint, float, enum, bool
+    namespace: str | None = None  # optional namespace hint for Layer 2 accessors
+
+
+@dataclass(frozen=True)
+class MacroTemplate:
+    """A pre-validated multi-step SAL instruction chain template (Claim 37).
+
+    The chain_template contains namespace-prefixed opcodes connected by glyph
+    operators, with {slot_name} placeholders at positions where the invoking
+    agent supplies context-specific values.
+
+    Example:
+        macro_id = "MESH:DEV"
+        chain_template = "X:STORE[bat:{battery_level}]∧X:VOLT[v:{voltage}]"
+        slots = (SlotDefinition("battery_level", "uint"),
+                 SlotDefinition("voltage", "float"))
+    """
+    macro_id: str
+    chain_template: str
+    slots: tuple[SlotDefinition, ...]
+    description: str
+    consequence_class: str | None = None
+    triggers: tuple[str, ...] = ()
+
+
+# Consequence class severity ordering for inheritance (Claim 45)
+_CC_SEVERITY: dict[str, int] = {
+    "\u21ba": 1,  # REVERSIBLE
+    "\u26a0": 2,  # HAZARDOUS
+    "\u2298": 3,  # IRREVERSIBLE
+}
+_CC_BY_SEVERITY: dict[int, str] = {v: k for k, v in _CC_SEVERITY.items()}
+
+
+class MacroRegistry:
+    """Registry of pre-validated SAL instruction chain templates (Claims 37-39, 45).
+
+    Macros are an ASD extension: stored alongside regular opcodes, queried
+    through the same lookup path, but with template expansion triggered when
+    A:MACRO is detected.
+
+    Patent: OSMP-001-UTIL Claims 37-39, 45
+    License: Apache 2.0
+    """
+
+    def __init__(self, asd: AdaptiveSharedDictionary | None = None):
+        self.asd = asd or AdaptiveSharedDictionary()
+        self._macros: dict[str, MacroTemplate] = {}
+
+    def register(self, template: MacroTemplate) -> None:
+        """Register a macro template (Claim 37).
+
+        Validates that every opcode in the chain exists in the ASD and that
+        all slot placeholders have matching SlotDefinitions. Computes the
+        inherited consequence class from the chain.
+        """
+        # Validate opcodes in chain exist in ASD
+        chain = template.chain_template
+        # Strip slot placeholders before opcode validation
+        import re as _re
+        clean = _re.sub(r'\{[^}]+\}', 'X', chain)
+        parts = _FRAME_SPLIT_RE.split(clean)
+        frames = [p.strip() for p in parts
+                  if p.strip() and p.strip() not in "\u2192\u2227\u2228\u2194\u2225;"]
+        for frame in frames:
+            m = _FRAME_NS_OP_RE.match(frame)
+            if m:
+                ns, op = m.group(1), m.group(2)
+                if self.asd.lookup(ns, op) is None:
+                    raise ValueError(
+                        f"Macro {template.macro_id}: opcode {ns}:{op} "
+                        f"not found in ASD"
+                    )
+
+        # Validate slot placeholders have matching definitions
+        placeholders = set(_re.findall(r'\{(\w+)\}', template.chain_template))
+        defined_slots = {s.name for s in template.slots}
+        missing = placeholders - defined_slots
+        if missing:
+            raise ValueError(
+                f"Macro {template.macro_id}: slot placeholders {missing} "
+                f"have no matching SlotDefinition"
+            )
+        extra = defined_slots - placeholders
+        if extra:
+            raise ValueError(
+                f"Macro {template.macro_id}: SlotDefinitions {extra} "
+                f"have no matching placeholder in chain template"
+            )
+
+        # Compute inherited consequence class (Claim 45)
+        cc = self._compute_inherited_cc(clean)
+
+        # Store with computed CC if not explicitly set
+        if template.consequence_class is None and cc is not None:
+            template = MacroTemplate(
+                macro_id=template.macro_id,
+                chain_template=template.chain_template,
+                slots=template.slots,
+                description=template.description,
+                consequence_class=cc,
+                triggers=template.triggers,
+            )
+
+        self._macros[template.macro_id] = template
+
+    def lookup(self, macro_id: str) -> MacroTemplate | None:
+        """Look up a registered macro by ID."""
+        return self._macros.get(macro_id)
+
+    def expand(self, macro_id: str,
+               slot_values: dict[str, str | int | float]) -> str:
+        """Expand a macro with slot values (Claim 37).
+
+        Returns the fully expanded SAL chain with all placeholders
+        substituted. This is the "slot-fill" operation the patent describes.
+        """
+        template = self._macros.get(macro_id)
+        if template is None:
+            raise KeyError(f"Macro not found: {macro_id}")
+
+        # Verify all required slots are provided
+        required = {s.name for s in template.slots}
+        provided = set(slot_values.keys())
+        missing = required - provided
+        if missing:
+            raise ValueError(
+                f"Macro {macro_id}: missing slot values: {missing}"
+            )
+
+        # Substitute placeholders
+        result = template.chain_template
+        for name, value in slot_values.items():
+            result = result.replace(f"{{{name}}}", str(value))
+
+        return result
+
+    def encode_compact(self, macro_id: str,
+                       slot_values: dict[str, str | int | float]) -> str:
+        """Encode a macro invocation in compact wire format (Claim 38).
+
+        Compact format: A:MACRO[macro_id]:slot1[val1]:slot2[val2]...
+        Used when both nodes share the macro definition.
+        """
+        template = self._macros.get(macro_id)
+        if template is None:
+            raise KeyError(f"Macro not found: {macro_id}")
+
+        parts = [f"A:MACRO[{macro_id}]"]
+        for slot_def in template.slots:
+            if slot_def.name in slot_values:
+                parts.append(f":{slot_def.name}[{slot_values[slot_def.name]}]")
+
+        result = "".join(parts)
+
+        # Append inherited consequence class if present
+        if template.consequence_class:
+            result += template.consequence_class
+
+        return result
+
+    def encode_expanded(self, macro_id: str,
+                        slot_values: dict[str, str | int | float]) -> str:
+        """Encode a macro invocation in expanded wire format (Claim 38).
+
+        Expanded format: the full chain with values substituted.
+        Used when the receiving node doesn't have the macro definition.
+        """
+        return self.expand(macro_id, slot_values)
+
+    def encode_with_annotation(self, macro_id: str,
+                               slot_values: dict[str, str | int | float]
+                               ) -> str:
+        """Encode compact form with expansion annotation (Claim 39).
+
+        The _EXP slot carries the fully expanded chain for monitoring.
+        Non-authoritative: receiver always expands from local ASD.
+        Included at unconstrained bandwidth, omitted at constrained.
+        """
+        compact = self.encode_compact(macro_id, slot_values)
+        expanded = self.expand(macro_id, slot_values)
+        # Insert _EXP before any trailing consequence class
+        if compact[-1] in "\u21ba\u26a0\u2298":
+            cc = compact[-1]
+            base = compact[:-1]
+            return f"{base}:_EXP[{expanded}]{cc}"
+        return f"{compact}:_EXP[{expanded}]"
+
+    def inherited_consequence_class(self, macro_id: str) -> str | None:
+        """Get the inherited consequence class for a macro (Claim 45).
+
+        Scans the chain template for R namespace instructions and returns
+        the highest severity consequence class found.
+        IRREVERSIBLE > HAZARDOUS > REVERSIBLE > None
+        """
+        template = self._macros.get(macro_id)
+        if template is None:
+            return None
+        return template.consequence_class
+
+    def _compute_inherited_cc(self, clean_chain: str) -> str | None:
+        """Compute the highest consequence class from a chain's R frames."""
+        max_severity = 0
+        # Check for consequence class glyphs after R: frames
+        parts = _FRAME_SPLIT_RE.split(clean_chain)
+        for part in parts:
+            part = part.strip()
+            if not part or part in "\u2192\u2227\u2228\u2194\u2225;":
+                continue
+            # Check if this frame is R namespace
+            m = _FRAME_NS_OP_RE.match(part)
+            if m and m.group(1) == "R":
+                # Check for trailing consequence class
+                for cc_glyph, severity in _CC_SEVERITY.items():
+                    if cc_glyph in part:
+                        max_severity = max(max_severity, severity)
+
+        return _CC_BY_SEVERITY.get(max_severity)
+
+    def list_macros(self) -> list[MacroTemplate]:
+        """List all registered macros."""
+        return list(self._macros.values())
+
+    def load_corpus(self, corpus_path: str | Path) -> int:
+        """Load macro definitions from a JSON corpus file.
+
+        Returns the count of macros successfully loaded.
+        """
+        import json
+        corpus_path = Path(corpus_path)
+        with open(corpus_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        count = 0
+        for entry in data.get("macros", []):
+            slots = tuple(
+                SlotDefinition(
+                    name=s["name"],
+                    slot_type=s.get("slot_type", "string"),
+                    namespace=s.get("namespace"),
+                )
+                for s in entry.get("slots", [])
+            )
+            template = MacroTemplate(
+                macro_id=entry["macro_id"],
+                chain_template=entry["chain_template"],
+                slots=slots,
+                description=entry.get("description", ""),
+                triggers=tuple(entry.get("triggers", ())),
+            )
+            self.register(template)
+            count += 1
+
+        return count
+
+
 @dataclass
 class DecodedInstruction:
     namespace:             str
