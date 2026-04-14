@@ -311,7 +311,7 @@ Run it yourself. The numbers are real and independently reproducible across all 
 
 Everything here is operational from the floor ASD without MDR, cloud access, or additional tooling.
 
-**Instruction encoding across all 26 standard namespaces** — 352 opcodes drawn from authoritative sources: IEC 61850 (energy), ICD-10/SNOMED CT/CPT (clinical), ISO 20022/FIX/SWIFT (financial), ISO 10218-1:2025 (robotics), FEMA ICS/NIMS (emergency management), BDI/PDDL/HTN (cognitive AI), OpenAI/Anthropic APIs (model operations).
+**Instruction encoding across all 26 standard namespaces** — 352 opcodes drawn from authoritative sources: IEC 61850 (energy), ICD-10/SNOMED CT/CPT (clinical), ISO 20022/FIX/SWIFT (financial), ISO 10218-1:2025 (robotics), FEMA ICS/NIMS (emergency management), BDI/PDDL/HTN (cognitive AI), OpenAI/Anthropic APIs (model operations). Registered macro architecture with 16 Meshtastic macros (pre-validated multi-opcode chain templates invoked via `A:MACRO[name]`).
 
 **Four AI-native namespaces** — J (Cognitive Execution State), Q (Quality/Evaluation/Grounding), Y (Memory + Retrieval), Z (Model/Inference Operations). No prior agent communication protocol defines these. They encode what agents do internally, not just what they communicate between themselves. The J→Y→Z→Q chain encodes the full AI cognitive pipeline as a single transmissible SAL instruction sequence, decodable by ASD lookup without neural inference.
 
@@ -426,6 +426,7 @@ cloudless-sky/
     icd10cm/        <- CMS FY2026 ICD-10-CM (74,719 codes, 477KB)
     iso20022/       <- ISO 20022 eRepository (47,835 elements, 1.2MB)
     mitre-attack/   <- MITRE ATT&CK Enterprise v18.1 (1,661 entries, 20KB)
+    meshtastic/     <- Meshtastic macro corpus (16 macros)
   benchmarks/
     sal-vs-json/    <- 29-vector framework benchmark, four-way comparison, grammar analysis
   docs/

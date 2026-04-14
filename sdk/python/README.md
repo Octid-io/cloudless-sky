@@ -1,6 +1,6 @@
 # OSMP Python SDK
 
-Reference implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, and validates agentic AI instructions using SAL (Semantic Assembly Language). 352 opcodes across 26 namespaces. Inference-free decode by table lookup.
+Reference implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, and validates agentic AI instructions using SAL (Semantic Assembly Language). 352 opcodes across 26 namespaces. MacroRegistry for pre-validated chain templates (16 Meshtastic macros shipped). Inference-free decode by table lookup.
 
 ## Install
 

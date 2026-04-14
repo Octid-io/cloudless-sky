@@ -77,6 +77,8 @@ mdr/
     MDR-ISO20022-K-ISO-blk.dpack       BLK profile (47,835 unique definitions, 1.2MB)
   mitre-attack/
     MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack  BLK profile (1,661 entries, 20KB)
+  meshtastic/
+    meshtastic-macros.json             Meshtastic macro corpus (16 macros, v1)
 ```
 
 ### DBLK Binary Format (v1)

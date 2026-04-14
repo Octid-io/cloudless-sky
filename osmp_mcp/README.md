@@ -85,6 +85,15 @@ The bridge annotates outbound messages with SAL equivalents, seeding the remote 
 | `osmp://corpora` | Available D:PACK/BLK domain corpus stats |
 | `osmp://examples` | 11 annotated SAL examples |
 
+### Data
+
+| Corpus | Content |
+|---|---|
+| ICD-10-CM | 74,719 clinical codes (D:PACK/BLK) |
+| ISO 20022 | 47,835 financial definitions (D:PACK/BLK) |
+| MITRE ATT&CK | 1,661 entries (D:PACK/BLK) |
+| Meshtastic macros | 16 pre-validated SAL chain templates for Meshtastic telemetry |
+
 ## Agent Quickstart
 
 1. Read `osmp://system_prompt` -- the agent learns SAL grammar and composition rules on connect
