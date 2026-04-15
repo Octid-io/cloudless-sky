@@ -74,11 +74,11 @@ The LLM needs to know the SAL grammar, the opcode dictionary, and the compositio
 
 ### Step 2: Compose
 
-The LLM composes a SAL instruction from natural language input. It uses the dictionary to select opcodes and the grammar to structure them.
+Call `osmp_compose` (MCP) or `SALComposer.compose()` (SDK). The deterministic pipeline handles opcode selection, grammar assembly, and validation. The model never writes SAL by hand.
 
 ```
 Natural language: "If heart rate exceeds 120, file a casualty report and evacuate all nodes."
-LLM output:       H:HR@NODE1>120→H:CASREP∧M:EVA@*
+osmp_compose →    H:HR>120→H:CASREP∧M:EVA@*
 ```
 
 ### Step 3: Validate Before Transmitting
@@ -109,7 +109,7 @@ from osmp import decode
 
 sal = receive()  # your transport layer
 text = decode(sal)
-# "H:heart_rate →NODE1>120; H:casualty_report; M:evacuation →*"
+# "(clinical) [clinical] heart rate above 120 at NODE1, then [clinical] casualty report, then [emergency] evacuation at all nodes"
 # The agent acts on the decoded instruction.
 ```
 
@@ -208,7 +208,7 @@ sal = encode(["H:HR@NODE1>120", "H:CASREP", "M:EVA@*"])
 # "H:HR@NODE1>120;H:CASREP;M:EVA@*"
 
 text = decode(sal)
-# "H:heart_rate →NODE1>120; H:casualty_report; M:evacuation →*"
+# "(clinical) [clinical] heart rate above 120 at NODE1, then [clinical] casualty report, then [emergency] evacuation at all nodes"
 ```
 
 Three lines. Zero setup. Zero dependencies. The SDK handles dictionary initialization internally.
@@ -247,7 +247,7 @@ text := osmp.Decode(sal)
 pip install osmp-mcp
 osmp-mcp
 ```
-The MCP server is not an evaluation tool. It is a production integration. The agent connects, reads the `osmp://system_prompt` resource, learns the SAL grammar and dictionary, and composes SAL natively from that point forward. The server stays running as the encode/decode/validate layer underneath. Nine tools, three MDR corpora, composition doctrine included. Connect from Claude Code: `claude mcp add osmp -- osmp-mcp`. Listed on the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.Octid-io/osmp`.
+The MCP server is not an evaluation tool. It is a production integration. The agent connects, reads the `osmp://system_prompt` resource, and calls `osmp_compose` to convert NL instructions to SAL. The server stays running as the compose/encode/decode/validate layer underneath. 17 tools, three MDR corpora, composition doctrine included. Connect from Claude Code: `claude mcp add osmp -- osmp-mcp`. Listed on the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.Octid-io/osmp`.
 
 The three SDKs are for agents and frameworks that manage their own transport (CrewAI, AutoGen, LangGraph, custom orchestrators, embedded nodes). The MCP server is for agents that already speak MCP. Both approaches run OSMP in production. The difference is who manages the connection.
 
@@ -266,7 +266,7 @@ All three SDKs are independently verified against the canonical test suite. Wire
 | **Python** | `pip install osmp` | `from osmp import encode, decode` | Reference implementation |
 | **TypeScript** | `npm install osmp-protocol` | `import { encode, decode }` | `fzstd` for D:PACK/BLK |
 | **Go** | `go get .../sdk/go/osmp` | `osmp.Encode()` / `osmp.Decode()` | ASD compiled-in |
-| **MCP Server** | `pip install osmp-mcp` | 9 tools via MCP protocol | Wraps Python SDK |
+| **MCP Server** | `pip install osmp-mcp` | 17 tools via MCP protocol | Wraps Python SDK |
 
 ### Benchmark
 

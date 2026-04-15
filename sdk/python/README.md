@@ -98,6 +98,24 @@ result = bc.resolve("J93.0")
 
 Three corpora bundled: ICD-10-CM (74,719 codes), ISO 20022 (47,835 codes), MITRE ATT&CK (1,661 codes).
 
+## SALComposer: NL to SAL
+
+Deterministic composition pipeline. No inference.
+
+```python
+from osmp.protocol import SALComposer
+
+composer = SALComposer()
+
+sal, is_sal = composer.compose_or_passthrough("Alert if heart rate exceeds 130")
+# sal = "H:HR>130.→H:ALERT", is_sal = True
+
+sal, is_sal = composer.compose_or_passthrough("Order me some tacos")
+# sal = "Order me some tacos", is_sal = False (NL passthrough)
+```
+
+95.7% opcode coverage on the full 352-opcode dictionary. Generation index with 358 phrase triggers. Confidence gate prevents false positives on common English words.
+
 ## MCP Server
 
 The MCP server is a separate package that wraps this SDK:
@@ -107,7 +125,7 @@ pip install osmp-mcp
 osmp-mcp
 ```
 
-Nine tools for AI client integration. Connect from Claude Code (`claude mcp add osmp -- osmp-mcp`), Claude Desktop, Cursor, or any MCP-compatible client.
+17 tools for AI client integration including `osmp_compose` (NL to SAL), `osmp_macro_list`, and `osmp_macro_invoke`. Connect from Claude Code (`claude mcp add osmp -- osmp-mcp`), Claude Desktop, Cursor, or any MCP-compatible client.
 
 ## License
 
