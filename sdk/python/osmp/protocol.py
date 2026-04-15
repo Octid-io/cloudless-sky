@@ -2135,6 +2135,262 @@ def validate_composition(
         nl=nl,
     )
 
+# ── SAL Composer (NL to validated SAL pipeline) ───────────────────────────
+#
+# The composer implements the composition pipeline described in the spec:
+# NL input -> intent extraction -> ASD lookup -> grammar assembly -> validate.
+#
+# The LLM's job (if present) is ONLY intent extraction: identify actions,
+# conditions, targets, and parameters from natural language. Everything
+# after intent extraction is deterministic code.
+#
+# Without an LLM, the composer falls back to keyword-based ASD matching.
+# This produces correct SAL for inputs that map cleanly to ASD definitions.
+# Ambiguous or complex inputs return None, signaling the caller to
+# escalate or use NL passthrough.
+
+
+@dataclass
+class ComposedIntent:
+    """Extracted intent from natural language, ready for ASD lookup."""
+    actions: list[str]          # verbs/nouns: "alert", "heart rate", "temperature"
+    conditions: list[str]       # threshold expressions: "above 130", "> 38"
+    targets: list[str]          # node IDs or wildcards: "NODE1", "*"
+    parameters: dict[str, str]  # slot values: {"bpm": "130"}
+    raw: str                    # original NL input
+
+
+class SALComposer:
+    """Compose valid SAL from natural language using ASD lookup and grammar assembly.
+
+    The composer NEVER generates SAL text via inference. It decomposes
+    NL into intent, looks up opcodes in the ASD, assembles using grammar
+    rules, and validates the result. The only inference step (if an LLM
+    is provided) is intent extraction -- identifying action words from
+    a sentence.
+
+    Patent pending | License: Apache 2.0
+    """
+
+    # Condition operators mapped from NL to SAL
+    _CONDITION_MAP: dict[str, str] = {
+        "above": ">", "over": ">", "exceeds": ">", "greater than": ">",
+        "more than": ">", "higher than": ">",
+        "below": "<", "under": "<", "less than": "<", "lower than": "<",
+        "equals": "=", "equal to": "=", "is": "=",
+        "not": "\u00ac",  # NOT glyph
+    }
+
+    # Action words mapped to SAL operators
+    _ACTION_MAP: dict[str, str] = {
+        "then": "\u2192",      # THEN
+        "and": "\u2227",       # AND
+        "or": "\u2228",        # OR
+        "if": "\u2192",        # conditional (THEN)
+        "when": "\u2192",      # conditional
+        "alert": "U:ALERT",    # common direct mapping
+        "notify": "U:NOTIFY",
+        "broadcast": "@*",
+    }
+
+    def __init__(self, asd: AdaptiveSharedDictionary | None = None,
+                 macro_registry: 'MacroRegistry | None' = None):
+        self.asd = asd or AdaptiveSharedDictionary()
+        self.macro_registry = macro_registry
+        self._encoder = SALEncoder(self.asd)
+        self._keyword_index: dict[str, list[tuple[str, str]]] = {}
+        self._build_keyword_index()
+
+    def _build_keyword_index(self) -> None:
+        """Build a reverse index from definition keywords to (namespace, opcode)."""
+        for ns, ops in ASD_BASIS.items():
+            for op, defn in ops.items():
+                # Split definition into keywords
+                words = defn.lower().replace("_", " ").split()
+                for word in words:
+                    if len(word) > 2:  # skip tiny words
+                        if word not in self._keyword_index:
+                            self._keyword_index[word] = []
+                        self._keyword_index[word].append((ns, op))
+
+    def lookup_by_keyword(self, keyword: str) -> list[tuple[str, str, str]]:
+        """Find opcodes matching a keyword. Returns [(namespace, opcode, definition)]."""
+        keyword = keyword.lower().strip()
+        results = []
+
+        # Direct opcode match first
+        for ns, ops in ASD_BASIS.items():
+            for op, defn in ops.items():
+                if keyword == op.lower():
+                    results.append((ns, op, defn))
+
+        # Definition keyword match
+        for ns, op in self._keyword_index.get(keyword, []):
+            defn = self.asd.lookup(ns, op) or ""
+            if (ns, op, defn) not in results:
+                results.append((ns, op, defn))
+
+        # Fuzzy: check if keyword appears in any definition
+        if not results:
+            for ns, ops in ASD_BASIS.items():
+                for op, defn in ops.items():
+                    if keyword in defn.lower():
+                        results.append((ns, op, defn))
+
+        return results
+
+    def extract_intent_keywords(self, nl_text: str) -> ComposedIntent:
+        """Extract intent from NL using keyword matching (no LLM needed).
+
+        This is the fallback path when no LLM is available. It tokenizes
+        the input, matches tokens against the ASD keyword index, and
+        extracts conditions from numeric patterns.
+        """
+        import re
+
+        raw = nl_text.strip()
+        words = raw.lower().split()
+        actions: list[str] = []
+        conditions: list[str] = []
+        targets: list[str] = []
+        parameters: dict[str, str] = {}
+
+        # Extract numeric conditions (e.g., "above 130", "> 38")
+        cond_pattern = re.compile(
+            r'(above|over|below|under|exceeds?|greater than|less than|higher than|lower than)\s+(\d+\.?\d*)',
+            re.IGNORECASE,
+        )
+        for match in cond_pattern.finditer(raw):
+            op_word = match.group(1).lower()
+            value = match.group(2)
+            sal_op = self._CONDITION_MAP.get(op_word, ">")
+            conditions.append(f"{sal_op}{value}")
+
+        # Extract targets (words after "on", "at", "to", "@")
+        target_pattern = re.compile(r'(?:on|at|to|@)\s+(\w+)', re.IGNORECASE)
+        for match in target_pattern.finditer(raw):
+            targets.append(match.group(1).upper())
+
+        # Match remaining words against ASD keyword index
+        # Skip common verbs and articles that aren't domain keywords
+        _SKIP_WORDS = {
+            'the', 'and', 'for', 'from', 'with', 'that', 'this', 'when',
+            'then', 'turn', 'get', 'set', 'put', 'make', 'give', 'take',
+            'show', 'tell', 'let', 'run', 'use', 'try', 'see', 'ask',
+            'how', 'what', 'where', 'who', 'why', 'can', 'will', 'has',
+            'have', 'does', 'did', 'are', 'was', 'been', 'being', 'many',
+            'much', 'some', 'any', 'all', 'each', 'every', 'other',
+            'about', 'into', 'over', 'after', 'before', 'between',
+            'check', 'report', 'send', 'start', 'stop', 'open', 'close',
+        }
+        for word in words:
+            if len(word) > 2 and word not in _SKIP_WORDS:
+                matches = self.lookup_by_keyword(word)
+                if matches:
+                    actions.append(word)
+
+        return ComposedIntent(
+            actions=actions,
+            conditions=conditions,
+            targets=targets,
+            parameters=parameters,
+            raw=raw,
+        )
+
+    def compose(self, nl_text: str,
+                intent: ComposedIntent | None = None) -> str | None:
+        """Compose valid SAL from natural language.
+
+        If intent is provided (e.g., from an LLM extraction step), uses it
+        directly. Otherwise falls back to keyword-based intent extraction.
+
+        Returns validated SAL string or None if composition fails.
+        """
+        if intent is None:
+            intent = self.extract_intent_keywords(nl_text)
+
+        # Step 1: Check macros first (composition priority hierarchy)
+        if self.macro_registry:
+            for macro in self.macro_registry.list_macros():
+                for trigger in macro.triggers:
+                    if trigger.lower() in intent.raw.lower():
+                        # Found a macro match -- this is the preferred path
+                        # Caller handles slot-fill separately
+                        return f"A:MACRO[{macro.macro_id}]"
+
+        # Step 2: ASD lookup for each action keyword
+        resolved_opcodes: list[tuple[str, str]] = []
+        for action in intent.actions:
+            matches = self.lookup_by_keyword(action)
+            if matches:
+                # Take the best match (first result)
+                ns, op, _ = matches[0]
+                if (ns, op) not in resolved_opcodes:
+                    resolved_opcodes.append((ns, op))
+
+        if not resolved_opcodes:
+            return None  # nothing resolved -- NL passthrough
+
+        # Step 3: Grammar assembly
+        frames: list[str] = []
+        for ns, op in resolved_opcodes:
+            frame = f"{ns}:{op}"
+            # Attach target if available (skip common false positives)
+            valid_targets = [t for t in intent.targets
+                           if t not in ('THE', 'A', 'AN', 'THIS', 'THAT', 'MY', 'YOUR')]
+            if valid_targets:
+                frame += f"@{valid_targets[0]}"
+            # R namespace: add default consequence class (REVERSIBLE)
+            # R:ESTOP is the sole exception (no CC required)
+            if ns == "R" and op != "ESTOP":
+                frame += "\u21ba"  # REVERSIBLE default
+            frames.append(frame)
+
+        # Attach conditions to the first frame if present
+        if intent.conditions and frames:
+            condition = intent.conditions[0]
+            frames[0] = frames[0] + condition
+
+        # Join frames with appropriate operator
+        if len(frames) == 1:
+            sal = frames[0]
+        elif intent.conditions:
+            # Conditional chain: condition -> action
+            sal = "\u2192".join(frames)
+        else:
+            # Conjunctive: action AND action
+            sal = "\u2227".join(frames)
+
+        # Step 4: Validate
+        result = validate_composition(sal, nl=nl_text)
+        if result.valid:
+            return sal
+
+        # If validation failed, try without conditions (simpler form)
+        if intent.conditions and len(frames) > 1:
+            sal_simple = "\u2227".join(
+                f"{ns}:{op}" for ns, op in resolved_opcodes
+            )
+            result = validate_composition(sal_simple, nl=nl_text)
+            if result.valid:
+                return sal_simple
+
+        return None  # composition failed validation
+
+    def compose_or_passthrough(self, nl_text: str,
+                               intent: ComposedIntent | None = None
+                               ) -> tuple[str, bool]:
+        """Compose SAL or return NL passthrough.
+
+        Returns (output, is_sal) where is_sal indicates whether the output
+        is composed SAL or original natural language.
+        """
+        sal = self.compose(nl_text, intent=intent)
+        if sal is not None:
+            return sal, True
+        return nl_text, False
+
+
 # ── Registered Macro Architecture ──────────────────────────────────────────
 #
 # A registered macro is a pre-validated multi-step SAL instruction chain
