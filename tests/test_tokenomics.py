@@ -146,11 +146,9 @@ class TestDecodeIsLookup:
 
     def test_decode_expands_semantic_fields(self):
         decoded = decode("H:HR@NODE1>120;H:CASREP;M:EVA@*")
-        parts = decoded.split("; ")
-        assert len(parts) == 3
-        assert "heart_rate" in parts[0]
-        assert "casualty_report" in parts[1]
-        assert "evacuation" in parts[2]
+        assert "heart rate" in decoded
+        assert "casualty report" in decoded
+        assert "evacuation" in decoded
 
 
 class TestAggregateReport:

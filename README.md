@@ -28,7 +28,7 @@ When AI agents communicate in JSON over HTTP, the cost compounds at every hop.
 R:MOV@BOT1:WPT:WP1↺
 ```
 
-21 bytes. Decode is a table lookup. Fits a single LoRa packet at maximum-range spreading factor. No inference required at the receiving node. The LLM's existing NL→structured output capability handles the translation. The system prompt supplies the SAL grammar, the ASD, and examples from the canonical test vectors. No new tooling required on the generating side. What OSMP changes is the output format, and the decode layer: the receiving node does a table lookup, not inference.
+21 bytes. Decode is a table lookup. Fits a single LoRa packet at maximum-range spreading factor. No inference required at the receiving node. The agent calls `osmp_compose` and the deterministic pipeline handles opcode selection, grammar assembly, and validation. 95.7% opcode coverage on the full 352-opcode dictionary. 98.6% with LLM fallback. What OSMP changes is the output format, and the decode layer: the receiving node does a table lookup, not inference.
 
 ---
 

@@ -44,7 +44,15 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
-## Tools (14)
+## Tools (17)
+
+### Composition (3) -- start here
+
+| Tool | What it does |
+|---|---|
+| `osmp_compose` | **NL to SAL via deterministic pipeline.** Call this instead of writing SAL by hand. Handles phrase matching, opcode selection, grammar assembly, and validation. Returns SAL or NL_PASSTHROUGH. |
+| `osmp_macro_list` | List all registered macros (pre-validated multi-step SAL chains with slot-fill) |
+| `osmp_macro_invoke` | Invoke a macro by ID with slot values. Zero composition error surface. |
 
 ### Core (9)
 
@@ -97,14 +105,12 @@ The bridge annotates outbound messages with SAL equivalents, seeding the remote 
 ## Agent Quickstart
 
 1. Read `osmp://system_prompt` -- the agent learns SAL grammar and composition rules on connect
-2. Use `osmp_lookup` to find opcodes by namespace or keyword
-3. Compose SAL directly from the dictionary
-4. Use `osmp_validate` to check composition before emission
-5. Use `osmp_discover` to find domain codes you don't know
-6. Use `osmp_resolve` for exact code lookup once you have the code
-7. Use `osmp_compound_decode` to check DAG topology before transmitting
-8. Use `osmp_decode` to parse received instructions
-9. Use the bridge tools when communicating with non-OSMP agents
+2. Call `osmp_compose` with NL instructions -- the deterministic pipeline composes SAL for you
+3. If `osmp_compose` returns NL_PASSTHROUGH, send the natural language as-is
+4. Use `osmp_macro_list` to discover pre-validated macros for common workflows
+5. Use `osmp_validate` to verify any manually composed SAL before emission
+6. Use `osmp_decode` to parse received instructions
+7. Use the bridge tools when communicating with non-OSMP agents
 
 ## Context Window Footprint
 

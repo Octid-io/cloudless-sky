@@ -26,16 +26,14 @@ class TestTier1DX:
     def test_decode_single_frame(self):
         from osmp import decode
         text = decode("H:HR@NODE1>120")
-        assert "heart_rate" in text
+        assert "heart rate" in text
 
     def test_decode_sequence(self):
         from osmp import decode
         text = decode("H:HR@NODE1>120;H:CASREP;M:EVA@*")
-        parts = text.split("; ")
-        assert len(parts) == 3
-        assert "heart_rate" in parts[0]
-        assert "casualty_report" in parts[1]
-        assert "evacuation" in parts[2]
+        assert "heart rate" in text
+        assert "casualty report" in text
+        assert "evacuation" in text
 
     def test_encode_string_passthrough(self):
         from osmp import encode
@@ -79,7 +77,7 @@ class TestTier1DX:
         from osmp import encode, decode
         sal = encode(["H:HR@NODE1>120", "H:CASREP", "M:EVA@*"])
         text = decode(sal)
-        assert "heart_rate" in text and "casualty_report" in text and "evacuation" in text
+        assert "heart rate" in text and "casualty report" in text and "evacuation" in text
 
     def test_version(self):
         # Single source of truth: __version__ must match what
@@ -102,7 +100,7 @@ class TestTier1DX:
         sal = o.encode(["H:HR@NODE1>120", "H:CASREP"])
         assert sal == "H:HR@NODE1>120;H:CASREP"
         text = o.decode("H:HR@NODE1>120")
-        assert "heart_rate" in text
+        assert "heart rate" in text
 
 
 # ── SECTION 2: AGENT DX ─────────────────────────────────────────────────────

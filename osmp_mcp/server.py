@@ -106,7 +106,11 @@ mcp = FastMCP(
     instructions=(
         "OSMP encodes agentic instructions as SAL (Semantic Assembly Language). "
         "Decode is table lookup. No inference. 86.8% byte reduction vs JSON.\n\n"
-        "MANDATORY RULES FOR COMPOSITION:\n"
+        "COMPOSITION: Call osmp_compose with the natural language instruction. "
+        "The deterministic pipeline handles opcode selection, grammar assembly, "
+        "and validation. Never write SAL by hand. If osmp_compose returns "
+        "NL_PASSTHROUGH, send the natural language as-is.\n\n"
+        "MANDATORY RULES (if composing manually instead of using osmp_compose):\n"
         "1. ALWAYS call osmp_lookup before composing. Never guess opcodes. "
         "If lookup returns 0 results, the opcode does not exist.\n"
         "2. READ THE DEFINITION, NOT THE MNEMONIC. "
@@ -862,10 +866,19 @@ EXAMPLE: H:HR@NODE1>120\u2192H:CASREP\u2227M:EVA@*
 {opcode_count} opcodes, {namespace_count} namespaces. Use osmp_lookup to search.
 {namespace_listing}
 
+COMPOSITION TOOLS (use these instead of writing SAL by hand):
+osmp_compose: NL to SAL via deterministic pipeline. Call this first. It handles
+  phrase matching, opcode selection, grammar assembly, and validation automatically.
+  Returns SAL or NL_PASSTHROUGH. The model's job is to call this tool, not write SAL.
+osmp_macro_list: List all registered macros (pre-validated multi-step SAL chains).
+osmp_macro_invoke: Invoke a macro by ID with slot values. Zero composition error surface.
+
+VALIDATION AND LOOKUP:
 osmp_validate checks composition rules before emission (hallucination, consequence class, etc).
-osmp_compound_decode shows DAG topology and loss tolerance behavior.
+osmp_lookup searches the ASD by namespace or keyword.
 osmp_discover searches domain corpora by keyword (use when you don't know the code).
-osmp_resolve / osmp_batch_resolve for exact code lookup (ICD-10, ISO 20022, MITRE ATT\u0026CK).
+osmp_resolve / osmp_batch_resolve for exact code lookup (ICD-10, ISO 20022, MITRE ATT&CK).
+osmp_compound_decode shows DAG topology and loss tolerance behavior.
 If SAL is longer than the NL, send the NL. Floor: 51 bytes.
 """
 
