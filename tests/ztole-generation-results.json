@@ -1,0 +1,1728 @@
+{
+  "panel_size": 5,
+  "threshold": 3,
+  "total_candidates": 155,
+  "graduated": 0,
+  "borderline": 132,
+  "failed": 23,
+  "graduation_rate_pct": 0.0,
+  "graduated_triggers": [],
+  "borderline_triggers": [
+    {
+      "phrase": "generate key",
+      "ns": "S",
+      "op": "KEYGEN",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:KEYGEN",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:KEYGEN",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "generate a key pair",
+      "ns": "S",
+      "op": "KEYGEN",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:KEYGEN",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:KEYGEN",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "key generation",
+      "ns": "S",
+      "op": "KEYGEN",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:KEYGEN",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:KEYGEN",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "create keys",
+      "ns": "S",
+      "op": "KEYGEN",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:KEYGEN",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:KEYGEN",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "make a keypair",
+      "ns": "S",
+      "op": "KEYGEN",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Z:KEYGEN",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:KEYGEN",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "sign the payload",
+      "ns": "S",
+      "op": "SIGN",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:SIGN",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:SIGN",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "digital signature",
+      "ns": "S",
+      "op": "SIGN",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:SIGN",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:SIGN",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "cryptographically sign",
+      "ns": "S",
+      "op": "SIGN",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:SIGN",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:SIGN",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "send data",
+      "ns": "D",
+      "op": "PUSH",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "D:PUSH",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "D:PUSH",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "push data",
+      "ns": "D",
+      "op": "PUSH",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "D:PUSH",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "D:PUSH",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "transmit to node",
+      "ns": "D",
+      "op": "PUSH",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "D:PUSH",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "D:PUSH",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "send to node",
+      "ns": "D",
+      "op": "PUSH",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "D:PUSH",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "D:PUSH",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "emergency stop",
+      "ns": "R",
+      "op": "ESTOP",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "R:ESTOP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "R:ESTOP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "stop everything",
+      "ns": "R",
+      "op": "ESTOP",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "R:ESTOP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "R:STOP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "halt immediately",
+      "ns": "R",
+      "op": "ESTOP",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "R:ESTOP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "C:KILL",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "e-stop",
+      "ns": "R",
+      "op": "ESTOP",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "R:ESTOP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "R:ESTOP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "evacuate",
+      "ns": "M",
+      "op": "EVA",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "M:EVA",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "M:EVA",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "evacuation",
+      "ns": "M",
+      "op": "EVA",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "M:EVA",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "M:EVA",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "hand off",
+      "ns": "J",
+      "op": "HANDOFF",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "J:HANDOFF",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "J:HANDOFF",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "handoff",
+      "ns": "J",
+      "op": "HANDOFF",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "J:HANDOFF",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "J:HANDOFF",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "transfer task",
+      "ns": "J",
+      "op": "HANDOFF",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "U:DELEGATE",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "J:HANDOFF",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "pass the task",
+      "ns": "J",
+      "op": "HANDOFF",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "J:HANDOFF",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "J:HANDOFF",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "verify identity",
+      "ns": "I",
+      "op": "ID",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "I:ID",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "I:ID",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "identity check",
+      "ns": "I",
+      "op": "ID",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "I:ID",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "I:ID",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "identify the patient",
+      "ns": "I",
+      "op": "ID",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "I:ID",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "I:ID",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "heart rate",
+      "ns": "H",
+      "op": "HR",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:HR",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:HR",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "pulse",
+      "ns": "H",
+      "op": "HR",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:HR",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "cardiac rate",
+      "ns": "H",
+      "op": "HR",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:HR",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:HR",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "bpm",
+      "ns": "H",
+      "op": "HR",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:HR",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:BP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "blood pressure",
+      "ns": "H",
+      "op": "BP",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:BP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:BP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "bp reading",
+      "ns": "H",
+      "op": "BP",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:BP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:BP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "systolic",
+      "ns": "H",
+      "op": "BP",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:BP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "diastolic",
+      "ns": "H",
+      "op": "BP",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:BP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:BP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "body temperature",
+      "ns": "H",
+      "op": "TEMP",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:TEMP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:TEMP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "patient temperature",
+      "ns": "H",
+      "op": "TEMP",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:TEMP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:TEMP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "fever check",
+      "ns": "H",
+      "op": "TEMP",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:TEMP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:TEMP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "core temp",
+      "ns": "H",
+      "op": "TEMP",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:TEMP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "E:TH",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "oxygen saturation",
+      "ns": "H",
+      "op": "SPO2",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:SPO2",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:SPO2",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "spo2",
+      "ns": "H",
+      "op": "SPO2",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:SPO2",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:SPO2",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "pulse ox",
+      "ns": "H",
+      "op": "SPO2",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:SPO2",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:SPO2",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "blood oxygen",
+      "ns": "H",
+      "op": "SPO2",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:SPO2",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:SPO2",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "casualty report",
+      "ns": "H",
+      "op": "CASREP",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:CASREP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:CASREP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "injury report",
+      "ns": "H",
+      "op": "CASREP",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:CASREP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "diagnosis code",
+      "ns": "H",
+      "op": "ICD",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:ICD",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:ICD",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "icd code",
+      "ns": "H",
+      "op": "ICD",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:ICD",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:ICD",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "icd-10",
+      "ns": "H",
+      "op": "ICD",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:ICD",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:ICD",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "diagnostic code",
+      "ns": "H",
+      "op": "ICD",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "H:ICD",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "H:ICD",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "sensor temperature",
+      "ns": "E",
+      "op": "TH",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "E:TH",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "E:TH",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "ambient reading",
+      "ns": "E",
+      "op": "TH",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "E:TH",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "W:TEMP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "environmental temperature",
+      "ns": "E",
+      "op": "TH",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "E:TH",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "E:TH",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "temp and humidity",
+      "ns": "E",
+      "op": "TH",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "E:TH",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "E:TH",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "humidity",
+      "ns": "E",
+      "op": "HU",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "E:HU",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "E:HU",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "moisture level",
+      "ns": "E",
+      "op": "HU",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "E:HU",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "E:HU",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "relative humidity",
+      "ns": "E",
+      "op": "HU",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "E:HU",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "E:HU",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "gps coordinates",
+      "ns": "E",
+      "op": "GPS",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "G:POS",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "E:GPS",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "wind speed",
+      "ns": "W",
+      "op": "WIND",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:WIND",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "W:WIND",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "wind direction",
+      "ns": "W",
+      "op": "WIND",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:WIND",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "W:WIND",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "wind conditions",
+      "ns": "W",
+      "op": "WIND",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:WIND",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "W:WIND",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "wind data",
+      "ns": "W",
+      "op": "WIND",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:WIND",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "W:WIND",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "visibility",
+      "ns": "W",
+      "op": "VIS",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:VIS",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "W:VIS",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "visibility report",
+      "ns": "W",
+      "op": "VIS",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:VIS",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "W:VIS",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "visual range",
+      "ns": "W",
+      "op": "VIS",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:VIS",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "weather temperature",
+      "ns": "W",
+      "op": "TEMP",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:TEMP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "W:TEMP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "outside temperature",
+      "ns": "W",
+      "op": "TEMP",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:TEMP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "E:TH",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "ambient temperature",
+      "ns": "W",
+      "op": "TEMP",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:TEMP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "W:TEMP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "metar",
+      "ns": "W",
+      "op": "METAR",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:METAR",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "W:METAR",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "aviation weather",
+      "ns": "W",
+      "op": "METAR",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:METAR",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "W:METAR",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "airfield weather",
+      "ns": "W",
+      "op": "METAR",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "W:METAR",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "W:FCST",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "move robot",
+      "ns": "R",
+      "op": "MOV",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "R:MOV",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "R:MOV",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "move to",
+      "ns": "R",
+      "op": "MOV",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "R:MOV",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "R:MOV",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "safety zone",
+      "ns": "R",
+      "op": "ZONE",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "R:ZONE",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "R:ZONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "exclusion zone",
+      "ns": "R",
+      "op": "ZONE",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "R:ZONE",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "keep-out area",
+      "ns": "R",
+      "op": "ZONE",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "R:ZONE",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "B:AREA",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "restricted area",
+      "ns": "R",
+      "op": "ZONE",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "R:ZONE",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "B:AREA",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "encrypt",
+      "ns": "S",
+      "op": "ENC",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:ENC",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:ENC",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "encrypt data",
+      "ns": "S",
+      "op": "ENC",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:ENC",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:ENC",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "encryption",
+      "ns": "S",
+      "op": "ENC",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:ENC",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:ENC",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "cipher",
+      "ns": "S",
+      "op": "ENC",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:ENC",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:ENC",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "decrypt",
+      "ns": "S",
+      "op": "DEC",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:DEC",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:DEC",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "decryption",
+      "ns": "S",
+      "op": "DEC",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:DEC",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:DEC",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "decipher",
+      "ns": "S",
+      "op": "DEC",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:DEC",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:DEC",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "verify signature",
+      "ns": "S",
+      "op": "VFY",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:VFY",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:VFY",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "signature verification",
+      "ns": "S",
+      "op": "VFY",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:VFY",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:VFY",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "check signature",
+      "ns": "S",
+      "op": "VFY",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "S:VFY",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "S:VFY",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "payment",
+      "ns": "K",
+      "op": "PAY",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "K:PAY",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "K:PAY",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "process payment",
+      "ns": "K",
+      "op": "PAY",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "K:PAY",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "K:PAY",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "pay",
+      "ns": "K",
+      "op": "PAY",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "K:PAY",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "K:PAY",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "execute payment",
+      "ns": "K",
+      "op": "PAY",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "K:PAY",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "K:PAY",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "model temperature",
+      "ns": "Z",
+      "op": "TEMP",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Z:TEMP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "Z:TEMP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "sampling temperature",
+      "ns": "Z",
+      "op": "TEMP",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Z:TEMP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "X:TEMP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "inference temperature",
+      "ns": "Z",
+      "op": "TEMP",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Z:TEMP",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "X:TEMP",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "run inference",
+      "ns": "Z",
+      "op": "INF",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Z:INF",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "X:INF",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "invoke model",
+      "ns": "Z",
+      "op": "INF",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Z:INF",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "X:INF",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "call the model",
+      "ns": "Z",
+      "op": "INF",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Z:INF",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "token count",
+      "ns": "Z",
+      "op": "TOKENS",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Z:TOKENS",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "X:TOKENS",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "token usage",
+      "ns": "Z",
+      "op": "TOKENS",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Z:TOKENS",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "Y:USG",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "how many tokens",
+      "ns": "Z",
+      "op": "TOKENS",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Z:TOKENS",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "Z:TOKENS",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "wind generation",
+      "ns": "X",
+      "op": "WND",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "X:WND",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "X:WIND",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "wind farm",
+      "ns": "X",
+      "op": "WND",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "X:WND",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "wind energy",
+      "ns": "X",
+      "op": "WND",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "X:WND",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "X:SOLAR",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "wind turbine output",
+      "ns": "X",
+      "op": "WND",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "X:WND",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "X:PROD",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "solar generation",
+      "ns": "X",
+      "op": "SOLAR",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "X:SOLAR",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "X:SOLAR",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "solar output",
+      "ns": "X",
+      "op": "SOLAR",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "X:SOLAR",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "X:PROD",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "solar panel",
+      "ns": "X",
+      "op": "SOLAR",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "X:SOLAR",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "X:SOLAR",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "photovoltaic",
+      "ns": "X",
+      "op": "SOLAR",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "X:SOLAR",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "building alarm",
+      "ns": "B",
+      "op": "ALRM",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "B:ALRM",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "B:ALRM",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "fire alarm",
+      "ns": "B",
+      "op": "ALRM",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "B:ALRM",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "M:ALRM",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "alarm in the building",
+      "ns": "B",
+      "op": "ALRM",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "B:ALRM",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "B:ALRM",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "schedule",
+      "ns": "T",
+      "op": "SCHED",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "T:SCHED",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "T:SCHED",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "schedule event",
+      "ns": "T",
+      "op": "SCHED",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "T:SCHED",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "T:SCHED",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "book a time",
+      "ns": "T",
+      "op": "SCHED",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "T:SCHED",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "set a time",
+      "ns": "T",
+      "op": "SCHED",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "T:SCHED",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "T:SCHED",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "time window",
+      "ns": "T",
+      "op": "WIN",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "T:WIN",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "T:WIN",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "scheduling window",
+      "ns": "T",
+      "op": "WIN",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "T:WIN",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "T:WIN",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "audit log",
+      "ns": "L",
+      "op": "AUDIT",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "L:LOG",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "L:AUDIT",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "compliance report",
+      "ns": "L",
+      "op": "REPORT",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "L:REPORT",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "L:REPORT",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "audit report",
+      "ns": "L",
+      "op": "REPORT",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "L:REPORT",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "L:REPORT",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "generate report",
+      "ns": "L",
+      "op": "REPORT",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Q:RPRT",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "L:REPORT",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "log entry",
+      "ns": "D",
+      "op": "LOG",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "D:LOG",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "D:LOG",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "write log",
+      "ns": "D",
+      "op": "LOG",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "L:LOG",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "D:LOG",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "log data",
+      "ns": "D",
+      "op": "LOG",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "D:LOG",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "D:LOG",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "alert operator",
+      "ns": "U",
+      "op": "ALERT",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "U:ALERT",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "U:ALERT",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "urgent alert",
+      "ns": "U",
+      "op": "ALERT",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "U:ALERT",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "U:ALERT",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "send alert",
+      "ns": "U",
+      "op": "ALERT",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "U:ALERT",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "order tacos",
+      "ns": "NONE",
+      "op": "NONE",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "K:ORD",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "book a flight",
+      "ns": "NONE",
+      "op": "NONE",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "K:ORD",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "send an email",
+      "ns": "NONE",
+      "op": "NONE",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "U:NOTIFY",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "post to instagram",
+      "ns": "NONE",
+      "op": "NONE",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "R:NOTIF",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "what is 2+2",
+      "ns": "NONE",
+      "op": "NONE",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Z:INF",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "hey how are you",
+      "ns": "NONE",
+      "op": "NONE",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "A:PING",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "who painted the mona lisa",
+      "ns": "NONE",
+      "op": "NONE",
+      "agreements": 2,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "NONE:NONE",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    },
+    {
+      "phrase": "calculate the total cost",
+      "ns": "NONE",
+      "op": "NONE",
+      "agreements": 1,
+      "responses": {
+        "claude-hi": "ERROR:HTTP Error 404: Not Found",
+        "claude-lo": "Z:COST",
+        "gpt-hi": "ERROR:HTTP Error 400: Bad Request",
+        "gpt-lo": "NONE:NONE",
+        "gemini": "ERROR:HTTP Error 400: Bad Request"
+      }
+    }
+  ]
+}

@@ -1,0 +1,732 @@
+[
+  {
+    "id": "CF-001",
+    "nl": "Alert me if the patient's heart rate goes above 130.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "H:HR>130→H:ALERT",
+      "H:HR>130→U:ALERT"
+    ],
+    "composer_sal": "H:HR>130.→H:ALERT",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "H:ALERT@*⚠I:§→H:HR>130",
+      "gpt-5": null,
+      "gpt-4o-mini": "H:ALERT@*⚠ I:§→ H:HR>130 THEN U:NOTIFY@*",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "H:ALERT@*⚠I:§→H:HR>130",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "H:ALERT@*⚠ I:§→ H:HR>130 THEN U:NOTIFY@*",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('U', 'NOTIFY'), ('I', '§')}"
+  },
+  {
+    "id": "CF-002",
+    "nl": "Get me the temperature and humidity from sensor node 4A.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "E:EQ@4A?TH:0∧?HU:0",
+      "E:TH@4A?∧E:HU@4A?"
+    ],
+    "composer_sal": "E:TH∧E:HU∧D:PULL",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "E:TH@4A",
+      "gpt-5": null,
+      "gpt-4o-mini": "E:TH@4A⚠;E:HU@4A⚠",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "E:TH@4A",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "E:TH@4A⚠;E:HU@4A⚠",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_MATCH",
+    "detail": "Partial overlap"
+  },
+  {
+    "id": "CF-003",
+    "nl": "Generate a key pair, then sign the payload, then send it to node BRAVO.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "S:KEYGEN;S:SIGN;D:PUSH@BRAVO"
+    ],
+    "composer_sal": "Y:EMBED@NODE∧S:KEYEX@NODE∧S:SIGN@NODE∧D:CHUNK@NODE∧D:PULL@NODE",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "S:KEYGEN → S:SIGN → D:PUSH@BRAVO",
+      "gpt-5": null,
+      "gpt-4o-mini": "S:KEYGEN⚠; S:SIGN⚠@BRAVO",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "S:KEYGEN → S:SIGN → D:PUSH@BRAVO",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "S:KEYGEN⚠; S:SIGN⚠@BRAVO",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('D', 'PUSH'), ('S', 'KEYGEN')}"
+  },
+  {
+    "id": "CF-004",
+    "nl": "Stop everything immediately. Emergency.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "R:ESTOP"
+    ],
+    "composer_sal": "R:STOP↺∧R:ESTOP",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "R:ESTOP@*",
+      "gpt-5": null,
+      "gpt-4o-mini": "R:ESTOP⚠@*",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "R:ESTOP@*",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "R:ESTOP⚠@*",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_MATCH",
+    "detail": "Partial overlap"
+  },
+  {
+    "id": "CF-005",
+    "nl": "Process the payment but only if a human approves it first.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "I:§→K:PAY",
+      "I:§↔K:PAY"
+    ],
+    "composer_sal": "C:KILL∧K:PAY∧I:§",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "U:APPROVE@* → K:PAY",
+      "gpt-5": null,
+      "gpt-4o-mini": "K:PAY⚠I:§→ U:APPROVE@*; K:PAY",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "U:APPROVE@* → K:PAY",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "K:PAY⚠I:§→ U:APPROVE@*; K:PAY",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('U', 'APPROVE')}"
+  },
+  {
+    "id": "CF-006",
+    "nl": "Hand this task off to agent BETA with full context.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "J:HANDOFF@BETA"
+    ],
+    "composer_sal": "A:ERR@AGENT∧J:DECOMP@AGENT∧R:TORCH@AGENT↺∧A:DA@AGENT∧J:HANDOFF@AGENT",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "J:HANDOFF@BETA",
+      "gpt-5": null,
+      "gpt-4o-mini": "R:HANDOFF@BETA",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "J:HANDOFF@BETA",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "R:HANDOFF@BETA",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('R', 'HANDOFF')}"
+  },
+  {
+    "id": "CF-007",
+    "nl": "Run the model at temperature 0.3 with top-p 0.9 and report the token count.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "Z:TEMP:0.3∧Z:TOPP:0.9→Z:INF→Z:TOKENS?"
+    ],
+    "composer_sal": "Z:MODEL∧E:TH∧L:REPORT∧Z:TOKENS∧Z:TEMP:0.3∧Z:TOPP:0.9",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "Z:INF@*∧Z:TEMP[0.3]∧Z:TOPP[0.9]∧Z:TOKENS",
+      "gpt-5": null,
+      "gpt-4o-mini": "Z:INF[TEMP=0.3 ∧ TOPP=0.9]; Z:TOKENS",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "Z:INF@*∧Z:TEMP[0.3]∧Z:TOPP[0.9]∧Z:TOKENS",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "Z:INF[TEMP=0.3 ∧ TOPP=0.9]; Z:TOKENS",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('Z', 'INF')}"
+  },
+  {
+    "id": "CF-008",
+    "nl": "Fire alarm in sector 3. Evacuate the whole building.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "B:ALRM@AREA∧M:EVA@*",
+      "B:SAFE@AREA:3→M:EVA@*"
+    ],
+    "composer_sal": "W:FIRE∧T:ALARM∧B:AREA∧B:ALRM",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "B:ALRM@*→M:EVA∧O:ESCL",
+      "gpt-5": null,
+      "gpt-4o-mini": "R:ALRM:AREA:3⚠;M:EVA⚠",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "B:ALRM@*→M:EVA∧O:ESCL",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "R:ALRM:AREA:3⚠;M:EVA⚠",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('R', 'ALRM'), ('M', 'EVA'), ('O', 'ESCL'), ('A', '3')}"
+  },
+  {
+    "id": "CF-009",
+    "nl": "What's the wind and visibility at the airfield?",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "W:WIND?∧W:VIS?",
+      "W:METAR?"
+    ],
+    "composer_sal": "W:WIND∧W:VIS",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "W:WIND@* ∧ W:VIS@*",
+      "gpt-5": null,
+      "gpt-4o-mini": "W: WIND@*; W: VIS@*",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "W:WIND@* ∧ W:VIS@*",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "W: WIND@*; W: VIS@*",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "CONFIRMED",
+    "detail": "Panel and composer agree"
+  },
+  {
+    "id": "CF-010",
+    "nl": "Move the robot to waypoint alpha, but make sure it respects the safety zone around the workers.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "R:ZONE[WORKERS]∧I:§→R:⚠MOV@WPT[ALPHA]"
+    ],
+    "composer_sal": "R:MOV@WAYPOINT↺∧G:WPT@WAYPOINT∧E:PU@WAYPOINT∧B:SAFE@WAYPOINT∧R:ZONE@WAYPOINT↺",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "R:MOV@*→R:WPT@*[alpha]∧R:ZONE@*[workers]",
+      "gpt-5": null,
+      "gpt-4o-mini": "R:MOV@alpha; R:ZONE@safety_zone",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "R:MOV@*→R:WPT@*[alpha]∧R:ZONE@*[workers]",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "R:MOV@alpha; R:ZONE@safety_zone",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('R', 'WPT')}"
+  },
+  {
+    "id": "CF-011",
+    "nl": "Order me some tacos.",
+    "expected_mode": "NL_PASSTHROUGH",
+    "expected_sal": null,
+    "composer_sal": null,
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": null,
+      "gpt-5": null,
+      "gpt-4o-mini": null,
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "NL_PASSTHROUGH",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "NL_PASSTHROUGH",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "ALL_NONE",
+    "detail": "Everyone agrees: NL passthrough"
+  },
+  {
+    "id": "CF-012",
+    "nl": "Book me a flight to Denver next Tuesday.",
+    "expected_mode": "NL_PASSTHROUGH",
+    "expected_sal": null,
+    "composer_sal": null,
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": null,
+      "gpt-5": null,
+      "gpt-4o-mini": null,
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "NL_PASSTHROUGH",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "NL_PASSTHROUGH",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "ALL_NONE",
+    "detail": "Everyone agrees: NL passthrough"
+  },
+  {
+    "id": "CF-013",
+    "nl": "Send an email to the engineering team about the deployment schedule.",
+    "expected_mode": "NL_PASSTHROUGH",
+    "expected_sal": null,
+    "composer_sal": null,
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": null,
+      "gpt-5": null,
+      "gpt-4o-mini": null,
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "NL_PASSTHROUGH",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "NL_PASSTHROUGH",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "ALL_NONE",
+    "detail": "Everyone agrees: NL passthrough"
+  },
+  {
+    "id": "CF-014",
+    "nl": "Post this photo to Instagram with the caption 'sunset over Austin'.",
+    "expected_mode": "NL_PASSTHROUGH",
+    "expected_sal": null,
+    "composer_sal": null,
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "R:NOTIF@*∧R:SPKR⊘I:§",
+      "gpt-5": null,
+      "gpt-4o-mini": null,
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "R:NOTIF@*∧R:SPKR⊘I:§",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "NL_PASSTHROUGH",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PANEL_FINDS_NEW",
+    "detail": "Panel found opcodes composer missed: {('R', 'NOTIF'), ('I', '§'), ('R', 'SPKR')}"
+  },
+  {
+    "id": "CF-015",
+    "nl": "Hey, how's it going?",
+    "expected_mode": "NL_PASSTHROUGH",
+    "expected_sal": null,
+    "composer_sal": null,
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": null,
+      "gpt-5": null,
+      "gpt-4o-mini": null,
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "NL_PASSTHROUGH",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "NL_PASSTHROUGH",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "ALL_NONE",
+    "detail": "Everyone agrees: NL passthrough"
+  },
+  {
+    "id": "CF-016",
+    "nl": "What's 247 times 83?",
+    "expected_mode": "NL_PASSTHROUGH",
+    "expected_sal": null,
+    "composer_sal": null,
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": null,
+      "gpt-5": null,
+      "gpt-4o-mini": null,
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "NL_PASSTHROUGH",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "NL_PASSTHROUGH",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "ALL_NONE",
+    "detail": "Everyone agrees: NL passthrough"
+  },
+  {
+    "id": "CF-017",
+    "nl": "Stop.",
+    "expected_mode": "NL_PASSTHROUGH",
+    "expected_sal": null,
+    "composer_sal": null,
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "R:STOP",
+      "gpt-5": null,
+      "gpt-4o-mini": "R:ESTOP",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "R:STOP",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "R:ESTOP",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PANEL_FINDS_NEW",
+    "detail": "Panel found opcodes composer missed: {('R', 'STOP'), ('R', 'ESTOP')}"
+  },
+  {
+    "id": "CF-018",
+    "nl": "Who painted the Mona Lisa?",
+    "expected_mode": "NL_PASSTHROUGH",
+    "expected_sal": null,
+    "composer_sal": null,
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": null,
+      "gpt-5": null,
+      "gpt-4o-mini": null,
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "NL_PASSTHROUGH",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "NL_PASSTHROUGH",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "ALL_NONE",
+    "detail": "Everyone agrees: NL passthrough"
+  },
+  {
+    "id": "CF-019",
+    "nl": "Summarize the customer feedback survey results.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "A:SUM[customer feedback survey results]"
+    ],
+    "composer_sal": "A:SUM∧I:KYC∧U:FEEDBACK",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "A:SUM@*",
+      "gpt-5": null,
+      "gpt-4o-mini": "A:SUM⚠ I:§→",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "A:SUM@*",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "A:SUM⚠ I:§→",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('I', '§')}"
+  },
+  {
+    "id": "CF-020",
+    "nl": "Check the temperature.",
+    "expected_mode": "NL_PASSTHROUGH",
+    "expected_sal": null,
+    "composer_sal": null,
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "E:TH@*",
+      "gpt-5": null,
+      "gpt-4o-mini": "E:TH⚠ I:§→",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "E:TH@*",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "E:TH⚠ I:§→",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PANEL_FINDS_NEW",
+    "detail": "Panel found opcodes composer missed: {('I', '§'), ('E', 'TH')}"
+  },
+  {
+    "id": "CF-021",
+    "nl": "Calculate the total cost.",
+    "expected_mode": "NL_PASSTHROUGH",
+    "expected_sal": null,
+    "composer_sal": "Z:COST",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": null,
+      "gpt-5": null,
+      "gpt-4o-mini": null,
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "NL_PASSTHROUGH",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "NL_PASSTHROUGH",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "COMPOSER_ONLY",
+    "detail": "Panel all NONE, composer produced SAL"
+  },
+  {
+    "id": "CF-022",
+    "nl": "The wind farm output dropped. Check the wind generation status.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "X:WND?"
+    ],
+    "composer_sal": "X:WND∧W:WIND∧A:TRUST∧A:PING∧J:STATUS",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "Z:INF@* → X:WIND → X:STAT",
+      "gpt-5": null,
+      "gpt-4o-mini": "W:STATUS⚠@*",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "Z:INF@* → X:WIND → X:STAT",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "W:STATUS⚠@*",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('X', 'WIND'), ('W', 'STATUS'), ('X', 'STAT'), ('Z', 'INF')}"
+  },
+  {
+    "id": "CF-023",
+    "nl": "Verify the patient's identity, check their blood pressure, and if it's above 180, file a casualty report and medevac them to base camp.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "I:ID@PATIENT→H:BP@PATIENT>180→H:CASREP∧M:EVA@BASECAMP"
+    ],
+    "composer_sal": "H:CASREP@BASE>180→H:BP@BASE→D:CHUNK@BASE→Q:REVISE@BASE→A:VERIFY@BASE→A:ASD@BASE→A:PING@BASE",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "I:ID ∧ H:BP → H:CASREP ∧ M:EVA@*",
+      "gpt-5": null,
+      "gpt-4o-mini": "I:§→ VERIFY@*⚠; CHKPT@*⚠ ∧ H > 180 THEN M:CASREP@*⚠ ∥ M:EVA@*⚠",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "I:ID ∧ H:BP → H:CASREP ∧ M:EVA@*",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "I:§→ VERIFY@*⚠; CHKPT@*⚠ ∧ H > 180 THEN M:CASREP@*⚠ ∥ M:EVA@*⚠",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('I', 'ID'), ('I', '§'), ('M', 'EVA'), ('M', 'CASREP')}"
+  },
+  {
+    "id": "CF-024",
+    "nl": "Report the soil moisture at sensor grid point 7.",
+    "expected_mode": "CONDITIONAL",
+    "expected_sal": [
+      "Ω:SOIL@GRID7?"
+    ],
+    "composer_sal": "L:REPORT@SENSOR∧X:FREQ@SENSOR∧B:AP@SENSOR",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "E:EQ@7",
+      "gpt-5": null,
+      "gpt-4o-mini": null,
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "E:EQ@7",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "NL_PASSTHROUGH",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "DISAGREE",
+    "detail": "Panel consensus {('E', 'EQ')} vs composer {('L', 'REPORT'), ('B', 'AP'), ('X', 'FREQ')}"
+  },
+  {
+    "id": "CF-025",
+    "nl": "Go.",
+    "expected_mode": "NL_PASSTHROUGH",
+    "expected_sal": null,
+    "composer_sal": null,
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "R:DRVE@*",
+      "gpt-5": null,
+      "gpt-4o-mini": null,
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "R:DRVE@*",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "NL_PASSTHROUGH",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PANEL_FINDS_NEW",
+    "detail": "Panel found opcodes composer missed: {('R', 'DRVE')}"
+  },
+  {
+    "id": "CF-026",
+    "nl": "I need to acknowledge the receipt.",
+    "expected_mode": "NL_PASSTHROUGH",
+    "expected_sal": null,
+    "composer_sal": null,
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "A:ACK",
+      "gpt-5": null,
+      "gpt-4o-mini": "U:ACK⚠",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "A:ACK",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "U:ACK⚠",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PANEL_FINDS_NEW",
+    "detail": "Panel found opcodes composer missed: {('U', 'ACK'), ('A', 'ACK')}"
+  },
+  {
+    "id": "CF-027",
+    "nl": "Encrypt the data, email it to the team lead, then log the audit trail.",
+    "expected_mode": "NL_OR_HITL",
+    "expected_sal": null,
+    "composer_sal": "S:ENC∧D:FEED∧D:LOG∧L:AUDIT∧G:TRAIL",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "S:ENC@* → K:PAY@* → L:LOG@*",
+      "gpt-5": null,
+      "gpt-4o-mini": "S: ENC⚠@* THEN LOG⚠@*",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "S:ENC@* → K:PAY@* → L:LOG@*",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "S: ENC⚠@* THEN LOG⚠@*",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('K', 'PAY'), ('L', 'LOG')}"
+  },
+  {
+    "id": "CF-028",
+    "nl": "Move the drone to coordinates 35.7, -122.4.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "I:§→R:⚠MOV@DRONE1∧E:GPS[35.7,-122.4]"
+    ],
+    "composer_sal": "R:MOV@COORDINATES↺∧E:GPS@COORDINATES",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "R:MOV@*→G:POS[35.7,-122.4]",
+      "gpt-5": null,
+      "gpt-4o-mini": "R:MOV@*⚠ I:§→",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "R:MOV@*→G:POS[35.7,-122.4]",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "R:MOV@*⚠ I:§→",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('I', '§'), ('G', 'POS')}"
+  },
+  {
+    "id": "CF-029",
+    "nl": "The patient has pneumothorax. Code J93.0. Get a casualty report to the medevac team.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "H:ICD[J930]→H:CASREP→M:EVA@MEDEVAC"
+    ],
+    "composer_sal": "H:ICD[J930]∧H:CASREP∧P:CODE",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "H:ICD@*→H:CASREP@*",
+      "gpt-5": null,
+      "gpt-4o-mini": "H:CASREP@*⚠ I:§→",
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "H:ICD@*→H:CASREP@*",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "H:CASREP@*⚠ I:§→",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('I', '§')}"
+  },
+  {
+    "id": "CF-030",
+    "nl": "Schedule a maintenance window for the grid controller.",
+    "expected_mode": "FULL_OSMP",
+    "expected_sal": [
+      "T:WIN∧P:DEVICE[GRID_CTRL]",
+      "T:SCHED∧P:DEVICE[GRID_CTRL]"
+    ],
+    "composer_sal": "T:REPEAT∧P:CODE∧T:WIN∧X:FREQ",
+    "panel_sals": {
+      "claude-sonnet": null,
+      "claude-haiku": "T:SCHED@*",
+      "gpt-5": null,
+      "gpt-4o-mini": null,
+      "gemini-flash": null
+    },
+    "panel_raw": {
+      "claude-sonnet": "ERROR: HTTP Error 404: Not Found",
+      "claude-haiku": "T:SCHED@*",
+      "gpt-5": "ERROR: HTTP Error 400: Bad Request",
+      "gpt-4o-mini": "NL_PASSTHROUGH",
+      "gemini-flash": "ERROR: HTTP Error 404: Not Found"
+    },
+    "category": "PARTIAL_NEW",
+    "detail": "Panel found additional opcodes: {('T', 'SCHED')}"
+  }
+]

@@ -1,0 +1,1866 @@
+{
+  "claude": [
+    {
+      "id": "CF-001",
+      "nl": "Alert me if the patient's heart rate goes above 130.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "H:HR>130.→H:ALERT",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "H:ALERT@*[HR>130]",
+      "p2_raw": "H:ALERT@*[HR>130]",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": "H:ALERT@patient>130",
+      "p3_raw": "```json\n{\n  \"actions\": [\"alert\", \"monitor\"],\n  \"conditions\": [\">130\"],\n  \"targets\": [\"patient\"],\n  \"parameters\": {\"metri",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-002",
+      "nl": "Get me the temperature and humidity from sensor node 4A.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "E:TH∧E:HU∧D:PULL",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "E:TH@4A",
+      "p2_raw": "E:TH@4A",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [\"read\", \"get\"],\n  \"conditions\": [],\n  \"targets\": [\"4A\"],\n  \"parameters\": {\"sensor_type\": \"temper",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-003",
+      "nl": "Generate a key pair, then sign the payload, then send it to node BRAVO.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "Y:EMBED@NODE∧S:KEYEX@NODE∧S:SIGN@NODE∧D:CHUNK@NODE∧D:PULL@NODE",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 0,
+        "safety": 1,
+        "total": 3
+      },
+      "p2_sal": "S:KEYGEN→S:SIGN@*→D:PUSH@BRAVO",
+      "p2_raw": "S:KEYGEN→S:SIGN@*→D:PUSH@BRAVO",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [\"generate_key_pair\", \"sign_payload\", \"send\"],\n  \"conditions\": [],\n  \"targets\": [\"BRAVO\"],\n  \"par",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-004",
+      "nl": "Stop everything immediately. Emergency.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "R:STOP↺∧R:ESTOP",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "R:ESTOP@*",
+      "p2_raw": "R:ESTOP@*",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": "R:STOP↺",
+      "p3_raw": "```json\n{\n  \"actions\": [\"stop\", \"emergency_halt\"],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_co",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 0,
+        "safety": 1,
+        "total": 3
+      }
+    },
+    {
+      "id": "CF-005",
+      "nl": "Process the payment but only if a human approves it first.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "C:KILL∧K:PAY∧I:§",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "U:APPROVE→K:PAY",
+      "p2_raw": "U:APPROVE→K:PAY",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [\"process_payment\", \"request_approval\"],\n  \"conditions\": [\"human_approval_required\"],\n  \"targets\"",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-006",
+      "nl": "Hand this task off to agent BETA with full context.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "A:ERR@AGENT∧J:DECOMP@AGENT∧R:TORCH@AGENT↺∧A:DA@AGENT∧J:HANDOFF@AGENT",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "J:HANDOFF@BETA",
+      "p2_raw": "J:HANDOFF@BETA",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [\"BETA\"],\n  \"parameters\": {\n    \"context\": \"full\"\n  },\n  \"sh",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-007",
+      "nl": "Run the model at temperature 0.3 with top-p 0.9 and report the token count.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "Z:MODEL∧E:TH∧L:REPORT∧Z:TOKENS∧Z:TEMP:0.3∧Z:TOPP:0.9",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "Z:INF@*→Z:TEMP[0.3]∧Z:TOPP[0.9]→Z:TOKENS",
+      "p2_raw": "Z:INF@*→Z:TEMP[0.3]∧Z:TOPP[0.9]→Z:TOKENS",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [\"run\", \"report\"],\n  \"conditions\": [],\n  \"targets\": [\"model\"],\n  \"parameters\": {\n    \"temperature",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-008",
+      "nl": "Fire alarm in sector 3. Evacuate the whole building.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "W:FIRE∧T:ALARM∧B:AREA∧B:ALRM",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "B:ALRM@*[SECTOR 3] → M:EVA@*",
+      "p2_raw": "B:ALRM@*[SECTOR 3] → M:EVA@*",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [\"activate_alarm\", \"evacuate\"],\n  \"conditions\": [],\n  \"targets\": [\"sector_3\", \"building\"],\n  \"par",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-009",
+      "nl": "What's the wind and visibility at the airfield?",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "W:WIND∧W:VIS",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "W:WIND@*;W:VIS@*",
+      "p2_raw": "W:WIND@*;W:VIS@*",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [\"query\"],\n  \"conditions\": [],\n  \"targets\": [\"airfield\"],\n  \"parameters\": {\"metrics\": [\"wind\", \"v",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-010",
+      "nl": "Move the robot to waypoint alpha, but make sure it respects the safety zone around the workers.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "R:MOV@WAYPOINT↺∧G:WPT@WAYPOINT∧E:PU@WAYPOINT∧B:SAFE@WAYPOINT∧R:ZONE@WAYPOINT↺",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "R:MOV@*→R:WPT[alpha]∧R:ZONE[workers]",
+      "p2_raw": "R:MOV@*→R:WPT[alpha]∧R:ZONE[workers]",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 0,
+        "total": 3
+      },
+      "p3_sal": "R:MOV@robot↺safety_zone_constraint",
+      "p3_raw": "```json\n{\n  \"actions\": [\"move\", \"navigate\"],\n  \"conditions\": [\"safety_zone_constraint\"],\n  \"targets\": [\"robot\", \"waypoin",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 0,
+        "safety": 1,
+        "total": 3
+      }
+    },
+    {
+      "id": "CF-011",
+      "nl": "Order me some tacos.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}\n```",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-012",
+      "nl": "Book me a flight to Denver next Tuesday.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {\n    \"destination\": \"Denver\",\n    \"date",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-013",
+      "nl": "Send an email to the engineering team about the deployment schedule.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}\n```",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-014",
+      "nl": "Post this photo to Instagram with the caption 'sunset over Austin'.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {\n    \"platform\": \"Instagram\",\n    \"capt",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-015",
+      "nl": "Hey, how's it going?",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}\n```",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-016",
+      "nl": "What's 247 times 83?",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}\n```",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-017",
+      "nl": "Stop.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "R:ESTOP",
+      "p2_raw": "R:ESTOP",
+      "p2_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}\n```",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-018",
+      "nl": "Who painted the Mona Lisa?",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}\n```",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-019",
+      "nl": "Summarize the customer feedback survey results.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "A:SUM∧I:KYC∧U:FEEDBACK",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "A:SUM@*[feedback survey results]",
+      "p2_raw": "A:SUM@*[feedback survey results]",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}\n```",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-020",
+      "nl": "Check the temperature.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "E:TH",
+      "p2_raw": "E:TH",
+      "p2_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [\"check\"],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {\n    \"attribute\": \"temperature\"\n",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-021",
+      "nl": "Calculate the total cost.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": "Z:COST",
+      "p1_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p2_sal": "Z:COST",
+      "p2_raw": "Z:COST",
+      "p2_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}\n```",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-022",
+      "nl": "The wind farm output dropped. Check the wind generation status.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "X:WND∧W:WIND∧A:TRUST∧A:PING∧J:STATUS",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "X:PROD@*→X:WND",
+      "p2_raw": "X:PROD@*→X:WND",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": "A:PING@wind_farmdropped",
+      "p3_raw": "```json\n{\n  \"actions\": [\"check\", \"read_status\"],\n  \"conditions\": [\"dropped\"],\n  \"targets\": [\"wind_farm\", \"wind_generatio",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 2
+      }
+    },
+    {
+      "id": "CF-023",
+      "nl": "Verify the patient's identity, check their blood pressure, and if it's above 180, file a casualty report and medevac them to base camp.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "H:CASREP@BASE>180→H:BP@BASE→D:CHUNK@BASE→Q:REVISE@BASE→A:VERIFY@BASE→A:ASD@BASE→A:PING@BASE",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 1,
+        "safety": 1,
+        "total": 3
+      },
+      "p2_sal": "H:ID→H:BP→H:ALERT[180]?THEN H:CASREP∧M:EVA@*",
+      "p2_raw": "H:ID→H:BP→H:ALERT[180]?THEN H:CASREP∧M:EVA@*",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 0,
+        "total": 3
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [\"verify_identity\", \"check_blood_pressure\", \"file_casualty_report\", \"medevac\"],\n  \"conditions\": [",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-024",
+      "nl": "Report the soil moisture at sensor grid point 7.",
+      "expected_mode": "CONDITIONAL",
+      "p1_sal": "L:REPORT@SENSOR∧X:FREQ@SENSOR∧B:AP@SENSOR",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 2
+      },
+      "p2_sal": "E:EQ@*?SLOT[soil_moisture]∧G:POS@*?SLOT[grid_point_7]",
+      "p2_raw": "E:EQ@*?SLOT[soil_moisture]∧G:POS@*?SLOT[grid_point_7]",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 2
+      },
+      "p3_sal": "R:NFC@sensor grid point 7↺∧L:REPORT@sensor grid point 7",
+      "p3_raw": "```json\n{\n  \"actions\": [\"read\", \"report\"],\n  \"conditions\": [],\n  \"targets\": [\"sensor grid point 7\"],\n  \"parameters\": {\n ",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 2
+      }
+    },
+    {
+      "id": "CF-025",
+      "nl": "Go.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}\n```",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-026",
+      "nl": "I need to acknowledge the receipt.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "A:ACK",
+      "p2_raw": "A:ACK",
+      "p2_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}\n```",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-027",
+      "nl": "Encrypt the data, email it to the team lead, then log the audit trail.",
+      "expected_mode": "NL_OR_HITL",
+      "p1_sal": "S:ENC∧D:FEED∧D:LOG∧L:AUDIT∧G:TRAIL",
+      "p1_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p2_sal": "S:ENC@* → U:NOTIFY@* ; L:LOG@*",
+      "p2_raw": "S:ENC@* → U:NOTIFY@* ; L:LOG@*",
+      "p2_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [\"encrypt\", \"email\", \"log\"],\n  \"conditions\": [],\n  \"targets\": [\"team lead\"],\n  \"parameters\": {\n  ",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-028",
+      "nl": "Move the drone to coordinates 35.7, -122.4.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "R:MOV@COORDINATES↺∧E:GPS@COORDINATES",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "R:MOV@*→G:POS[35.7,-122.4]",
+      "p2_raw": "R:MOV@*→G:POS[35.7,-122.4]",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 0,
+        "safety": 0,
+        "total": 1
+      },
+      "p3_sal": "R:MOV@drone↺",
+      "p3_raw": "```json\n{\n  \"actions\": [\"move\", \"navigate\"],\n  \"conditions\": [],\n  \"targets\": [\"drone\"],\n  \"parameters\": {\n    \"latitude",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 2
+      }
+    },
+    {
+      "id": "CF-029",
+      "nl": "The patient has pneumothorax. Code J93.0. Get a casualty report to the medevac team.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "H:ICD[J930]∧H:CASREP∧P:CODE",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "H:CASREP@*→Z:INF[medevac_team]",
+      "p2_raw": "H:CASREP@*→Z:INF[medevac_team]",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 0,
+        "safety": 1,
+        "total": 3
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [\"report\", \"notify\"],\n  \"conditions\": [],\n  \"targets\": [\"medevac_team\"],\n  \"parameters\": {\n    \"i",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-030",
+      "nl": "Schedule a maintenance window for the grid controller.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "T:REPEAT∧P:CODE∧T:WIN∧X:FREQ",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "T:SCHED[@*][U:ASSIGN→P:GUIDE]",
+      "p2_raw": "T:SCHED[@*][U:ASSIGN→P:GUIDE]",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "```json\n{\n  \"actions\": [\"schedule\", \"maintenance\"],\n  \"conditions\": [],\n  \"targets\": [\"grid controller\"],\n  \"parameters\"",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    }
+  ],
+  "openai": [
+    {
+      "id": "CF-001",
+      "nl": "Alert me if the patient's heart rate goes above 130.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "H:HR>130.→H:ALERT",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "H:ALERT@*; H:HR→H:ALERT",
+      "p2_raw": "H:ALERT@*; H:HR→H:ALERT",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": "H:ALERT@patient's heart rate>130",
+      "p3_raw": "{\n  \"actions\": [\"alert\"],\n  \"conditions\": [\">130\"],\n  \"targets\": [\"patient's heart rate\"],\n  \"parameters\": {},\n  \"should",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-002",
+      "nl": "Get me the temperature and humidity from sensor node 4A.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "E:TH∧E:HU∧D:PULL",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "E:TH@4A; E:HU@4A",
+      "p2_raw": "E:TH@4A; E:HU@4A",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"get\"],\n  \"conditions\": [],\n  \"targets\": [\"sensor node 4A\"],\n  \"parameters\": {\"temperature\": \"request\", ",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-003",
+      "nl": "Generate a key pair, then sign the payload, then send it to node BRAVO.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "Y:EMBED@NODE∧S:KEYEX@NODE∧S:SIGN@NODE∧D:CHUNK@NODE∧D:PULL@NODE",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 0,
+        "safety": 1,
+        "total": 3
+      },
+      "p2_sal": "S:KEYGEN@BRAVO; S:SIGN@BRAVO",
+      "p2_raw": "S:KEYGEN@BRAVO; S:SIGN@BRAVO",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"generate key pair\", \"sign payload\", \"send to node\"],\n  \"conditions\": [],\n  \"targets\": [\"BRAVO\"],\n  \"par",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-004",
+      "nl": "Stop everything immediately. Emergency.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "R:STOP↺∧R:ESTOP",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "R:ESTOP@*",
+      "p2_raw": "R:ESTOP@*",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-005",
+      "nl": "Process the payment but only if a human approves it first.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "C:KILL∧K:PAY∧I:§",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "K:PAY@* U:APPROVE@*; K:PAY@* U:REJECT@*",
+      "p2_raw": "K:PAY@* U:APPROVE@*; K:PAY@* U:REJECT@*",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"process payment\"],\n  \"conditions\": [\"human approval required\"],\n  \"targets\": [],\n  \"parameters\": {},\n  ",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-006",
+      "nl": "Hand this task off to agent BETA with full context.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "A:ERR@AGENT∧J:DECOMP@AGENT∧R:TORCH@AGENT↺∧A:DA@AGENT∧J:HANDOFF@AGENT",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "R: HANDOFF@BETA",
+      "p2_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"list of domain action keywords that map to protocol opcodes\"],\n  \"conditions\": [\"threshold expressions ",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-007",
+      "nl": "Run the model at temperature 0.3 with top-p 0.9 and report the token count.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "Z:MODEL∧E:TH∧L:REPORT∧Z:TOKENS∧Z:TEMP:0.3∧Z:TOPP:0.9",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "Z:INF@*;Z:TEMP[0.3]∧Z:TOPP[0.9]∧Z:TOKENS",
+      "p2_raw": "Z:INF@*;Z:TEMP[0.3]∧Z:TOPP[0.9]∧Z:TOKENS",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {\n    \"temperature\": 0.3,\n    \"top-p\": 0.9\n  },\n",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-008",
+      "nl": "Fire alarm in sector 3. Evacuate the whole building.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "W:FIRE∧T:ALARM∧B:AREA∧B:ALRM",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "B:ALRM@AREA3;M:EVA@*",
+      "p2_raw": "B:ALRM@AREA3;M:EVA@*",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"evacuate\"],\n  \"conditions\": [],\n  \"targets\": [\"sector 3\", \"whole building\"],\n  \"parameters\": {},\n  \"sho",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-009",
+      "nl": "What's the wind and visibility at the airfield?",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "W:WIND∧W:VIS",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "W:WIND@* ∧ W:VIS@*",
+      "p2_raw": "W:WIND@* ∧ W:VIS@*",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [\"airfield\"],\n  \"parameters\": {},\n  \"should_compose\": false\n}",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-010",
+      "nl": "Move the robot to waypoint alpha, but make sure it respects the safety zone around the workers.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "R:MOV@WAYPOINT↺∧G:WPT@WAYPOINT∧E:PU@WAYPOINT∧B:SAFE@WAYPOINT∧R:ZONE@WAYPOINT↺",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "R:MOV@WPT(α) ∧ R:ZONE(safety zone)",
+      "p2_raw": "R:MOV@WPT(α) ∧ R:ZONE(safety zone)",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 0,
+        "total": 3
+      },
+      "p3_sal": "R:MOV@waypoint alpha↺respect safety zone around workers",
+      "p3_raw": "{\n  \"actions\": [\"move\"],\n  \"conditions\": [\"respect safety zone around workers\"],\n  \"targets\": [\"waypoint alpha\"],\n  \"par",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 0,
+        "safety": 1,
+        "total": 3
+      }
+    },
+    {
+      "id": "CF-011",
+      "nl": "Order me some tacos.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-012",
+      "nl": "Book me a flight to Denver next Tuesday.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"book flight\"],\n  \"conditions\": [],\n  \"targets\": [\"Denver\"],\n  \"parameters\": {\"date\": \"next Tuesday\"},\n ",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-013",
+      "nl": "Send an email to the engineering team about the deployment schedule.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-014",
+      "nl": "Post this photo to Instagram with the caption 'sunset over Austin'.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"post photo\"],\n  \"conditions\": [],\n  \"targets\": [\"Instagram\"],\n  \"parameters\": {\n    \"caption\": \"sunset ",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-015",
+      "nl": "Hey, how's it going?",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-016",
+      "nl": "What's 247 times 83?",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-017",
+      "nl": "Stop.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "R:STOP",
+      "p2_raw": "R:STOP",
+      "p2_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 0,
+        "total": 0
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-018",
+      "nl": "Who painted the Mona Lisa?",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-019",
+      "nl": "Summarize the customer feedback survey results.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "A:SUM∧I:KYC∧U:FEEDBACK",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "J:SUM",
+      "p2_raw": "J:SUM",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 1,
+        "safety": 0,
+        "total": 2
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-020",
+      "nl": "Check the temperature.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "E: TH@*",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-021",
+      "nl": "Calculate the total cost.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": "Z:COST",
+      "p1_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-022",
+      "nl": "The wind farm output dropped. Check the wind generation status.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "X:WND∧W:WIND∧A:TRUST∧A:PING∧J:STATUS",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "X:WND@*STAT()",
+      "p2_raw": "X:WND@*STAT()",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"check wind generation status\"],\n  \"conditions\": [],\n  \"targets\": [\"wind farm\"],\n  \"parameters\": {},\n  \"",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-023",
+      "nl": "Verify the patient's identity, check their blood pressure, and if it's above 180, file a casualty report and medevac them to base camp.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "H:CASREP@BASE>180→H:BP@BASE→D:CHUNK@BASE→Q:REVISE@BASE→A:VERIFY@BASE→A:ASD@BASE→A:PING@BASE",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 1,
+        "safety": 1,
+        "total": 3
+      },
+      "p2_sal": "H:ID@* ∧ H:BP@* → H:CASREP@* ; H:EVA@*",
+      "p2_raw": "H:ID@* ∧ H:BP@* → H:CASREP@* ; H:EVA@*",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 1,
+        "safety": 0,
+        "total": 2
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"file casualty report\", \"medevac\"],\n  \"conditions\": [\">180\"],\n  \"targets\": [\"patient\"],\n  \"parameters\": ",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-024",
+      "nl": "Report the soil moisture at sensor grid point 7.",
+      "expected_mode": "CONDITIONAL",
+      "p1_sal": "L:REPORT@SENSOR∧X:FREQ@SENSOR∧B:AP@SENSOR",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 2
+      },
+      "p2_sal": "E:EQ@7",
+      "p2_raw": "E:EQ@7",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 2
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"report\"],\n  \"conditions\": [],\n  \"targets\": [\"sensor grid point 7\"],\n  \"parameters\": {},\n  \"should_compo",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-025",
+      "nl": "Go.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"list of domain action keywords that map to protocol opcodes\"],\n  \"conditions\": [\"threshold expressions ",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-026",
+      "nl": "I need to acknowledge the receipt.",
+      "expected_mode": "NL_PASSTHROUGH",
+      "p1_sal": null,
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "U:ACK",
+      "p2_raw": "U:ACK",
+      "p2_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [],\n  \"conditions\": [],\n  \"targets\": [],\n  \"parameters\": {},\n  \"should_compose\": false\n}",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-027",
+      "nl": "Encrypt the data, email it to the team lead, then log the audit trail.",
+      "expected_mode": "NL_OR_HITL",
+      "p1_sal": "S:ENC∧D:FEED∧D:LOG∧L:AUDIT∧G:TRAIL",
+      "p1_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p2_sal": "S:ENC@*; S:LOG@*",
+      "p2_raw": "S:ENC@*; S:LOG@*",
+      "p2_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 0,
+        "total": 0
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"encrypt\", \"email\", \"log\"],\n  \"conditions\": [],\n  \"targets\": [\"team lead\"],\n  \"parameters\": {},\n  \"shoul",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      }
+    },
+    {
+      "id": "CF-028",
+      "nl": "Move the drone to coordinates 35.7, -122.4.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "R:MOV@COORDINATES↺∧E:GPS@COORDINATES",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "R: MOV@* 35.7,-122.4",
+      "p2_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p3_sal": "R:MOV@drone↺",
+      "p3_raw": "{\n  \"actions\": [\"move\"],\n  \"conditions\": [],\n  \"targets\": [\"drone\"],\n  \"parameters\": {\"coordinates\": \"35.7, -122.4\"},\n  ",
+      "p3_scores": {
+        "mode": 1,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 2
+      }
+    },
+    {
+      "id": "CF-029",
+      "nl": "The patient has pneumothorax. Code J93.0. Get a casualty report to the medevac team.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "H:ICD[J930]∧H:CASREP∧P:CODE",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": "H:ICD(J93.0) H:CASREP",
+      "p2_raw": "H:ICD(J93.0) H:CASREP",
+      "p2_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"get casualty report\"],\n  \"conditions\": [],\n  \"targets\": [\"medevac team\"],\n  \"parameters\": {\"key\": \"valu",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "CF-030",
+      "nl": "Schedule a maintenance window for the grid controller.",
+      "expected_mode": "FULL_OSMP",
+      "p1_sal": "T:REPEAT∧P:CODE∧T:WIN∧X:FREQ",
+      "p1_scores": {
+        "mode": 1,
+        "ns": 1,
+        "op": 1,
+        "safety": 1,
+        "total": 4
+      },
+      "p2_sal": null,
+      "p2_raw": "NL_PASSTHROUGH",
+      "p2_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      },
+      "p3_sal": null,
+      "p3_raw": "{\n  \"actions\": [\"schedule maintenance\"],\n  \"conditions\": [],\n  \"targets\": [\"grid controller\"],\n  \"parameters\": {},\n  \"sh",
+      "p3_scores": {
+        "mode": 0,
+        "ns": 0,
+        "op": 0,
+        "safety": 1,
+        "total": 1
+      }
+    }
+  ]
+}

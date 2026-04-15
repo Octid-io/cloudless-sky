@@ -1,0 +1,1350 @@
+{
+  "claude": [
+    {
+      "id": "CF-001",
+      "nl": "Alert me if the patient's heart rate goes above 130.",
+      "sal": "H:HR>130.→H:ALERT",
+      "decoded_nl": "[clinical] heart rate above 130. then [clinical] threshold crossing event",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "medical/clinical",
+        "action": "Alert when patient heart rate exceeds threshold",
+        "threshold": 130,
+        "target": "patient"
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "medical/clinical",
+        "action": "Alert on heart rate threshold crossing event",
+        "threshold": 130,
+        "target": null
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "medical/clinical",
+        "action": "Alert when heart rate exceeds 130 bpm",
+        "threshold": 130,
+        "target": "H"
+      }
+    },
+    {
+      "id": "CF-002",
+      "nl": "Get me the temperature and humidity from sensor node 4A.",
+      "sal": "E:TH∧E:HU∧D:PULL",
+      "decoded_nl": "[sensor] temperature humidity composite and [sensor] humidity and [data] request payload from node",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "environmental/sensor",
+        "action": "retrieve temperature and humidity readings from sensor node",
+        "threshold": null,
+        "target": "sensor node 4A"
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "environmental/sensor",
+        "action": "Request composite temperature humidity sensor data payload from node",
+        "threshold": null,
+        "target": "node"
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "Execute thermal and humidity sensor data pull operation",
+        "threshold": null,
+        "target": null
+      }
+    },
+    {
+      "id": "CF-003",
+      "nl": "Generate a key pair, then sign the payload, then send it to node BRAVO.",
+      "sal": "Y:EMBED@NODE∧S:KEYEX@NODE∧S:SIGN@NODE∧D:CHUNK@NODE∧D:PULL@NODE",
+      "decoded_nl": "[memory] generate embedding for storage at NODE and [security] key exchange at NODE and [security] sign at NODE and [data] file chunk payload at NODE and [data] request payload from node at NODE",
+      "path_a": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "cryptography/security",
+        "action": "Generate key pair, sign payload, send to node",
+        "threshold": null,
+        "target": "BRAVO"
+      },
+      "path_b": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "data transfer",
+        "action": "Generate embedding, exchange keys, sign, store and request file chunk payloads",
+        "threshold": null,
+        "target": "NODE"
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "cryptography/security",
+        "action": "Embed key exchange, sign data, chunk and pull from node",
+        "threshold": null,
+        "target": "NODE"
+      }
+    },
+    {
+      "id": "CF-004",
+      "nl": "Stop everything immediately. Emergency.",
+      "sal": "R:STOP↺∧R:ESTOP",
+      "decoded_nl": "[physical] stop [REVERSIBLE] and [physical] emergency stop",
+      "path_a": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "municipal/emergency",
+        "action": "Halt all operations immediately due to emergency condition",
+        "threshold": null,
+        "target": null
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "robotics/physical",
+        "action": "Execute reversible stop followed by emergency stop",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "robotics/physical",
+        "action": "Emergency stop with cascade confirmation across robot units",
+        "threshold": null,
+        "target": "R"
+      }
+    },
+    {
+      "id": "CF-005",
+      "nl": "Process the payment but only if a human approves it first.",
+      "sal": "C:KILL∧K:PAY∧I:§",
+      "decoded_nl": "[compute] terminate process and [financial] payment execution and [identity] human operator confirmation",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "financial",
+        "action": "Process payment pending human approval",
+        "threshold": null,
+        "target": null
+      },
+      "path_b": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "agentic protocol",
+        "action": "terminate process, execute payment, and confirm human operator identity",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "Execute termination with payment authorization confirmed",
+        "threshold": null,
+        "target": null
+      }
+    },
+    {
+      "id": "CF-006",
+      "nl": "Hand this task off to agent BETA with full context.",
+      "sal": "A:ERR@AGENT∧J:DECOMP@AGENT∧R:TORCH@AGENT↺∧A:DA@AGENT∧J:HANDOFF@AGENT",
+      "decoded_nl": "[protocol] error handler at AGENT and [cognitive] task decomposition at AGENT and [physical] flashlight on off at AGENT [REVERSIBLE] and [protocol] delegate to agent at AGENT and [cognitive] transfer execution with full state context at AGENT",
+      "path_a": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "agentic protocol",
+        "action": "hand off task to agent BETA with full context",
+        "threshold": null,
+        "target": "BETA"
+      },
+      "path_b": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "agentic protocol",
+        "action": "Handle error and decompose task with state transfer delegation",
+        "threshold": null,
+        "target": "AGENT"
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "Execute error handling, decomposition, torch activation with retry, data acquisition, and task handoff",
+        "threshold": null,
+        "target": "AGENT"
+      }
+    },
+    {
+      "id": "CF-007",
+      "nl": "Run the model at temperature 0.3 with top-p 0.9 and report the token count.",
+      "sal": "Z:MODEL∧E:TH∧L:REPORT∧Z:TOKENS∧Z:TEMP:0.3∧Z:TOPP:0.9",
+      "decoded_nl": "[inference] specify model by identifier and [sensor] temperature humidity composite and [audit] compliance report and [inference] token count report and [inference] temperature parameter 0.3= and [inference] top p nucleus sampling parameter 0.9=",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "AI inference",
+        "action": "Run model with temperature 0.3 and top-p 0.9, report token count",
+        "threshold": 0.3,
+        "target": null
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 0,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "AI inference",
+        "action": "Configure AI model with temperature and sampling parameters for inference",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "AI inference",
+        "action": "Generate model report with temperature 0.3 and top-p 0.9 sampling",
+        "threshold": 0.3,
+        "target": "MODEL"
+      }
+    },
+    {
+      "id": "CF-008",
+      "nl": "Fire alarm in sector 3. Evacuate the whole building.",
+      "sal": "W:FIRE∧T:ALARM∧B:AREA∧B:ALRM",
+      "decoded_nl": "[weather] fire weather data and [time] time alarm and [building] building sector or area and [building] building alarm",
+      "path_a": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "municipal/emergency",
+        "action": "Evacuate entire building due to fire alarm activation",
+        "threshold": null,
+        "target": "sector 3"
+      },
+      "path_b": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "weather",
+        "action": "Fire weather data with time alarm for building sector",
+        "threshold": null,
+        "target": "building"
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "municipal/emergency",
+        "action": "Trigger fire alarm in designated area",
+        "threshold": null,
+        "target": "AREA"
+      }
+    },
+    {
+      "id": "CF-009",
+      "nl": "What's the wind and visibility at the airfield?",
+      "sal": "W:WIND∧W:VIS",
+      "decoded_nl": "[weather] wind speed and direction and [weather] visibility report",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "weather",
+        "action": "Query wind speed and visibility conditions at airfield",
+        "threshold": null,
+        "target": "airfield"
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "weather",
+        "action": "Report wind speed, direction, and visibility conditions",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "weather",
+        "action": "Read wind speed and visibility sensor values",
+        "threshold": null,
+        "target": null
+      }
+    },
+    {
+      "id": "CF-010",
+      "nl": "Move the robot to waypoint alpha, but make sure it respects the safety zone around the workers.",
+      "sal": "R:MOV@WAYPOINT↺∧G:WPT@WAYPOINT∧E:PU@WAYPOINT∧B:SAFE@WAYPOINT∧R:ZONE@WAYPOINT↺",
+      "decoded_nl": "[physical] move at WAYPOINT [REVERSIBLE] and [geospatial] waypoint reference at WAYPOINT and [sensor] pressure at WAYPOINT and [building] life safety at WAYPOINT and [physical] safety zone declaration at WAYPOINT [REVERSIBLE]",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "robotics/physical",
+        "action": "Move robot to waypoint alpha while maintaining safety zone clearance",
+        "threshold": null,
+        "target": "waypoint alpha"
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "robotics/physical",
+        "action": "Move to waypoint with safety zone declaration and monitoring",
+        "threshold": null,
+        "target": "WAYPOINT"
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "robotics/physical",
+        "action": "Move to waypoint with zone safety and pickup execution",
+        "threshold": null,
+        "target": "WAYPOINT"
+      }
+    },
+    {
+      "id": "CF-019",
+      "nl": "Summarize the customer feedback survey results.",
+      "sal": "A:SUM∧I:KYC∧U:FEEDBACK",
+      "decoded_nl": "[protocol] summarize and [identity] know your customer check and [operator] request human feedback",
+      "path_a": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "quality/evaluation",
+        "action": "Summarize customer feedback survey results",
+        "threshold": null,
+        "target": null
+      },
+      "path_b": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "identity/authorization",
+        "action": "Perform KYC check and request human feedback on summary",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "identity/authorization",
+        "action": "Submit KYC verification with user feedback",
+        "threshold": null,
+        "target": null
+      }
+    },
+    {
+      "id": "CF-022",
+      "nl": "The wind farm output dropped. Check the wind generation status.",
+      "sal": "X:WND∧W:WIND∧A:TRUST∧A:PING∧J:STATUS",
+      "decoded_nl": "[energy] wind generation and [weather] wind speed and direction and [protocol] trust assertion about agent output and [protocol] liveness check and [cognitive] execution status",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "energy",
+        "action": "Check wind generation status after output drop",
+        "threshold": null,
+        "target": "wind farm"
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "energy",
+        "action": "Monitor wind generation with weather correlation and agent liveness verification",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "Request wind data status with trust verification and ping confirmation",
+        "threshold": null,
+        "target": "WND"
+      }
+    },
+    {
+      "id": "CF-023",
+      "nl": "Verify the patient's identity, check their blood pressure, and if it's above 180, file a casualty report and medevac them to base camp.",
+      "sal": "H:CASREP@BASE>180→H:BP@BASE→D:CHUNK@BASE→Q:REVISE@BASE→A:VERIFY@BASE→A:ASD@BASE→A:PING@BASE",
+      "decoded_nl": "[clinical] casualty report above 180 at BASE then [clinical] blood pressure at BASE then [data] file chunk payload at BASE then [quality] request revision based on critique at BASE then [protocol] request output verification at BASE then [protocol] asd version identity or delta at BASE then [protocol] liveness check at BASE",
+      "path_a": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "medical/clinical",
+        "action": "verify patient identity, measure blood pressure, escalate if critical",
+        "threshold": 180,
+        "target": "base camp"
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "medical/clinical",
+        "action": "Report casualty status and blood pressure readings at BASE",
+        "threshold": 180,
+        "target": "BASE"
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 0,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "Execute cascading SAL protocol verification chain from human operator through distributed agents",
+        "threshold": null,
+        "target": "BASE"
+      }
+    },
+    {
+      "id": "CF-028",
+      "nl": "Move the drone to coordinates 35.7, -122.4.",
+      "sal": "R:MOV@COORDINATES↺∧E:GPS@COORDINATES",
+      "decoded_nl": "[physical] move at COORDINATES [REVERSIBLE] and [sensor] gps coordinates at COORDINATES",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "robotics/physical",
+        "action": "Move drone to specified geographic coordinates",
+        "threshold": null,
+        "target": "35.7, -122.4"
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "robotics/physical",
+        "action": "Move to specified GPS coordinates with sensor verification",
+        "threshold": null,
+        "target": "COORDINATES"
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "robotics/physical",
+        "action": "Move to GPS coordinates with rotational adjustment",
+        "threshold": null,
+        "target": "GPS@COORDINATES"
+      }
+    },
+    {
+      "id": "CF-029",
+      "nl": "The patient has pneumothorax. Code J93.0. Get a casualty report to the medevac team.",
+      "sal": "H:ICD[J930]∧H:CASREP∧P:CODE",
+      "decoded_nl": "[clinical] ICD[J930] and [clinical] casualty report and [maintenance] maintenance code reference for compliance logging",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "medical/clinical",
+        "action": "Generate casualty report for pneumothorax patient and notify medevac team",
+        "threshold": null,
+        "target": "medevac team"
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "medical/clinical",
+        "action": "Report ICD diagnosis code J930 with casualty status and maintenance compliance logging",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "medical/clinical",
+        "action": "Report critical status for implantable cardioverter-defibrillator device",
+        "threshold": null,
+        "target": "J930"
+      }
+    },
+    {
+      "id": "CF-030",
+      "nl": "Schedule a maintenance window for the grid controller.",
+      "sal": "T:REPEAT∧P:CODE∧T:WIN∧X:FREQ",
+      "decoded_nl": "[time] recurring schedule and [maintenance] maintenance code reference for compliance logging and [time] time window and [energy] grid frequency",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "time/scheduling",
+        "action": "Schedule maintenance window for grid controller",
+        "threshold": null,
+        "target": "grid controller"
+      },
+      "path_b": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "energy",
+        "action": "Schedule maintenance compliance logging within time window for grid frequency",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "Repeat code execution with frequency window parameter",
+        "threshold": null,
+        "target": "WIN"
+      }
+    }
+  ],
+  "openai": [
+    {
+      "id": "CF-001",
+      "nl": "Alert me if the patient's heart rate goes above 130.",
+      "sal": "H:HR>130.→H:ALERT",
+      "decoded_nl": "[clinical] heart rate above 130. then [clinical] threshold crossing event",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "medical/clinical",
+        "action": "Alert if heart rate exceeds 130",
+        "threshold": 130,
+        "target": null
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "medical/clinical",
+        "action": "report heart rate threshold crossing event",
+        "threshold": 130,
+        "target": null
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "healthcare/clinical",
+        "action": "alert if heart rate exceeds 130",
+        "threshold": 130,
+        "target": null
+      }
+    },
+    {
+      "id": "CF-002",
+      "nl": "Get me the temperature and humidity from sensor node 4A.",
+      "sal": "E:TH∧E:HU∧D:PULL",
+      "decoded_nl": "[sensor] temperature humidity composite and [sensor] humidity and [data] request payload from node",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "environmental/sensor",
+        "action": "Retrieve temperature and humidity from sensor node 4A",
+        "threshold": null,
+        "target": "sensor node 4A"
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "environmental/sensor",
+        "action": "request temperature and humidity data from sensor node",
+        "threshold": null,
+        "target": "sensor node"
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "execute pull command",
+        "threshold": null,
+        "target": null
+      }
+    },
+    {
+      "id": "CF-003",
+      "nl": "Generate a key pair, then sign the payload, then send it to node BRAVO.",
+      "sal": "Y:EMBED@NODE∧S:KEYEX@NODE∧S:SIGN@NODE∧D:CHUNK@NODE∧D:PULL@NODE",
+      "decoded_nl": "[memory] generate embedding for storage at NODE and [security] key exchange at NODE and [security] sign at NODE and [data] file chunk payload at NODE and [data] request payload from node at NODE",
+      "path_a": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "cryptography/security",
+        "action": "Generate key pair, sign payload, and send to node BRAVO",
+        "threshold": null,
+        "target": "node BRAVO"
+      },
+      "path_b": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "data transfer",
+        "action": "generate embedding and perform key exchange and signing",
+        "threshold": null,
+        "target": "NODE"
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "cryptography/security",
+        "action": "Embed, key exchange, sign, chunk, and pull data",
+        "threshold": null,
+        "target": "NODE"
+      }
+    },
+    {
+      "id": "CF-004",
+      "nl": "Stop everything immediately. Emergency.",
+      "sal": "R:STOP↺∧R:ESTOP",
+      "decoded_nl": "[physical] stop [REVERSIBLE] and [physical] emergency stop",
+      "path_a": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "municipal/emergency",
+        "action": "Stop all operations immediately due to emergency",
+        "threshold": null,
+        "target": null
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "robotics/physical",
+        "action": "stop and emergency stop the physical device",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "robotics/physical",
+        "action": "stop the robot and engage emergency stop",
+        "threshold": null,
+        "target": null
+      }
+    },
+    {
+      "id": "CF-005",
+      "nl": "Process the payment but only if a human approves it first.",
+      "sal": "C:KILL∧K:PAY∧I:§",
+      "decoded_nl": "[compute] terminate process and [financial] payment execution and [identity] human operator confirmation",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "financial",
+        "action": "Process payment with human approval",
+        "threshold": null,
+        "target": null
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "financial",
+        "action": "execute payment and confirm human operator",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "terminate payment process",
+        "threshold": null,
+        "target": null
+      }
+    },
+    {
+      "id": "CF-006",
+      "nl": "Hand this task off to agent BETA with full context.",
+      "sal": "A:ERR@AGENT∧J:DECOMP@AGENT∧R:TORCH@AGENT↺∧A:DA@AGENT∧J:HANDOFF@AGENT",
+      "decoded_nl": "[protocol] error handler at AGENT and [cognitive] task decomposition at AGENT and [physical] flashlight on off at AGENT [REVERSIBLE] and [protocol] delegate to agent at AGENT and [cognitive] transfer execution with full state context at AGENT",
+      "path_a": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "agentic protocol",
+        "action": "hand off task to agent BETA with context",
+        "threshold": null,
+        "target": "agent BETA"
+      },
+      "path_b": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "agentic protocol",
+        "action": "handle errors and manage task execution at AGENT",
+        "threshold": null,
+        "target": "AGENT"
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "decompose and hand off torch to agent",
+        "threshold": null,
+        "target": "AGENT"
+      }
+    },
+    {
+      "id": "CF-007",
+      "nl": "Run the model at temperature 0.3 with top-p 0.9 and report the token count.",
+      "sal": "Z:MODEL∧E:TH∧L:REPORT∧Z:TOKENS∧Z:TEMP:0.3∧Z:TOPP:0.9",
+      "decoded_nl": "[inference] specify model by identifier and [sensor] temperature humidity composite and [audit] compliance report and [inference] token count report and [inference] temperature parameter 0.3= and [inference] top p nucleus sampling parameter 0.9=",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 0,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "AI inference",
+        "action": "Run model with specified parameters and report token count",
+        "threshold": null,
+        "target": null
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 0,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "AI inference",
+        "action": "specify model and parameters for inference",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 0,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "AI inference",
+        "action": "report model parameters with specified thresholds",
+        "threshold": null,
+        "target": null
+      }
+    },
+    {
+      "id": "CF-008",
+      "nl": "Fire alarm in sector 3. Evacuate the whole building.",
+      "sal": "W:FIRE∧T:ALARM∧B:AREA∧B:ALRM",
+      "decoded_nl": "[weather] fire weather data and [time] time alarm and [building] building sector or area and [building] building alarm",
+      "path_a": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "municipal/emergency",
+        "action": "Evacuate the whole building due to fire alarm",
+        "threshold": null,
+        "target": "sector 3"
+      },
+      "path_b": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "weather",
+        "action": "request fire weather data and time alarm",
+        "threshold": null,
+        "target": "building sector or area"
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "municipal/emergency",
+        "action": "trigger fire alarm in specified area",
+        "threshold": null,
+        "target": "AREA"
+      }
+    },
+    {
+      "id": "CF-009",
+      "nl": "What's the wind and visibility at the airfield?",
+      "sal": "W:WIND∧W:VIS",
+      "decoded_nl": "[weather] wind speed and direction and [weather] visibility report",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "weather",
+        "action": "request wind and visibility information at airfield",
+        "threshold": null,
+        "target": "airfield"
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "weather",
+        "action": "request wind speed, direction, and visibility report",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "weather",
+        "action": "monitor wind and visibility conditions",
+        "threshold": null,
+        "target": null
+      }
+    },
+    {
+      "id": "CF-010",
+      "nl": "Move the robot to waypoint alpha, but make sure it respects the safety zone around the workers.",
+      "sal": "R:MOV@WAYPOINT↺∧G:WPT@WAYPOINT∧E:PU@WAYPOINT∧B:SAFE@WAYPOINT∧R:ZONE@WAYPOINT↺",
+      "decoded_nl": "[physical] move at WAYPOINT [REVERSIBLE] and [geospatial] waypoint reference at WAYPOINT and [sensor] pressure at WAYPOINT and [building] life safety at WAYPOINT and [physical] safety zone declaration at WAYPOINT [REVERSIBLE]",
+      "path_a": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "robotics/physical",
+        "action": "Move the robot to waypoint alpha while ensuring safety",
+        "threshold": null,
+        "target": "waypoint alpha"
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "robotics/physical",
+        "action": "move to specified waypoint with safety checks",
+        "threshold": null,
+        "target": "WAYPOINT"
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "robotics/physical",
+        "action": "move to specified waypoint with safety checks",
+        "threshold": null,
+        "target": "WAYPOINT"
+      }
+    },
+    {
+      "id": "CF-019",
+      "nl": "Summarize the customer feedback survey results.",
+      "sal": "A:SUM∧I:KYC∧U:FEEDBACK",
+      "decoded_nl": "[protocol] summarize and [identity] know your customer check and [operator] request human feedback",
+      "path_a": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "quality/evaluation",
+        "action": "summarize customer feedback survey results",
+        "threshold": null,
+        "target": null
+      },
+      "path_b": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "audit/compliance",
+        "action": "summarize know your customer check and request feedback",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "identity/authorization",
+        "action": "Summarize KYC feedback",
+        "threshold": null,
+        "target": null
+      }
+    },
+    {
+      "id": "CF-022",
+      "nl": "The wind farm output dropped. Check the wind generation status.",
+      "sal": "X:WND∧W:WIND∧A:TRUST∧A:PING∧J:STATUS",
+      "decoded_nl": "[energy] wind generation and [weather] wind speed and direction and [protocol] trust assertion about agent output and [protocol] liveness check and [cognitive] execution status",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "energy",
+        "action": "Check the wind generation status",
+        "threshold": null,
+        "target": null
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "energy",
+        "action": "monitor wind generation and weather conditions",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "Check the status of the wind sensor",
+        "threshold": null,
+        "target": null
+      }
+    },
+    {
+      "id": "CF-023",
+      "nl": "Verify the patient's identity, check their blood pressure, and if it's above 180, file a casualty report and medevac them to base camp.",
+      "sal": "H:CASREP@BASE>180→H:BP@BASE→D:CHUNK@BASE→Q:REVISE@BASE→A:VERIFY@BASE→A:ASD@BASE→A:PING@BASE",
+      "decoded_nl": "[clinical] casualty report above 180 at BASE then [clinical] blood pressure at BASE then [data] file chunk payload at BASE then [quality] request revision based on critique at BASE then [protocol] request output verification at BASE then [protocol] asd version identity or delta at BASE then [protocol] liveness check at BASE",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_a_raw": {
+        "domain": "medical/clinical",
+        "action": "Verify patient identity and check blood pressure",
+        "threshold": 180,
+        "target": null
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "medical/clinical",
+        "action": "report casualty and check blood pressure at BASE",
+        "threshold": 180,
+        "target": "BASE"
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 0,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "verify and revise data chunk",
+        "threshold": null,
+        "target": "D:CHUNK@BASE"
+      }
+    },
+    {
+      "id": "CF-028",
+      "nl": "Move the drone to coordinates 35.7, -122.4.",
+      "sal": "R:MOV@COORDINATES↺∧E:GPS@COORDINATES",
+      "decoded_nl": "[physical] move at COORDINATES [REVERSIBLE] and [sensor] gps coordinates at COORDINATES",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_a_raw": {
+        "domain": "robotics/physical",
+        "action": "Move the drone to specified coordinates",
+        "threshold": null,
+        "target": "drone"
+      },
+      "path_b": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "robotics/physical",
+        "action": "move to specified GPS coordinates",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 1,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "robotics/physical",
+        "action": "move to specified GPS coordinates",
+        "threshold": null,
+        "target": "GPS"
+      }
+    },
+    {
+      "id": "CF-029",
+      "nl": "The patient has pneumothorax. Code J93.0. Get a casualty report to the medevac team.",
+      "sal": "H:ICD[J930]∧H:CASREP∧P:CODE",
+      "decoded_nl": "[clinical] ICD[J930] and [clinical] casualty report and [maintenance] maintenance code reference for compliance logging",
+      "path_a": {
+        "domain": 1,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_a_raw": {
+        "domain": "medical/clinical",
+        "action": "Get a casualty report to the medevac team",
+        "threshold": null,
+        "target": null
+      },
+      "path_b": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_b_raw": {
+        "domain": "audit/compliance",
+        "action": "log compliance for clinical casualty report and maintenance code",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 0
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "Extract information from ICD and CASREP codes",
+        "threshold": null,
+        "target": "J930"
+      }
+    },
+    {
+      "id": "CF-030",
+      "nl": "Schedule a maintenance window for the grid controller.",
+      "sal": "T:REPEAT∧P:CODE∧T:WIN∧X:FREQ",
+      "decoded_nl": "[time] recurring schedule and [maintenance] maintenance code reference for compliance logging and [time] time window and [energy] grid frequency",
+      "path_a": {
+        "domain": 0,
+        "action": 1,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_a_raw": {
+        "domain": "maintenance/procedural",
+        "action": "Schedule a maintenance window for the grid controller",
+        "threshold": null,
+        "target": "grid controller"
+      },
+      "path_b": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_b_raw": {
+        "domain": "audit/compliance",
+        "action": "request recurring schedule for compliance logging",
+        "threshold": null,
+        "target": null
+      },
+      "path_c": {
+        "domain": 0,
+        "action": 0,
+        "threshold": 1,
+        "target": 1
+      },
+      "path_c_raw": {
+        "domain": "agentic protocol",
+        "action": "repeat code with specified frequency",
+        "threshold": null,
+        "target": null
+      }
+    }
+  ]
+}
