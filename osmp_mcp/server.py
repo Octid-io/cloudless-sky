@@ -27,6 +27,8 @@ from osmp.protocol import (
     validate_composition,
     CompositionResult,
     CompositionIssue,
+    SALComposer,
+    MacroRegistry,
 )
 
 # -- Paths ----------------------------------------------------------------
@@ -61,6 +63,29 @@ _encoder = SALEncoder()
 _decoder = SALDecoder()
 _bc = BlockCompressor(use_dict=False)
 _mdr_cache: dict[str, bytes] = {}
+_composer: SALComposer | None = None
+_macro_registry: MacroRegistry | None = None
+
+
+def _get_composer() -> SALComposer:
+    global _composer, _macro_registry
+    if _composer is None:
+        _macro_registry = _get_macro_registry()
+        _composer = SALComposer(macro_registry=_macro_registry)
+    return _composer
+
+
+def _get_macro_registry() -> MacroRegistry:
+    global _macro_registry
+    if _macro_registry is None:
+        _macro_registry = MacroRegistry()
+        # Load Meshtastic macro corpus if available
+        corpus_path = REPO_ROOT / "mdr" / "meshtastic" / "meshtastic-macros.json"
+        if not corpus_path.exists():
+            corpus_path = DATA_DIR / "meshtastic-macros.json"
+        if corpus_path.exists():
+            _macro_registry.load_corpus(str(corpus_path))
+    return _macro_registry
 
 
 def _load_mdr(corpus: str) -> bytes:
@@ -415,6 +440,98 @@ def osmp_validate(sal: str, nl_input: str = "") -> str:
             for i in result.issues
         ],
     }, indent=2, ensure_ascii=False)
+
+
+# -- Composition ----------------------------------------------------------
+
+@mcp.tool()
+def osmp_compose(nl_text: str) -> str:
+    """Compose valid SAL from natural language. The model's job is to call this
+    tool with the user's intent — the deterministic pipeline handles opcode
+    selection, grammar assembly, and validation. Never write SAL by hand.
+
+    Returns JSON with either composed SAL or NL_PASSTHROUGH if no opcodes match.
+
+    The pipeline: phrase matching (generation index) -> keyword fallback ->
+    macro priority check -> grammar assembly -> 8-rule validation.
+
+    Example: osmp_compose(nl_text="Alert if heart rate exceeds 130")
+    Returns: {"mode": "FULL_OSMP", "sal": "H:HR>130→H:ALERT", "nl": "...", ...}"""
+    composer = _get_composer()
+    sal, is_sal = composer.compose_or_passthrough(nl_text)
+    if is_sal:
+        result = validate_composition(sal, nl=nl_text)
+        return json.dumps({
+            "mode": "FULL_OSMP",
+            "sal": sal,
+            "nl": nl_text,
+            "sal_bytes": len(sal.encode("utf-8")),
+            "nl_bytes": len(nl_text.encode("utf-8")),
+            "reduction_pct": round((1 - len(sal.encode("utf-8")) / len(nl_text.encode("utf-8"))) * 100, 1)
+                if len(nl_text.encode("utf-8")) > 0 else 0,
+            "valid": result.valid,
+            "warnings": [{"rule": w.rule, "message": w.message} for w in result.warnings],
+            "errors": [{"rule": e.rule, "message": e.message} for e in result.errors],
+        }, indent=2, ensure_ascii=False)
+    return json.dumps({
+        "mode": "NL_PASSTHROUGH",
+        "sal": None,
+        "nl": nl_text,
+        "reason": "No ASD opcodes matched the input. Send as natural language.",
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def osmp_macro_list() -> str:
+    """List all registered macros. Macros are pre-validated multi-step SAL
+    chains for common workflows. When a macro matches, use it instead of
+    composing from individual opcodes — macros have zero composition error surface.
+
+    Returns JSON array of macros with id, description, triggers, and slots."""
+    registry = _get_macro_registry()
+    macros = registry.list_macros()
+    return json.dumps([{
+        "macro_id": m.macro_id,
+        "description": m.description,
+        "chain_template": m.chain_template,
+        "triggers": list(m.triggers),
+        "slots": [{"name": s.name, "type": s.slot_type, "namespace": s.namespace}
+                  for s in m.slots],
+        "consequence_class": m.consequence_class,
+    } for m in macros], indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def osmp_macro_invoke(macro_id: str, slots: str = "{}") -> str:
+    """Invoke a registered macro by ID with slot values.
+
+    Example: osmp_macro_invoke(macro_id="MESH:DEV", slots='{"battery_level": "87", "voltage": "3.72"}')
+    Returns the expanded SAL chain with slot values filled in.
+
+    Use osmp_macro_list to find available macros and their required slots."""
+    registry = _get_macro_registry()
+    macro = registry.lookup(macro_id)
+    if macro is None:
+        return json.dumps({"error": f"Macro '{macro_id}' not found. Use osmp_macro_list to see available macros."},
+                          indent=2, ensure_ascii=False)
+    try:
+        slot_values = json.loads(slots) if isinstance(slots, str) else slots
+    except json.JSONDecodeError:
+        return json.dumps({"error": f"Invalid JSON for slots: {slots}"}, indent=2, ensure_ascii=False)
+    try:
+        expanded = registry.expand(macro_id, slot_values)
+        compact = registry.encode_compact(macro_id, slot_values)
+        return json.dumps({
+            "macro_id": macro_id,
+            "expanded_sal": expanded,
+            "compact_sal": compact,
+            "expanded_bytes": len(expanded.encode("utf-8")),
+            "compact_bytes": len(compact.encode("utf-8")),
+            "consequence_class": macro.consequence_class,
+        }, indent=2, ensure_ascii=False)
+    except (ValueError, KeyError) as e:
+        return json.dumps({"error": str(e), "required_slots": [s.name for s in macro.slots]},
+                          indent=2, ensure_ascii=False)
 
 
 # -- Bridge ---------------------------------------------------------------

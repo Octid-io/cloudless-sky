@@ -2193,13 +2193,21 @@ class SALComposer:
         "broadcast": "@*",
     }
 
+    # Namespaces that produce/sense data (condition carriers in chains)
+    _SENSING_NS: set[str] = {"E", "H", "W", "G", "X", "S", "D", "Z"}
+    # Namespaces that consume/act on data (action targets in chains)
+    _ACTION_NS: set[str] = {"U", "M", "R", "B", "J", "A", "K"}
+
     def __init__(self, asd: AdaptiveSharedDictionary | None = None,
                  macro_registry: 'MacroRegistry | None' = None):
         self.asd = asd or AdaptiveSharedDictionary()
         self.macro_registry = macro_registry
         self._encoder = SALEncoder(self.asd)
         self._keyword_index: dict[str, list[tuple[str, str]]] = {}
+        self._phrase_index: dict[str, tuple[str, str]] = {}
+        self._phrases_by_length: list[str] = []  # sorted longest-first
         self._build_keyword_index()
+        self._build_phrase_index()
 
     def _build_keyword_index(self) -> None:
         """Build a reverse index from definition keywords to (namespace, opcode)."""
@@ -2212,6 +2220,86 @@ class SALComposer:
                         if word not in self._keyword_index:
                             self._keyword_index[word] = []
                         self._keyword_index[word].append((ns, op))
+
+    def _build_phrase_index(self) -> None:
+        """Build a generation index: NL phrases -> (namespace, opcode).
+
+        Auto-generated from ASD_BASIS definitions. Every underscore-joined
+        definition becomes a phrase trigger. Multi-word phrases are matched
+        longest-first to prevent fragmentation (e.g., "heart rate" matches
+        as a phrase before "heart" and "rate" match individually).
+
+        Only multi-word phrases are indexed here. Single-word lookups are
+        handled by the keyword index. This prevents short opcode names
+        (e.g., "th", "q", "dr") from matching inside common English words.
+        """
+        for ns, ops in ASD_BASIS.items():
+            for op, defn in ops.items():
+                phrase = defn.lower().replace("_", " ")
+                # Only index multi-word phrases (2+ words)
+                if " " in phrase:
+                    self._phrase_index[phrase] = (ns, op)
+
+        # ── Curated triggers: ZTOLE-discovered generation paths ──────
+        # These extend the auto-generated set with mappings discovered
+        # through the ZTOLE 3B generative measurement (April 2026).
+        # Each entry was found by cross-vendor panel consensus or
+        # identified as a gap in the full-dictionary sweep.
+        _CURATED: dict[str, tuple[str, str]] = {
+            # Gap fixes (5 opcodes uncovered by auto-generation)
+            "flow authorization": ("F", "AV"),
+            "authorization proceed": ("F", "AV"),
+            "emergency route": ("M", "RTE"),
+            "municipal route": ("M", "RTE"),
+            "incident route": ("M", "RTE"),
+            "network status": ("N", "STS"),
+            "node status": ("N", "STS"),
+            "vessel heading": ("V", "HDG"),
+            "ship heading": ("V", "HDG"),
+            "maritime heading": ("V", "HDG"),
+            # LLM-only hits (10 opcodes models resolved that tool missed)
+            "restart process": ("C", "RSTRT"),
+            "restart service": ("C", "RSTRT"),
+            "data query": ("D", "Q"),
+            "query data": ("D", "Q"),
+            "audit query": ("L", "QUERY"),
+            "query audit": ("L", "QUERY"),
+            "robot heading": ("R", "HDNG"),
+            "vehicle heading": ("R", "HDNG"),
+            "robot status": ("R", "STAT"),
+            "device status": ("R", "STAT"),
+            "robot waypoint": ("R", "WPT"),
+            "attest payload": ("S", "ATST"),
+            "attestation": ("S", "ATST"),
+            "page out memory": ("Y", "PAGEOUT"),
+            "store to memory": ("Y", "STORE"),
+            "save to memory": ("Y", "STORE"),
+            # Composition failure fixes (from CF-003, CF-006, CF-023)
+            "generate key": ("S", "KEYGEN"),
+            "generate keys": ("S", "KEYGEN"),
+            "key pair": ("S", "KEYGEN"),
+            "create keypair": ("S", "KEYGEN"),
+            "sign payload": ("S", "SIGN"),
+            "digital signature": ("S", "SIGN"),
+            "push to node": ("D", "PUSH"),
+            "send to node": ("D", "PUSH"),
+            "transfer task": ("J", "HANDOFF"),
+            "hand off": ("J", "HANDOFF"),
+            "task handoff": ("J", "HANDOFF"),
+            "verify identity": ("I", "ID"),
+            "identity check": ("I", "ID"),
+            "run inference": ("Z", "INF"),
+            "invoke model": ("Z", "INF"),
+            "building fire": ("B", "ALRM"),
+            "fire alarm": ("B", "ALRM"),
+        }
+        for phrase, (ns, op) in _CURATED.items():
+            self._phrase_index[phrase] = (ns, op)
+
+        # Sort phrases longest-first for greedy matching
+        self._phrases_by_length = sorted(
+            self._phrase_index.keys(), key=len, reverse=True
+        )
 
     def lookup_by_keyword(self, keyword: str) -> list[tuple[str, str, str]]:
         """Find opcodes matching a keyword. Returns [(namespace, opcode, definition)]."""
@@ -2240,16 +2328,27 @@ class SALComposer:
         return results
 
     def extract_intent_keywords(self, nl_text: str) -> ComposedIntent:
-        """Extract intent from NL using keyword matching (no LLM needed).
+        """Extract intent from NL using phrase-first matching and keyword fallback.
 
-        This is the fallback path when no LLM is available. It tokenizes
-        the input, matches tokens against the ASD keyword index, and
-        extracts conditions from numeric patterns.
+        Pipeline:
+          1. Extract numeric conditions and targets via regex
+          2. Scan for multi-word phrase matches (longest-first) from the
+             generation index built from ASD definitions
+          3. Fall back to single-word keyword matching for unmatched positions
+          4. Return structured ComposedIntent for grammar assembly
+
+        The generation index ensures multi-word concepts like "heart rate",
+        "blood pressure", "emergency stop" match as phrases before their
+        component words are matched individually against wrong namespaces.
         """
         import re
 
         raw = nl_text.strip()
-        words = raw.lower().split()
+        raw_lower = raw.lower()
+        # Tokenize: split on whitespace, strip punctuation from each token
+        import string as _string
+        words = [w.strip(_string.punctuation) for w in raw_lower.split()]
+        words = [w for w in words if w]  # drop empty tokens
         actions: list[str] = []
         conditions: list[str] = []
         targets: list[str] = []
@@ -2266,24 +2365,81 @@ class SALComposer:
             sal_op = self._CONDITION_MAP.get(op_word, ">")
             conditions.append(f"{sal_op}{value}")
 
-        # Extract targets (words after "on", "at", "to", "@")
-        target_pattern = re.compile(r'(?:on|at|to|@)\s+(\w+)', re.IGNORECASE)
+        # Extract parametric values (e.g., "temperature 0.3" -> :0.3)
+        param_pattern = re.compile(
+            r'(?:temperature|top.?p|top.?k|max.?tokens?)\s+(\d+\.?\d*)',
+            re.IGNORECASE,
+        )
+        for match in param_pattern.finditer(raw):
+            parameters[match.group(0).split()[0].lower()] = match.group(1)
+
+        # Extract ICD/diagnostic codes (e.g., "code J93.0", "ICD J93.0")
+        icd_pattern = re.compile(
+            r'(?:code|icd|diagnosis|icd-10)\s+([A-Z]\d{2}\.?\d*)',
+            re.IGNORECASE,
+        )
+        for match in icd_pattern.finditer(raw):
+            # Normalize: remove dots for OSMP format (J93.0 -> J930)
+            code = match.group(1).replace(".", "")
+            parameters["icd"] = code
+
+        # Extract targets (words after standalone "on", "at", "to", "@")
+        target_pattern = re.compile(r'(?<!\w)(?:on|at|to|@)\s+(\w+)', re.IGNORECASE)
         for match in target_pattern.finditer(raw):
             targets.append(match.group(1).upper())
 
-        # Match remaining words against ASD keyword index
-        # Skip common verbs and articles that aren't domain keywords
+        # ── Phase 1: Phrase-first matching (generation index) ────────────
+        # Scan for multi-word phrases longest-first. Use word boundaries
+        # to prevent partial matches (e.g., "th" inside "the").
+        # Mark matched character positions so word matching doesn't overlap.
+        import re as _re
+        matched_spans: list[tuple[int, int]] = []
+        for phrase in self._phrases_by_length:
+            # Word-boundary match: phrase must be bounded by non-word chars or string edges
+            pattern = r'(?<!\w)' + _re.escape(phrase) + r'(?!\w)'
+            m = _re.search(pattern, raw_lower)
+            if m:
+                idx, end = m.start(), m.end()
+                # Check this span doesn't overlap already-matched spans
+                overlaps = any(
+                    not (end <= s[0] or idx >= s[1])
+                    for s in matched_spans
+                )
+                if not overlaps:
+                    matched_spans.append((idx, end))
+                    actions.append(phrase)
+
+        # Build set of word positions consumed by phrase matches
+        consumed_positions: set[int] = set()
+        for span_start, span_end in matched_spans:
+            # Map character spans to word positions
+            char_pos = 0
+            for i, word in enumerate(words):
+                word_start = raw_lower.find(word, char_pos)
+                word_end = word_start + len(word)
+                if word_start >= span_start and word_end <= span_end:
+                    consumed_positions.add(i)
+                char_pos = word_end
+
+        # ── Phase 2: Single-word keyword fallback ────────────────────────
+        # Only process words not consumed by phrase matches.
+        # Skip articles, pronouns, prepositions. Domain verbs are NOT
+        # skipped -- "stop", "alert", "report" etc. are composition signals.
         _SKIP_WORDS = {
             'the', 'and', 'for', 'from', 'with', 'that', 'this', 'when',
             'then', 'turn', 'get', 'set', 'put', 'make', 'give', 'take',
-            'show', 'tell', 'let', 'run', 'use', 'try', 'see', 'ask',
+            'show', 'tell', 'let', 'use', 'try', 'see', 'ask',
             'how', 'what', 'where', 'who', 'why', 'can', 'will', 'has',
             'have', 'does', 'did', 'are', 'was', 'been', 'being', 'many',
             'much', 'some', 'any', 'all', 'each', 'every', 'other',
             'about', 'into', 'over', 'after', 'before', 'between',
-            'check', 'report', 'send', 'start', 'stop', 'open', 'close',
+            'but', 'only', 'just', 'also', 'too', 'very', 'really',
+            'it', 'its', "it's", 'me', 'my', 'your', 'our', 'their',
+            'him', 'her', 'his', 'them', 'going', 'goes', 'went',
         }
-        for word in words:
+        for i, word in enumerate(words):
+            if i in consumed_positions:
+                continue
             if len(word) > 2 and word not in _SKIP_WORDS:
                 matches = self.lookup_by_keyword(word)
                 if matches:
@@ -2309,6 +2465,13 @@ class SALComposer:
         if intent is None:
             intent = self.extract_intent_keywords(nl_text)
 
+        # BAEL byte pre-check: if the NL input is very short, any SAL
+        # encoding will be larger. Short inputs (< 6 bytes) can't compress.
+        # The minimum SAL frame is 4 bytes (X:Y) + operator overhead.
+        nl_bytes = len(nl_text.encode("utf-8"))
+        if nl_bytes < 6:
+            return None  # too short to compress — NL passthrough
+
         # Step 1: Check macros first (composition priority hierarchy)
         if self.macro_registry:
             for macro in self.macro_registry.list_macros():
@@ -2318,26 +2481,104 @@ class SALComposer:
                         # Caller handles slot-fill separately
                         return f"A:MACRO[{macro.macro_id}]"
 
-        # Step 2: ASD lookup for each action keyword
+        # Step 2: ASD lookup for each action keyword/phrase
         resolved_opcodes: list[tuple[str, str]] = []
+        has_phrase_match = False
         for action in intent.actions:
+            # Phrase match against generation index first
+            if action in self._phrase_index:
+                ns, op = self._phrase_index[action]
+                if (ns, op) not in resolved_opcodes:
+                    resolved_opcodes.append((ns, op))
+                has_phrase_match = True
+                continue
+            # Fall back to keyword lookup
             matches = self.lookup_by_keyword(action)
             if matches:
-                # Take the best match (first result)
                 ns, op, _ = matches[0]
                 if (ns, op) not in resolved_opcodes:
                     resolved_opcodes.append((ns, op))
 
+        # Parameter-driven opcode injection: when intent extraction found
+        # parametric values, ensure the corresponding opcodes are resolved
+        if intent.parameters.get("icd") and ("H", "ICD") not in resolved_opcodes:
+            resolved_opcodes.insert(0, ("H", "ICD"))
+        if intent.parameters.get("temperature") and ("Z", "TEMP") not in resolved_opcodes:
+            resolved_opcodes.append(("Z", "TEMP"))
+        if intent.parameters.get("top-p") and ("Z", "TOPP") not in resolved_opcodes:
+            resolved_opcodes.append(("Z", "TOPP"))
+
         if not resolved_opcodes:
             return None  # nothing resolved -- NL passthrough
 
+        # Confidence gate: if no phrase matched and only keyword matches
+        # are present, apply conservative composition rules to prevent
+        # false positives on common English words that happen to match
+        # ASD definition keywords.
+        if not has_phrase_match and not intent.conditions:
+            def _is_strong_match(ns: str, op: str, actions: list[str]) -> bool:
+                """A strong match is when the action word closely matches the opcode."""
+                defn = ASD_BASIS.get(ns, {}).get(op, "")
+                head_word = defn.split("_")[0].lower() if defn else ""
+                for action in actions:
+                    a = action.upper()
+                    # Direct opcode name match (e.g., "stop" == "STOP")
+                    if a == op:
+                        return True
+                    # Exact definition match (e.g., "move" == "move", "stop" == "stop")
+                    # Only matches when the entire definition IS the action word,
+                    # not when it's just the first word of a multi-word definition
+                    defn_clean = defn.lower().replace("_", " ")
+                    if action.lower() == defn_clean and len(action) >= 4:
+                        return True
+                    # Opcode is prefix of action AND action is much longer
+                    # (e.g., "encrypt" starts with "ENC" — 7 vs 3, strong signal)
+                    # But NOT "ORDER" starts with "ORD" — too close, could be coincidence
+                    if len(op) >= 3 and a.startswith(op) and len(action) >= len(op) + 3:
+                        return True
+                return False
+
+            if len(resolved_opcodes) == 1:
+                ns, op = resolved_opcodes[0]
+                if not _is_strong_match(ns, op, intent.actions):
+                    return None  # low-confidence single keyword match
+            elif len(resolved_opcodes) == 2:
+                strong = sum(
+                    1 for ns, op in resolved_opcodes
+                    if _is_strong_match(ns, op, intent.actions)
+                )
+                if strong == 0:
+                    return None  # both matches are weak keyword hits
+
         # Step 3: Grammar assembly
+        # Sort: sensing/data namespaces before action namespaces when
+        # conditions are present (condition attaches to the sensing frame)
+        if intent.conditions and len(resolved_opcodes) > 1:
+            sensing = [(ns, op) for ns, op in resolved_opcodes
+                       if ns in self._SENSING_NS]
+            acting = [(ns, op) for ns, op in resolved_opcodes
+                      if ns in self._ACTION_NS]
+            other = [(ns, op) for ns, op in resolved_opcodes
+                     if ns not in self._SENSING_NS and ns not in self._ACTION_NS]
+            resolved_opcodes = sensing + other + acting
+
         frames: list[str] = []
         for ns, op in resolved_opcodes:
             frame = f"{ns}:{op}"
+
+            # Attach parametric values (e.g., Z:TEMP:0.3)
+            if ns == "H" and op == "ICD" and intent.parameters.get("icd"):
+                frame += f"[{intent.parameters['icd']}]"
+            elif ns == "Z" and op == "TEMP" and intent.parameters.get("temperature"):
+                frame += f":{intent.parameters['temperature']}"
+            elif ns == "Z" and op == "TOPP" and intent.parameters.get("top-p"):
+                frame += f":{intent.parameters['top-p']}"
+
             # Attach target if available (skip common false positives)
             valid_targets = [t for t in intent.targets
-                           if t not in ('THE', 'A', 'AN', 'THIS', 'THAT', 'MY', 'YOUR')]
+                           if t not in ('THE', 'A', 'AN', 'THIS', 'THAT', 'MY', 'YOUR',
+                                        'IT', 'THEM', 'HIM', 'HER', 'ME', 'EVERYTHING',
+                                        'TEMPERATURE', 'IS', 'SOME', 'ALL')]
             if valid_targets:
                 frame += f"@{valid_targets[0]}"
             # R namespace: add default consequence class (REVERSIBLE)
@@ -2355,7 +2596,7 @@ class SALComposer:
         if len(frames) == 1:
             sal = frames[0]
         elif intent.conditions:
-            # Conditional chain: condition -> action
+            # Conditional chain: sensing -> action
             sal = "\u2192".join(frames)
         else:
             # Conjunctive: action AND action
@@ -2776,41 +3017,114 @@ class SALDecoder:
             consequence_class=cc, consequence_class_name=cc_name, raw=raw,
         )
 
-    def decode_natural_language(self, encoded: str) -> str:
-        """Decode a SAL string (single frame or ;-separated chain) to natural language.
+    # Operator glyph to readable NL word mapping
+    _OPERATOR_NL: dict[str, str] = {
+        "\u2192": " then ",     # → THEN
+        "\u2227": " and ",      # ∧ AND
+        "\u2228": " or ",       # ∨ OR
+        "\u2194": " iff ",      # ↔ IFF
+        "\u2225": " parallel ", # ∥ PARALLEL
+        ";": ", then ",         # ; SEQUENCE
+    }
 
-        For chains, each frame is decoded independently and joined with "; ".
-        Empty frames (e.g. trailing semicolons) are dropped. Malformed individual
-        frames are wrapped as ``[malformed: ...]`` and the chain decode continues
-        rather than failing the whole sequence.
+    def decode_natural_language(self, encoded: str) -> str:
+        """Decode a SAL string to human-readable natural language.
+
+        Handles all chain operators (→ ∧ ∨ ↔ ∥ ;), not just semicolons.
+        Each frame is decoded independently and operators are converted
+        to readable English words. Multi-frame chains get a leading
+        primary domain label based on the most frequent namespace.
 
         This is the single source of truth for SAL→NL conversion. The Tier 1
         ``osmp.decode()`` wrapper and the ``SALBridge`` outbound translator both
         delegate to this method without additional chain handling.
         """
-        # Single frame fast path: no chain operator present
-        if ";" not in encoded:
-            return self._decode_single_frame(encoded)
-
-        # Chain: split on top-level ; and decode each frame independently
-        frames = [f.strip() for f in encoded.split(";") if f.strip()]
-        if not frames:
+        # Split on all chain operators, preserving the operators
+        parts = _FRAME_SPLIT_RE.split(encoded)
+        if not parts:
             return ""
-        if len(frames) == 1:
-            return self._decode_single_frame(frames[0])
-        return "; ".join(self._decode_single_frame(f) for f in frames)
+
+        result_parts = []
+        frame_count = 0
+        ns_counts: dict[str, int] = {}
+        for part in parts:
+            part = part.strip()
+            if not part:
+                continue
+            if part in self._OPERATOR_NL:
+                result_parts.append(self._OPERATOR_NL[part])
+            else:
+                decoded = self._decode_single_frame(part)
+                result_parts.append(decoded)
+                frame_count += 1
+                # Track namespace frequency for primary domain
+                m = _FRAME_NS_OP_RE.match(part)
+                if m:
+                    ns = m.group(1)
+                    ns_counts[ns] = ns_counts.get(ns, 0) + 1
+
+        body = "".join(result_parts).strip()
+
+        # For multi-namespace chains, prepend primary domain
+        if frame_count > 1 and len(ns_counts) > 1:
+            primary_ns = max(ns_counts, key=ns_counts.get)
+            primary_domain = self._NS_DOMAIN.get(primary_ns, "")
+            if primary_domain:
+                return f"({primary_domain}) {body}"
+
+        return body
+
+    # Namespace to readable domain label for decode context
+    _NS_DOMAIN: dict[str, str] = {
+        "A": "protocol", "B": "building", "C": "compute", "D": "data",
+        "E": "sensor", "F": "flow control", "G": "geospatial", "H": "clinical",
+        "I": "identity", "J": "cognitive", "K": "financial", "L": "audit",
+        "M": "emergency", "N": "network", "O": "operations", "P": "maintenance",
+        "Q": "quality", "R": "physical", "S": "security", "T": "time",
+        "U": "operator", "V": "maritime", "W": "weather", "X": "energy",
+        "Y": "memory", "Z": "inference",
+    }
 
     def _decode_single_frame(self, encoded: str) -> str:
-        """Decode exactly one SAL frame to its natural language form."""
+        """Decode exactly one SAL frame to its human-readable NL form.
+
+        Output includes domain context from the namespace and readable
+        target descriptions. Format:
+          [domain] action_description [condition] [at target] [slots]
+        """
+        import re as _re
+
+        # Extract and strip condition from the raw frame before decode
+        # (e.g., H:HR>130 → decode H:HR, condition >130)
+        cond_match = _re.search(r'([><=!]+)(\d+\.?\d*)', encoded)
+        clean_encoded = encoded
+        if cond_match:
+            clean_encoded = encoded[:cond_match.start()] + encoded[cond_match.end():]
+
         try:
-            d = self.decode_frame(encoded)
+            d = self.decode_frame(clean_encoded)
         except Exception:
             return f"[malformed: {encoded!r}]"
-        parts = [f"{d.namespace}:{d.opcode_meaning or d.opcode}"]
+
+        # Domain context from namespace
+        domain = self._NS_DOMAIN.get(d.namespace, "")
+        # Use the definition text (spaces instead of underscores) as the NL form
+        meaning = (d.opcode_meaning or d.opcode).replace("_", " ")
+
+        parts = []
+        if domain:
+            parts.append(f"[{domain}]")
+        parts.append(meaning)
+
+        if cond_match:
+            op_map = {">": "above", "<": "below", "=": "equals",
+                      ">=": "at least", "<=": "at most", "!=": "not"}
+            op_word = op_map.get(cond_match.group(1), cond_match.group(1))
+            parts.append(f"{op_word} {cond_match.group(2)}")
         if d.target:
-            parts.append("→*" if d.target == "*" else f"→{d.target}")
+            parts.append(f"at {'all nodes' if d.target == '*' else d.target}")
         if d.query_slot:
-            parts.append(f"?{d.query_slot}")
+            parts.append(f"query {d.query_slot}")
         for k, v in d.slots.items():
             parts.append(f"{k}={v}")
         if d.consequence_class_name:

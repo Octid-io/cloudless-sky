@@ -301,6 +301,15 @@ class SALBridge:
             return BridgeInbound(sal=message, nl=None, passthrough=False,
                                  peer_id=peer_id, state=session.state)
 
+        # Strip [SAL: ...] annotation wrapper if the model echoed our format.
+        # The bridge teaches models to annotate with [SAL: ...], so the model
+        # may respond in that exact format. Parse it.
+        sal_wrapper_match = re.match(
+            r'^\s*\[SAL:\s*(.+?)\]\s*$', message, re.DOTALL
+        )
+        if sal_wrapper_match:
+            message = sal_wrapper_match.group(1).strip()
+
         # Scan for SAL fragments
         detected_frames = self._detect_sal_frames(message)
 
@@ -459,6 +468,7 @@ class SALBridge:
         frame_with_tail_re = re.compile(
             r"\b" + _NS_PATTERN + r":" + _OPCODE_PATTERN
             + r"(?:@[A-Za-z0-9_*\-]+)?"
+            + r"(?:[><=!]+\d+\.?\d*)?"  # conditions (e.g., >130, <=38.5)
             + r"(?:\?[A-Za-z0-9_]+)?"
             + r"(?:\[[^\]]*\])?"
             + r"(?::[A-Za-z0-9_]+(?::[A-Za-z0-9_.\-]+)?)*"
