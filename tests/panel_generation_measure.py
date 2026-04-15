@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-ZTOLE 3rd Mode: Generation Measurement
+Cross-Model Panel Generation Measurement: Generation Measurement
 
 Measures whether frontier models consistently resolve NL phrases to the
-correct OSMP opcode. The same cross-vendor panel methodology as ZTOLE
+correct OSMP opcode. The same cross-vendor panel methodology as cross-model panel
 recognition measurement, applied in the generation direction.
 
 Input:  Candidate NL phrases with expected (namespace, opcode) mappings
@@ -11,8 +11,8 @@ Output: Per-phrase panel agreement score. Phrases with >= 3/4 panel
         agreement graduate into the generation index.
 
 Usage:
-  python tests/ztole_generation_measure.py --anthropic-key KEY --openai-key KEY [--gemini-key KEY]
-  python tests/ztole_generation_measure.py --generate-candidates  # list candidates only
+  python tests/panel_generation_measure.py --anthropic-key KEY --openai-key KEY [--gemini-key KEY]
+  python tests/panel_generation_measure.py --generate-candidates  # list candidates only
 """
 from __future__ import annotations
 
@@ -86,7 +86,7 @@ def call_gemini(prompt: str, system: str, api_key: str, model: str = "gemini-2.0
         return data["candidates"][0]["content"]["parts"][0]["text"].strip()
 
 
-# ── ZTOLE Generation Probe ──────────────────────────────────────────────────
+# ── cross-model panel Generation Probe ──────────────────────────────────────────────────
 
 def build_probe_system() -> str:
     """Build probe prompt with the full ASD listing.
@@ -186,7 +186,7 @@ SYNONYM_SEEDS: dict[str, list[str]] = {
 
 
 def generate_candidates() -> list[dict]:
-    """Generate the full candidate set for ZTOLE generation measurement."""
+    """Generate the full candidate set for cross-model panel generation measurement."""
     candidates = []
     for opcode_key, phrases in SYNONYM_SEEDS.items():
         if opcode_key == "NONE":
@@ -223,13 +223,13 @@ def parse_opcode_response(text: str) -> tuple[str, str]:
 
 
 def run_measurement(panel: dict[str, callable], candidates: list[dict]) -> list[ProbeResult]:
-    """Run the ZTOLE generation measurement across the panel."""
+    """Run the cross-model panel generation measurement across the panel."""
     results = []
     panel_size = len(panel)
     probe_system = build_probe_system()
 
     print(f"\n{'='*78}")
-    print(f"ZTOLE 3rd MODE — GENERATION MEASUREMENT (dictionary-aware)")
+    print(f"cross-model panel 3rd MODE — GENERATION MEASUREMENT (dictionary-aware)")
     print(f"{'='*78}")
     print(f"Panel: {', '.join(panel.keys())} ({panel_size} models)")
     print(f"Candidates: {len(candidates)} phrases")
@@ -302,7 +302,7 @@ def report(results: list[ProbeResult]) -> dict:
     op_graduated = [r for r in opcode_results if r.agreements >= threshold]
 
     print(f"\n{'='*78}")
-    print(f"ZTOLE GENERATION MEASUREMENT — RESULTS")
+    print(f"cross-model panel GENERATION MEASUREMENT — RESULTS")
     print(f"{'='*78}")
     print(f"Panel size: {panel_size}  Graduation threshold: {threshold}/{panel_size}")
     print(f"Total candidates: {len(results)}")
@@ -355,7 +355,7 @@ def report(results: list[ProbeResult]) -> dict:
 # ── CLI ──────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="ZTOLE Generation Measurement")
+    parser = argparse.ArgumentParser(description="cross-model panel Generation Measurement")
     parser.add_argument("--anthropic-key", default=os.environ.get("ANTHROPIC_API_KEY"))
     parser.add_argument("--openai-key", default=os.environ.get("OPENAI_API_KEY"))
     parser.add_argument("--gemini-key", default=os.environ.get("GEMINI_API_KEY"))
@@ -386,13 +386,13 @@ def main():
         panel["gemini"] = lambda p, s, k=args.gemini_key: call_gemini(p, s, k, "gemini-2.0-flash")
 
     if len(panel) < 2:
-        print("ERROR: ZTOLE requires at least 2 panel models. Provide 2+ API keys.")
+        print("ERROR: cross-model panel requires at least 2 panel models. Provide 2+ API keys.")
         return 1
 
     results = run_measurement(panel, candidates)
     report_data = report(results)
 
-    report_path = REPO_ROOT / "tests" / "ztole-generation-results.json"
+    report_path = REPO_ROOT / "tests" / "panel-generation-results.json"
     with open(report_path, "w") as f:
         json.dump(report_data, f, indent=2, ensure_ascii=False)
     print(f"Report: {report_path}")

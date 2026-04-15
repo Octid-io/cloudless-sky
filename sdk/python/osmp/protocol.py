@@ -2240,11 +2240,10 @@ class SALComposer:
                 if " " in phrase:
                     self._phrase_index[phrase] = (ns, op)
 
-        # ── Curated triggers: ZTOLE-discovered generation paths ──────
+        # ── Curated triggers ─────────────────────────────────────────
         # These extend the auto-generated set with mappings discovered
-        # through the ZTOLE 3B generative measurement (April 2026).
-        # Each entry was found by cross-vendor panel consensus or
-        # identified as a gap in the full-dictionary sweep.
+        # through cross-model composition testing. Each entry was found
+        # by panel consensus or identified as a gap in the dictionary sweep.
         _CURATED: dict[str, tuple[str, str]] = {
             # Gap fixes (5 opcodes uncovered by auto-generation)
             "flow authorization": ("F", "AV"),

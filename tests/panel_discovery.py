@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ZTOLE 3B: Discovery Instrument
+Cross-Model Panel Discovery: Discovery Instrument
 
 Panel composes SAL freely from NL inputs. No expected answer provided.
 Compare panel outputs against each other and against the deterministic
@@ -13,7 +13,7 @@ composer. Disagreements are the discovery surface:
   - Panel says NONE, composer says SAL  →  potential false positive
 
 Usage:
-  python tests/ztole_discovery.py --anthropic-key KEY --openai-key KEY [--gemini-key KEY]
+  python tests/panel_discovery.py --anthropic-key KEY --openai-key KEY [--gemini-key KEY]
 """
 from __future__ import annotations
 
@@ -200,7 +200,7 @@ def run_discovery(panel: dict[str, callable]):
     doctrine = build_doctrine()
 
     print(f"\n{'='*78}")
-    print(f"ZTOLE 3B — DISCOVERY INSTRUMENT")
+    print(f"Cross-Model Panel Discovery — DISCOVERY INSTRUMENT")
     print(f"{'='*78}")
     print(f"Panel: {', '.join(panel.keys())} ({len(panel)} models)")
     print(f"Vectors: {len(data['vectors'])}")
@@ -302,7 +302,7 @@ def run_discovery(panel: dict[str, callable]):
     print(f"{'='*78}\n")
 
     # Write report
-    report_path = REPO_ROOT / "tests" / "ztole-discovery-results.json"
+    report_path = REPO_ROOT / "tests" / "panel-discovery-results.json"
     with open(report_path, "w") as f:
         json.dump(results, f, indent=2, ensure_ascii=False, default=str)
     print(f"Report: {report_path}")
@@ -313,7 +313,7 @@ def run_discovery(panel: dict[str, callable]):
 # ── CLI ──────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="ZTOLE 3B Discovery")
+    parser = argparse.ArgumentParser(description="Cross-Model Panel Discovery Discovery")
     parser.add_argument("--anthropic-key", default=os.environ.get("ANTHROPIC_API_KEY"))
     parser.add_argument("--openai-key", default=os.environ.get("OPENAI_API_KEY"))
     parser.add_argument("--gemini-key", default=os.environ.get("GEMINI_API_KEY"))

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ZTOLE Full Dictionary Sweep — All 350 opcodes, 3 composition paths.
+Full Dictionary Sweep — All 350 opcodes, 3 composition paths.
 
 For each opcode in ASD_BASIS:
   1. Generate an NL prompt from the definition
@@ -11,7 +11,7 @@ For each opcode in ASD_BASIS:
 Output: per-opcode coverage map showing which paths resolve each opcode.
 
 Usage:
-  python tests/ztole_full_sweep.py --anthropic-key KEY --openai-key KEY [--gemini-key KEY]
+  python tests/panel_full_sweep.py --anthropic-key KEY --openai-key KEY [--gemini-key KEY]
 """
 from __future__ import annotations
 
@@ -168,7 +168,7 @@ def run_sweep(models: dict[str, callable]):
             opcodes.append((ns, op, defn))
 
     print(f"\n{'='*78}")
-    print(f"ZTOLE FULL DICTIONARY SWEEP — {len(opcodes)} opcodes, 3 paths")
+    print(f"cross-model panel FULL DICTIONARY SWEEP — {len(opcodes)} opcodes, 3 paths")
     print(f"{'='*78}")
     print(f"Models: {', '.join(models.keys())}")
     print(f"Path A: Deterministic (osmp_compose)")
@@ -262,7 +262,7 @@ def run_sweep(models: dict[str, callable]):
     print(f"{'='*78}\n")
 
     # Write report
-    report_path = REPO_ROOT / "tests" / "ztole-full-sweep-results.json"
+    report_path = REPO_ROOT / "tests" / "panel-full-sweep-results.json"
     with open(report_path, "w") as f:
         json.dump({
             "total_opcodes": n,
@@ -280,7 +280,7 @@ def run_sweep(models: dict[str, callable]):
 # ── CLI ──────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="ZTOLE Full Dictionary Sweep")
+    parser = argparse.ArgumentParser(description="Full Dictionary Sweep")
     parser.add_argument("--anthropic-key", default=os.environ.get("ANTHROPIC_API_KEY"))
     parser.add_argument("--openai-key", default=os.environ.get("OPENAI_API_KEY"))
     parser.add_argument("--gemini-key", default=os.environ.get("GEMINI_API_KEY"))
