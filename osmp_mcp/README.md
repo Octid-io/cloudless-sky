@@ -1,6 +1,6 @@
 # OSMP MCP Server
 
-MCP server for the [Octid Semantic Mesh Protocol (OSMP)](https://octid.io). Deterministic encode/decode of agentic AI instructions by table lookup. No inference at decode.
+MCP server for the [Octid Semantic Mesh Protocol (OSMP)](https://octid.io). Deterministic encode/decode of agentic AI instructions. The output is a structured, typed, safety-classified instruction — not text. No inference at decode.
 
 This is a production integration path. The agent connects, reads the system prompt, learns SAL, and speaks it natively from that point forward. The server stays running as the encode/decode/validate layer underneath.
 

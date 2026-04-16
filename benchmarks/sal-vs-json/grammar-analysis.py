@@ -476,7 +476,7 @@ analysis. Every point below is a genuine weakness or limitation.
 1. KEY NAMES CARRY INFORMATION (Partially Valid)
    
    The analysis counts JSON key names as structural overhead because SAL
-   eliminates them via positional encoding and the ASD lookup table.
+   eliminates them via positional encoding and the ASD.
    
    COUNTERARGUMENT: Key names DO carry information to a human reader.
    "location" tells you what the value means. SAL's E:EQ requires
@@ -484,7 +484,7 @@ analysis. Every point below is a genuine weakness or limitation.
    SAL is opaque without the ASD.
    
    REBUTTAL: Agent-to-agent communication has no human reader in the loop.
-   The receiver is a machine that decodes by table lookup. Self-documentation
+   The receiver is a machine that decodes deterministically. Self-documentation
    is a human UX feature, not an encoding efficiency requirement. The ASD
    provides the same documentation at decode time. However, this IS a real
    cost during development and debugging. JSON's self-documentation has

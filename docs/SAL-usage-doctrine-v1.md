@@ -8,11 +8,11 @@
 **Architect:** Clay Holberg
 **Protocol:** OSMP v1.0 | Patent pending | Apache 2.0 with express patent grant
 
-**Architectural Layer Separation:** This document governs agent-layer composition behavior. It does not modify protocol-layer decode properties. Decode remains inference-free table lookup per the protocol specification. Composition uses the agent's native inference capability, constrained by these rules. The agent is a dictionary consumer, not a dictionary author. Dictionary authorship is a sovereign node operator function exercised through FNP, MDR registration, or local Omega registration. The agent composes from what exists in the local ASD at the moment of composition, no more, no less.
+**Architectural Layer Separation:** This document governs agent-layer composition behavior. It does not modify protocol-layer decode properties. Decode remains deterministic per the protocol specification. Composition uses the agent's native inference capability, constrained by these rules. The agent is a dictionary consumer, not a dictionary author. Dictionary authorship is a sovereign node operator function exercised through FNP, MDR registration, or local Omega registration. The agent composes from what exists in the local ASD at the moment of composition, no more, no less.
 
 | Operation | Layer | Inference required? |
 |---|---|---|
-| Decode (SAL to meaning) | Protocol | No. Table lookup against ASD. |
+| Decode (SAL to meaning) | Protocol | No. Deterministic decode against ASD. |
 | Lookup (is this opcode in the ASD?) | Protocol | No. Dictionary search. |
 | Compose (NL to SAL) | Agent | Yes. LLM inference, constrained by grammar enforcement rules. |
 | Selection (which opcode is correct?) | Agent | Yes. Domain context evaluation, constrained by namespace selection rules. |
@@ -471,7 +471,7 @@ Decode errors occur when a conformant SAL instruction fails to round-trip throug
 **Definition:** The LLM invents an opcode not present in the ASD.
 **Mechanism:** The LLM pattern-matches English to a plausible abbreviation and emits it without calling osmp_lookup.
 **Example:** "Download the file" -> `D:DOWNLOAD` (DOWNLOAD is not an ASD opcode; the D namespace has PULL, PUSH, XFER, CHUNK but not DOWNLOAD)
-**Severity:** Critical. A hallucinated opcode will fail to decode at the receiving node. It violates conformance requirement 7 (decode by table lookup).
+**Severity:** Critical. A hallucinated opcode will fail to decode at the receiving node. It violates conformance requirement 7 (deterministic decode).
 **Prevention:** Mandatory osmp_lookup before every opcode use. If lookup returns zero results, the opcode does not exist.
 **Detection:** Post-composition validation: every opcode in the composed instruction must have a matching ASD entry.
 
@@ -612,7 +612,7 @@ The following replaces the current `osmp://system_prompt` resource content. It i
 
 ```
 SAL encodes agent instructions as deterministic opcode strings.
-Decode is table lookup. No inference.
+Decode is deterministic. No inference. The instruction is the intent.
 
 GRAMMAR: [NS:]OPCODE[@TARGET][OPERATOR INSTRUCTION]
 OPERATORS: → THEN  ∧ AND  ∨ OR  ; SEQUENCE  ∥ PARALLEL

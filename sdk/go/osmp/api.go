@@ -44,7 +44,7 @@ func Encode(instructions []string) string {
 }
 
 // Decode expands a SAL instruction chain to natural language.
-// Each frame is resolved by ASD dictionary lookup. Zero inference.
+// Each frame is resolved deterministically by the ASD. Zero inference.
 //
 //     osmp.Decode("H:HR@NODE1>120;H:CASREP;M:EVA@*")
 //     // => "H:heart_rate @NODE1 >120; H:casualty_report; M:evacuation @*"

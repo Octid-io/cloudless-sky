@@ -28,7 +28,7 @@ When AI agents communicate in JSON over HTTP, the cost compounds at every hop.
 R:MOV@BOT1:WPT:WP1↺
 ```
 
-21 bytes. Decode is a table lookup. Fits a single LoRa packet at maximum-range spreading factor. No inference required at the receiving node. The agent calls `osmp_compose` and the deterministic pipeline handles opcode selection, grammar assembly, and validation. 95.7% opcode coverage on the full 352-opcode dictionary. 98.6% with LLM fallback. What OSMP changes is the output format, and the decode layer: the receiving node does a table lookup, not inference.
+21 bytes. Decode is deterministic. Fits a single LoRa packet at maximum-range spreading factor. No inference required at the receiving node. The agent calls `osmp_compose` and the deterministic pipeline handles opcode selection, grammar assembly, and validation. 95.7% opcode coverage on the full 352-opcode dictionary. 98.6% with LLM fallback. What OSMP changes is the output format, and the decode layer: the receiving node decodes a structured instruction without inference.
 
 ---
 
@@ -49,7 +49,7 @@ can be configured via system prompt to output:
 ```
 H:HR@NODE1>120→H:CASREP∧M:EVA@*
 
-→ 35 bytes. 65% reduction. Decode is a table lookup.
+→ 35 bytes. 65% reduction. Decode is deterministic.
   Fits a single LoRa packet at maximum-range spreading factor.
   No inference required at the receiving node.
 ```
@@ -102,7 +102,7 @@ The validator catches hallucinated opcodes, missing consequence classes, namespa
 
 ### Step 4: Decode at the Receiving Node
 
-The receiving node decodes by dictionary lookup. No inference. No model. No ambiguity.
+The receiving node decodes deterministically. No inference. No model. No ambiguity. The instruction is the intent.
 
 ```python
 from osmp import decode
@@ -157,7 +157,7 @@ Today, every framework above the line serializes to JSON-RPC over HTTP. That wor
 
 **SAIL** (Semantic Assembly Isomorphic Language) is the binary encoding. Opaque bytes. Maximum compression for constrained channels.
 
-SAL and SAIL are isomorphic. Every valid SAL instruction has exactly one SAIL encoding. Every valid SAIL payload decodes to exactly one SAL instruction. The decode path is encoding-agnostic: the same dictionary lookup, the same result.
+SAL and SAIL are isomorphic. Every valid SAL instruction has exactly one SAIL encoding. Every valid SAIL payload decodes to exactly one SAL instruction. The decode path is encoding-agnostic: the same deterministic decode, the same structured result.
 
 BAEL selects the wire mode automatically based on channel capacity and instruction safety classification:
 
@@ -224,7 +224,7 @@ pip install osmp
 ```python
 from osmp import encode, decode
 ```
-Wire encode/decode into your agent framework's serialization pipeline. Add the [Usage Doctrine](docs/SAL-usage-doctrine-v1.md) to your LLM's system prompt. The agent composes SAL instead of JSON. The receiving node decodes by dictionary lookup.
+Wire encode/decode into your agent framework's serialization pipeline. Add the [Usage Doctrine](docs/SAL-usage-doctrine-v1.md) to your LLM's system prompt. The agent composes SAL instead of JSON. The receiving node decodes deterministically — the output is a structured, typed instruction, not text.
 
 **TypeScript SDK**
 ```bash

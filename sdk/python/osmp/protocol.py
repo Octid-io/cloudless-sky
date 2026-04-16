@@ -2688,7 +2688,7 @@ class SALComposer:
 #
 # A registered macro is a pre-validated multi-step SAL instruction chain
 # template stored alongside regular opcodes. Macros eliminate the composition
-# step for deterministic workflows: the agent's task is dictionary lookup
+# step for deterministic workflows: the agent's task is deterministic lookup
 # and slot-fill, not opcode-by-opcode composition.
 #
 # Composition priority hierarchy (spec Section 11):
@@ -2973,7 +2973,7 @@ class DecodedInstruction:
 class SALDecoder:
     """
     Inference-free SAL decoder.
-    All parsing is table lookup — no statistical models, no ambiguity resolution.
+    All parsing is deterministic — structured output, no inference — no statistical models, no ambiguity resolution.
     Analog: HPACK static table decode (RFC 7541 §A).
     """
 

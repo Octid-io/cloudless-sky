@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "osmp-mcp"
-version = "1.0.34"
+version = "1.0.35"
 description = "OSMP MCP Server -- Agentic AI instruction encoding. 86.8% byte reduction vs JSON. Inference-free decode. Any channel."
 readme = {text = """<!-- mcp-name: io.github.Octid-io/osmp -->
 # OSMP MCP Server
 
-MCP server for the [Octid Semantic Mesh Protocol (OSMP)](https://octid.io). Gives any MCP-compatible AI client native OSMP capability: encode, decode, validate, and resolve agentic instructions by table lookup. No inference at decode.
+MCP server for the [Octid Semantic Mesh Protocol (OSMP)](https://octid.io). Gives any MCP-compatible AI client native OSMP capability: encode, decode, validate, and resolve agentic instructions as structured instructions. Deterministic decode. No inference.
 
 ## Install
 

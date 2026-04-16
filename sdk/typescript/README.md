@@ -1,6 +1,6 @@
 # OSMP TypeScript SDK
 
-TypeScript implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, and validates agentic AI instructions using SAL (Semantic Assembly Language). 352 opcodes across 26 namespaces. Inference-free decode by table lookup. Pure JS D:PACK/BLK via `fzstd` (82KB, zero native deps).
+TypeScript implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, and validates agentic AI instructions using SAL (Semantic Assembly Language). 352 opcodes across 26 namespaces. Deterministic decode to structured instructions. No inference. Pure JS D:PACK/BLK via `fzstd` (82KB, zero native deps).
 
 ## Install
 

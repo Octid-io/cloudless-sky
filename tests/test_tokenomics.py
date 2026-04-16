@@ -4,7 +4,7 @@ OSMP Tokenomics Benchmark — Multi-Hop Token Cost Analysis
 Proves the core OSMP thesis: every current agent-to-agent hop burns two
 inference cycles (parse the inbound NL/JSON, then reason about it). OSMP
 burns one inference cycle (encode at origin) and every subsequent node
-decodes by table lookup at zero token cost.
+decodes deterministically at zero token cost.
 
 The cost of coordination is O(1) regardless of how many nodes the
 instruction touches.

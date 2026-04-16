@@ -91,7 +91,7 @@ def decode(sal: str) -> str:
     """Decode SAL to natural language description.
 
     Accepts a SAL instruction string (single frame or ;-separated sequence).
-    Returns the natural language expansion via ASD dictionary lookup. Zero
+    Returns the natural language expansion via deterministic ASD decode. Zero
     inference. Chain handling is delegated to SALDecoder.decode_natural_language
     which natively handles ;-separated frames.
     """

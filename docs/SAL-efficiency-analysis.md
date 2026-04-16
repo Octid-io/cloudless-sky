@@ -64,7 +64,7 @@ Both sender and receiver must possess the ASD. This is architecturally analogous
 
 ### 2.3 Decode Property
 
-SAL decoding is performed by table lookup against the ASD. No neural inference, statistical model, or training history is required. Any device capable of string processing and dictionary lookup can decode SAL instructions. This enables deployment on constrained hardware (ESP32, LoRaWAN end devices, Meshtastic nodes) where language model inference is computationally infeasible.
+SAL decoding is performed by deterministic decode against the ASD. No neural inference, statistical model, or training history is required. Any device capable of string processing and dictionary lookup can decode SAL instructions. This enables deployment on constrained hardware (ESP32, LoRaWAN end devices, Meshtastic nodes) where language model inference is computationally infeasible.
 
 ---
 
@@ -237,7 +237,7 @@ The multipliers are derived from cited production reporting, empirical research,
 
 ### 5.6 Scope Boundary: Decode Fidelity
 
-This analysis measures encoding efficiency, not meaning resolution fidelity. SAL decode is deterministic by design: the same instruction produces the same structured output on every decode via table lookup. Whether JSON parsed through an LLM inference layer reliably resolves to the same semantic instruction at production scale is an open empirical question with no published comparative data. A controlled comparison of meaning resolution accuracy between deterministic decode and inference-based parsing under production conditions would constitute a separate analysis with different methodology, different evidence requirements, and different conclusions.
+This analysis measures encoding efficiency, not meaning resolution fidelity. SAL decode is deterministic by design: the same instruction produces the same structured output on every decode deterministically. Whether JSON parsed through an LLM inference layer reliably resolves to the same semantic instruction at production scale is an open empirical question with no published comparative data. A controlled comparison of meaning resolution accuracy between deterministic decode and inference-based parsing under production conditions would constitute a separate analysis with different methodology, different evidence requirements, and different conclusions.
 
 ### 5.7 The Gzip Boundary
 
@@ -319,7 +319,7 @@ Applying these codes to DOM-04:
 
 The tier code encoding beats protobuf by 1 byte and would flip the scoreboard to 29 of 29. Non-standard values that fall outside the tier table (`C:SCALE@api-gateway[5:1742m:3.5Gi]`, 34 bytes) would fall back to text representation, the same behavior as the current encoding.
 
-This optimization was not applied. The slot value codes for resource tiers are ordinal: E is the 5th tier, not a mnemonic for "2000m." A developer inspecting `C:SCALE@api-gateway[5:E:F]` in a Kubernetes deployment log cannot infer that E means 2000m CPU and F means 4Gi memory without the dictionary lookup table. Compare this to H:TRIAGE?I, where I means Immediate, or C:STAT?A, where A means Active. Those are mnemonics. The Kubernetes tier codes are not.
+This optimization was not applied. The slot value codes for resource tiers are ordinal: E is the 5th tier, not a mnemonic for "2000m." A developer inspecting `C:SCALE@api-gateway[5:E:F]` in a Kubernetes deployment log cannot infer that E means 2000m CPU and F means 4Gi memory without the ASD. Compare this to H:TRIAGE?I, where I means Immediate, or C:STAT?A, where A means Active. Those are mnemonics. The Kubernetes tier codes are not.
 
 The protocol's design preference is that common operational instructions remain partially inspectable by a human operator without consulting a non-mnemonic lookup table. The triage and status codes satisfy this because their letters are the first letter of the word they represent. Ordinal tier codes that require memorization or reference violate that principle for a 6-byte improvement on one vector. The 5-byte gap on DOM-04 is accepted as the cost of maintaining human readability on the one vector class where it is most expensive. The mechanism is disclosed and available for deployments where byte efficiency at the edge outweighs field inspectability.
 
@@ -473,7 +473,7 @@ The protocol-level tradeoff is a 42-byte numeric tax per vitals panel in exchang
 
 The edge node encodes in SAL and transmits via LoRaWAN gateway, Meshtastic mesh relay, cellular, or satellite. The cloud node decodes by ASD lookup. A triage classification with ICD-10 diagnosis, GPS coordinates, and MEDEVAC request encodes in approximately 38 bytes, transmissible at any LoRaWAN data rate or over Meshtastic.
 
-The H namespace contains 16 clinical opcodes. The ICD-10-CM MDR corpus contains 74,719 codes resolvable at the edge by table lookup. Decode is deterministic: `H:ICD[J939]` resolves to "Pneumothorax, unspecified" by dictionary lookup. Deterministic decode is not the same as semantic adequacy: if the opcode inventory lacks a needed clinical concept, the decode is exact but incomplete. The ASD covers the ICD-10-CM code set; concepts outside that set require Frame Negotiation Protocol extension.
+The H namespace contains 16 clinical opcodes. The ICD-10-CM MDR corpus contains 74,719 codes resolvable at the edge deterministically. Decode is deterministic: `H:ICD[J939]` resolves to "Pneumothorax, unspecified" by dictionary lookup. Deterministic decode is not the same as semantic adequacy: if the opcode inventory lacks a needed clinical concept, the decode is exact but incomplete. The ASD covers the ICD-10-CM code set; concepts outside that set require Frame Negotiation Protocol extension.
 
 ### 9.3 Mode 3: Cloud-to-Cloud (Binding Constraint: Token Economics)
 

@@ -1967,7 +1967,7 @@ class DecodedInstruction:
 class SALDecoder:
     """
     Inference-free SAL decoder.
-    All parsing is table lookup — no statistical models, no ambiguity resolution.
+    All parsing is deterministic — structured output, no inference — no statistical models, no ambiguity resolution.
     Analog: HPACK static table decode (RFC 7541 §A).
     """
 

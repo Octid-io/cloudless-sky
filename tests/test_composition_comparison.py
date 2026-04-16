@@ -108,7 +108,7 @@ def build_doctrine() -> str:
     opcode_count = sum(len(ops) for ops in asd._data.values())
     namespace_listing = "\n".join(ns_lines)
 
-    return f"""SAL encodes agent instructions as deterministic opcode strings. Decode is table lookup. No inference.
+    return f"""SAL encodes agent instructions as deterministic opcode strings. Decode is deterministic. No inference.
 
 GRAMMAR: [NS:]OPCODE[@TARGET][OPERATOR INSTRUCTION]
 OPERATORS: → THEN  ∧ AND  ∨ OR  ; SEQUENCE  ∥ PARALLEL

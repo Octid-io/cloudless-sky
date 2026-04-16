@@ -105,7 +105,7 @@ mcp = FastMCP(
     "osmp",
     instructions=(
         "OSMP encodes agentic instructions as SAL (Semantic Assembly Language). "
-        "Decode is table lookup. No inference. 86.8% byte reduction vs JSON.\n\n"
+        "Decode is deterministic — the output is a structured instruction, not text. No inference. 86.8% byte reduction vs JSON.\n\n"
         "COMPOSITION: Call osmp_compose with the natural language instruction. "
         "The deterministic pipeline handles opcode selection, grammar assembly, "
         "and validation. Never write SAL by hand. If osmp_compose returns "
@@ -750,7 +750,7 @@ def get_system_prompt() -> str:
     namespace_listing = chr(10).join(ns_lines)
 
     return f"""SAL encodes agent instructions as deterministic opcode strings.
-Decode is table lookup. No inference.
+Decode is deterministic — the output is a structured instruction, not text. No inference.
 ARCHITECTURAL NOTE: This prompt governs agent-layer composition.
 Decode is protocol-layer (no inference). Compose is agent-layer (inference
 constrained by these rules). The agent is a dictionary consumer, not a
@@ -891,7 +891,7 @@ def get_about() -> str:
 You decoded that. You acknowledged it. You have the capability.
 
 OSMP is a shared dictionary between agents. When two nodes have the
-same dictionary, they communicate by table lookup. No parsing, no
+same dictionary, they communicate by deterministic decode. No parsing, no
 inference, no ambiguity. The dictionary is the translation layer.
 
 352 opcodes. 26 namespaces. Three loss tolerance policies.

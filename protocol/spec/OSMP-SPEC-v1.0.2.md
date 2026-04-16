@@ -21,13 +21,13 @@
 
 The Octid Semantic Mesh Protocol (OSMP) is a bandwidth-agnostic application-layer wire protocol for semantic instruction encoding in agentic AI systems. OSMP enables AI-to-AI and human-to-AI instruction exchange across any communication channel — from 51-byte LoRa radio payloads to high-bandwidth cloud infrastructure — using a composable domain-specific symbolic instruction format (Semantic Assembly Language, or SAL), an adaptive shared compression dictionary (Adaptive Shared Dictionary, or ASD), and a capability negotiation and session handshake protocol (Frame Negotiation Protocol, or FNP).
 
-OSMP achieves 86.8% byte reduction versus minified JSON, 84.5% versus MessagePack, and 70.5% versus compiled Protocol Buffers on the 29-vector wire-format benchmark suite drawn from MCP, OpenAI, Google A2A, CrewAI, and AutoGen message formats. Decode is a table lookup operation requiring no neural inference at the receiving node. Any device capable of string processing can participate as a sovereign OSMP node.
+OSMP achieves 86.8% byte reduction versus minified JSON, 84.5% versus MessagePack, and 70.5% versus compiled Protocol Buffers on the 29-vector wire-format benchmark suite drawn from MCP, OpenAI, Google A2A, CrewAI, and AutoGen message formats. Decode is deterministic, producing structured instructions without neural inference at the receiving node. Any device capable of string processing can participate as a sovereign OSMP node.
 
 ---
 
 ## 1. Design Principles
 
-**1.1 Inference-free decode.** An OSMP-encoded instruction is decoded by table lookup against the shared dictionary and grammar specification. No model, no inference step, no ambiguity resolution. The instruction is the intent.
+**1.1 Inference-free decode.** An OSMP-encoded instruction is decoded deterministically against the shared dictionary and grammar specification. The output is a structured, typed, safety-classified instruction — not text that requires further interpretation. No model, no inference step, no ambiguity resolution. The instruction is the intent.
 
 **1.2 Sovereignty.** Every node maintains its own Local Context Store and executes SAL encoding and decoding locally without dependency on any central server or cloud infrastructure. Nodes retain the right to define proprietary namespace extensions without requiring approval from any central authority.
 
@@ -35,7 +35,7 @@ OSMP achieves 86.8% byte reduction versus minified JSON, 84.5% versus MessagePac
 
 **1.4 Human inspectability.** OSMP-encoded instructions are human-readable at every transmission point without specialized decoding hardware. Any operator can inspect instruction traffic at the encoding layer.
 
-**1.5 Lossless semantics.** Every SAL substitution maps a natural language phrase or operational code to a single symbolic element with one-to-one formal equivalence. No semantic information is discarded. Recovery is by table lookup with no statistical inference.
+**1.5 Lossless semantics.** Every SAL substitution maps a natural language phrase or operational code to a single symbolic element with one-to-one formal equivalence. No semantic information is discarded. Recovery is deterministic with no statistical inference.
 
 ---
 
@@ -77,7 +77,7 @@ UTF-8 bytes: 12 vs 57 (78.9% reduction)
 
 ### 3.2 Glyph Operators
 
-Glyph operators are single Unicode characters with formal logical equivalences. Decode is by table lookup — no inference required.
+Glyph operators are single Unicode characters with formal logical equivalences. Decode is deterministic — no inference required.
 
 | Glyph | Unicode | Name | Function | Natural Language Equivalents |
 |---|---|---|---|---|
@@ -142,7 +142,7 @@ The OSMP glyph system comprises six functionally distinct symbol categories. Cat
 
 SAIL is the binary wire encoding of SAL. The mapping between SAL and SAIL is bijective for any peer pair sharing an equal Dictionary Basis Fingerprint (§9.8): every valid SAL instruction has exactly one SAIL encoding under that basis, every valid SAIL payload decodes to exactly one SAL instruction under that basis, and no information is lost in either direction. The bijection is anchored to basis equality, not assumed across heterogeneous loadouts.
 
-SAL is the human-readable encoding (Unicode glyphs, inspectable at every hop). SAIL is the binary encoding (opaque bytes, maximum compression for constrained channels). The decode path is encoding-agnostic for any peer pair within a basis: whether the wire carries UTF-8 SAL or packed SAIL, the receiving node performs the same dictionary lookup against its local intern table and produces the same decoded instruction.
+SAL is the human-readable encoding (Unicode glyphs, inspectable at every hop). SAIL is the binary encoding (opaque bytes, maximum compression for constrained channels). The decode path is encoding-agnostic for any peer pair within a basis: whether the wire carries UTF-8 SAL or packed SAIL, the receiving node performs the same deterministic decode against its local intern table and produces the same decoded instruction.
 
 SAIL encoding operates on the SAL instruction structure:
 
@@ -714,7 +714,7 @@ D:PACK defines two binary profiles addressing different deployment targets. Both
 
 **D:PACK/LZMA** (full-corpus, companion-device profile)
 
-Binary magic: `DPAK`. Second-tier algorithm: LZMA (Lempel-Ziv-Markov chain Algorithm). The corpus and index are each LZMA-compressed as monolithic blobs. At node startup the LZMA second tier is decompressed once into a memory-resident SAL corpus; subsequent lookups resolve by offset seek into the SAL layer and ASD expansion, with no per-lookup decompression cost. This is the zero-unpack semantic resolution property: once the SAL intermediate is resident, any code resolves to actionable clinical context by table lookup in constant time.
+Binary magic: `DPAK`. Second-tier algorithm: LZMA (Lempel-Ziv-Markov chain Algorithm). The corpus and index are each LZMA-compressed as monolithic blobs. At node startup the LZMA second tier is decompressed once into a memory-resident SAL corpus; subsequent lookups resolve by offset seek into the SAL layer and ASD expansion, with no per-lookup decompression cost. This is the zero-unpack semantic resolution property: once the SAL intermediate is resident, any code resolves to actionable clinical context deterministically in constant time.
 
 Deployment target: companion device with adequate SRAM for full-corpus decompression (approximately 6.2MB resident for ICD-10-CM: 4.7MB corpus + 1.4MB index).
 
@@ -774,7 +774,7 @@ The primary value of the two-tier architecture at full scale is edge-local deplo
 
 ## 11. Registered Macro Architecture
 
-A registered macro is a pre-validated multi-step SAL instruction chain template stored as a single callable entry in the Adaptive Shared Dictionary. The agent invokes a macro by dictionary lookup and slot-fill, producing the complete chain without composing from individual opcodes.
+A registered macro is a pre-validated multi-step SAL instruction chain template stored as a single callable entry in the Adaptive Shared Dictionary. The agent invokes a macro by deterministic lookup and slot-fill, producing the complete chain without composing from individual opcodes.
 
 ### 11.1 Macro Entry Structure
 
@@ -829,14 +829,14 @@ When the MDR updates a macro definition, ADP synchronization propagates the chan
 
 OSMP distinguishes two structurally independent operations:
 
-- **Decode** (protocol layer): Table lookup. The receiving node resolves a SAL expression into its semantic meaning by ASD lookup. No neural inference. No model. No ambiguity resolution. This is the core protocol claim.
+- **Decode** (protocol layer): Deterministic decode. The receiving node resolves a SAL expression into its semantic meaning by ASD lookup. No neural inference. No model. No ambiguity resolution. This is the core protocol claim.
 - **Compose** (agent layer): The process of translating natural language into a valid SAL expression. This inherently requires intelligence. An LLM performs it using its native inference capability constrained by the grammar enforcement rules below. Composition does not modify the inference-free decode property.
 
 These operations occur at different nodes, different architectural layers, and different times.
 
 ### 12.2 Mandatory Per-Opcode Lookup Gate
 
-For every opcode candidate identified in a natural language input, the composing agent MUST invoke dictionary lookup to confirm the opcode exists in the local ASD prior to composition. This gate operates per opcode candidate: each candidate in a multi-opcode chain is independently confirmed. No opcode in the chain may be assumed without dictionary confirmation.
+For every opcode candidate identified in a natural language input, the composing agent MUST invoke dictionary search to confirm the opcode exists in the local ASD prior to composition. This gate operates per opcode candidate: each candidate in a multi-opcode chain is independently confirmed. No opcode in the chain may be assumed without dictionary confirmation.
 
 Three outcomes: exactly one match routes to composition; multiple matches across namespaces routes to namespace selection (Section 12.3); zero matches routes to boundary detection (Section 12.4).
 
@@ -860,7 +860,7 @@ When ASD lookup resolves nothing at any tier (Tier 1, Tier 2, registered Omega),
 
 The following patterns render a composed instruction non-conformant:
 
-1. **Hallucinated opcodes:** Opcodes not confirmed by dictionary lookup.
+1. **Hallucinated opcodes:** Opcodes not confirmed by dictionary search.
 2. **Namespace as target:** The @ operator takes a node identifier or wildcard, never a namespace-prefixed opcode.
 3. **Forced fit:** Substituting the closest-sounding opcode when the concept does not map. Mnemonic similarity is not definition match.
 4. **Mixed-mode frames:** SAL and natural language may not be mixed within a single payload.
@@ -938,7 +938,7 @@ A conformant OSMP implementation MUST:
 4. Implement Overflow Protocol Tier 1 and at least one of Tier 2 or Tier 3
 5. Implement at least one loss tolerance policy from Section 8.2
 6. Produce UTF-8 byte reduction ≥60% on the standard benchmark instruction set (see test vectors)
-7. Decode any conformant OSMP instruction by table lookup without neural inference
+7. Decode any conformant OSMP instruction deterministically without neural inference
 8. Reject R namespace instructions (except R:ESTOP) that lack a consequence class designator as malformed
 9. Validate that every opcode in a composed instruction exists in the local ASD before emission
 
