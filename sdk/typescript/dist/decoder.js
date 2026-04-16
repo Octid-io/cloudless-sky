@@ -1,5 +1,5 @@
 /**
- * OSMP SAL Decoder — inference-free table lookup
+ * OSMP SAL Decoder — inference-free deterministic decode
  * Analog: HPACK static table decode (RFC 7541 §A)
  * Patent pending | License: Apache 2.0
  */

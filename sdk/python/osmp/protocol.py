@@ -2291,6 +2291,24 @@ class SALComposer:
             "invoke model": ("Z", "INF"),
             "building fire": ("B", "ALRM"),
             "fire alarm": ("B", "ALRM"),
+            # Operational abbreviations (mesh radio shorthand)
+            "temp report": ("E", "TH"),
+            "temp check": ("E", "TH"),
+            "battery level": ("X", "STORE"),
+            "battery status": ("X", "STORE"),
+            "battery report": ("X", "STORE"),
+            "signal strength": ("O", "LINK"),
+            "link quality": ("O", "LINK"),
+            "gps fix": ("E", "GPS"),
+            "position report": ("G", "POS"),
+            "node info": ("N", "STS"),
+            "mesh status": ("O", "MESH"),
+            "air quality": ("E", "EQ"),
+            "wind speed": ("W", "WIND"),
+            "heart rate check": ("H", "HR"),
+            "blood pressure check": ("H", "BP"),
+            "vitals check": ("H", "VITALS"),
+            "oxygen level": ("H", "SPO2"),
         }
         for phrase, (ns, op) in _CURATED.items():
             self._phrase_index[phrase] = (ns, op)
@@ -2435,11 +2453,27 @@ class SALComposer:
             'but', 'only', 'just', 'also', 'too', 'very', 'really',
             'it', 'its', "it's", 'me', 'my', 'your', 'our', 'their',
             'him', 'her', 'his', 'them', 'going', 'goes', 'went',
+            'you', 'need', 'want', 'know', 'like', 'think', 'would',
+            'post', 'photo', 'caption', 'book', 'order', 'send',
         }
+        # Build set of all 2-char opcode names for short-word matching
+        _SHORT_OPCODES = set()
+        for _ns, _ops in ASD_BASIS.items():
+            for _op in _ops:
+                if len(_op) <= 2:
+                    _SHORT_OPCODES.add(_op.lower())
+
         for i, word in enumerate(words):
             if i in consumed_positions:
                 continue
-            if len(word) > 2 and word not in _SKIP_WORDS:
+            # Allow short words (2 chars) if they're exact opcode names
+            if len(word) == 2 and word.upper() not in {op.upper() for op in _SHORT_OPCODES}:
+                continue
+            if len(word) < 2:
+                continue
+            if word in _SKIP_WORDS:
+                continue
+            if len(word) > 2 or word in _SHORT_OPCODES:
                 matches = self.lookup_by_keyword(word)
                 if matches:
                     actions.append(word)
@@ -2518,11 +2552,19 @@ class SALComposer:
                 defn = ASD_BASIS.get(ns, {}).get(op, "")
                 for action in actions:
                     a = action.upper()
+                    # Direct opcode name match (e.g., "stop" == "STOP", "temp" == "TEMP")
                     if a == op:
                         return True
+                    # Exact full definition match (e.g., "move" == "move")
                     defn_clean = defn.lower().replace("_", " ")
                     if action.lower() == defn_clean and len(action) >= 4:
                         return True
+                    # Action is a prefix of a definition word (e.g., "temp" starts "temperature")
+                    # Require 4+ chars to prevent short false positives ("post" ≠ "posture")
+                    for dw in defn_clean.split():
+                        if len(action) >= 4 and dw.startswith(action.lower()) and len(dw) >= len(action) + 2:
+                            return True
+                    # Opcode is prefix of action (e.g., "encrypt" starts with "ENC")
                     if len(op) >= 3 and a.startswith(op) and len(action) >= len(op) + 3:
                         return True
                 return False
@@ -2532,19 +2574,33 @@ class SALComposer:
 
                 Catches false positives like "cost" -> Z:COST where the definition
                 is "inference_cost_report" but the NL says "calculate the total cost"
-                with no inference context. If the definition has domain qualifiers
-                (multi-word) and none of those qualifier words appear in the NL,
-                the match is contextually wrong.
+                with no inference context.
                 """
                 defn = ASD_BASIS.get(ns, {}).get(op, "")
                 defn_words = defn.lower().replace("_", " ").split()
                 if len(defn_words) <= 1:
                     return True  # single-word definition, no qualifier to check
                 nl_lower = nl.lower()
-                # The action word itself will match; check if ANY qualifier word matches
+                # Check if definition qualifier words appear in the NL
                 qualifier_words = [w for w in defn_words if len(w) > 3]
-                matches = sum(1 for w in qualifier_words if w in nl_lower)
-                return matches >= 2  # need at least 2 definition words in the NL
+                exact_matches = 0
+                prefix_matches = 0
+                for qw in qualifier_words:
+                    if qw in nl_lower:
+                        exact_matches += 1
+                    else:
+                        for nl_word in nl_lower.split():
+                            if len(nl_word) >= 4 and qw.startswith(nl_word):
+                                prefix_matches += 1
+                                break
+                # Require 2 exact matches OR 1 exact + 1 prefix OR 1 prefix with strong signal
+                if exact_matches >= 2:
+                    return True
+                if exact_matches >= 1 and prefix_matches >= 1:
+                    return True
+                if prefix_matches >= 1 and len(defn_words) <= 2:
+                    return True  # short definition, prefix is enough
+                return False
 
             if len(resolved_opcodes) == 1:
                 ns, op = resolved_opcodes[0]

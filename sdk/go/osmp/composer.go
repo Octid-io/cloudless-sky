@@ -59,6 +59,9 @@ var (
 		"its": true, "me": true, "my": true, "your": true, "our": true,
 		"their": true, "him": true, "her": true, "his": true, "them": true,
 		"going": true, "goes": true, "went": true,
+		"you": true, "need": true, "want": true, "know": true, "like": true,
+		"think": true, "would": true, "post": true, "photo": true,
+		"caption": true, "book": true, "order": true, "send": true,
 	}
 
 	targetFalsePositives = map[string]bool{
@@ -98,6 +101,16 @@ var curatedTriggers = map[string][2]string{
 	"identity check": {"I", "ID"}, "run inference": {"Z", "INF"},
 	"invoke model": {"Z", "INF"}, "building fire": {"B", "ALRM"},
 	"fire alarm": {"B", "ALRM"},
+	// Operational abbreviations (mesh radio shorthand)
+	"temp report": {"E", "TH"}, "temp check": {"E", "TH"},
+	"battery level": {"X", "STORE"}, "battery status": {"X", "STORE"},
+	"battery report": {"X", "STORE"}, "signal strength": {"O", "LINK"},
+	"link quality": {"O", "LINK"}, "gps fix": {"E", "GPS"},
+	"position report": {"G", "POS"}, "node info": {"N", "STS"},
+	"mesh status": {"O", "MESH"}, "air quality": {"E", "EQ"},
+	"wind speed": {"W", "WIND"}, "heart rate check": {"H", "HR"},
+	"blood pressure check": {"H", "BP"}, "vitals check": {"H", "VITALS"},
+	"oxygen level": {"H", "SPO2"},
 }
 
 // NewComposer creates a SALComposer with the default ASD.
@@ -288,12 +301,32 @@ func (c *Composer) ExtractIntentKeywords(nlText string) ComposedIntent {
 		}
 	}
 
+	// Build set of all 2-char opcode names for short-word matching
+	shortOpcodes := map[string]bool{}
+	for _, ops := range ASDFloorBasis {
+		for op := range ops {
+			if len(op) <= 2 {
+				shortOpcodes[strings.ToLower(op)] = true
+			}
+		}
+	}
+
 	// Phase 2: Single-word fallback
 	for i, word := range words {
 		if consumed[i] {
 			continue
 		}
-		if len(word) > 2 && !skipWords[word] {
+		// Allow short words (2 chars) if they're exact opcode names
+		if len(word) == 2 && !shortOpcodes[word] {
+			continue
+		}
+		if len(word) < 2 {
+			continue
+		}
+		if skipWords[word] {
+			continue
+		}
+		if len(word) > 2 || shortOpcodes[word] {
 			if len(c.LookupByKeyword(word)) > 0 {
 				intent.Actions = append(intent.Actions, word)
 			}
@@ -376,6 +409,12 @@ func (c *Composer) Compose(nlText string, intent *ComposedIntent) string {
 				if strings.ToLower(action) == defnClean && len(action) >= 4 {
 					return true
 				}
+				// Action is a prefix of a definition word (e.g., "temp" starts "temperature")
+				for _, dw := range strings.Fields(defnClean) {
+					if len(action) >= 4 && strings.HasPrefix(dw, strings.ToLower(action)) && len(dw) >= len(action)+2 {
+						return true
+					}
+				}
 				if len(op) >= 3 && strings.HasPrefix(strings.ToUpper(action), op) && len(action) >= len(op)+3 {
 					return true
 				}
@@ -396,13 +435,30 @@ func (c *Composer) Compose(nlText string, intent *ComposedIntent) string {
 					qualifiers = append(qualifiers, w)
 				}
 			}
-			matches := 0
-			for _, w := range qualifiers {
-				if strings.Contains(nlLower, w) {
-					matches++
+			exactMatches := 0
+			prefixMatches := 0
+			for _, qw := range qualifiers {
+				if strings.Contains(nlLower, qw) {
+					exactMatches++
+				} else {
+					for _, nlWord := range strings.Fields(nlLower) {
+						if len(nlWord) >= 4 && strings.HasPrefix(qw, nlWord) {
+							prefixMatches++
+							break
+						}
+					}
 				}
 			}
-			return matches >= 2
+			if exactMatches >= 2 {
+				return true
+			}
+			if exactMatches >= 1 && prefixMatches >= 1 {
+				return true
+			}
+			if prefixMatches >= 1 && len(defnWords) <= 2 {
+				return true
+			}
+			return false
 		}
 
 		if len(resolved) == 1 {

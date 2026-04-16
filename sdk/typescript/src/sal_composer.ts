@@ -46,6 +46,8 @@ const SKIP_WORDS = new Set([
   "but", "only", "just", "also", "too", "very", "really",
   "it", "its", "it's", "me", "my", "your", "our", "their",
   "him", "her", "his", "them", "going", "goes", "went",
+  "you", "need", "want", "know", "like", "think", "would",
+  "post", "photo", "caption", "book", "order", "send",
 ]);
 
 const TARGET_FALSE_POSITIVES = new Set([
@@ -100,6 +102,24 @@ const CURATED_TRIGGERS: Record<string, [string, string]> = {
   "invoke model": ["Z", "INF"],
   "building fire": ["B", "ALRM"],
   "fire alarm": ["B", "ALRM"],
+  // Operational abbreviations (mesh radio shorthand)
+  "temp report": ["E", "TH"],
+  "temp check": ["E", "TH"],
+  "battery level": ["X", "STORE"],
+  "battery status": ["X", "STORE"],
+  "battery report": ["X", "STORE"],
+  "signal strength": ["O", "LINK"],
+  "link quality": ["O", "LINK"],
+  "gps fix": ["E", "GPS"],
+  "position report": ["G", "POS"],
+  "node info": ["N", "STS"],
+  "mesh status": ["O", "MESH"],
+  "air quality": ["E", "EQ"],
+  "wind speed": ["W", "WIND"],
+  "heart rate check": ["H", "HR"],
+  "blood pressure check": ["H", "BP"],
+  "vitals check": ["H", "VITALS"],
+  "oxygen level": ["H", "SPO2"],
 };
 
 // ── SALComposer ──────────────────────────────────────────────────────────────
@@ -252,11 +272,23 @@ export class SALComposer {
       }
     }
 
+    // Build set of all 2-char opcode names for short-word matching
+    const shortOpcodes = new Set<string>();
+    for (const [, ops] of Object.entries(ASD_BASIS)) {
+      for (const op of Object.keys(ops)) {
+        if (op.length <= 2) shortOpcodes.add(op.toLowerCase());
+      }
+    }
+
     // Phase 2: Single-word keyword fallback
     for (let i = 0; i < words.length; i++) {
       if (consumed.has(i)) continue;
       const word = words[i];
-      if (word.length > 2 && !SKIP_WORDS.has(word)) {
+      // Allow short words (2 chars) if they're exact opcode names
+      if (word.length === 2 && !shortOpcodes.has(word)) continue;
+      if (word.length < 2) continue;
+      if (SKIP_WORDS.has(word)) continue;
+      if (word.length > 2 || shortOpcodes.has(word)) {
         if (this.lookupByKeyword(word).length > 0) {
           actions.push(word);
         }
@@ -314,6 +346,10 @@ export class SALComposer {
         for (const action of intent.actions) {
           if (action.toUpperCase() === op) return true;
           if (action.toLowerCase() === defnClean && action.length >= 4) return true;
+          // Action is a prefix of a definition word (e.g., "temp" starts "temperature")
+          for (const dw of defnClean.split(/\s+/)) {
+            if (action.length >= 4 && dw.startsWith(action.toLowerCase()) && dw.length >= action.length + 2) return true;
+          }
           if (op.length >= 3 && action.toUpperCase().startsWith(op) && action.length >= op.length + 3) return true;
         }
         return false;
@@ -325,8 +361,24 @@ export class SALComposer {
         if (defnWords.length <= 1) return true;
         const nlLower = nlText.toLowerCase();
         const qualifiers = defnWords.filter(w => w.length > 3);
-        const matches = qualifiers.filter(w => nlLower.includes(w)).length;
-        return matches >= 2;
+        let exactMatches = 0;
+        let prefixMatches = 0;
+        for (const qw of qualifiers) {
+          if (nlLower.includes(qw)) {
+            exactMatches++;
+          } else {
+            for (const nlWord of nlLower.split(/\s+/)) {
+              if (nlWord.length >= 4 && qw.startsWith(nlWord)) {
+                prefixMatches++;
+                break;
+              }
+            }
+          }
+        }
+        if (exactMatches >= 2) return true;
+        if (exactMatches >= 1 && prefixMatches >= 1) return true;
+        if (prefixMatches >= 1 && defnWords.length <= 2) return true;
+        return false;
       };
 
       if (resolved.length === 1) {

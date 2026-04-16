@@ -52,7 +52,7 @@ export function encode(input) {
 }
 /**
  * Decode SAL to natural language. Zero inference.
- * Each frame is resolved by ASD dictionary lookup.
+ * Each frame is resolved deterministically by the ASD.
  *
  * @example
  * decode("H:HR@NODE1>120;H:CASREP;M:EVA@*")
