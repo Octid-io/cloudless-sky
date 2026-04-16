@@ -126,4 +126,5 @@ export { LossPolicy, BAELMode, DictUpdateMode, FLAG_TERMINAL, FLAG_CRITICAL, FLA
 export { FNPSession, FNP_MSG_ADV, FNP_MSG_ACK, FNP_MSG_NACK, FNP_MATCH_EXACT, FNP_MATCH_VERSION, FNP_MATCH_FINGERPRINT, FNP_CAP_FLOOR, FNP_CAP_STANDARD, FNP_CAP_BLE, FNP_CAP_UNCONSTRAINED, FNP_CAP_BYTES, FNP_ADV_SIZE, FNP_ACK_SIZE } from "./fnp.js";
 export { ADPSession, asdVersionPack, asdVersionUnpack, asdVersionStr, asdVersionParse, asdVersionIsBreaking, deltaToSal, deltaHasBreaking, deltaOpToSal, deltaOpIsBreaking, ADP_PRIORITY_MISSION, ADP_PRIORITY_MICRO, ADP_PRIORITY_DELTA, ADP_PRIORITY_TRICKLE } from "./adp.js";
 export { SALBridge } from "./bridge.js";
+export { SALComposer } from "./sal_composer.js";
 //# sourceMappingURL=index.js.map
