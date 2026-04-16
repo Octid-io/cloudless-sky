@@ -319,11 +319,49 @@ export class SALComposer {
         return false;
       };
 
+      const defnMatchesContext = (ns: string, op: string): boolean => {
+        const defn = ASD_BASIS[ns]?.[op] ?? "";
+        const defnWords = defn.toLowerCase().replace(/_/g, " ").split(/\s+/);
+        if (defnWords.length <= 1) return true;
+        const nlLower = nlText.toLowerCase();
+        const qualifiers = defnWords.filter(w => w.length > 3);
+        const matches = qualifiers.filter(w => nlLower.includes(w)).length;
+        return matches >= 2;
+      };
+
       if (resolved.length === 1) {
         if (!isStrong(resolved[0][0], resolved[0][1])) return null;
+        if (!defnMatchesContext(resolved[0][0], resolved[0][1])) return null;
       } else if (resolved.length === 2) {
         const strong = resolved.filter(([ns, op]) => isStrong(ns, op)).length;
         if (strong === 0) return null;
+      } else if (resolved.length >= 3) {
+        const strong = resolved.filter(([ns, op]) => isStrong(ns, op)).length;
+        const nlWordCount = nlText.split(/\s+/).length;
+        if (strong === 0 && nlWordCount < 8) return null;
+      }
+    }
+
+    // OOV chain gap detection
+    if (resolved.length > 0 && !hasPhraseMatch) {
+      const segments = nlText.toLowerCase().split(/,\s+then\s+|,\s+and\s+then\s+|\bthen\b|,\s+/);
+      if (segments.length >= 3) {
+        let unresolved = 0;
+        for (const seg of segments) {
+          const s = seg.trim();
+          if (!s || s.length < 5) continue;
+          let segHasMatch = false;
+          for (const [ns, op] of resolved) {
+            const defn = ASD_BASIS[ns]?.[op] ?? "";
+            const defnWords = defn.toLowerCase().replace(/_/g, " ").split(/\s+/);
+            if (defnWords.some(w => w.length > 3 && s.includes(w))) {
+              segHasMatch = true;
+              break;
+            }
+          }
+          if (!segHasMatch) unresolved++;
+        }
+        if (unresolved > 0) return null;
       }
     }
 

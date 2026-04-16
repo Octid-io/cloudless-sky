@@ -2510,44 +2510,97 @@ class SALComposer:
         if not resolved_opcodes:
             return None  # nothing resolved -- NL passthrough
 
-        # Confidence gate: if no phrase matched and only keyword matches
-        # are present, apply conservative composition rules to prevent
-        # false positives on common English words that happen to match
-        # ASD definition keywords.
+        # Confidence gate: prevent false positives from keyword noise.
+        # Three levels of filtering based on match quality.
         if not has_phrase_match and not intent.conditions:
             def _is_strong_match(ns: str, op: str, actions: list[str]) -> bool:
-                """A strong match is when the action word closely matches the opcode."""
+                """A strong match: action word closely matches the opcode."""
                 defn = ASD_BASIS.get(ns, {}).get(op, "")
-                head_word = defn.split("_")[0].lower() if defn else ""
                 for action in actions:
                     a = action.upper()
-                    # Direct opcode name match (e.g., "stop" == "STOP")
                     if a == op:
                         return True
-                    # Exact definition match (e.g., "move" == "move", "stop" == "stop")
-                    # Only matches when the entire definition IS the action word,
-                    # not when it's just the first word of a multi-word definition
                     defn_clean = defn.lower().replace("_", " ")
                     if action.lower() == defn_clean and len(action) >= 4:
                         return True
-                    # Opcode is prefix of action AND action is much longer
-                    # (e.g., "encrypt" starts with "ENC" — 7 vs 3, strong signal)
-                    # But NOT "ORDER" starts with "ORD" — too close, could be coincidence
                     if len(op) >= 3 and a.startswith(op) and len(action) >= len(op) + 3:
                         return True
                 return False
 
+            def _definition_matches_context(ns: str, op: str, nl: str) -> bool:
+                """Check if the definition's domain qualifiers appear in the NL.
+
+                Catches false positives like "cost" -> Z:COST where the definition
+                is "inference_cost_report" but the NL says "calculate the total cost"
+                with no inference context. If the definition has domain qualifiers
+                (multi-word) and none of those qualifier words appear in the NL,
+                the match is contextually wrong.
+                """
+                defn = ASD_BASIS.get(ns, {}).get(op, "")
+                defn_words = defn.lower().replace("_", " ").split()
+                if len(defn_words) <= 1:
+                    return True  # single-word definition, no qualifier to check
+                nl_lower = nl.lower()
+                # The action word itself will match; check if ANY qualifier word matches
+                qualifier_words = [w for w in defn_words if len(w) > 3]
+                matches = sum(1 for w in qualifier_words if w in nl_lower)
+                return matches >= 2  # need at least 2 definition words in the NL
+
             if len(resolved_opcodes) == 1:
                 ns, op = resolved_opcodes[0]
                 if not _is_strong_match(ns, op, intent.actions):
-                    return None  # low-confidence single keyword match
+                    return None
+                if not _definition_matches_context(ns, op, nl_text):
+                    return None
             elif len(resolved_opcodes) == 2:
                 strong = sum(
                     1 for ns, op in resolved_opcodes
                     if _is_strong_match(ns, op, intent.actions)
                 )
                 if strong == 0:
-                    return None  # both matches are weak keyword hits
+                    return None
+            elif len(resolved_opcodes) >= 3:
+                # Many keyword matches with no phrase: require at least one
+                # strong match, otherwise it's likely all noise.
+                # BUT: if the NL is long (many words), multiple weak matches
+                # together can indicate a real multi-step instruction.
+                strong = sum(
+                    1 for ns, op in resolved_opcodes
+                    if _is_strong_match(ns, op, intent.actions)
+                )
+                nl_word_count = len(nl_text.split())
+                if strong == 0 and nl_word_count < 8:
+                    return None  # short NL with all weak matches = noise
+
+        # OOV chain gap detection: if the NL contains step separators
+        # ("then", "and then", comma-separated clauses) and any step
+        # has no opcode match, the chain is incomplete. Passthrough
+        # rather than silently dropping the unresolved step.
+        if resolved_opcodes and not has_phrase_match:
+            import re as _re_chain
+            # Split on chain separators (commas, "then", "and then")
+            segments = _re_chain.split(
+                r',\s+then\s+|,\s+and\s+then\s+|\bthen\b|,\s+',
+                nl_text.lower()
+            )
+            if len(segments) >= 3:
+                # Multi-step chain: check each segment has a match
+                unresolved = 0
+                for seg in segments:
+                    seg = seg.strip()
+                    if not seg or len(seg) < 5:
+                        continue
+                    seg_has_match = False
+                    for ns, op in resolved_opcodes:
+                        defn = ASD_BASIS.get(ns, {}).get(op, "")
+                        defn_words = defn.lower().replace("_", " ").split()
+                        if any(w in seg for w in defn_words if len(w) > 3):
+                            seg_has_match = True
+                            break
+                    if not seg_has_match:
+                        unresolved += 1
+                if unresolved > 0:
+                    return None  # chain has OOV gap, passthrough
 
         # Step 3: Grammar assembly
         # Sort: sensing/data namespaces before action namespaces when

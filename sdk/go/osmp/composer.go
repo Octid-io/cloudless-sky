@@ -382,8 +382,34 @@ func (c *Composer) Compose(nlText string, intent *ComposedIntent) string {
 			}
 			return false
 		}
+
+		defnMatchesContext := func(ns, op string) bool {
+			defn := ASDFloorBasis[ns][op]
+			defnWords := strings.Fields(strings.ReplaceAll(strings.ToLower(defn), "_", " "))
+			if len(defnWords) <= 1 {
+				return true
+			}
+			nlLower := strings.ToLower(nlText)
+			qualifiers := []string{}
+			for _, w := range defnWords {
+				if len(w) > 3 {
+					qualifiers = append(qualifiers, w)
+				}
+			}
+			matches := 0
+			for _, w := range qualifiers {
+				if strings.Contains(nlLower, w) {
+					matches++
+				}
+			}
+			return matches >= 2
+		}
+
 		if len(resolved) == 1 {
 			if !isStrong(resolved[0][0], resolved[0][1]) {
+				return ""
+			}
+			if !defnMatchesContext(resolved[0][0], resolved[0][1]) {
 				return ""
 			}
 		} else if len(resolved) == 2 {
@@ -394,6 +420,52 @@ func (c *Composer) Compose(nlText string, intent *ComposedIntent) string {
 				}
 			}
 			if strong == 0 {
+				return ""
+			}
+		} else if len(resolved) >= 3 {
+			strong := 0
+			for _, p := range resolved {
+				if isStrong(p[0], p[1]) {
+					strong++
+				}
+			}
+			nlWordCount := len(strings.Fields(nlText))
+			if strong == 0 && nlWordCount < 8 {
+				return ""
+			}
+		}
+	}
+
+	// OOV chain gap detection
+	if len(resolved) > 0 && !hasPhraseMatch {
+		chainSplitRe := regexp.MustCompile(`(?i),\s+then\s+|,\s+and\s+then\s+|\bthen\b|,\s+`)
+		segments := chainSplitRe.Split(strings.ToLower(nlText), -1)
+		if len(segments) >= 3 {
+			unresolved := 0
+			for _, seg := range segments {
+				s := strings.TrimSpace(seg)
+				if s == "" || len(s) < 5 {
+					continue
+				}
+				segHasMatch := false
+				for _, p := range resolved {
+					defn := ASDFloorBasis[p[0]][p[1]]
+					defnWords := strings.Fields(strings.ReplaceAll(strings.ToLower(defn), "_", " "))
+					for _, w := range defnWords {
+						if len(w) > 3 && strings.Contains(s, w) {
+							segHasMatch = true
+							break
+						}
+					}
+					if segHasMatch {
+						break
+					}
+				}
+				if !segHasMatch {
+					unresolved++
+				}
+			}
+			if unresolved > 0 {
 				return ""
 			}
 		}
