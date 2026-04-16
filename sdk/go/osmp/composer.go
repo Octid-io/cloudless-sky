@@ -62,6 +62,10 @@ var (
 		"you": true, "need": true, "want": true, "know": true, "like": true,
 		"think": true, "would": true, "post": true, "photo": true,
 		"caption": true, "book": true, "order": true, "send": true,
+		// Generic referent nouns — objects of actions, not actions themselves
+		"payload": true, "data": true, "message": true, "request": true,
+		"response": true, "content": true, "file": true, "item": true,
+		"value": true, "result": true, "thing": true,
 	}
 
 	targetFalsePositives = map[string]bool{

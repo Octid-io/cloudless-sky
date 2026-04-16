@@ -2455,6 +2455,9 @@ class SALComposer:
             'him', 'her', 'his', 'them', 'going', 'goes', 'went',
             'you', 'need', 'want', 'know', 'like', 'think', 'would',
             'post', 'photo', 'caption', 'book', 'order', 'send',
+            # Generic referent nouns — they're objects of actions, not actions themselves
+            'payload', 'data', 'message', 'request', 'response', 'content',
+            'file', 'item', 'value', 'result', 'thing',
         }
         # Build set of all 2-char opcode names for short-word matching
         _SHORT_OPCODES = set()
@@ -2486,14 +2489,98 @@ class SALComposer:
             raw=raw,
         )
 
+    # Chain separators detected in NL for split-then-compose.
+    # Each separator maps to the SAL operator that joins the segments.
+    # Order matters: longer/more-specific patterns first.
+    _CHAIN_SEPARATORS: list[tuple[str, str]] = [
+        # Sequential (strict order, non-conditional)
+        (r',\s+then\s+', ';'),
+        (r',\s+and\s+then\s+', ';'),
+        (r'\s+then\s+', ';'),
+        (r'\s+next\s+', ';'),
+        # Conditional ("if X, then Y" or "if X above N, Y")
+        # These are handled by condition extraction, not chain split
+        # Conjunction (concurrent)
+        (r',\s+and\s+', '\u2227'),
+    ]
+
+    def _try_chain_split(self, nl_text: str) -> str | None:
+        """Try to split NL into chain segments and compose each independently.
+
+        Returns a composed SAL chain (using ; or ∧) or None if the NL
+        doesn't contain chain separators OR if any segment fails to compose.
+        """
+        import re as _re_split
+
+        # Find the first matching separator pattern in the NL
+        # If the NL contains conditional language ("if"), fall through
+        # to the normal single-composition path
+        nl_lower = nl_text.lower()
+        if ' if ' in nl_lower or nl_lower.startswith('if '):
+            return None  # conditional chains handled by existing logic
+
+        # Try each separator pattern
+        for pattern, operator in self._CHAIN_SEPARATORS:
+            segments = _re_split.split(pattern, nl_text, flags=_re_split.IGNORECASE)
+            if len(segments) >= 2:
+                # Clean segments
+                segments = [s.strip().rstrip('.,;') for s in segments if s.strip()]
+                if len(segments) < 2:
+                    continue
+
+                # Compose each segment independently
+                composed_segments = []
+                for seg in segments:
+                    if len(seg.encode("utf-8")) < 4:
+                        return None  # segment too short
+                    # Recursive compose with chain-split disabled to avoid infinite loop
+                    seg_sal = self._compose_single(seg)
+                    if seg_sal is None:
+                        return None  # any segment fails → whole chain fails
+                    composed_segments.append(seg_sal)
+
+                if len(composed_segments) >= 2:
+                    return operator.join(composed_segments)
+                return None
+
+        return None
+
+    def _compose_single(self, nl_text: str,
+                       intent: ComposedIntent | None = None) -> str | None:
+        """Single-segment composition — used by chain-split and top-level compose."""
+        return self._compose_impl(nl_text, intent)
+
     def compose(self, nl_text: str,
                 intent: ComposedIntent | None = None) -> str | None:
         """Compose valid SAL from natural language.
 
-        If intent is provided (e.g., from an LLM extraction step), uses it
-        directly. Otherwise falls back to keyword-based intent extraction.
+        First tries chain-split: if the NL contains sequential separators
+        ("then", "next", ", and"), split into segments and compose each.
+        This produces proper ; (SEQUENCE) or ∧ (AND) chains instead of
+        flat keyword-matched SAL.
+
+        Falls back to single-segment composition if no chain detected.
 
         Returns validated SAL string or None if composition fails.
+        """
+        if intent is None:
+            # Try chain-split first (only if intent not provided)
+            chain_sal = self._try_chain_split(nl_text)
+            if chain_sal is not None:
+                # Validate the chain
+                result = validate_composition(chain_sal, nl=nl_text)
+                if result.valid:
+                    return chain_sal
+                # Chain validation failed → fall through to single-compose
+
+        return self._compose_impl(nl_text, intent)
+
+    def _compose_impl(self, nl_text: str,
+                      intent: ComposedIntent | None = None) -> str | None:
+        """Core composition logic (was compose, now internal).
+
+        If intent is provided (e.g., from an LLM extraction step), uses it
+        directly. Otherwise falls back to keyword-based intent extraction.
         """
         if intent is None:
             intent = self.extract_intent_keywords(nl_text)
@@ -2616,17 +2703,15 @@ class SALComposer:
                 if strong == 0:
                     return None
             elif len(resolved_opcodes) >= 3:
-                # Many keyword matches with no phrase: require at least one
-                # strong match, otherwise it's likely all noise.
-                # BUT: if the NL is long (many words), multiple weak matches
-                # together can indicate a real multi-step instruction.
+                # 3+ keyword matches with no phrase: require at least one
+                # strong match (direct opcode name match or exact definition
+                # match). If zero strong matches, it's keyword noise.
                 strong = sum(
                     1 for ns, op in resolved_opcodes
                     if _is_strong_match(ns, op, intent.actions)
                 )
-                nl_word_count = len(nl_text.split())
-                if strong == 0 and nl_word_count < 8:
-                    return None  # short NL with all weak matches = noise
+                if strong == 0:
+                    return None
 
         # OOV chain gap detection: if the NL contains step separators
         # ("then", "and then", comma-separated clauses) and any step

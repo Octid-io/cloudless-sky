@@ -48,6 +48,9 @@ const SKIP_WORDS = new Set([
   "him", "her", "his", "them", "going", "goes", "went",
   "you", "need", "want", "know", "like", "think", "would",
   "post", "photo", "caption", "book", "order", "send",
+  // Generic referent nouns — objects of actions, not actions themselves
+  "payload", "data", "message", "request", "response", "content",
+  "file", "item", "value", "result", "thing",
 ]);
 
 const TARGET_FALSE_POSITIVES = new Set([
