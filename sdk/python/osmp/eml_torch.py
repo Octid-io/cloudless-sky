@@ -893,6 +893,121 @@ def demo_sweep_depth4():
                     print(f"    L{i}: eml({lvl['left']}, {lvl['right']})")
 
 
+def demo_overnight_search(log_path: str | None = None) -> None:
+    """High-restart search for functions that failed the quick sweep.
+    Logs every restart's best loss to see the recovery-rate distribution.
+
+    Targets: identity (L=4 wide), 1/x (L=5 wide), sqrt (L=5 wide).
+    All theoretically reachable; paper reports <25% cold-init success at
+    depth >=3 so restart count matters.
+    """
+    import math as m
+    import time
+    import json
+    import io
+
+    log_lines: list[str] = []
+
+    def log(line: str) -> None:
+        print(line, flush=True)
+        log_lines.append(line)
+
+    log("EML Overnight Search — 40 restarts per function, L=4/5 wide")
+    log("=" * 70)
+
+    targets = [
+        ("identity", lambda x: x,       (0.5, 5.0), 4),
+        ("1/x",      lambda x: 1.0/x,   (0.5, 5.0), 5),
+        ("sqrt",     m.sqrt,            (0.5, 5.0), 5),
+    ]
+
+    n_restarts = 40
+    epochs = 5000
+    harden_end = 0.01
+
+    for name, fn, xr, nlev in targets:
+        log(f"\n[{name} @ L={nlev} wide — {n_restarts} restarts, "
+            f"epochs={epochs}, harden_end_T={harden_end}]")
+        t_func_start = time.time()
+
+        per_restart = []
+        best_overall_loss = float("inf")
+        best_model: EMLChainWide | None = None
+        best_info: dict = {}
+
+        for r in range(n_restarts):
+            t_r = time.time()
+            mdl, info = train_chain_wide(
+                fn, n_levels=nlev, x_range=xr,
+                n_samples=50, epochs=epochs, restarts=1,
+                harden_end_temp=harden_end,
+                seed_base=13 + r * 97,  # wide seed variance
+                verbose=False,
+            )
+            rl = info.get("loss", float("inf"))
+            re = info.get("max_error", float("inf"))
+            per_restart.append({"restart": r, "loss": rl, "max_error": re,
+                                 "time_s": round(time.time() - t_r, 1)})
+            if rl < best_overall_loss:
+                best_overall_loss = rl
+                best_model = mdl
+                best_info = info
+            if rl < 1e-18:
+                log(f"  r{r:2d}: loss={rl:.2e} max_err={re:.2e} CONVERGED")
+                break
+            if r % 5 == 0 or r == n_restarts - 1:
+                log(f"  r{r:2d}: loss={rl:.2e} max_err={re:.2e} "
+                    f"(best so far {best_overall_loss:.2e})")
+
+        elapsed = time.time() - t_func_start
+        log(f"  -> {n_restarts} restarts in {elapsed:.0f}s. "
+            f"Best loss={best_overall_loss:.2e}")
+
+        if best_model is not None:
+            # Discrete verification
+            xs_np = [xr[0] + (xr[1] - xr[0]) * i / 49 for i in range(50)]
+            targets_np = [fn(x) for x in xs_np]
+            xs_t = torch.tensor(xs_np, dtype=torch.float64)
+            with torch.no_grad():
+                disc = best_model.forward_discrete(xs_t).real.tolist()
+            disc_err = max(abs(p - t) for p, t in zip(disc, targets_np))
+            diag = best_model.softmax_diagnostics()
+            log(f"  discrete max_err: {disc_err:.3e}")
+            log(f"  min_max_weight: {diag['min_max_weight']:.6f}")
+            if best_info.get("structure"):
+                log(f"  structure: {best_info['structure']['levels']}")
+            if disc_err < 1e-6:
+                log(f"  VERDICT: EXACT — discrete tree verified")
+            elif disc_err < 0.05:
+                log(f"  VERDICT: APPROX (disc err {disc_err:.2e})")
+            else:
+                log(f"  VERDICT: no converged restart")
+
+        # Recovery-rate histogram
+        bucketed = {"exact (<1e-10)": 0, "near (<1e-4)": 0,
+                    "loose (<1.0)": 0, "fail": 0}
+        for r in per_restart:
+            if r["loss"] < 1e-10:
+                bucketed["exact (<1e-10)"] += 1
+            elif r["loss"] < 1e-4:
+                bucketed["near (<1e-4)"] += 1
+            elif r["loss"] < 1.0:
+                bucketed["loose (<1.0)"] += 1
+            else:
+                bucketed["fail"] += 1
+        log(f"  recovery histogram: {bucketed}")
+
+    log("\n" + "=" * 70)
+    log("Overnight search complete.")
+
+    if log_path:
+        try:
+            with open(log_path, "w", encoding="utf-8") as f:
+                f.write("\n".join(log_lines))
+        except Exception:
+            pass
+
+
 def demo_discretization_gap():
     """IP-critical verification: does hard-argmax give the same error as
     the trained softmax mixture? If yes, the discrete tree is the wire form.
