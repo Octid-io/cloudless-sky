@@ -6,9 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
-## [2.3.0] — 2026-04-21
+## [v2.1.0] — 2026-04-21
 
 Additive release. No breaking changes. Patent-pending UBOT evaluator integrated across all three SDKs + MCP server.
+
+**Package versions shipped with this release:**
+- `osmp` (Python / PyPI): 2.2.5 → **2.3.0**
+- `osmp-protocol` (npm): 2.2.5 → **2.3.0**
+- `osmp-mcp` (PyPI): 1.0.37 → **1.1.0**
+- MCP Registry entry (`io.github.Octid-io/osmp` in server.json): 1.0.36 → 1.0.37 (lag-of-one convention)
 
 ### Added — EML (Universal Binary Operator Evaluator)
 
@@ -67,6 +73,10 @@ UBOT-001-UTIL filed 2026-04-21 covering the encoding, transmission, and apparatu
 
 ---
 
-## [2.2.x and earlier]
+## [v2.0.0 and earlier]
 
-See the [git log](https://github.com/octid-io/cloudless-sky/commits/main) for earlier version history. Pre-2.3.0 versions covered OSMP (Semantic Assembly Language) encode / decode / validate, SALComposer, MCP server, and three MDR corpora (ICD-10-CM, ISO 20022, MITRE ATT&CK).
+See the [git log](https://github.com/octid-io/cloudless-sky/commits/main) for earlier version history. Prior GitHub releases:
+
+- **v2.0.0** — OSMP (Semantic Assembly Language) encode / decode / validate, SALComposer, MCP server, three MDR corpora (ICD-10-CM, ISO 20022, MITRE ATT&CK). Package versions at release: osmp 2.2.5, osmp-mcp 1.0.37.
+- **v1.0.1** — patch release on v1.0.0.
+- **v1.0.0** — initial public release.
