@@ -13,6 +13,7 @@ sdk/typescript/dist/
 sdk/go/osmp-benchmark
 .DS_Store
 desktop.ini
+.claude/
 build/
 dist/
 *.whl
