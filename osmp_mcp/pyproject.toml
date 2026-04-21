@@ -65,8 +65,11 @@ Homepage = "https://octid.io"
 Repository = "https://github.com/octid-io/cloudless-sky"
 Documentation = "https://github.com/octid-io/cloudless-sky/blob/main/protocol/spec/OSMP-SPEC-v1.0.2.md"
 
-[tool.setuptools.packages.find]
-include = ["osmp_mcp*"]
+[tool.setuptools]
+packages = ["osmp_mcp"]
+
+[tool.setuptools.package-dir]
+osmp_mcp = "."
 
 [tool.setuptools.package-data]
 osmp_mcp = ["data/*"]
