@@ -11,10 +11,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 Additive release. No breaking changes. Patent-pending UBOT evaluator integrated across all three SDKs + MCP server.
 
 **Package versions shipped with this release:**
-- `osmp` (Python / PyPI): 2.2.5 → **2.3.0**
-- `osmp-protocol` (npm): 2.2.5 → **2.3.0**
+- `osmp` (Python / PyPI): 2.2.5 → **2.3.1**
+- `osmp-protocol` (npm): 2.2.5 → **2.3.1**
 - `osmp-mcp` (PyPI): 1.0.37 → **1.1.0**
 - MCP Registry entry (`io.github.Octid-io/osmp` in server.json): 1.0.36 → 1.0.37 (lag-of-one convention)
+
+*Note: `osmp` and `osmp-protocol` were initially published as 2.3.0. Patch 2.3.1 strips docstring-level patent-docket references from the eml module — functionally identical; fresh installs pull 2.3.1 automatically.*
 
 ### Added — EML (Universal Binary Operator Evaluator)
 
