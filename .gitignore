@@ -4,6 +4,7 @@ __pycache__/
 # IP-sensitive research code — local only, do not commit
 sdk/python/osmp/eml_torch.py
 sdk/python/osmp/eml_chain*.py
+sdk/python/osmp/_eml_*.py
 overnight-eml-*.txt
 .venv/
 node_modules/
