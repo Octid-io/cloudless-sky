@@ -150,14 +150,14 @@ Identical fingerprint across Python, Go, and TypeScript on every IEEE-754-confor
 Two modes toggled via `SetPrecisionMode`:
 
 - **`eml.Fast`** (default) — fdlibm-derived, 1-ULP accurate, ships publicly.
-- **`eml.Precision`** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license** — contact `licensing@octid.io` or see [PATENTS.md](../../PATENT-NOTICE.md).
+- **`eml.Precision`** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license** — contact `ack@octid.io` or see [PATENTS.md](../../PATENT-NOTICE.md).
 
 ```go
 if err := eml.SetPrecisionMode(eml.Precision); err != nil {
     // err == eml.ErrPrecisionPackNotInstalled
     fmt.Println(err)
     // "precision mode requires the commercial precision pack;
-    //  contact licensing@octid.io or see PATENTS.md"
+    //  contact ack@octid.io or see PATENTS.md"
 }
 ```
 

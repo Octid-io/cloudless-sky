@@ -158,7 +158,7 @@ Identical fingerprint across Python, Go, and TypeScript on every IEEE-754-confor
 Two modes toggled via `setPrecisionMode`:
 
 - **`"fast"`** (default) — fdlibm-derived, 1-ULP accurate, ships publicly.
-- **`"precision"`** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license** — contact `licensing@octid.io` or see [PATENTS.md](../../PATENT-NOTICE.md).
+- **`"precision"`** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license** — contact `ack@octid.io` or see [PATENTS.md](../../PATENT-NOTICE.md).
 
 ```typescript
 import { setPrecisionMode, precisionModeAvailable, PrecisionModeNotAvailableError } from "osmp-protocol/eml";
@@ -171,7 +171,7 @@ try {
   if (e instanceof PrecisionModeNotAvailableError) {
     console.log(e.message);
     // "Precision mode requires the commercial precision pack.
-    //  Contact licensing@octid.io or see PATENTS.md."
+    //  Contact ack@octid.io or see PATENTS.md."
   }
 }
 ```

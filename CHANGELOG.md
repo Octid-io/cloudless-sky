@@ -51,7 +51,7 @@ The commercial precision pack replaces the stub file with a real CRLibm-derived 
 - Audit-grade financial, cryptographic protocol-frame hash inputs
 - DoD distribution under DFARS 252.227-7013 / 7014 Restricted Rights
 
-Licensing: `licensing@octid.io`.
+Licensing: `ack@octid.io`.
 
 ### Added — MCP tools
 

@@ -34,7 +34,7 @@ Two precision modes:
 Precision mode (correctly-rounded, cross-device deterministic, audit-grade
 for regulated industries — medical IEC 62304, aerospace DO-178C, nuclear
 IEC 61513, audit-grade finance) is available under commercial license.
-Contact licensing@octid.io for evaluation.
+Contact ack@octid.io for evaluation.
 
 Calling set_precision_mode("precision") without the commercial precision
 pack installed raises PrecisionModeNotAvailable.
@@ -107,7 +107,7 @@ def set_precision_mode(mode: str) -> None:
         ValueError: if mode is neither "fast" nor "precision"
         PrecisionModeNotAvailable: if "precision" is requested and the
             commercial precision pack is not installed. Contact
-            licensing@octid.io for evaluation.
+            ack@octid.io for evaluation.
     """
     global PRECISION_MODE
     if mode not in ("fast", "precision"):
@@ -115,7 +115,7 @@ def set_precision_mode(mode: str) -> None:
     if mode == "precision" and not _CRLIBM_AVAILABLE:
         raise PrecisionModeNotAvailable(
             "Precision mode requires the commercial precision pack. "
-            "Contact licensing@octid.io or see PATENTS.md for license inquiries."
+            "Contact ack@octid.io or see PATENTS.md for license inquiries."
         )
     PRECISION_MODE = mode
 
@@ -843,7 +843,7 @@ def _self_test() -> None:
         set_precision_mode("fast")
     else:
         print(f"  precision mode: available under commercial license")
-        print(f"    (contact licensing@octid.io or see PATENTS.md)")
+        print(f"    (contact ack@octid.io or see PATENTS.md)")
 
 
 if __name__ == "__main__":

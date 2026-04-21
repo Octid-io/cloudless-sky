@@ -14,7 +14,7 @@
 //
 // To enable precision mode:
 //
-//	Contact licensing@octid.io for evaluation access under NDA.
+//	Contact ack@octid.io for evaluation access under NDA.
 //	Standard distribution: per-deployment commercial license.
 //	DoD distribution: under DFARS 252.227-7013 / 7014 Restricted Rights.
 //
@@ -30,10 +30,10 @@ import "errors"
 // ErrPrecisionPackNotInstalled is returned / panicked when precision mode
 // is requested without the commercial precision pack.
 //
-// Contact licensing@octid.io for commercial evaluation under NDA.
+// Contact ack@octid.io for commercial evaluation under NDA.
 // See PATENTS.md at the repository root for license-inquiry details.
 var ErrPrecisionPackNotInstalled = errors.New(
-	"precision mode requires the commercial precision pack; contact licensing@octid.io or see PATENTS.md",
+	"precision mode requires the commercial precision pack; contact ack@octid.io or see PATENTS.md",
 )
 
 // CrlibmAvailable reports whether the precision-mode backend is installed.

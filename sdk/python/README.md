@@ -174,7 +174,7 @@ Identical fingerprint across Python, Go, and TypeScript.
 Two modes toggled via `set_precision_mode`:
 
 - **`"fast"`** (default) — fdlibm-derived, 1-ULP accurate, ships publicly in this package. Correct for LoRa/BLE/edge-ML, constrained-channel telemetry, drone swarm coordination, and general scientific computation.
-- **`"precision"`** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license** — contact `licensing@octid.io` or see [PATENTS.md](../../PATENT-NOTICE.md).
+- **`"precision"`** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license** — contact `ack@octid.io` or see [PATENTS.md](../../PATENT-NOTICE.md).
 
 ```python
 from osmp.eml import set_precision_mode, precision_mode_available, PrecisionModeNotAvailable
@@ -186,7 +186,7 @@ try:
 except PrecisionModeNotAvailable as e:
     print(e)
     # Precision mode requires the commercial precision pack.
-    # Contact licensing@octid.io or see PATENTS.md.
+    # Contact ack@octid.io or see PATENTS.md.
 ```
 
 ## SALComposer: NL to SAL

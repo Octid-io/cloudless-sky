@@ -20,7 +20,7 @@
 // Precision mode (correctly-rounded, cross-device deterministic, audit-grade
 // for regulated industries — medical IEC 62304, aerospace DO-178C, nuclear
 // IEC 61513, audit-grade finance) is available under commercial license.
-// Contact licensing@octid.io for evaluation.
+// Contact ack@octid.io for evaluation.
 //
 // Calling SetPrecisionMode(Precision) without the commercial precision
 // pack installed returns ErrPrecisionPackNotInstalled (see crlibm.go stub).
@@ -77,7 +77,7 @@ var currentMode PrecisionMode = Fast
 // Precision mode requires the commercial precision pack. If the pack is
 // not installed (CrlibmAvailable == false), SetPrecisionMode(Precision)
 // returns ErrPrecisionPackNotInstalled without changing the current mode.
-// Fast mode always succeeds. Contact licensing@octid.io for evaluation.
+// Fast mode always succeeds. Contact ack@octid.io for evaluation.
 func SetPrecisionMode(m PrecisionMode) error {
 	if m == Precision && !CrlibmAvailable {
 		return ErrPrecisionPackNotInstalled

@@ -725,7 +725,7 @@ def osmp_eml_evaluate(chain_name: str, values: list[float]) -> str:
 
     Runs in FAST mode (fdlibm-derived, 1-ULP, cross-language byte-exact).
     Precision mode (correctly-rounded, audit-grade) is available under
-    commercial license — contact licensing@octid.io.
+    commercial license — contact ack@octid.io.
 
     Base corpus (16 entries, single variable x):
       "exp(x)", "ln(x)", "identity", "zero",
@@ -801,7 +801,7 @@ def osmp_eml_corpus_lookup(chain_name: str = "") -> str:
             "note": (
                 "All chains evaluated via osmp_eml_evaluate. Fast mode (1-ULP) "
                 "ships publicly; precision mode (correctly-rounded) is commercial "
-                "license — contact licensing@octid.io."
+                "license — contact ack@octid.io."
             ),
         }, indent=2)
     chain, kind = _lookup_eml_chain(chain_name)

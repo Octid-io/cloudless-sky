@@ -21,7 +21,7 @@
  * Precision mode (correctly-rounded, cross-device deterministic, audit-grade
  * for regulated industries — medical IEC 62304, aerospace DO-178C, nuclear
  * IEC 61513, audit-grade finance) is available under commercial license.
- * Contact licensing@octid.io for evaluation.
+ * Contact ack@octid.io for evaluation.
  *
  * Calling setPrecisionMode("precision") without the commercial precision
  * pack installed throws PrecisionModeNotAvailableError.
@@ -58,7 +58,7 @@ let currentMode: PrecisionMode = "fast";
  * Precision mode requires the commercial precision pack. If the pack is
  * not installed, setPrecisionMode("precision") throws
  * PrecisionModeNotAvailableError. Fast mode always succeeds.
- * Contact licensing@octid.io for evaluation.
+ * Contact ack@octid.io for evaluation.
  */
 export function setPrecisionMode(m: PrecisionMode): void {
   if (m === "precision" && !CRLIBM_AVAILABLE) {
@@ -706,7 +706,7 @@ export function selfTest(): void {
     setPrecisionMode("fast");
   } else {
     console.log(`  precision mode: available under commercial license`);
-    console.log(`    (contact licensing@octid.io or see PATENTS.md)`);
+    console.log(`    (contact ack@octid.io or see PATENTS.md)`);
   }
 }
 

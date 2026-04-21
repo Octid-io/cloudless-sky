@@ -224,7 +224,7 @@ This means a constrained-channel instruction can carry its own math: a 51-byte L
 ### Dual-Mode Precision
 
 - **Fast mode** (default) — fdlibm-derived, 1-ULP accurate. Correct for LoRa/BLE/edge-ML, drone swarm coordination, and general scientific computation. **Ships publicly.**
-- **Precision mode** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license.** Contact `licensing@octid.io` or see [PATENTS.md](PATENT-NOTICE.md).
+- **Precision mode** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license.** Contact `ack@octid.io` or see [PATENTS.md](PATENT-NOTICE.md).
 
 ### Cross-Device Determinism
 

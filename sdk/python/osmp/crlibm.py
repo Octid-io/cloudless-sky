@@ -16,7 +16,7 @@ fusion-robust arithmetic primitives.
 
 To enable precision mode:
 
-    Contact licensing@octid.io for evaluation access under NDA.
+    Contact ack@octid.io for evaluation access under NDA.
     Standard distribution: per-deployment commercial license.
     DoD distribution: under DFARS 252.227-7013 / 7014 Restricted Rights.
 
@@ -31,7 +31,7 @@ from __future__ import annotations
 class PrecisionModeNotAvailable(RuntimeError):
     """Raised when precision mode is requested without the commercial precision pack.
 
-    Contact licensing@octid.io for commercial evaluation under NDA.
+    Contact ack@octid.io for commercial evaluation under NDA.
     See PATENTS.md at repo root for license-inquiry details.
     """
 
@@ -40,7 +40,7 @@ class PrecisionModeNotAvailable(RuntimeError):
             msg
             or (
                 "Precision mode requires the commercial precision pack. "
-                "Contact licensing@octid.io or see PATENTS.md."
+                "Contact ack@octid.io or see PATENTS.md."
             )
         )
 

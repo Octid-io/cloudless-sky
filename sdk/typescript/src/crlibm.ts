@@ -15,7 +15,7 @@
  *
  * To enable precision mode:
  *
- *     Contact licensing@octid.io for evaluation access under NDA.
+ *     Contact ack@octid.io for evaluation access under NDA.
  *     Standard distribution: per-deployment commercial license.
  *     DoD distribution: under DFARS 252.227-7013 / 7014 Restricted Rights.
  *
@@ -30,7 +30,7 @@ export class PrecisionModeNotAvailableError extends Error {
     super(
       msg ||
         "Precision mode requires the commercial precision pack. " +
-          "Contact licensing@octid.io or see PATENTS.md."
+          "Contact ack@octid.io or see PATENTS.md."
     );
     this.name = "PrecisionModeNotAvailableError";
   }

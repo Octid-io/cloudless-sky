@@ -77,7 +77,7 @@ On-wire mathematics via UBOT — the Universal Binary Operator evaluator. Based 
 | `osmp_eml_evaluate` | Evaluate a pre-built EML chain at input value(s). 16 base functions (exp, ln, sin, cos, etc.) + 4 arithmetic compounds (neg, +, ×, linear calibration). Fast mode (1-ULP). |
 | `osmp_eml_corpus_lookup` | List available chains, or retrieve the chain structure (variables, levels, operand pairs) for a named entry. |
 
-Precision mode (correctly-rounded, audit-grade for regulated industries) is available under commercial license. Contact `licensing@octid.io`.
+Precision mode (correctly-rounded, audit-grade for regulated industries) is available under commercial license. Contact `ack@octid.io`.
 
 ### Bridge (5)
 
