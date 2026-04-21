@@ -31,6 +31,10 @@ from osmp.protocol import (
     MacroRegistry,
 )
 
+# EML (UBOT) public evaluator — Odrzywołek arXiv:2603.21852
+# Fast mode ships with this package; precision mode is commercial-license only.
+from osmp import eml as _eml
+
 # -- Paths ----------------------------------------------------------------
 # When pip-installed, package data lives next to this file in osmp_mcp/data/.
 # When run from a repo clone, the same layout works because the repo also
@@ -693,6 +697,127 @@ def osmp_bridge_comparison(peer_id: str) -> str:
         "aggregate_reduction_pct": round(avg_reduction, 1),
         "comparisons": comparisons,
     }, indent=2, ensure_ascii=False)
+
+
+# -- EML (UBOT) Tools -----------------------------------------------------
+# Evaluate pre-built EML chains from the corpus. Construction (authoring
+# new chains) is not exposed — the precision-mode backend is commercial-
+# license only. Fast-mode evaluation (fdlibm-derived, 1-ULP) ships publicly.
+
+def _lookup_eml_chain(chain_name: str):
+    """Return a Chain for a corpus entry name, or None if unknown."""
+    if chain_name in _eml.BASE_CHAIN_STRUCTURES:
+        return _eml.get_base_chain(chain_name), "base"
+    if chain_name == "neg_y":
+        return _eml.compound_neg_y(), "compound"
+    if chain_name == "x_plus_y":
+        return _eml.compound_x_plus_y(), "compound"
+    if chain_name == "x_times_y":
+        return _eml.compound_x_times_y(), "compound"
+    if chain_name == "linear_calibration":
+        return _eml.compound_linear_calibration(), "compound"
+    return None, None
+
+
+@mcp.tool()
+def osmp_eml_evaluate(chain_name: str, values: list[float]) -> str:
+    """Evaluate a pre-built EML corpus chain at given input value(s).
+
+    Runs in FAST mode (fdlibm-derived, 1-ULP, cross-language byte-exact).
+    Precision mode (correctly-rounded, audit-grade) is available under
+    commercial license — contact licensing@octid.io.
+
+    Base corpus (16 entries, single variable x):
+      "exp(x)", "ln(x)", "identity", "zero",
+      "exp(x)-ln(x)", "exp(x)-x", "e-x", "exp(exp(x))",
+      "e-exp(x)", "1-ln(x)", "e/x", "exp(x)-1",
+      "exp(x)-e", "e^e/x", "ln(ln(x))", "exp(exp(exp(x)))"
+
+    Arithmetic compounds (multi-variable):
+      "neg_y"              — negation: values=[y]
+      "x_plus_y"           — addition: values=[x, y]
+      "x_times_y"          — multiplication: values=[x, y]
+      "linear_calibration" — a·x + b: values=[a, x, b]
+
+    Examples:
+      osmp_eml_evaluate(chain_name="exp(x)", values=[2.0])
+        -> {"output": 7.389056098930650, ...}
+      osmp_eml_evaluate(chain_name="x_plus_y", values=[2.0, 3.0])
+        -> {"output": 5.0, ...}
+    """
+    chain, kind = _lookup_eml_chain(chain_name)
+    if chain is None:
+        return json.dumps({
+            "error": f"Unknown chain: {chain_name!r}",
+            "hint": "Use osmp_eml_corpus_lookup with no arguments to list available chains.",
+        }, indent=2)
+    if len(values) != chain.n_variables:
+        return json.dumps({
+            "error": (
+                f"Chain {chain_name!r} expects {chain.n_variables} input value(s) "
+                f"for variables {chain.variables}, got {len(values)}."
+            ),
+        }, indent=2)
+    try:
+        result = chain.evaluate(list(values))
+    except Exception as exc:
+        return json.dumps({
+            "error": f"Evaluation failed: {type(exc).__name__}: {exc}",
+            "chain": chain_name,
+            "inputs": values,
+        }, indent=2)
+    return json.dumps({
+        "chain": chain_name,
+        "kind": kind,
+        "variables": chain.variables,
+        "inputs": values,
+        "output": result,
+        "n_levels": chain.n_levels,
+        "precision_mode": _eml.get_precision_mode(),
+    }, indent=2)
+
+
+@mcp.tool()
+def osmp_eml_corpus_lookup(chain_name: str = "") -> str:
+    """Look up an EML corpus chain by name, or list all available chains.
+
+    When chain_name is empty, returns the full corpus (base + compounds).
+    When chain_name is given, returns the chain structure: variables,
+    number of levels, and per-level (left, right) operand pairs.
+
+    Examples:
+      osmp_eml_corpus_lookup()
+        -> {"base": [16 names], "compounds": [4 names], "total": 20}
+
+      osmp_eml_corpus_lookup(chain_name="exp(x)")
+        -> {"name": "exp(x)", "variables": ["x"], "n_levels": 1,
+            "levels": [{"left": "x", "right": "1"}], ...}
+    """
+    if not chain_name:
+        return json.dumps({
+            "base": sorted(_eml.BASE_CHAIN_STRUCTURES.keys()),
+            "compounds": ["neg_y", "x_plus_y", "x_times_y", "linear_calibration"],
+            "total": len(_eml.BASE_CHAIN_STRUCTURES) + 4,
+            "note": (
+                "All chains evaluated via osmp_eml_evaluate. Fast mode (1-ULP) "
+                "ships publicly; precision mode (correctly-rounded) is commercial "
+                "license — contact licensing@octid.io."
+            ),
+        }, indent=2)
+    chain, kind = _lookup_eml_chain(chain_name)
+    if chain is None:
+        return json.dumps({
+            "error": f"Unknown chain: {chain_name!r}",
+            "hint": "Call osmp_eml_corpus_lookup() with no arguments to list available chains.",
+        }, indent=2)
+    return json.dumps({
+        "name": chain_name,
+        "kind": kind,
+        "variant": chain.variant,
+        "variables": chain.variables,
+        "n_levels": chain.n_levels,
+        "levels": [{"left": lvl.left, "right": lvl.right} for lvl in chain.levels],
+    }, indent=2)
 
 
 # -- Resources ------------------------------------------------------------

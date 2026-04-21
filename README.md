@@ -199,6 +199,47 @@ SAL delivers 88-95% behavioral compliance across three models at 72% less wire c
 
 ---
 
+## EML — Mathematics on the Wire
+
+OSMP encodes instructions. **EML encodes mathematics.** Both ship in the same package.
+
+EML is a companion evaluator based on Odrzywołek (2026, [arXiv:2603.21852](https://arxiv.org/abs/2603.21852)): a single binary operator `eml(x, y) = exp(x) − ln(y)`, together with the constant 1, generates the standard calculator function basis — exp, ln, sin, cos, sqrt, arithmetic, and more — as compact expression trees.
+
+A full sin(x) or sqrt(x) approximation fits in fewer than 100 bytes on the wire. The receiving node decodes the tree and evaluates it deterministically by composing `eml` in a loop — no math library dependency, byte-exact identical output across Python, Go, and TypeScript.
+
+```python
+from osmp.eml import get_base_chain, compound_x_plus_y, compound_linear_calibration
+import math
+
+# exp, ln, sin, cos and 12 other base functions as pre-built chains
+get_base_chain("ln(x)").evaluate(math.e)          # 1.0
+
+# Arithmetic compounds
+compound_x_plus_y().evaluate([2.0, 3.0])                # 5.0
+compound_linear_calibration().evaluate([2.0, 3.0, 1.0]) # a·x + b = 7.0
+```
+
+This means a constrained-channel instruction can carry its own math: a 51-byte LoRa frame can ship an OSMP instruction AND the Breit-Wigner fit, exponential decay curve, or sensor calibration polynomial needed to interpret it — on any receiver, without firmware updates or a math library.
+
+### Dual-Mode Precision
+
+- **Fast mode** (default) — fdlibm-derived, 1-ULP accurate. Correct for LoRa/BLE/edge-ML, drone swarm coordination, and general scientific computation. **Ships publicly.**
+- **Precision mode** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license.** Contact `licensing@octid.io` or see [PATENTS.md](PATENT-NOTICE.md).
+
+### Cross-Device Determinism
+
+Two receivers on heterogeneous hardware must produce byte-exact identical output from the same encoded chain. The fast-mode backend uses only IEEE-754 basic arithmetic plus `frexp` / `ldexp`, making all three language implementations bit-equivalent. Fingerprint the corpus to verify:
+
+```
+fast-mode fingerprint: e9a4a71383f14624472fe0602ca5e0ff1959e00b09725a62d584e1361f842c1b
+```
+
+Identical across Python / Go / TypeScript.
+
+See the [Python SDK eml section](sdk/python/README.md#eml--universal-binary-operator-evaluator), [Go SDK eml section](sdk/go/README.md#eml--universal-binary-operator-evaluator), or [TypeScript SDK eml section](sdk/typescript/README.md#eml--universal-binary-operator-evaluator) for usage details. Patent pending under UBOT-001-UTIL (filed April 21, 2026).
+
+---
+
 ## Quick Start
 
 ```python
@@ -247,7 +288,7 @@ text := osmp.Decode(sal)
 pip install osmp-mcp
 osmp-mcp
 ```
-The MCP server is not an evaluation tool. It is a production integration. The agent connects, reads the `osmp://system_prompt` resource, and calls `osmp_compose` to convert NL instructions to SAL. The server stays running as the compose/encode/decode/validate layer underneath. 17 tools, three MDR corpora, composition doctrine included. Connect from Claude Code: `claude mcp add osmp -- osmp-mcp`. Listed on the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.Octid-io/osmp`.
+The MCP server is not an evaluation tool. It is a production integration. The agent connects, reads the `osmp://system_prompt` resource, and calls `osmp_compose` to convert NL instructions to SAL. The server stays running as the compose/encode/decode/validate layer underneath. 19 tools (including `osmp_eml_evaluate` and `osmp_eml_corpus_lookup` for on-wire mathematics), three MDR corpora, composition doctrine included. Connect from Claude Code: `claude mcp add osmp -- osmp-mcp`. Listed on the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.Octid-io/osmp`.
 
 The three SDKs are for agents and frameworks that manage their own transport (CrewAI, AutoGen, LangGraph, custom orchestrators, embedded nodes). The MCP server is for agents that already speak MCP. Both approaches run OSMP in production. The difference is who manages the connection.
 
@@ -266,7 +307,7 @@ All three SDKs are independently verified against the canonical test suite. Wire
 | **Python** | `pip install osmp` | `from osmp import encode, decode` | Reference implementation |
 | **TypeScript** | `npm install osmp-protocol` | `import { encode, decode }` | `fzstd` for D:PACK/BLK |
 | **Go** | `go get .../sdk/go/osmp` | `osmp.Encode()` / `osmp.Decode()` | ASD compiled-in |
-| **MCP Server** | `pip install osmp-mcp` | 17 tools via MCP protocol | Wraps Python SDK |
+| **MCP Server** | `pip install osmp-mcp` | 19 tools via MCP protocol | Wraps Python SDK |
 
 ### Benchmark
 

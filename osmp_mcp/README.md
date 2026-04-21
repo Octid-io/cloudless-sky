@@ -44,7 +44,7 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
-## Tools (17)
+## Tools (19)
 
 ### Composition (3) -- start here
 
@@ -67,6 +67,17 @@ Add to `claude_desktop_config.json`:
 | `osmp_resolve` | Single domain code lookup (exact code required) |
 | `osmp_batch_resolve` | Multiple exact domain codes in one call |
 | `osmp_benchmark` | Canonical conformance suite (55 vectors) |
+
+### Math (2)
+
+On-wire mathematics via UBOT — the Universal Binary Operator evaluator. Based on Odrzywołek (2026, arXiv:2603.21852): a single operator `eml(x, y) = exp(x) − ln(y)` generates the standard calculator function basis as compact expression trees. Cross-language byte-exact determinism.
+
+| Tool | What it does |
+|---|---|
+| `osmp_eml_evaluate` | Evaluate a pre-built EML chain at input value(s). 16 base functions (exp, ln, sin, cos, etc.) + 4 arithmetic compounds (neg, +, ×, linear calibration). Fast mode (1-ULP). |
+| `osmp_eml_corpus_lookup` | List available chains, or retrieve the chain structure (variables, levels, operand pairs) for a named entry. |
+
+Precision mode (correctly-rounded, audit-grade for regulated industries) is available under commercial license. Contact `licensing@octid.io`.
 
 ### Bridge (5)
 

@@ -98,6 +98,97 @@ result = bc.resolve("J93.0")
 
 Three corpora bundled: ICD-10-CM (74,719 codes), ISO 20022 (47,835 codes), MITRE ATT&CK (1,661 codes).
 
+## EML — Universal Binary Operator Evaluator
+
+A companion math-evaluation layer. Based on Odrzywołek (2026, [arXiv:2603.21852](https://arxiv.org/abs/2603.21852)): a single binary operator `eml(x, y) = exp(x) − ln(y)`, together with the constant 1, generates the standard calculator function basis — exp, ln, sin, cos, sqrt, arithmetic, and more — as compact expression trees.
+
+The receiver evaluates a pre-built tree by composing `eml` in a loop. No math library dependency. A full sin(x) or sqrt(x) approximation fits in fewer than 100 bytes on the wire, byte-exact across Python, Go, and TypeScript.
+
+```python
+from osmp.eml import eml, EMLNode, leaf, var_x, node
+
+# The operator itself: eml(x, y) = exp(x) - ln(y)
+eml(2.0, 1.0)  # exp(2) - ln(1) = 7.389056...
+
+# Build an expression tree: exp(x) = eml(x, 1)
+tree = node(var_x(), leaf(1.0))
+tree.evaluate(2.0)  # 7.389056...
+```
+
+### Pre-Built Corpus
+
+Sixteen single-variable base functions and four multi-variable arithmetic compounds ship pre-verified:
+
+```python
+from osmp.eml import get_base_chain, compound_x_plus_y, compound_x_times_y, compound_linear_calibration
+import math
+
+# Base corpus (single variable x)
+chain = get_base_chain("ln(x)")
+chain.evaluate(math.e)       # 1.0
+chain.evaluate(math.e ** 2)  # 2.0
+
+# Arithmetic compounds (multi-variable)
+compound_x_plus_y().evaluate([2.0, 3.0])                # 5.0
+compound_x_times_y().evaluate([2.0, 3.0])               # 6.0
+compound_linear_calibration().evaluate([2.0, 3.0, 1.0]) # 7.0  (a=2, x=3, b=1)
+```
+
+Available base names: `exp(x)`, `ln(x)`, `identity`, `zero`, `exp(x)-ln(x)`, `exp(x)-x`, `e-x`, `exp(exp(x))`, `e-exp(x)`, `1-ln(x)`, `e/x`, `exp(x)-1`, `exp(x)-e`, `e^e/x`, `ln(ln(x))`, `exp(exp(exp(x)))`.
+
+### Wire Format (Transmit the Math)
+
+Three wire encodings ship:
+
+```python
+from osmp.eml import encode_tree, decode_tree, encode_chain_restricted, decode_chain_restricted
+from osmp.eml import get_base_chain, tree_ln_x
+
+# Paper tree form: pre-order tagged traversal, 4-byte float32 or 8-byte float64 leaves
+tree = tree_ln_x()
+wire = encode_tree(tree)            # 7 bytes
+decode_tree(wire).evaluate(math.e)  # 1.0
+
+# Restricted chain form (bit-packed, single variable)
+chain = get_base_chain("ln(x)")
+wire = encode_chain_restricted(chain)        # 2 bytes (self-describing)
+decode_chain_restricted(wire).evaluate(math.e)  # 1.0
+```
+
+A wide multi-variable form (`encode_chain_wide` / `decode_chain_wide`) handles compounds with up to 15 variables and 15 levels in a single-byte header.
+
+### Cross-Device Determinism
+
+Two receivers on heterogeneous hardware evaluating the same wire-encoded chain must produce byte-exact identical output. The fast-mode backend (fdlibm-derived) guarantees this across IEEE-754-conformant platforms using only basic arithmetic and `frexp` / `ldexp`. Verify by fingerprinting the corpus:
+
+```python
+from osmp.eml import corpus_fingerprint
+print(corpus_fingerprint())
+# e9a4a71383f14624472fe0602ca5e0ff1959e00b09725a62d584e1361f842c1b
+```
+
+Identical fingerprint across Python, Go, and TypeScript.
+
+### Precision Modes
+
+Two modes toggled via `set_precision_mode`:
+
+- **`"fast"`** (default) — fdlibm-derived, 1-ULP accurate, ships publicly in this package. Correct for LoRa/BLE/edge-ML, constrained-channel telemetry, drone swarm coordination, and general scientific computation.
+- **`"precision"`** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license** — contact `licensing@octid.io` or see [PATENTS.md](../../PATENT-NOTICE.md).
+
+```python
+from osmp.eml import set_precision_mode, precision_mode_available, PrecisionModeNotAvailable
+
+print(precision_mode_available())  # False in public release
+
+try:
+    set_precision_mode("precision")
+except PrecisionModeNotAvailable as e:
+    print(e)
+    # Precision mode requires the commercial precision pack.
+    # Contact licensing@octid.io or see PATENTS.md.
+```
+
 ## SALComposer: NL to SAL
 
 Deterministic composition pipeline. No inference.

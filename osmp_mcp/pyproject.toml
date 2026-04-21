@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "osmp-mcp"
-version = "1.0.37"
+version = "1.1.0"
 description = "OSMP MCP Server -- Agentic AI instruction encoding. 86.8% byte reduction vs JSON. Inference-free decode. Any channel."
 readme = {text = """<!-- mcp-name: io.github.Octid-io/osmp -->
 # OSMP MCP Server
@@ -28,8 +28,10 @@ pip install osmp-mcp
 - **osmp_benchmark** -- Run the canonical conformance suite
 - **osmp_compound_decode** -- Analyze DAG topology and loss tolerance
 - **osmp_batch_resolve** -- Multiple domain codes in one call
+- **osmp_eml_evaluate** -- Evaluate a pre-built EML chain (math on the wire, UBOT)
+- **osmp_eml_corpus_lookup** -- List or inspect EML corpus chains
 
-352 opcodes. 26 namespaces. Three MDR corpora (124,215 resolvable codes).
+352 opcodes. 26 namespaces. Three MDR corpora (124,215 resolvable codes). 20 pre-verified EML chains (math).
 
 For the standalone SDK (no MCP dependency): `pip install osmp`
 
@@ -51,7 +53,7 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "osmp[dpack]>=2.2.0",
+    "osmp[dpack]>=2.3.0",
     "mcp[cli]>=1.0.0",
 ]
 

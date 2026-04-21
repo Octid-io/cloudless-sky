@@ -1,6 +1,6 @@
 {
   "name": "osmp-protocol",
-  "version": "2.2.5",
+  "version": "2.3.0",
   "description": "OSMP — Octid Semantic Mesh Protocol. Agentic AI instruction encoding for any channel.",
   "type": "module",
   "main": "./dist/index.js",
@@ -9,6 +9,18 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./eml": {
+      "import": "./dist/eml.js",
+      "types": "./dist/eml.d.ts"
+    },
+    "./fdlibm": {
+      "import": "./dist/fdlibm.js",
+      "types": "./dist/fdlibm.d.ts"
+    },
+    "./crlibm": {
+      "import": "./dist/crlibm.js",
+      "types": "./dist/crlibm.d.ts"
     }
   },
   "files": [
