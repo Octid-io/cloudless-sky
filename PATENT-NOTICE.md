@@ -12,7 +12,7 @@ This software is licensed under the Apache License, Version 2.0. Section 3 of th
 
 > Each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Work, where such license applies only to those patent claims licensable by such Contributor that are necessarily infringed by their Contribution(s) alone or by combination of their Contribution(s) with the Work.
 
-This means: if you implement OSMP according to this specification, you receive a license to the relevant patent claims under the terms of Apache 2.0. You do not need a separate patent license agreement to build a conformant OSMP implementation.
+This means: if you implement OSMP or UBOT according to the published specification, you receive a license to the relevant patent claims under the terms of Apache 2.0. You do not need a separate patent license agreement to build a conformant implementation.
 
 ---
 
@@ -22,30 +22,34 @@ If you initiate patent litigation against any entity (including a cross-claim or
 
 ---
 
-## Sovereign Extension Namespace Scope
+## Commercial Services — Request-Gated
 
-The patent grant covers implementations of the published OSMP specification. Sovereign namespace extensions defined by third parties under the reserved extension prefix are outside the scope of the patent grant and are neither covered by nor restricted by the OSMP patent claims, provided they do not practice the claimed OSMP architecture itself. Third-party sovereign extensions are the intellectual property of their respective authors.
+Three commercial services require a direct request. Gating is intentional: each service requires a conversation to ensure informational integrity, deployment quality, and appropriate use. Contact `licensing@octid.io` for all three (subject line triage is appreciated — see each section below).
 
----
+### Omega Namespace Extensions
 
-## MDR Certification (Separate from Patent)
+The OSMP grammar reserves extension namespaces for domain-specific opcodes beyond the 352-opcode public ASD. Organizations deploying OSMP in specialized domains — clinical specialties, defense-vertical taxonomies, industrial-control vocabularies, proprietary agent frameworks, multi-tenant enterprise platforms — can register custom namespace opcodes under the Omega extension protocol. Registered Omega namespaces sit outside the core patent claim scope (third-party sovereign extensions are the intellectual property of their respective authors) while retaining wire-level compatibility with the public grammar.
 
-The Managed Dictionary Registry (MDR) is a certification layer for compliant enterprise namespace implementations. MDR certification is a commercial service and is separate from the Apache 2.0 patent grant. Use of the OSMP protocol does not require MDR certification. MDR certification may be required for specific regulated-industry deployments where authoritative namespace mapping is operationally required.
+**Request Omega namespace registration:** `licensing@octid.io` — subject: *Omega namespace request*
 
----
+### MDR Certification (Managed Dictionary Registry)
 
-## UBOT Precision Pack (Separate from Patent Grant)
+The MDR is a certification layer for compliant enterprise namespace implementations where authoritative domain-code mapping is operationally required. Relevant deployments include regulated industries (healthcare, financial services, defense), multi-tenant platforms requiring attestation, and audit-grade contexts where the namespace-to-semantics binding must be formally certified. MDR certification is separate from the Apache 2.0 patent grant; use of the public OSMP protocol does not require MDR certification.
+
+**Request MDR certification inquiry:** `licensing@octid.io` — subject: *MDR certification*
+
+### UBOT Precision Mode
 
 The UBOT evaluator ships in this repository with two precision modes:
 
-- **Fast mode (fdlibm-derived, 1-ULP accurate):** included with this public release under Apache 2.0. Covers the vast majority of UBOT applications — LoRa / BLE / edge-ML deployments, drone swarm coordination, constrained-channel transmission, and general scientific computation.
+- **Fast mode (fdlibm-derived, 1-ULP accurate):** included publicly under Apache 2.0. Correct for LoRa / BLE / edge-ML, drone swarm coordination, constrained-channel transmission, and general scientific computation.
 - **Precision mode (crlibm-derived, correctly-rounded, cross-device byte-exact):** NOT included in the public release. Available under **commercial license** for regulated-industry applications — medical (IEC 62304), aerospace (DO-178C), nuclear (IEC 61513), audit-grade financial, cryptographic protocol-frame hash inputs, and DoD / defense-aerospace deployments.
 
 Calling `set_precision_mode("precision")` / `SetPrecisionMode(Precision)` without the commercial precision pack installed raises `PrecisionModeNotAvailable` / returns `ErrPrecisionPackNotInstalled`.
 
 **DoD / defense-aerospace distribution:** The commercial precision pack is available under DFARS 252.227-7013 ("Rights in Technical Data — Noncommercial Items") and DFARS 252.227-7014 ("Rights in Noncommercial Computer Software") Restricted Rights framework.
 
-**Licensing inquiries:** `licensing@octid.io`
+**Request precision-mode access:** `licensing@octid.io` — subject: *UBOT precision mode*
 
 The precision pack is separate from the Apache 2.0 patent grant above. Use of the fast-mode public release does not require a commercial precision-pack license.
 
@@ -53,6 +57,6 @@ The precision pack is separate from the Apache 2.0 patent grant above. Use of th
 
 ## Questions
 
-Patent and commercial licensing inquiries: `licensing@octid.io` or [octid.io](https://octid.io)
+Commercial services (Omega / MDR / precision mode) and general licensing: `licensing@octid.io` or [octid.io](https://octid.io)
 
 General protocol / software questions: open an issue at [github.com/octid-io/cloudless-sky](https://github.com/octid-io/cloudless-sky)
