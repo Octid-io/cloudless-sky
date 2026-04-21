@@ -3,7 +3,7 @@ eml.py — Universal Binary Operator Evaluator (UBOT public reference)
 ====================================================================
 
 Reference implementation of the Universal Binary Operator for mathematical
-instruction encoding, under the UBOT-001-UTIL patent application (pending).
+instruction encoding. Patent pending.
 
 Based on Odrzywołek (2026, arXiv:2603.21852):
 

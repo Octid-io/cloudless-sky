@@ -2,31 +2,7 @@
 
 ## Patent Status
 
-The Octid Semantic Mesh Protocol (OSMP) architecture is covered by pending United States patent applications:
-
-**Utility Application — OSMP**
-- **Docket:** OSMP-001-UTIL
-- **Title:** Bandwidth-Agnostic Semantic Assembly Language and Adaptive Shared Dictionary Infrastructure for Inference-Free Agentic Instruction Encoding
-- **Inventor:** Clay Holberg, Texas, United States of America
-- **Priority Date:** March 17, 2026
-- **Status:** Pending
-
-**Continuation-in-Part — OSMP**
-- **Docket:** OSMP-001-CIP
-- **Scope:** Extends coverage to cloud-scale AI orchestration, non-RF channel encoding, mobile sovereign node architectures, AI-native cognitive pipeline encoding (J/Q/Y/Z namespaces), four-mode communication architecture, and cross-namespace authorization composition
-- **Inventor:** Clay Holberg, Texas, United States of America
-- **Priority Date:** March 17, 2026
-- **Status:** Pending
-
-**Utility Application — UBOT (Universal Binary Operator Transmission)**
-- **Docket:** UBOT-001-UTIL
-- **Title:** Universal Binary Operator Encoding, Transmission, and Apparatus for Cross-Device Deterministic Mathematical Evaluation
-- **Inventor:** Clay Holberg, Texas, United States of America
-- **Priority Date:** April 21, 2026
-- **Status:** Pending
-- **Scope:** Encoding, transmission, and apparatus claims covering the wire-format layer and cross-device deterministic evaluation. The underlying operator `eml(x, y) = exp(x) − ln(y)` introduced by Odrzywołek (arXiv:2603.21852) is not claimed.
-
-The inventor asserts a conception date of August 7, 2025 for certain OSMP claim elements as documented in the provisional application.
+The software in this repository is the subject of pending United States patent applications. Inventor: Clay Holberg, Texas, United States of America.
 
 ---
 

@@ -65,11 +65,11 @@ Precision mode is not exposed via MCP; fast-mode evaluation only.
 - `README.md` — new "EML — Mathematics on the Wire" section
 - `sdk/python/README.md`, `sdk/go/README.md`, `sdk/typescript/README.md` — per-language EML usage with examples
 - `osmp_mcp/README.md` — new Math (2) tool category, updated tool count to 19
-- `PATENT-NOTICE.md` — UBOT-001-UTIL section added alongside OSMP; dual-tier distribution (open fast mode + commercial precision mode) documented
+- `PATENT-NOTICE.md` — dual-tier distribution (open fast mode + commercial precision mode) documented
 
 ### Patent Pending
 
-UBOT-001-UTIL filed 2026-04-21 covering the encoding, transmission, and apparatus layer for universal-binary-operator mathematical instruction encoding. The underlying operator (Odrzywołek) is not claimed.
+Patent pending. The underlying operator (Odrzywołek) is not claimed.
 
 ---
 

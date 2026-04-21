@@ -236,7 +236,7 @@ fast-mode fingerprint: e9a4a71383f14624472fe0602ca5e0ff1959e00b09725a62d584e1361
 
 Identical across Python / Go / TypeScript.
 
-See the [Python SDK eml section](sdk/python/README.md#eml--universal-binary-operator-evaluator), [Go SDK eml section](sdk/go/README.md#eml--universal-binary-operator-evaluator), or [TypeScript SDK eml section](sdk/typescript/README.md#eml--universal-binary-operator-evaluator) for usage details. Patent pending under UBOT-001-UTIL (filed April 21, 2026).
+See the [Python SDK eml section](sdk/python/README.md#eml--universal-binary-operator-evaluator), [Go SDK eml section](sdk/go/README.md#eml--universal-binary-operator-evaluator), or [TypeScript SDK eml section](sdk/typescript/README.md#eml--universal-binary-operator-evaluator) for usage details. Patent pending.
 
 ---
 
@@ -493,7 +493,7 @@ Wanted: C++ firmware-level encoder/decoder (ESP32/nRF52 sovereign nodes), Kotlin
 
 ## Patent Notice
 
-Patent pending. Priority date March 17, 2026. Apache 2.0 includes an express patent grant for implementations of this specification. See [`PATENT-NOTICE.md`](PATENT-NOTICE.md).
+Patent pending. Apache 2.0 includes an express patent grant for implementations of this specification. See [`PATENT-NOTICE.md`](PATENT-NOTICE.md).
 
 ---
 

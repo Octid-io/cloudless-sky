@@ -980,7 +980,7 @@ See `/protocol/test-vectors/` for the canonical test vector suite. Every conform
 
 ## 17. Patent Notice
 
-This protocol specification is provided under Apache 2.0 license. The underlying architecture is covered by pending US patent applications (inventor: Clay Holberg), filed March 17, 2026. Apache 2.0 includes an express patent grant for implementations of this specification.
+This protocol specification is provided under Apache 2.0 license. The underlying architecture is covered by pending US patent applications (inventor: Clay Holberg). Apache 2.0 includes an express patent grant for implementations of this specification.
 
 ---
 

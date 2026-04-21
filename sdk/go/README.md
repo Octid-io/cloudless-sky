@@ -170,7 +170,7 @@ go test ./osmp/ -v
 
 ## License
 
-Apache 2.0. Patent pending. Filed March 17, 2026.
+Apache 2.0. Patent pending.
 
 ## SALBridge: Mixed Environment Integration
 
