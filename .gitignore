@@ -1,10 +1,13 @@
 __pycache__/
 *.py[cod]
 *.egg-info/
-# IP-sensitive research code — local only, do not commit
-sdk/python/osmp/eml_torch.py
-sdk/python/osmp/eml_chain*.py
-sdk/python/osmp/_eml_*.py
+# IP-sensitive research code — local only, do not commit.
+# These live in sdk/python/ (NOT inside osmp/) so setuptools cannot pick
+# them up when building the osmp wheel — structural separation is the
+# primary safeguard; build.py is the belt-and-suspenders verifier.
+sdk/python/eml_torch.py
+sdk/python/eml_chain*.py
+sdk/python/_eml_*.py
 overnight-eml-*.txt
 .venv/
 node_modules/
