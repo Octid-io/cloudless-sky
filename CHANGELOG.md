@@ -13,6 +13,8 @@ Patch release. Bridge-fix: ASCII arrow `->` is now a first-class SAL frame-bound
 **Package versions shipped with this release:**
 - `osmp` (Python / PyPI): 2.3.2 → **2.3.3**
 - `osmp-protocol` (npm): 2.3.2 → **2.3.3**
+- `osmp-mcp` (PyPI): 1.1.0 → **1.1.1** (patch bump — no functional change; re-published so `server.json` can advance per lag-of-one convention)
+- MCP Registry entry (`io.github.Octid-io/osmp` in server.json): 1.0.37 → **1.1.0** (lag-of-one convention; previous `packages[0].version` becomes the new registry version)
 
 ### Fixed
 

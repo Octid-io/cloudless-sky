@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "osmp-mcp"
-version = "1.1.0"
+version = "1.1.1"
 description = "OSMP MCP Server -- Agentic AI instruction encoding. 86.8% byte reduction vs JSON. Inference-free decode. Any channel."
 readme = {text = """<!-- mcp-name: io.github.Octid-io/osmp -->
 # OSMP MCP Server
