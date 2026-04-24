@@ -6,6 +6,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [v2.3.3] — 2026-04-24
+
+Patch release. Bridge-fix: ASCII arrow `->` is now a first-class SAL frame-boundary operator equivalent to Unicode `→`.
+
+**Package versions shipped with this release:**
+- `osmp` (Python / PyPI): 2.3.2 → **2.3.3**
+- `osmp-protocol` (npm): 2.3.2 → **2.3.3**
+
+### Fixed
+
+- **Bridge:** `->` (ASCII) is now treated as a SAL frame-boundary operator equivalent to `→` (Unicode). Previously, any SAL string using the ASCII shorthand (e.g. `H:HR>130->U:ALERT`) was parsed as a single frame rather than split into constituent frames, causing `validate_composition` to false-negative on valid chains, `MacroRegistry.register` to reject ASCII-arrow chain templates, and `SALDecoder.decode_natural_language` to skip the "then" NL mapping. Unicode behavior is unchanged.
+
+Coordinated edits across two files:
+- `sdk/python/osmp/protocol.py` — five edits: line 1787 (`_FRAME_SPLIT_RE` adds `->` alternate), line 2046 (`validate_composition` filter whitelist adds `"->"`), line 2908 (`MacroRegistry.register` chain-validation filter adds `"->"`), line 3052 (`MacroRegistry` consequence-class-inheritance filter adds `"->"`), line 3215 (`SALDecoder._OPERATOR_NL` adds `"->": " then "`).
+- `sdk/python/src/osmp.py` (legacy single-file distribution) — two edits: line 1610 (frame-split regex), line 1862 (validator filter). Three edits from the modular package have no legacy counterpart because `MacroRegistry` and `_OPERATOR_NL` are not exported from the legacy surface. See `LEGACY_PARITY_AUDIT.md` for the full parity picture.
+
+### Tests
+
+- Added `sdk/python/tests/test_bridge_fix.py` — T1 (NL annotation round-trip ASCII↔Unicode byte-identical, "then" present), T2 (validator parity — same issue set across arrow forms), T3 (macro chain with ASCII arrow validates against ASD), T4 (Unicode corpus regression: 10 golden frames decode byte-identical). 4/4 pass.
+- TypeScript suite (existing): 97/97 pass.
+- Go suite (existing): `osmp` tests ok.
+
+### Field verification
+
+Verified on-device during RTP-012-B (2026-04-24, Gemma-4-E4B Q4_K_M on RedMagic 10S Pro via llama-server in Termux). Patched-substrate cells used the `->` operator across 9 cells × 15 rounds = 135 opportunities with zero parser defects. Ctrl-substrate cells (pre-fix) produced 0/9 acquisition across all priming conditions — supporting evidence that the pre-fix parser silently gated valid SAL chains.
+
+### Not changed
+
+- No API additions, no breaking changes, no migration required.
+- `osmp-mcp` server not re-released; it picks up `osmp==2.3.3` automatically at install time.
+- `server.json` unchanged; MCP registry entry trails the package version per project convention.
+
+---
+
 ## [v2.1.0] — 2026-04-21
 
 Additive release. No breaking changes. Patent-pending UBOT evaluator integrated across all three SDKs + MCP server.

@@ -1784,7 +1784,7 @@ _NS_PATTERN     = r'[A-Z]{1,2}'           # Tier 1 (single char) and Tier 2 (two
 _OPCODE_PATTERN = r'[A-Z§][A-Z0-9§]*'     # Opcode body, includes § for I:§
 
 # Operators that split compound SAL instructions into frames
-_FRAME_SPLIT_RE = re.compile(r'([→∧∨↔∥;])')
+_FRAME_SPLIT_RE = re.compile(r'(->|[→∧∨↔∥;])')
 # Pattern matching namespace:opcode after @ (prohibited: namespace-as-target)
 _NS_TARGET_RE = re.compile(rf'@({_NS_PATTERN}):({_OPCODE_PATTERN})')
 # Pattern extracting namespace:opcode from a SAL frame
@@ -2043,7 +2043,7 @@ def validate_composition(
 
     # ── Split into frames and validate each ──────────────────────────────
     parts = _FRAME_SPLIT_RE.split(sal)
-    frames = [p.strip() for p in parts if p.strip() and p.strip() not in "→∧∨↔∥;"]
+    frames = [p.strip() for p in parts if p.strip() and p.strip() not in ("→", "∧", "∨", "↔", "∥", ";", "->")]
 
     has_r_namespace = False
     has_r_hazardous_or_irreversible = False
@@ -2905,7 +2905,7 @@ class MacroRegistry:
         clean = _re.sub(r'\{[^}]+\}', 'X', chain)
         parts = _FRAME_SPLIT_RE.split(clean)
         frames = [p.strip() for p in parts
-                  if p.strip() and p.strip() not in "\u2192\u2227\u2228\u2194\u2225;"]
+                  if p.strip() and p.strip() not in ("\u2192", "\u2227", "\u2228", "\u2194", "\u2225", ";", "->")]
         for frame in frames:
             m = _FRAME_NS_OP_RE.match(frame)
             if m:
@@ -3049,7 +3049,7 @@ class MacroRegistry:
         parts = _FRAME_SPLIT_RE.split(clean_chain)
         for part in parts:
             part = part.strip()
-            if not part or part in "\u2192\u2227\u2228\u2194\u2225;":
+            if not part or part in ("\u2192", "\u2227", "\u2228", "\u2194", "\u2225", ";", "->"):
                 continue
             # Check if this frame is R namespace
             m = _FRAME_NS_OP_RE.match(part)
@@ -3213,6 +3213,7 @@ class SALDecoder:
     # Operator glyph to readable NL word mapping
     _OPERATOR_NL: dict[str, str] = {
         "\u2192": " then ",     # → THEN
+        "->":     " then ",     # → ASCII shorthand
         "\u2227": " and ",      # ∧ AND
         "\u2228": " or ",       # ∨ OR
         "\u2194": " iff ",      # ↔ IFF

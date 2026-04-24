@@ -1607,7 +1607,7 @@ class SALEncoder:
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Operators that split compound SAL instructions into frames
-_FRAME_SPLIT_RE = re.compile(r'([→∧∨↔∥;])')
+_FRAME_SPLIT_RE = re.compile(r'(->|[→∧∨↔∥;])')
 # Pattern matching namespace:opcode after @ (prohibited: namespace-as-target)
 _NS_TARGET_RE = re.compile(r'@([A-Z]{1,2}):([A-Z][A-Z0-9]+)')
 # Pattern extracting namespace:opcode from a SAL frame
@@ -1859,7 +1859,7 @@ def validate_composition(
 
     # ── Split into frames and validate each ──────────────────────────────
     parts = _FRAME_SPLIT_RE.split(sal)
-    frames = [p.strip() for p in parts if p.strip() and p.strip() not in "→∧∨↔∥;"]
+    frames = [p.strip() for p in parts if p.strip() and p.strip() not in ("→", "∧", "∨", "↔", "∥", ";", "->")]
 
     has_r_namespace = False
     has_r_hazardous_or_irreversible = False
