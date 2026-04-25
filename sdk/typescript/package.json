@@ -1,6 +1,6 @@
 {
   "name": "osmp-protocol",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "description": "OSMP — Octid Semantic Mesh Protocol. Agentic AI instruction encoding for any channel.",
   "type": "module",
   "main": "./dist/index.js",

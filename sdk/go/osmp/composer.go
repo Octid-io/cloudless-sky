@@ -8,6 +8,7 @@
 package osmp
 
 import (
+	"fmt"
 	"regexp"
 	"sort"
 	"strings"
@@ -26,10 +27,28 @@ type ComposedIntent struct {
 // Composer is the deterministic NL-to-SAL composition pipeline.
 type Composer struct {
 	asd           *AdaptiveSharedDictionary
+	macroRegistry *MacroRegistry
 	keywordIndex  map[string][][2]string // keyword -> [(ns, op), ...]
 	phraseIndex   map[string][2]string   // phrase -> (ns, op)
 	phrasesSorted []string               // sorted longest-first
 }
+
+// chainSeparators map NL separator patterns to the SAL operator that joins
+// composed segments. Order matters: longer / more-specific patterns first.
+// Mirrors Python `_CHAIN_SEPARATORS` in protocol.py (lines 2495-2505).
+var chainSeparators = []struct {
+	re *regexp.Regexp
+	op string
+}{
+	{regexp.MustCompile(`(?i),\s+then\s+`), ";"},
+	{regexp.MustCompile(`(?i),\s+and\s+then\s+`), ";"},
+	{regexp.MustCompile(`(?i)\s+then\s+`), ";"},
+	{regexp.MustCompile(`(?i)\s+next\s+`), ";"},
+	{regexp.MustCompile(`(?i),\s+and\s+`), "\u2227"},
+}
+
+// chainTrailingPunctRe strips trailing , ; . from a chain segment after split.
+var chainTrailingPunctRe = regexp.MustCompile(`[.,;]+$`)
 
 var (
 	sensingNS = map[string]bool{"E": true, "H": true, "W": true, "G": true, "X": true, "S": true, "D": true, "Z": true}
@@ -132,9 +151,52 @@ func NewComposer(asd *AdaptiveSharedDictionary) *Composer {
 	return c
 }
 
+// NewComposerWithMacros creates a Composer with an attached macro registry.
+// The composer prefers macro matches over individual opcode composition;
+// see MacroRegistry semantics in macro.go.
+func NewComposerWithMacros(asd *AdaptiveSharedDictionary, registry *MacroRegistry) *Composer {
+	c := NewComposer(asd)
+	c.macroRegistry = registry
+	return c
+}
+
+// MacroRegistry returns the attached registry, or nil if none.
+func (c *Composer) MacroRegistry() *MacroRegistry { return c.macroRegistry }
+
+// SetMacroRegistry attaches or replaces the macro registry post-construction.
+func (c *Composer) SetMacroRegistry(registry *MacroRegistry) {
+	c.macroRegistry = registry
+}
+
+// sortedNamespaces returns the ASDFloorBasis namespaces in deterministic
+// (alphabetical) order. Go's `range map` is intentionally randomized; without
+// a stable iteration order the keyword index's first-match policy becomes
+// non-deterministic, which breaks both reproducibility and cross-SDK parity.
+func sortedNamespaces() []string {
+	out := make([]string, 0, len(ASDFloorBasis))
+	for ns := range ASDFloorBasis {
+		out = append(out, ns)
+	}
+	sort.Strings(out)
+	return out
+}
+
+// sortedOpcodes returns the opcodes for a single namespace in alphabetical
+// order. Same rationale as sortedNamespaces.
+func sortedOpcodes(ns string) []string {
+	ops := ASDFloorBasis[ns]
+	out := make([]string, 0, len(ops))
+	for op := range ops {
+		out = append(out, op)
+	}
+	sort.Strings(out)
+	return out
+}
+
 func (c *Composer) buildKeywordIndex() {
-	for ns, ops := range ASDFloorBasis {
-		for op, defn := range ops {
+	for _, ns := range sortedNamespaces() {
+		for _, op := range sortedOpcodes(ns) {
+			defn := ASDFloorBasis[ns][op]
 			words := strings.Fields(strings.ReplaceAll(strings.ToLower(defn), "_", " "))
 			for _, w := range words {
 				if len(w) > 2 {
@@ -146,8 +208,9 @@ func (c *Composer) buildKeywordIndex() {
 }
 
 func (c *Composer) buildPhraseIndex() {
-	for ns, ops := range ASDFloorBasis {
-		for op, defn := range ops {
+	for _, ns := range sortedNamespaces() {
+		for _, op := range sortedOpcodes(ns) {
+			defn := ASDFloorBasis[ns][op]
 			phrase := strings.ReplaceAll(strings.ToLower(defn), "_", " ")
 			if strings.Contains(phrase, " ") {
 				c.phraseIndex[phrase] = [2]string{ns, op}
@@ -166,19 +229,21 @@ func (c *Composer) buildPhraseIndex() {
 	})
 }
 
-// LookupByKeyword finds opcodes matching a keyword.
+// LookupByKeyword finds opcodes matching a keyword. Iteration order is
+// stable (alphabetical by namespace, then by opcode) so the first-match
+// policy in Compose() produces deterministic, reproducible output.
 func (c *Composer) LookupByKeyword(keyword string) [][3]string {
 	kw := strings.ToLower(strings.TrimSpace(keyword))
 	var results [][3]string
 	seen := map[string]bool{}
 
 	// Direct opcode match
-	for ns, ops := range ASDFloorBasis {
-		for op, defn := range ops {
+	for _, ns := range sortedNamespaces() {
+		for _, op := range sortedOpcodes(ns) {
 			if kw == strings.ToLower(op) {
 				key := ns + ":" + op
 				if !seen[key] {
-					results = append(results, [3]string{ns, op, defn})
+					results = append(results, [3]string{ns, op, ASDFloorBasis[ns][op]})
 					seen[key] = true
 				}
 			}
@@ -195,8 +260,9 @@ func (c *Composer) LookupByKeyword(keyword string) [][3]string {
 	}
 	// Fuzzy substring
 	if len(results) == 0 {
-		for ns, ops := range ASDFloorBasis {
-			for op, defn := range ops {
+		for _, ns := range sortedNamespaces() {
+			for _, op := range sortedOpcodes(ns) {
+				defn := ASDFloorBasis[ns][op]
 				if strings.Contains(strings.ToLower(defn), kw) {
 					results = append(results, [3]string{ns, op, defn})
 				}
@@ -345,7 +411,80 @@ func isWordChar(r rune) bool {
 }
 
 // Compose produces valid SAL from natural language, or "" if composition fails.
+//
+// First tries chain-split: if the NL contains sequential separators ("then",
+// "next", ", and"), split into segments and compose each. This produces
+// proper ; (SEQUENCE) or ∧ (AND) chains instead of flat keyword-matched SAL.
+// Falls back to single-segment composition if no chain detected.
+//
+// Mirrors Python `compose` at protocol.py lines 2553-2576.
 func (c *Composer) Compose(nlText string, intent *ComposedIntent) string {
+	if intent == nil {
+		if chainSAL := c.tryChainSplit(nlText); chainSAL != "" {
+			result := ValidateComposition(chainSAL, nlText, c.asd, true, nil)
+			if result.Valid {
+				return chainSAL
+			}
+			// Chain validation failed → fall through to single-compose
+		}
+	}
+	return c.composeImpl(nlText, intent)
+}
+
+// composeSingle is the chain-split entry point per segment. Kept separate
+// to make the recursion stop at one level (mirrors Python `_compose_single`).
+func (c *Composer) composeSingle(nlText string) string {
+	return c.composeImpl(nlText, nil)
+}
+
+// tryChainSplit splits NL on chain separators and composes each segment.
+// Returns "" if no separator matches OR any segment fails to compose.
+// Mirrors Python `_try_chain_split` at protocol.py lines 2507-2546.
+func (c *Composer) tryChainSplit(nlText string) string {
+	nlLower := strings.ToLower(nlText)
+	if strings.Contains(nlLower, " if ") || strings.HasPrefix(nlLower, "if ") {
+		return "" // conditional chains handled by existing logic
+	}
+
+	for _, sep := range chainSeparators {
+		raw := sep.re.Split(nlText, -1)
+		if len(raw) < 2 {
+			continue
+		}
+		segments := make([]string, 0, len(raw))
+		for _, s := range raw {
+			seg := chainTrailingPunctRe.ReplaceAllString(strings.TrimSpace(s), "")
+			if seg != "" {
+				segments = append(segments, seg)
+			}
+		}
+		if len(segments) < 2 {
+			continue
+		}
+
+		composed := make([]string, 0, len(segments))
+		for _, seg := range segments {
+			if len([]byte(seg)) < 4 {
+				return ""
+			}
+			segSAL := c.composeSingle(seg)
+			if segSAL == "" {
+				return "" // any segment fails → whole chain fails
+			}
+			composed = append(composed, segSAL)
+		}
+		if len(composed) >= 2 {
+			return strings.Join(composed, sep.op)
+		}
+		return ""
+	}
+	return ""
+}
+
+// composeImpl is the core composition logic. Mirrors Python `_compose_impl`
+// at protocol.py lines 2578-2812. The macro priority check is the first step
+// after the BAEL byte pre-check (lines 2595-2602).
+func (c *Composer) composeImpl(nlText string, intent *ComposedIntent) string {
 	if intent == nil {
 		i := c.ExtractIntentKeywords(nlText)
 		intent = &i
@@ -356,7 +495,22 @@ func (c *Composer) Compose(nlText string, intent *ComposedIntent) string {
 		return ""
 	}
 
-	// ASD lookup
+	// Step 1: Macro priority check (composition priority hierarchy)
+	if c.macroRegistry != nil {
+		rawLower := strings.ToLower(intent.Raw)
+		for _, m := range c.macroRegistry.ListMacros() {
+			for _, trigger := range m.Triggers {
+				if trigger == "" {
+					continue
+				}
+				if strings.Contains(rawLower, strings.ToLower(trigger)) {
+					return fmt.Sprintf("A:MACRO[%s]", m.MacroID)
+				}
+			}
+		}
+	}
+
+	// Step 2: ASD lookup
 	type nsOp = [2]string
 	var resolved []nsOp
 	hasPhraseMatch := false

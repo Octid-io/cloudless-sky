@@ -1,0 +1,128 @@
+{
+  "spec_version": "2.4.0-parity-1",
+  "reference_sdk": "python",
+  "macro_corpus": "mdr/meshtastic/meshtastic-macros.json",
+  "macros_loaded": 16,
+  "vectors": [
+    {
+      "category": "chip",
+      "nl": "report battery level",
+      "sal": "A:MACRO[MESH:DEV]"
+    },
+    {
+      "category": "chip",
+      "nl": "report temperature",
+      "sal": "L:REPORT∧E:TH"
+    },
+    {
+      "category": "chip",
+      "nl": "sync clock",
+      "sal": "T:SYNC"
+    },
+    {
+      "category": "chip",
+      "nl": "update config",
+      "sal": "N:CFG"
+    },
+    {
+      "category": "macro",
+      "nl": "report device status with battery details",
+      "sal": "A:MACRO[MESH:DEV]"
+    },
+    {
+      "category": "macro",
+      "nl": "give me the air quality readings",
+      "sal": "A:MACRO[MESH:AQ]"
+    },
+    {
+      "category": "macro",
+      "nl": "what is my position right now",
+      "sal": "A:MACRO[MESH:POS]"
+    },
+    {
+      "category": "macro",
+      "nl": "casualty evacuation needed at the LZ",
+      "sal": "A:MACRO[MEDEVAC]"
+    },
+    {
+      "category": "macro",
+      "nl": "send the mesh stats over",
+      "sal": "A:MACRO[MESH:STAT]"
+    },
+    {
+      "category": "macro",
+      "nl": "vitals report from sensor 3",
+      "sal": "A:MACRO[MESH:HLTH]"
+    },
+    {
+      "category": "chain",
+      "nl": "encrypt the payload, then push to node BRAVO",
+      "sal": "S:ENC;D:PUSH@NODE"
+    },
+    {
+      "category": "chain",
+      "nl": "sign payload then push to node ALPHA",
+      "sal": "S:SIGN;D:PUSH@NODE"
+    },
+    {
+      "category": "chain",
+      "nl": "verify identity, and then run inference",
+      "sal": "I:ID;Z:INF"
+    },
+    {
+      "category": "chain",
+      "nl": "store to memory, then sync clock",
+      "sal": "Y:STORE@MEMORY;T:SYNC"
+    },
+    {
+      "category": "single",
+      "nl": "fire alarm in building B",
+      "sal": "B:ALRM"
+    },
+    {
+      "category": "single",
+      "nl": "emergency route now to the staging point",
+      "sal": "A:MACRO[MESH:ALRT]"
+    },
+    {
+      "category": "single",
+      "nl": "data query needed for the audit",
+      "sal": "D:Q∧L:AUDIT"
+    },
+    {
+      "category": "single",
+      "nl": "robot status update from BOT1",
+      "sal": "R:STAT↺"
+    },
+    {
+      "category": "single",
+      "nl": "alert me if heart rate exceeds 130",
+      "sal": "A:MACRO[MESH:HLTH]"
+    },
+    {
+      "category": "passthrough",
+      "nl": "Order me some tacos",
+      "sal": null
+    },
+    {
+      "category": "passthrough",
+      "nl": "Hey, how is it going?",
+      "sal": null
+    },
+    {
+      "category": "passthrough",
+      "nl": "What is 247 times 83?",
+      "sal": null
+    },
+    {
+      "category": "passthrough",
+      "nl": "Book me a flight to Denver",
+      "sal": null
+    },
+    {
+      "category": "passthrough",
+      "nl": "Post this photo to Instagram",
+      "sal": null
+    }
+  ]
+}

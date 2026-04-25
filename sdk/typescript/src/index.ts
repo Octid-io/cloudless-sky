@@ -156,3 +156,4 @@ export { SALBridge } from "./bridge.js";
 export type { AcquisitionMetrics, BridgeEvent, BridgeInbound, BridgeSummary } from "./bridge.js";
 export { SALComposer } from "./sal_composer.js";
 export type { ComposedIntent } from "./sal_composer.js";
+export { SlotDefinition, MacroTemplate, MacroRegistry } from "./macro.js";

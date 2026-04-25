@@ -6,6 +6,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [v2.3.4] — 2026-04-24
+
+Cross-SDK parity restoration. The TypeScript and Go composers had been frozen at the April 16 snapshot — missing the macro registry, chain-split, and tighter phrase-matching that already landed in Python's 2.3.3. This patch closes the drift in both downstream SDKs so the protocol's behavior is byte-identical across all three. The protocol itself did not change; this is the work that should have shipped inside 2.3.3.
+
+**Package versions shipped with this release:**
+- `osmp` (Python / PyPI): **no change — stays at 2.3.3** (source identical; the 2.3.3 release already shipped macros + chain-split)
+- `osmp-protocol` (npm): 2.3.3 → **2.3.4** (catches up to Python 2.3.3: `MacroTemplate`, `MacroRegistry`, `SlotDefinition` now exported; optional `macroRegistry` constructor parameter on `SALComposer`)
+- Go module: tag **v2.3.4** (catches up to Python 2.3.3: `MacroTemplate`, `MacroRegistry`, `SlotDefinition`, `NewMacroRegistry`, `NewComposerWithMacros`, `SetMacroRegistry`; no `go.mod` edit, pre-v2 import path)
+- `osmp-mcp` (PyPI): no change required (depends on `osmp[dpack]>=2.3.0`; nothing to update on the wrapper)
+
+### Added
+
+- **TypeScript SDK — Registered Macro Architecture (port from Python).** `sdk/typescript/src/macro.ts` (~365 lines) ports `SlotDefinition`, `MacroTemplate`, and `MacroRegistry` 1:1 from `sdk/python/osmp/protocol.py` (lines 2841-3098). Includes register/lookup, opcode-existence validation against the ASD, slot-placeholder ↔ definition validation, expand, encodeCompact, encodeExpanded, encodeWithAnnotation, inheritedConsequenceClass (with severity-ordered inheritance from R-namespace frames), listMacros, and loadCorpus.
+- **TypeScript SDK — chain-split + macro priority in `SALComposer`.** Mirrors Python's `compose` flow at protocol.py lines 2553-2576: optional registry parameter on the constructor, `_tryChainSplit` private method, macro priority check at the top of `_composeImpl`. Macros take precedence over individual opcode composition when any trigger substring is present in the NL.
+- **Go SDK — Registered Macro Architecture (port from Python).** `sdk/go/osmp/macro.go` (~360 lines). Same API surface as the Python and TS macro modules, idiomatic Go (capitalized exported names, error returns, map[string]any slot values).
+- **Go SDK — chain-split + macro priority in `Composer`.** New `NewComposerWithMacros` constructor + `SetMacroRegistry` / `MacroRegistry` accessors. Same flow semantics as TS and Python.
+- **Cross-SDK parity vectors.** `tests/parity/parity_vectors.json` (24 vectors) generated from the Python composer with the Meshtastic macro corpus attached. `sdk/typescript/tests/cross_sdk_parity.test.ts` and `sdk/go/osmp/cross_sdk_parity_test.go` read the same JSON and assert byte-identical SAL output. Vectors cover the four site chips, six macro-priority triggers, four chain-split inputs, five single-segment compositions, and five passthrough cases. All 24 pass in all three SDKs.
+
+### Fixed
+
+- **Go SDK — non-deterministic composer iteration.** `Composer.buildKeywordIndex`, `buildPhraseIndex`, and `LookupByKeyword` previously walked `ASDFloorBasis` via `range map`, which Go intentionally randomizes. Different `Composer` instances would build different keyword indices and produce different SAL for the same NL input. Iteration is now sorted (alphabetical by namespace, then by opcode), making Go reproducible across runs and aligned with Python's insertion order for the parity vector set.
+
+### Cross-SDK parity contract
+
+Every input in `tests/parity/parity_vectors.json` produces byte-identical SAL across Python, TypeScript, and Go composers. Adding a feature or trigger that diverges any SDK's output is a parity contract violation and must either (a) update all three SDKs or (b) annotate the vector as a known divergence.
+
+### Tests
+
+- Python: 27/27 macro tests pass (`tests/tier1/test_macros.py`); existing test suites unchanged.
+- TypeScript: 158/158 pass — 36 new macro tests (`sdk/typescript/tests/macro.test.ts`) + 25 cross-SDK parity tests (`sdk/typescript/tests/cross_sdk_parity.test.ts`) + 97 pre-existing.
+- Go: full module suite passes — 27 new macro tests + 25 cross-SDK parity tests added (`sdk/go/osmp/macro_test.go`, `sdk/go/osmp/cross_sdk_parity_test.go`).
+
+### Background
+
+The April 16 commit (b6da16f) explicitly flagged "Python-only additions (TS/Go ports to follow if needed): chain-split infrastructure, 3+ confidence gate tightening." Macros landed in Python shortly after. The "ports to follow if needed" never got prioritized. The site's encoder demo surfaced the gap when chip phrases like `report battery level` resolved to `A:MACRO[MESH:DEV]` server-side (Python) but passed through client-side (TS). This release closes that drift.
+
+---
+
 ## [v2.3.3] — 2026-04-24
 
 Patch release. Bridge-fix: ASCII arrow `->` is now a first-class SAL frame-boundary operator equivalent to Unicode `→`.

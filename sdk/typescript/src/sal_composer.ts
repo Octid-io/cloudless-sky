@@ -11,6 +11,7 @@
 import { ASD_BASIS } from "./glyphs.js";
 import { AdaptiveSharedDictionary } from "./asd.js";
 import { validateComposition } from "./validate.js";
+import type { MacroRegistry } from "./macro.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -21,6 +22,20 @@ export interface ComposedIntent {
   parameters: Record<string, string>;
   raw: string;
 }
+
+// ── Chain separators ────────────────────────────────────────────────────────
+//
+// Each separator pattern in NL maps to the SAL operator that joins composed
+// segments. Order matters: longer/more-specific patterns first. Mirrors the
+// Python `_CHAIN_SEPARATORS` constant in protocol.py (lines 2495-2505).
+
+const CHAIN_SEPARATORS: ReadonlyArray<readonly [RegExp, string]> = [
+  [/,\s+then\s+/i, ";"],
+  [/,\s+and\s+then\s+/i, ";"],
+  [/\s+then\s+/i, ";"],
+  [/\s+next\s+/i, ";"],
+  [/,\s+and\s+/i, "\u2227"],
+];
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -129,14 +144,26 @@ const CURATED_TRIGGERS: Record<string, [string, string]> = {
 
 export class SALComposer {
   private _asd: AdaptiveSharedDictionary;
+  private _macroRegistry: MacroRegistry | null;
   private _keywordIndex: Map<string, [string, string][]> = new Map();
   private _phraseIndex: Map<string, [string, string]> = new Map();
   private _phrasesByLength: string[] = [];
 
-  constructor(asd?: AdaptiveSharedDictionary) {
+  constructor(asd?: AdaptiveSharedDictionary, macroRegistry?: MacroRegistry | null) {
     this._asd = asd ?? new AdaptiveSharedDictionary();
+    this._macroRegistry = macroRegistry ?? null;
     this._buildKeywordIndex();
     this._buildPhraseIndex();
+  }
+
+  /** Optional accessor for the registered macro registry (parity with Python self.macro_registry). */
+  get macroRegistry(): MacroRegistry | null {
+    return this._macroRegistry;
+  }
+
+  /** Attach or replace the macro registry after construction. */
+  setMacroRegistry(registry: MacroRegistry | null): void {
+    this._macroRegistry = registry;
   }
 
   private _buildKeywordIndex(): void {
@@ -301,13 +328,103 @@ export class SALComposer {
     return { actions, conditions, targets, parameters, raw };
   }
 
+  /**
+   * Compose valid SAL from natural language.
+   *
+   * First tries chain-split: if the NL contains sequential separators
+   * ("then", "next", ", and"), split into segments and compose each.
+   * This produces proper ; (SEQUENCE) or ∧ (AND) chains instead of
+   * flat keyword-matched SAL.
+   *
+   * Falls back to single-segment composition if no chain detected.
+   *
+   * Mirrors Python `compose` at protocol.py lines 2553-2576.
+   */
   compose(nlText: string, intent?: ComposedIntent): string | null {
+    if (!intent) {
+      // Try chain-split first (only when intent not pre-supplied)
+      const chainSal = this._tryChainSplit(nlText);
+      if (chainSal !== null) {
+        const result = validateComposition(chainSal, nlText);
+        if (result.valid) return chainSal;
+        // Chain validation failed → fall through to single-compose
+      }
+    }
+    return this._composeImpl(nlText, intent);
+  }
+
+  /**
+   * Single-segment composition entry. Used by chain-split for each
+   * segment so the recursion stops at one level.
+   */
+  private _composeSingle(nlText: string): string | null {
+    return this._composeImpl(nlText);
+  }
+
+  /**
+   * Try to split NL into chain segments and compose each independently.
+   *
+   * Returns a composed SAL chain (using ; or ∧) or null if the NL
+   * doesn't contain chain separators OR if any segment fails to compose.
+   *
+   * Mirrors Python `_try_chain_split` at protocol.py lines 2507-2546.
+   */
+  private _tryChainSplit(nlText: string): string | null {
+    const nlLower = nlText.toLowerCase();
+    if (nlLower.includes(" if ") || nlLower.startsWith("if ")) {
+      return null; // conditional chains handled by existing logic
+    }
+
+    for (const [pattern, operator] of CHAIN_SEPARATORS) {
+      const splitter = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g");
+      const rawSegments = nlText.split(splitter);
+      if (rawSegments.length < 2) continue;
+
+      const segments = rawSegments
+        .map((s) => s.trim().replace(/[.,;]+$/, ""))
+        .filter((s) => s.length > 0);
+      if (segments.length < 2) continue;
+
+      const composedSegments: string[] = [];
+      for (const seg of segments) {
+        if (new TextEncoder().encode(seg).length < 4) return null;
+        const segSal = this._composeSingle(seg);
+        if (segSal === null) return null; // any segment fails → whole chain fails
+        composedSegments.push(segSal);
+      }
+      if (composedSegments.length >= 2) {
+        return composedSegments.join(operator);
+      }
+      return null;
+    }
+
+    return null;
+  }
+
+  /**
+   * Core composition logic. Mirrors Python `_compose_impl` at protocol.py
+   * lines 2578-2812. The macro priority check is the first step after the
+   * BAEL byte pre-check (lines 2595-2602).
+   */
+  private _composeImpl(nlText: string, intent?: ComposedIntent): string | null {
     if (!intent) intent = this.extractIntentKeywords(nlText);
 
     // BAEL byte pre-check
     if (new TextEncoder().encode(nlText).length < 6) return null;
 
-    // ASD lookup
+    // Step 1: Macro priority check (composition priority hierarchy)
+    if (this._macroRegistry) {
+      const rawLower = intent.raw.toLowerCase();
+      for (const macro of this._macroRegistry.listMacros()) {
+        for (const trigger of macro.triggers) {
+          if (trigger && rawLower.includes(trigger.toLowerCase())) {
+            return `A:MACRO[${macro.macroId}]`;
+          }
+        }
+      }
+    }
+
+    // Step 2: ASD lookup
     let resolved: [string, string][] = [];
     let hasPhraseMatch = false;
     for (const action of intent.actions) {
