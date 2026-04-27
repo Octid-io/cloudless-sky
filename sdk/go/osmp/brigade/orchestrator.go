@@ -9,6 +9,22 @@ import (
 	"github.com/octid-io/cloudless-sky/sdk/go/osmp"
 )
 
+// init registers the brigade Orchestrator as the osmp.Composer's primary
+// path. This avoids an import cycle (brigade imports osmp; osmp can't
+// directly import brigade). See osmp.SetBrigadeCompose for the wiring
+// contract. Side-effect import users can opt in via:
+//
+//	import _ "github.com/octid-io/cloudless-sky/sdk/go/osmp/brigade"
+func init() {
+	var singleton *Orchestrator
+	osmp.SetBrigadeCompose(func(nl string) string {
+		if singleton == nil {
+			singleton = NewOrchestrator()
+		}
+		return singleton.Compose(nl)
+	})
+}
+
 // ComposeMode is the high-level decision the orchestrator made.
 type ComposeMode string
 

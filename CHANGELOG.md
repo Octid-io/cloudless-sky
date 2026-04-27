@@ -6,11 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
-## [Unreleased] — Brigade composer + ASD v15.1
+## [v2.4.0] — 2026-04-27
+
+Brigade composer architecture across all three SDKs + ASD v15.1 (4 new opcodes). The composition pipeline now runs `macro → brigade → legacy` in priority order. Brigade is the safety floor (3% WRONG vs 6-23% for LLMs in measurement); legacy keyword stacker is preserved as fallback for inputs the brigade abstains on.
+
+**Package versions shipped with this release:**
+- `osmp` (Python / PyPI): 2.3.3 → **2.4.0**
+- `osmp-mcp` (PyPI): 1.1.1 → **1.2.0** (depends on `osmp[dpack]>=2.4.0`)
+- `osmp-protocol` (npm): 2.3.4 → **2.4.0**
+- `osmp-mcp` server.json: wrapper 1.1.0 → 1.1.1, package 1.1.1 → 1.2.0 (lag-of-one convention)
+- Go module: tag **v2.4.0** (no `go.mod` edit, pre-v2 import path)
 
 ### Added
 
 - **Brigade composer architecture (NL → SAL).** All three SDKs gain a deterministic kitchen-brigade pipeline (parser + ParsedRequest IR + 26 namespace stations + orchestrator + bridge mode + structured `ComposeResult` with teaching hint). Python landed in commit `5f96d58`; TypeScript and Go ports landed in `dc74ab2` with byte-identical parity locked via `tests/parity/brigade_parity_vectors.json` (37 curated NL inputs across single-frame compose, conditional chains, auth-gated frames, bridge mode, refusal categories, passthrough). Refusal taxonomy: `INPUT_TOO_SHORT`, `NEGATION`, `UNSAFE_INPUT`, `UNRESOLVED_PRONOUN`, `NON_ACTUATOR_OBJECT`, `CHAIN_INCOMPLETE`, `NO_PROTOCOL_CONTENT`, `NO_OPCODE_MATCH`. Bridge mode emits `SAL::residue` for sensing namespaces only when the residue does not contain a modifier marker and the composite stays compression-positive against the NL.
+- **Brigade wired into all three composers.** `SALComposer.compose()` (Python + TS) and `Composer.Compose()` (Go) now call brigade as the primary path after macro priority. Macro priority is preserved at the top so pre-validated chain templates win over brigade single-frame matches. Go uses a function-pointer hook (`osmp.SetBrigadeCompose` set by `brigade.init()`) to avoid an import cycle; users opt in via `import _ "github.com/octid-io/cloudless-sky/sdk/go/osmp/brigade"`.
 - **ASD v15.1 — 4 opcode additions.** ZTOLE-confirmed gaps now in the canonical dictionary:
   - `R:OPEN` — open_actuator (door, hatch, valve, gate)
   - `R:CLOSE` — close_actuator
@@ -18,10 +28,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   - `D:DEL` — delete_data_irreversible
 - Total opcode count: **352 → 356**. ASD fingerprint regenerated via `tools/gen_asd.py` and propagated to TS/Go glyph tables and the cross-SDK fingerprint test.
 
+### Changed
+
+- **Cross-SDK parity vectors regenerated.** `tests/parity/parity_vectors.json` was regenerated against the brigade-wired Python composer. Several NL inputs now resolve through brigade (e.g., `"sign payload then push to node ALPHA"` → `S:SIGN;D:PUSH@ALPHA` instead of `S:SIGN;D:PUSH@NODE` — brigade extracts the entity target correctly). All 25 vectors hold byte-identical across Python, TypeScript, and Go.
+- **`Composer.Compose()` for `"Send an email to the team"`** now returns `D:PUSH@TEAM` instead of passthrough. Brigade reads the verb `send` + entity target `team` as a legitimate D:PUSH frame. Test updated; behavior consistent across Python, TypeScript, and Go.
+
 ### Notes
 
 - The 95.7% opcode coverage figure carried in the public READMEs was measured against the v15.0 baseline (352 opcodes). v15.1 adds 4 opcodes; re-measurement against the new denominator is pending. README copy now anchors the percentage to the v15.0 baseline rather than the current count to avoid silent drift.
 - Brigade verb lexicon currently maps `close → R:STOP` and `lock → R:STOP` for compatibility. A follow-on can re-route these to `R:CLOSE` / `R:LOCK` respectively once new parity vectors are accepted.
+
+### Tests
+
+- Python: brigade rule coverage zero-fatal across full corpus (147 chips, 18 domains).
+- TypeScript: 196/196 tests pass (38 brigade parity + 25 cross-SDK parity + 133 SDK).
+- Go: full module suite passes (37 brigade parity + 25 cross-SDK parity + composer/macro/wire/etc).
 
 ---
 

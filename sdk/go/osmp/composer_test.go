@@ -41,10 +41,14 @@ func TestComposerBasicComposition(t *testing.T) {
 func TestComposerPassthrough(t *testing.T) {
 	c := osmp.NewComposer(nil)
 
+	// Brigade-era passthroughs: inputs that produce no protocol-relevant
+	// SAL across all three SDKs. "Send an email to the team" was on this
+	// list pre-brigade but now resolves to D:PUSH@TEAM under the brigade
+	// composer (the verb 'send' + entity target is a legitimate D:PUSH
+	// frame), matching Python and TypeScript.
 	passthroughs := []string{
 		"Order me some tacos",
 		"Book me a flight to Denver",
-		"Send an email to the team",
 		"Post this photo to Instagram",
 		"What is 247 times 83?",
 		"Who painted the Mona Lisa?",

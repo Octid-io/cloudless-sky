@@ -12,6 +12,7 @@ import { ASD_BASIS } from "./glyphs.js";
 import { AdaptiveSharedDictionary } from "./asd.js";
 import { validateComposition } from "./validate.js";
 import type { MacroRegistry } from "./macro.js";
+import { Orchestrator as BrigadeOrchestrator } from "./brigade/index.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -342,7 +343,37 @@ export class SALComposer {
    */
   compose(nlText: string, intent?: ComposedIntent): string | null {
     if (!intent) {
-      // Try chain-split first (only when intent not pre-supplied)
+      // Step 1: Macro priority — pre-validated chain templates win over both
+      // brigade and legacy paths. A macro encodes the intent of a whole
+      // multi-opcode chain in a single A:MACRO[id] frame; we must not let a
+      // station propose a partial single-frame match in its place. Mirrors
+      // Python protocol.py compose() and Go composer.go.
+      if (this.macroRegistry) {
+        const nlLow = nlText.toLowerCase();
+        for (const macro of this.macroRegistry.listMacros()) {
+          for (const trigger of macro.triggers) {
+            if (nlLow.includes(trigger.toLowerCase())) {
+              return `A:MACRO[${macro.macroId}]`;
+            }
+          }
+        }
+      }
+
+      // Step 2: Brigade composer (parser → IR → 26 stations → orchestrator).
+      // Brigade returning null means "no station resolved confidently" — the
+      // legacy keyword stacker may still find something, so fall through.
+      try {
+        if (!SALComposer._brigadeSingleton) {
+          SALComposer._brigadeSingleton = new BrigadeOrchestrator();
+        }
+        const brigadeSal = SALComposer._brigadeSingleton.compose(nlText);
+        if (brigadeSal !== null) return brigadeSal;
+      } catch {
+        // Any brigade error → fall through, never break compose.
+      }
+
+      // Step 3: Legacy chain-split (preserved for inputs the brigade returns
+      // null for — e.g., novel chain shapes).
       const chainSal = this._tryChainSplit(nlText);
       if (chainSal !== null) {
         const result = validateComposition(chainSal, nlText);
@@ -352,6 +383,8 @@ export class SALComposer {
     }
     return this._composeImpl(nlText, intent);
   }
+
+  private static _brigadeSingleton: BrigadeOrchestrator | null = null;
 
   /**
    * Single-segment composition entry. Used by chain-split for each

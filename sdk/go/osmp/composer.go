@@ -136,6 +136,20 @@ var curatedTriggers = map[string][2]string{
 	"oxygen level": {"H", "SPO2"},
 }
 
+// brigadeComposeFn is set by the brigade package's init() to avoid an
+// import cycle (brigade imports osmp for ValidateComposition; osmp can't
+// import brigade directly). When non-nil, Composer.Compose calls it as
+// the primary composition path. Mirrors Python's lazy-import wiring at
+// protocol.py compose() and TS's static import in sal_composer.ts.
+var brigadeComposeFn func(nl string) string
+
+// SetBrigadeCompose installs the brigade orchestrator as the composer's
+// primary path. Called from brigade.init() to wire the dependency
+// without an import cycle.
+func SetBrigadeCompose(fn func(nl string) string) {
+	brigadeComposeFn = fn
+}
+
 // NewComposer creates a SALComposer with the default ASD.
 func NewComposer(asd *AdaptiveSharedDictionary) *Composer {
 	if asd == nil {
@@ -420,6 +434,31 @@ func isWordChar(r rune) bool {
 // Mirrors Python `compose` at protocol.py lines 2553-2576.
 func (c *Composer) Compose(nlText string, intent *ComposedIntent) string {
 	if intent == nil {
+		// Step 1: Macro priority — pre-validated chain templates win over
+		// both brigade and legacy paths. Mirrors Python protocol.py
+		// compose() and TS sal_composer.ts.
+		if c.macroRegistry != nil {
+			nlLow := strings.ToLower(nlText)
+			for _, macro := range c.macroRegistry.ListMacros() {
+				for _, trigger := range macro.Triggers {
+					if strings.Contains(nlLow, strings.ToLower(trigger)) {
+						return fmt.Sprintf("A:MACRO[%s]", macro.MacroID)
+					}
+				}
+			}
+		}
+
+		// Step 2: Brigade composer (parser → IR → 26 stations →
+		// orchestrator). Returning "" means "no station resolved
+		// confidently" — fall through to legacy paths.
+		if brigadeComposeFn != nil {
+			if brigadeSAL := brigadeComposeFn(nlText); brigadeSAL != "" {
+				return brigadeSAL
+			}
+		}
+
+		// Step 3: Legacy chain-split (preserved for inputs the brigade
+		// returns "" for — e.g., novel chain shapes).
 		if chainSAL := c.tryChainSplit(nlText); chainSAL != "" {
 			result := ValidateComposition(chainSAL, nlText, c.asd, true, nil)
 			if result.Valid {

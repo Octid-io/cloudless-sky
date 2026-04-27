@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/octid-io/cloudless-sky/sdk/go/osmp"
+	_ "github.com/octid-io/cloudless-sky/sdk/go/osmp/brigade" // wires brigade into osmp.Composer.Compose
 )
 
 type parityVector struct {

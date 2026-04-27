@@ -12,7 +12,7 @@
     {
       "category": "chip",
       "nl": "report temperature",
-      "sal": "L:REPORT∧E:TH"
+      "sal": "E:TH?"
     },
     {
       "category": "chip",
@@ -57,12 +57,12 @@
     {
       "category": "chain",
       "nl": "encrypt the payload, then push to node BRAVO",
-      "sal": "S:ENC;D:PUSH@NODE"
+      "sal": "S:ENC;D:PUSH@BRAVO"
     },
     {
       "category": "chain",
       "nl": "sign payload then push to node ALPHA",
-      "sal": "S:SIGN;D:PUSH@NODE"
+      "sal": "S:SIGN;D:PUSH@ALPHA"
     },
     {
       "category": "chain",
@@ -77,7 +77,7 @@
     {
       "category": "single",
       "nl": "fire alarm in building B",
-      "sal": "B:ALRM"
+      "sal": "B:ALRM@B"
     },
     {
       "category": "single",
@@ -87,12 +87,12 @@
     {
       "category": "single",
       "nl": "data query needed for the audit",
-      "sal": "D:Q∧L:AUDIT"
+      "sal": "D:Q"
     },
     {
       "category": "single",
       "nl": "robot status update from BOT1",
-      "sal": "R:STAT↺"
+      "sal": "N:CFG"
     },
     {
       "category": "single",

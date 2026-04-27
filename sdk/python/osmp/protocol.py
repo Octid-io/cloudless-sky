@@ -2855,23 +2855,34 @@ class SALComposer:
 
         Returns validated SAL string or None if all paths return None.
         """
-        # Brigade is the primary path — only when no caller-supplied intent
         if intent is None:
+            # Step 1: Macro priority — pre-validated chain templates win over
+            # both brigade and legacy paths. A macro encodes the intent of a
+            # whole multi-opcode chain in a single A:MACRO[id] frame; we
+            # must not let a station propose a partial single-frame match
+            # in its place. Mirrors TS sal_composer.ts and Go composer.go.
+            if self.macro_registry:
+                nl_low_macro = nl_text.lower()
+                for macro in self.macro_registry.list_macros():
+                    for trigger in macro.triggers:
+                        if trigger.lower() in nl_low_macro:
+                            return f"A:MACRO[{macro.macro_id}]"
+
+            # Step 2: Brigade composer (parser → IR → 26 stations →
+            # orchestrator → validator). Returning None means "no station
+            # resolved confidently" — fall through to legacy paths.
             try:
-                # Lazy import to avoid module-load cycle on legacy consumers
                 from .brigade import Orchestrator as _BrigadeOrch
                 if not hasattr(self.__class__, "_brigade_singleton"):
                     self.__class__._brigade_singleton = _BrigadeOrch()
                 brigade_sal = self.__class__._brigade_singleton.compose(nl_text)
                 if brigade_sal is not None:
                     return brigade_sal
-                # Brigade returned None — fall through to legacy paths.
-                # Brigade's None means "no station resolved confidently" —
-                # the legacy keyword stacker may still find something.
             except Exception:
                 pass  # any brigade error → fall through, never break compose
 
-            # Legacy chain-split (preserved)
+            # Step 3: Legacy chain-split (preserved for inputs the brigade
+            # returns None for — e.g., novel chain shapes).
             chain_sal = self._try_chain_split(nl_text)
             if chain_sal is not None:
                 result = validate_composition(chain_sal, nl=nl_text)
