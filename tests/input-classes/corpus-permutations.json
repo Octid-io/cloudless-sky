@@ -1,0 +1,5808 @@
+{
+  "version": "perms-v1",
+  "source": "corpus-v2-expanded.json",
+  "description": "Permutations of in-scope chips. Each variant shares the source's expected_sal.",
+  "scoring": {
+    "verdicts": [
+      "CORRECT",
+      "SAFE_BRIDGE",
+      "SAFE_PASSTHROUGH",
+      "REFUSED_MALFORMED",
+      "REFUSED",
+      "INVALID",
+      "WRONG"
+    ],
+    "fatal": [
+      "WRONG",
+      "INVALID"
+    ],
+    "safe": [
+      "CORRECT",
+      "SAFE_BRIDGE",
+      "SAFE_PASSTHROUGH",
+      "REFUSED_MALFORMED",
+      "REFUSED"
+    ],
+    "bar_correct_pct": 99,
+    "bar_wrong_pct": 0,
+    "bar_invalid_pct": 0
+  },
+  "inputs": [
+    {
+      "id": "DC-01-V1",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "stop conveyor",
+      "expected_sal": [
+        "R:STOP↻",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "original_id": "DC-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-01-V2",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "halt the conveyor",
+      "expected_sal": [
+        "R:STOP↻",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "original_id": "DC-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-01-V3",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "could you stop the conveyor",
+      "expected_sal": [
+        "R:STOP↻",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "original_id": "DC-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-01-V4",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "stop the the conveyor",
+      "expected_sal": [
+        "R:STOP↻",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "original_id": "DC-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-02-V1",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "could you lock door D-7",
+      "expected_sal": [
+        "R:LOCK↻@D-7",
+        "R:STOP↺@D-7",
+        "R:STOP↻@D-7"
+      ],
+      "original_id": "DC-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-02-V2",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "please lock door D-7",
+      "expected_sal": [
+        "R:LOCK↻@D-7",
+        "R:STOP↺@D-7",
+        "R:STOP↻@D-7"
+      ],
+      "original_id": "DC-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-02-V3",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "lock door D-7?",
+      "expected_sal": [
+        "R:LOCK↻@D-7",
+        "R:STOP↺@D-7",
+        "R:STOP↻@D-7"
+      ],
+      "original_id": "DC-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-02-V4",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "lock the door D-7",
+      "expected_sal": [
+        "R:LOCK↻@D-7",
+        "R:STOP↺@D-7",
+        "R:STOP↻@D-7"
+      ],
+      "original_id": "DC-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-03-V1",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "reboot the service",
+      "expected_sal": [
+        "C:RSTRT"
+      ],
+      "original_id": "DC-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-03-V2",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "could you restart the service",
+      "expected_sal": [
+        "C:RSTRT"
+      ],
+      "original_id": "DC-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-03-V3",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "please restart the service",
+      "expected_sal": [
+        "C:RSTRT"
+      ],
+      "original_id": "DC-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-03-V4",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "restart the service.",
+      "expected_sal": [
+        "C:RSTRT"
+      ],
+      "original_id": "DC-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-04-V1",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "shut down gateway 3",
+      "expected_sal": [
+        "C:KILL@3",
+        "R:STOP⊘@3"
+      ],
+      "original_id": "DC-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-04-V2",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "shutdown the gateway 3",
+      "expected_sal": [
+        "C:KILL@3",
+        "R:STOP⊘@3"
+      ],
+      "original_id": "DC-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-04-V3",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "please shutdown gateway 3",
+      "expected_sal": [
+        "C:KILL@3",
+        "R:STOP⊘@3"
+      ],
+      "original_id": "DC-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-04-V4",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "terminate gateway 3",
+      "expected_sal": [
+        "C:KILL@3",
+        "R:STOP⊘@3"
+      ],
+      "original_id": "DC-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-05-V1",
+      "domain": "DEVICE_CONTROL",
+      "shape": "chain_conjunctive",
+      "nl": "halt pump and close valve",
+      "expected_sal": [
+        "R:STOP↻@PUMP∧R:CLOSE↻@VALVE",
+        "R:STOP↻@PUMP∧R:STOP↻@VALVE",
+        "R:STOP@PUMP↺∧R:STOP@VALVE↺"
+      ],
+      "original_id": "DC-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-05-V2",
+      "domain": "DEVICE_CONTROL",
+      "shape": "chain_conjunctive",
+      "nl": "stop the pump and close valve",
+      "expected_sal": [
+        "R:STOP↻@PUMP∧R:CLOSE↻@VALVE",
+        "R:STOP↻@PUMP∧R:STOP↻@VALVE",
+        "R:STOP@PUMP↺∧R:STOP@VALVE↺"
+      ],
+      "original_id": "DC-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-05-V3",
+      "domain": "DEVICE_CONTROL",
+      "shape": "chain_conjunctive",
+      "nl": "stop pump and close valve?",
+      "expected_sal": [
+        "R:STOP↻@PUMP∧R:CLOSE↻@VALVE",
+        "R:STOP↻@PUMP∧R:STOP↻@VALVE",
+        "R:STOP@PUMP↺∧R:STOP@VALVE↺"
+      ],
+      "original_id": "DC-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-05-V4",
+      "domain": "DEVICE_CONTROL",
+      "shape": "chain_conjunctive",
+      "nl": "cease pump and close valve",
+      "expected_sal": [
+        "R:STOP↻@PUMP∧R:CLOSE↻@VALVE",
+        "R:STOP↻@PUMP∧R:STOP↻@VALVE",
+        "R:STOP@PUMP↺∧R:STOP@VALVE↺"
+      ],
+      "original_id": "DC-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-06-V1",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "halt the pump.",
+      "expected_sal": [
+        "R:STOP↺@PUMP",
+        "R:STOP↻@PUMP",
+        "R:STOP↺",
+        "R:STOP↻"
+      ],
+      "original_id": "DC-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-06-V2",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "halt pump",
+      "expected_sal": [
+        "R:STOP↺@PUMP",
+        "R:STOP↻@PUMP",
+        "R:STOP↺",
+        "R:STOP↻"
+      ],
+      "original_id": "DC-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-06-V3",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "please halt the pump",
+      "expected_sal": [
+        "R:STOP↺@PUMP",
+        "R:STOP↻@PUMP",
+        "R:STOP↺",
+        "R:STOP↻"
+      ],
+      "original_id": "DC-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-06-V4",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "could you halt the pump",
+      "expected_sal": [
+        "R:STOP↺@PUMP",
+        "R:STOP↻@PUMP",
+        "R:STOP↺",
+        "R:STOP↻"
+      ],
+      "original_id": "DC-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-08-V1",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "could you kill the worker process",
+      "expected_sal": [
+        "C:KILL"
+      ],
+      "original_id": "DC-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-08-V2",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "kill the worker process.",
+      "expected_sal": [
+        "C:KILL"
+      ],
+      "original_id": "DC-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-08-V3",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "kill the worker process?",
+      "expected_sal": [
+        "C:KILL"
+      ],
+      "original_id": "DC-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-08-V4",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "please kill the worker process",
+      "expected_sal": [
+        "C:KILL"
+      ],
+      "original_id": "DC-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-09-V1",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "please reboot server BRAVO",
+      "expected_sal": [
+        "C:RSTRT@BRAVO"
+      ],
+      "original_id": "DC-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-09-V2",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "reboot server BRAVO?",
+      "expected_sal": [
+        "C:RSTRT@BRAVO"
+      ],
+      "original_id": "DC-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-09-V3",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "reboot server BRAVO.",
+      "expected_sal": [
+        "C:RSTRT@BRAVO"
+      ],
+      "original_id": "DC-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "DC-09-V4",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "reboot the server BRAVO",
+      "expected_sal": [
+        "C:RSTRT@BRAVO"
+      ],
+      "original_id": "DC-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-01-V1",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "ping node 17.",
+      "expected_sal": [
+        "A:PING@17"
+      ],
+      "original_id": "MT-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-01-V2",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "ping node 17?",
+      "expected_sal": [
+        "A:PING@17"
+      ],
+      "original_id": "MT-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-01-V3",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "could you ping node 17",
+      "expected_sal": [
+        "A:PING@17"
+      ],
+      "original_id": "MT-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-01-V4",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "ping the node 17",
+      "expected_sal": [
+        "A:PING@17"
+      ],
+      "original_id": "MT-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-02-V1",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "locate peers",
+      "expected_sal": [
+        "N:Q@*",
+        "N:Q"
+      ],
+      "original_id": "MT-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-02-V2",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "discover peers?",
+      "expected_sal": [
+        "N:Q@*",
+        "N:Q"
+      ],
+      "original_id": "MT-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-02-V3",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "please discover peers",
+      "expected_sal": [
+        "N:Q@*",
+        "N:Q"
+      ],
+      "original_id": "MT-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-02-V4",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "find peers",
+      "expected_sal": [
+        "N:Q@*",
+        "N:Q"
+      ],
+      "original_id": "MT-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-03-V1",
+      "domain": "MESHTASTIC",
+      "shape": "simple_action",
+      "nl": "broadcast my position?",
+      "expected_sal": [
+        "G:POS@*"
+      ],
+      "original_id": "MT-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-03-V2",
+      "domain": "MESHTASTIC",
+      "shape": "simple_action",
+      "nl": "please broadcast my position",
+      "expected_sal": [
+        "G:POS@*"
+      ],
+      "original_id": "MT-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-03-V3",
+      "domain": "MESHTASTIC",
+      "shape": "simple_action",
+      "nl": "could you broadcast my position",
+      "expected_sal": [
+        "G:POS@*"
+      ],
+      "original_id": "MT-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-03-V4",
+      "domain": "MESHTASTIC",
+      "shape": "simple_action",
+      "nl": "broadcast the my position",
+      "expected_sal": [
+        "G:POS@*"
+      ],
+      "original_id": "MT-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-04-V1",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "could you find primary relay",
+      "expected_sal": [
+        "N:RLY?",
+        "N:Q[RLY]",
+        "N:RLY"
+      ],
+      "original_id": "MT-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-04-V2",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "find primary relay?",
+      "expected_sal": [
+        "N:RLY?",
+        "N:Q[RLY]",
+        "N:RLY"
+      ],
+      "original_id": "MT-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-04-V3",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "find primary relay.",
+      "expected_sal": [
+        "N:RLY?",
+        "N:Q[RLY]",
+        "N:RLY"
+      ],
+      "original_id": "MT-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-04-V4",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "find the primary relay",
+      "expected_sal": [
+        "N:RLY?",
+        "N:Q[RLY]",
+        "N:RLY"
+      ],
+      "original_id": "MT-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-05-V1",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "could you node status",
+      "expected_sal": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "original_id": "MT-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-05-V2",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "please node status",
+      "expected_sal": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "original_id": "MT-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-05-V3",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "node status?",
+      "expected_sal": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "original_id": "MT-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-05-V4",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "node status.",
+      "expected_sal": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "original_id": "MT-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-06-V1",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "please ping all peers",
+      "expected_sal": [
+        "A:PING@*"
+      ],
+      "original_id": "MT-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-06-V2",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "ping the all peers",
+      "expected_sal": [
+        "A:PING@*"
+      ],
+      "original_id": "MT-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-06-V3",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "could you ping all peers",
+      "expected_sal": [
+        "A:PING@*"
+      ],
+      "original_id": "MT-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-06-V4",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "ping all peers.",
+      "expected_sal": [
+        "A:PING@*"
+      ],
+      "original_id": "MT-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-08-V1",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "could you mesh topology",
+      "expected_sal": [
+        "O:MESH",
+        "O:MESH?"
+      ],
+      "original_id": "MT-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-08-V2",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "please mesh topology",
+      "expected_sal": [
+        "O:MESH",
+        "O:MESH?"
+      ],
+      "original_id": "MT-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-08-V3",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "mesh the topology",
+      "expected_sal": [
+        "O:MESH",
+        "O:MESH?"
+      ],
+      "original_id": "MT-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-08-V4",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "mesh topology?",
+      "expected_sal": [
+        "O:MESH",
+        "O:MESH?"
+      ],
+      "original_id": "MT-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-09-V1",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "ping host BRAVO.",
+      "expected_sal": [
+        "A:PING@BRAVO"
+      ],
+      "original_id": "MT-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-09-V2",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "ping the host BRAVO",
+      "expected_sal": [
+        "A:PING@BRAVO"
+      ],
+      "original_id": "MT-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-09-V3",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "could you ping host BRAVO",
+      "expected_sal": [
+        "A:PING@BRAVO"
+      ],
+      "original_id": "MT-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-09-V4",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "please ping host BRAVO",
+      "expected_sal": [
+        "A:PING@BRAVO"
+      ],
+      "original_id": "MT-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-10-V1",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "uptime?",
+      "expected_sal": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "original_id": "MT-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-10-V2",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "could you uptime",
+      "expected_sal": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "original_id": "MT-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-10-V3",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "uptime.",
+      "expected_sal": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "original_id": "MT-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "MT-10-V4",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "please uptime",
+      "expected_sal": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "original_id": "MT-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-01-V1",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "blood pressure check?",
+      "expected_sal": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "original_id": "MED-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-01-V2",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "could you blood pressure check",
+      "expected_sal": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "original_id": "MED-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-01-V3",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "blood the pressure check",
+      "expected_sal": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "original_id": "MED-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-01-V4",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "blood pressure examine",
+      "expected_sal": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "original_id": "MED-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-02-V1",
+      "domain": "MEDICAL",
+      "shape": "targeted_multi_read",
+      "nl": "all vitals for patient 12.",
+      "expected_sal": [
+        "H:VITALS@12",
+        "H:VITALS@PATIENT12",
+        "H:HR@12∧H:BP@12∧H:SPO2@12"
+      ],
+      "original_id": "MED-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-02-V2",
+      "domain": "MEDICAL",
+      "shape": "targeted_multi_read",
+      "nl": "please all vitals for patient 12",
+      "expected_sal": [
+        "H:VITALS@12",
+        "H:VITALS@PATIENT12",
+        "H:HR@12∧H:BP@12∧H:SPO2@12"
+      ],
+      "original_id": "MED-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-02-V3",
+      "domain": "MEDICAL",
+      "shape": "targeted_multi_read",
+      "nl": "all the vitals for patient 12",
+      "expected_sal": [
+        "H:VITALS@12",
+        "H:VITALS@PATIENT12",
+        "H:HR@12∧H:BP@12∧H:SPO2@12"
+      ],
+      "original_id": "MED-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-02-V4",
+      "domain": "MEDICAL",
+      "shape": "targeted_multi_read",
+      "nl": "could you all vitals for patient 12",
+      "expected_sal": [
+        "H:VITALS@12",
+        "H:VITALS@PATIENT12",
+        "H:HR@12∧H:BP@12∧H:SPO2@12"
+      ],
+      "original_id": "MED-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-03-V1",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "alert the me if heart rate exceeds 130",
+      "expected_sal": [
+        "H:HR>130→H:ALERT",
+        "H:HR>130→U:ALERT"
+      ],
+      "original_id": "MED-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-03-V2",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "alert me if heart rate exceeds 130.",
+      "expected_sal": [
+        "H:HR>130→H:ALERT",
+        "H:HR>130→U:ALERT"
+      ],
+      "original_id": "MED-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-03-V3",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "notify me if heart rate exceeds 130",
+      "expected_sal": [
+        "H:HR>130→H:ALERT",
+        "H:HR>130→U:ALERT"
+      ],
+      "original_id": "MED-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-03-V4",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "alert me if heart rate exceeds 130?",
+      "expected_sal": [
+        "H:HR>130→H:ALERT",
+        "H:HR>130→U:ALERT"
+      ],
+      "original_id": "MED-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-04-V1",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "casualty show if bp above 180",
+      "expected_sal": [
+        "H:BP>180→H:CASREP"
+      ],
+      "original_id": "MED-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-04-V2",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "casualty give me if bp above 180",
+      "expected_sal": [
+        "H:BP>180→H:CASREP"
+      ],
+      "original_id": "MED-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-04-V3",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "casualty what is if bp above 180",
+      "expected_sal": [
+        "H:BP>180→H:CASREP"
+      ],
+      "original_id": "MED-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-04-V4",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "casualty the report if BP above 180",
+      "expected_sal": [
+        "H:BP>180→H:CASREP"
+      ],
+      "original_id": "MED-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-05-V1",
+      "domain": "MEDICAL",
+      "shape": "parametric_action",
+      "nl": "patient has pneumothorax, code J93.0.",
+      "expected_sal": [
+        "H:ICD[J930]",
+        "H:ICD[J930]∧H:CASREP"
+      ],
+      "original_id": "MED-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-05-V2",
+      "domain": "MEDICAL",
+      "shape": "parametric_action",
+      "nl": "please patient has pneumothorax, code J93.0",
+      "expected_sal": [
+        "H:ICD[J930]",
+        "H:ICD[J930]∧H:CASREP"
+      ],
+      "original_id": "MED-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-05-V3",
+      "domain": "MEDICAL",
+      "shape": "parametric_action",
+      "nl": "patient the has pneumothorax, code J93.0",
+      "expected_sal": [
+        "H:ICD[J930]",
+        "H:ICD[J930]∧H:CASREP"
+      ],
+      "original_id": "MED-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-05-V4",
+      "domain": "MEDICAL",
+      "shape": "parametric_action",
+      "nl": "could you patient has pneumothorax, code J93.0",
+      "expected_sal": [
+        "H:ICD[J930]",
+        "H:ICD[J930]∧H:CASREP"
+      ],
+      "original_id": "MED-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-06-V1",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "could you oxygen level",
+      "expected_sal": [
+        "H:SPO2",
+        "H:SPO2?"
+      ],
+      "original_id": "MED-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-06-V2",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "please oxygen level",
+      "expected_sal": [
+        "H:SPO2",
+        "H:SPO2?"
+      ],
+      "original_id": "MED-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-06-V3",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "oxygen level?",
+      "expected_sal": [
+        "H:SPO2",
+        "H:SPO2?"
+      ],
+      "original_id": "MED-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-06-V4",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "oxygen the level",
+      "expected_sal": [
+        "H:SPO2",
+        "H:SPO2?"
+      ],
+      "original_id": "MED-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-07-V1",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "patient pulse.",
+      "expected_sal": [
+        "H:HR",
+        "H:HR?"
+      ],
+      "original_id": "MED-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-07-V2",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "could you patient pulse",
+      "expected_sal": [
+        "H:HR",
+        "H:HR?"
+      ],
+      "original_id": "MED-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-07-V3",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "patient pulse?",
+      "expected_sal": [
+        "H:HR",
+        "H:HR?"
+      ],
+      "original_id": "MED-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-07-V4",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "please patient pulse",
+      "expected_sal": [
+        "H:HR",
+        "H:HR?"
+      ],
+      "original_id": "MED-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-08-V1",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "body temperature.",
+      "expected_sal": [
+        "H:TEMP",
+        "H:TEMP?"
+      ],
+      "original_id": "MED-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-08-V2",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "could you body temperature",
+      "expected_sal": [
+        "H:TEMP",
+        "H:TEMP?"
+      ],
+      "original_id": "MED-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-08-V3",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "body temperature?",
+      "expected_sal": [
+        "H:TEMP",
+        "H:TEMP?"
+      ],
+      "original_id": "MED-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-08-V4",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "please body temperature",
+      "expected_sal": [
+        "H:TEMP",
+        "H:TEMP?"
+      ],
+      "original_id": "MED-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-09-V1",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "alert if oxygen drops below 90",
+      "expected_sal": [
+        "H:SPO2<90→H:ALERT",
+        "H:SPO2<90→U:ALERT"
+      ],
+      "original_id": "MED-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-09-V2",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "warn if oxygen drops below 90?",
+      "expected_sal": [
+        "H:SPO2<90→H:ALERT",
+        "H:SPO2<90→U:ALERT"
+      ],
+      "original_id": "MED-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-09-V3",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "could you warn if oxygen drops below 90",
+      "expected_sal": [
+        "H:SPO2<90→H:ALERT",
+        "H:SPO2<90→U:ALERT"
+      ],
+      "original_id": "MED-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-09-V4",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "warn the if oxygen drops below 90",
+      "expected_sal": [
+        "H:SPO2<90→H:ALERT",
+        "H:SPO2<90→U:ALERT"
+      ],
+      "original_id": "MED-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-10-V1",
+      "domain": "MEDICAL",
+      "shape": "targeted_query",
+      "nl": "blood the pressure of patient 7",
+      "expected_sal": [
+        "H:BP@7",
+        "H:BP@PATIENT7"
+      ],
+      "original_id": "MED-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-10-V2",
+      "domain": "MEDICAL",
+      "shape": "targeted_query",
+      "nl": "blood pressure of patient 7.",
+      "expected_sal": [
+        "H:BP@7",
+        "H:BP@PATIENT7"
+      ],
+      "original_id": "MED-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-10-V3",
+      "domain": "MEDICAL",
+      "shape": "targeted_query",
+      "nl": "could you blood pressure of patient 7",
+      "expected_sal": [
+        "H:BP@7",
+        "H:BP@PATIENT7"
+      ],
+      "original_id": "MED-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "MED-10-V4",
+      "domain": "MEDICAL",
+      "shape": "targeted_query",
+      "nl": "blood pressure of patient 7?",
+      "expected_sal": [
+        "H:BP@7",
+        "H:BP@PATIENT7"
+      ],
+      "original_id": "MED-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-01-V1",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "drone position.",
+      "expected_sal": [
+        "V:POS",
+        "G:POS",
+        "V:POS?",
+        "G:POS?"
+      ],
+      "original_id": "UAV-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-01-V2",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "drone the position",
+      "expected_sal": [
+        "V:POS",
+        "G:POS",
+        "V:POS?",
+        "G:POS?"
+      ],
+      "original_id": "UAV-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-01-V3",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "please drone position",
+      "expected_sal": [
+        "V:POS",
+        "G:POS",
+        "V:POS?",
+        "G:POS?"
+      ],
+      "original_id": "UAV-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-01-V4",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "drone position?",
+      "expected_sal": [
+        "V:POS",
+        "G:POS",
+        "V:POS?",
+        "G:POS?"
+      ],
+      "original_id": "UAV-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-02-V1",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "return the to base",
+      "expected_sal": [
+        "R:RTH↺",
+        "R:RTH↻",
+        "R:RTB↻"
+      ],
+      "original_id": "UAV-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-02-V2",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "could you return to base",
+      "expected_sal": [
+        "R:RTH↺",
+        "R:RTH↻",
+        "R:RTB↻"
+      ],
+      "original_id": "UAV-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-02-V3",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "return to base.",
+      "expected_sal": [
+        "R:RTH↺",
+        "R:RTH↻",
+        "R:RTB↻"
+      ],
+      "original_id": "UAV-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-02-V4",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "please return to base",
+      "expected_sal": [
+        "R:RTH↺",
+        "R:RTH↻",
+        "R:RTB↻"
+      ],
+      "original_id": "UAV-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-03-V1",
+      "domain": "UAV_TELEMETRY",
+      "shape": "authorized_targeted_action",
+      "nl": "could you move drone 1 to coordinates 35.7, -122.4",
+      "expected_sal": [
+        "I:§→R:⚠MOV@DRONE1∧E:GPS[35.7,-122.4]",
+        "R:MOV↻@DRONE1[35.7,-122.4]",
+        "R:MOV↺@DRONE1[35.7,-122.4]"
+      ],
+      "original_id": "UAV-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-03-V2",
+      "domain": "UAV_TELEMETRY",
+      "shape": "authorized_targeted_action",
+      "nl": "please move drone 1 to coordinates 35.7, -122.4",
+      "expected_sal": [
+        "I:§→R:⚠MOV@DRONE1∧E:GPS[35.7,-122.4]",
+        "R:MOV↻@DRONE1[35.7,-122.4]",
+        "R:MOV↺@DRONE1[35.7,-122.4]"
+      ],
+      "original_id": "UAV-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-03-V3",
+      "domain": "UAV_TELEMETRY",
+      "shape": "authorized_targeted_action",
+      "nl": "move the drone 1 to coordinates 35.7, -122.4",
+      "expected_sal": [
+        "I:§→R:⚠MOV@DRONE1∧E:GPS[35.7,-122.4]",
+        "R:MOV↻@DRONE1[35.7,-122.4]",
+        "R:MOV↺@DRONE1[35.7,-122.4]"
+      ],
+      "original_id": "UAV-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-03-V4",
+      "domain": "UAV_TELEMETRY",
+      "shape": "authorized_targeted_action",
+      "nl": "move drone 1 to coordinates 35.7, -122.4?",
+      "expected_sal": [
+        "I:§→R:⚠MOV@DRONE1∧E:GPS[35.7,-122.4]",
+        "R:MOV↻@DRONE1[35.7,-122.4]",
+        "R:MOV↺@DRONE1[35.7,-122.4]"
+      ],
+      "original_id": "UAV-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-04-V1",
+      "domain": "UAV_TELEMETRY",
+      "shape": "parametric_action",
+      "nl": "form swarm wedge with spacing 50?",
+      "expected_sal": [
+        "R:FORM↻[wedge,50]",
+        "R:FORM↺[wedge,50]"
+      ],
+      "original_id": "UAV-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-04-V2",
+      "domain": "UAV_TELEMETRY",
+      "shape": "parametric_action",
+      "nl": "form the swarm wedge with spacing 50",
+      "expected_sal": [
+        "R:FORM↻[wedge,50]",
+        "R:FORM↺[wedge,50]"
+      ],
+      "original_id": "UAV-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-04-V3",
+      "domain": "UAV_TELEMETRY",
+      "shape": "parametric_action",
+      "nl": "could you form swarm wedge with spacing 50",
+      "expected_sal": [
+        "R:FORM↻[wedge,50]",
+        "R:FORM↺[wedge,50]"
+      ],
+      "original_id": "UAV-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-04-V4",
+      "domain": "UAV_TELEMETRY",
+      "shape": "parametric_action",
+      "nl": "form swarm wedge with spacing 50.",
+      "expected_sal": [
+        "R:FORM↻[wedge,50]",
+        "R:FORM↺[wedge,50]"
+      ],
+      "original_id": "UAV-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-05-V1",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "could you vehicle heading",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "UAV-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-05-V2",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "vehicle the heading",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "UAV-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-05-V3",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "vehicle heading.",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "UAV-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-05-V4",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "vehicle heading?",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "UAV-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-06-V1",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "drone the return home",
+      "expected_sal": [
+        "R:RTH↺",
+        "R:RTH↻"
+      ],
+      "original_id": "UAV-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-06-V2",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "could you drone return home",
+      "expected_sal": [
+        "R:RTH↺",
+        "R:RTH↻"
+      ],
+      "original_id": "UAV-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-06-V3",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "drone return home?",
+      "expected_sal": [
+        "R:RTH↺",
+        "R:RTH↻"
+      ],
+      "original_id": "UAV-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-06-V4",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "please drone return home",
+      "expected_sal": [
+        "R:RTH↺",
+        "R:RTH↻"
+      ],
+      "original_id": "UAV-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-07-V1",
+      "domain": "UAV_TELEMETRY",
+      "shape": "targeted_query",
+      "nl": "drone 2 altitude.",
+      "expected_sal": [
+        "V:POS@DRONE2",
+        "V:POS@DRONE2?",
+        "G:POS@DRONE2"
+      ],
+      "original_id": "UAV-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-07-V2",
+      "domain": "UAV_TELEMETRY",
+      "shape": "targeted_query",
+      "nl": "could you drone 2 altitude",
+      "expected_sal": [
+        "V:POS@DRONE2",
+        "V:POS@DRONE2?",
+        "G:POS@DRONE2"
+      ],
+      "original_id": "UAV-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-07-V3",
+      "domain": "UAV_TELEMETRY",
+      "shape": "targeted_query",
+      "nl": "drone 2 altitude?",
+      "expected_sal": [
+        "V:POS@DRONE2",
+        "V:POS@DRONE2?",
+        "G:POS@DRONE2"
+      ],
+      "original_id": "UAV-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-07-V4",
+      "domain": "UAV_TELEMETRY",
+      "shape": "targeted_query",
+      "nl": "please drone 2 altitude",
+      "expected_sal": [
+        "V:POS@DRONE2",
+        "V:POS@DRONE2?",
+        "G:POS@DRONE2"
+      ],
+      "original_id": "UAV-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-08-V1",
+      "domain": "UAV_TELEMETRY",
+      "shape": "parametric_action",
+      "nl": "please form column with spacing 25",
+      "expected_sal": [
+        "R:FORM↺[column,25]",
+        "R:FORM↻[column,25]"
+      ],
+      "original_id": "UAV-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-08-V2",
+      "domain": "UAV_TELEMETRY",
+      "shape": "parametric_action",
+      "nl": "form column with spacing 25.",
+      "expected_sal": [
+        "R:FORM↺[column,25]",
+        "R:FORM↻[column,25]"
+      ],
+      "original_id": "UAV-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-08-V3",
+      "domain": "UAV_TELEMETRY",
+      "shape": "parametric_action",
+      "nl": "form column with spacing 25?",
+      "expected_sal": [
+        "R:FORM↺[column,25]",
+        "R:FORM↻[column,25]"
+      ],
+      "original_id": "UAV-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-08-V4",
+      "domain": "UAV_TELEMETRY",
+      "shape": "parametric_action",
+      "nl": "form the column with spacing 25",
+      "expected_sal": [
+        "R:FORM↺[column,25]",
+        "R:FORM↻[column,25]"
+      ],
+      "original_id": "UAV-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-09-V1",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "swarm RTB?",
+      "expected_sal": [
+        "R:RTH↺",
+        "R:RTH↻"
+      ],
+      "original_id": "UAV-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-09-V2",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "please swarm RTB",
+      "expected_sal": [
+        "R:RTH↺",
+        "R:RTH↻"
+      ],
+      "original_id": "UAV-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-09-V3",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "could you swarm RTB",
+      "expected_sal": [
+        "R:RTH↺",
+        "R:RTH↻"
+      ],
+      "original_id": "UAV-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-09-V4",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "swarm the RTB",
+      "expected_sal": [
+        "R:RTH↺",
+        "R:RTH↻"
+      ],
+      "original_id": "UAV-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-10-V1",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "uav heading.",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "UAV-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-10-V2",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "please uav heading",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "UAV-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-10-V3",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "uav the heading",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "UAV-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "UAV-10-V4",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "uav heading?",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "UAV-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-01-V1",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "show location",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "MOV-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-01-V2",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "report location.",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "MOV-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-01-V3",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "report location?",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "MOV-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-01-V4",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "give me location",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "MOV-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-02-V1",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "please report heading",
+      "expected_sal": [
+        "G:BEARING",
+        "G:BEARING?",
+        "V:HDG"
+      ],
+      "original_id": "MOV-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-02-V2",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "show heading",
+      "expected_sal": [
+        "G:BEARING",
+        "G:BEARING?",
+        "V:HDG"
+      ],
+      "original_id": "MOV-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-02-V3",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "what is heading",
+      "expected_sal": [
+        "G:BEARING",
+        "G:BEARING?",
+        "V:HDG"
+      ],
+      "original_id": "MOV-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-02-V4",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "could you report heading",
+      "expected_sal": [
+        "G:BEARING",
+        "G:BEARING?",
+        "V:HDG"
+      ],
+      "original_id": "MOV-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-03-V1",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "multi_read",
+      "nl": "position and heading.",
+      "expected_sal": [
+        "G:POS∧G:BEARING",
+        "G:POS∧V:HDG"
+      ],
+      "original_id": "MOV-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-03-V2",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "multi_read",
+      "nl": "position and heading?",
+      "expected_sal": [
+        "G:POS∧G:BEARING",
+        "G:POS∧V:HDG"
+      ],
+      "original_id": "MOV-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-03-V3",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "multi_read",
+      "nl": "position the and heading",
+      "expected_sal": [
+        "G:POS∧G:BEARING",
+        "G:POS∧V:HDG"
+      ],
+      "original_id": "MOV-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-03-V4",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "multi_read",
+      "nl": "please position and heading",
+      "expected_sal": [
+        "G:POS∧G:BEARING",
+        "G:POS∧V:HDG"
+      ],
+      "original_id": "MOV-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-04-V1",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "could you vessel heading",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "MOV-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-04-V2",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "vessel heading.",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "MOV-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-04-V3",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "vessel heading?",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "MOV-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-04-V4",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "please vessel heading",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "MOV-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-05-V1",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "please altitude reading",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "MOV-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-05-V2",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "altitude the reading",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "MOV-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-05-V3",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "could you altitude reading",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "MOV-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-05-V4",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "altitude reading.",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "MOV-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-06-V1",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "where am I.",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "MOV-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-06-V2",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "please where am I",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "MOV-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-06-V3",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "where am I?",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "MOV-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-06-V4",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "could you where am I",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "MOV-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-07-V1",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "show coordinates.",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?",
+        "E:GPS"
+      ],
+      "original_id": "MOV-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-07-V2",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "show the coordinates",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?",
+        "E:GPS"
+      ],
+      "original_id": "MOV-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-07-V3",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "please show coordinates",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?",
+        "E:GPS"
+      ],
+      "original_id": "MOV-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-07-V4",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "give me coordinates",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?",
+        "E:GPS"
+      ],
+      "original_id": "MOV-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-08-V1",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "could you compass bearing",
+      "expected_sal": [
+        "G:BEARING",
+        "G:BEARING?"
+      ],
+      "original_id": "MOV-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-08-V2",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "please compass bearing",
+      "expected_sal": [
+        "G:BEARING",
+        "G:BEARING?"
+      ],
+      "original_id": "MOV-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-08-V3",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "compass bearing?",
+      "expected_sal": [
+        "G:BEARING",
+        "G:BEARING?"
+      ],
+      "original_id": "MOV-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "MOV-08-V4",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "compass the bearing",
+      "expected_sal": [
+        "G:BEARING",
+        "G:BEARING?"
+      ],
+      "original_id": "MOV-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-01-V1",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "wind speed.",
+      "expected_sal": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "original_id": "WX-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-01-V2",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "wind speed?",
+      "expected_sal": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "original_id": "WX-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-01-V3",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "wind the speed",
+      "expected_sal": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "original_id": "WX-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-01-V4",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "could you wind speed",
+      "expected_sal": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "original_id": "WX-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-02-V1",
+      "domain": "WEATHER",
+      "shape": "targeted_query",
+      "nl": "wind speed at turbine 7.",
+      "expected_sal": [
+        "W:WIND@7",
+        "W:WIND@7?"
+      ],
+      "original_id": "WX-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-02-V2",
+      "domain": "WEATHER",
+      "shape": "targeted_query",
+      "nl": "could you wind speed at turbine 7",
+      "expected_sal": [
+        "W:WIND@7",
+        "W:WIND@7?"
+      ],
+      "original_id": "WX-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-02-V3",
+      "domain": "WEATHER",
+      "shape": "targeted_query",
+      "nl": "wind speed at turbine 7?",
+      "expected_sal": [
+        "W:WIND@7",
+        "W:WIND@7?"
+      ],
+      "original_id": "WX-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-02-V4",
+      "domain": "WEATHER",
+      "shape": "targeted_query",
+      "nl": "wind the speed at turbine 7",
+      "expected_sal": [
+        "W:WIND@7",
+        "W:WIND@7?"
+      ],
+      "original_id": "WX-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-03-V1",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "please barometric pressure",
+      "expected_sal": [
+        "E:PU",
+        "E:PU?",
+        "W:PRESS"
+      ],
+      "original_id": "WX-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-03-V2",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "could you barometric pressure",
+      "expected_sal": [
+        "E:PU",
+        "E:PU?",
+        "W:PRESS"
+      ],
+      "original_id": "WX-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-03-V3",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "barometric the pressure",
+      "expected_sal": [
+        "E:PU",
+        "E:PU?",
+        "W:PRESS"
+      ],
+      "original_id": "WX-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-03-V4",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "barometric pressure?",
+      "expected_sal": [
+        "E:PU",
+        "E:PU?",
+        "W:PRESS"
+      ],
+      "original_id": "WX-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-04-V1",
+      "domain": "WEATHER",
+      "shape": "conditional_alert",
+      "nl": "notify when wind exceeds 40",
+      "expected_sal": [
+        "W:WIND>40→L:ALERT",
+        "W:WIND>40→W:ALERT",
+        "W:WIND>40→U:NOTIFY",
+        "W:WIND>40→U:ALERT",
+        "W:WIND?>40→U:NOTIFY",
+        "W:WIND?>40→L:ALERT"
+      ],
+      "original_id": "WX-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-04-V2",
+      "domain": "WEATHER",
+      "shape": "conditional_alert",
+      "nl": "alert when wind exceeds 40.",
+      "expected_sal": [
+        "W:WIND>40→L:ALERT",
+        "W:WIND>40→W:ALERT",
+        "W:WIND>40→U:NOTIFY",
+        "W:WIND>40→U:ALERT",
+        "W:WIND?>40→U:NOTIFY",
+        "W:WIND?>40→L:ALERT"
+      ],
+      "original_id": "WX-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-04-V3",
+      "domain": "WEATHER",
+      "shape": "conditional_alert",
+      "nl": "alert the when wind exceeds 40",
+      "expected_sal": [
+        "W:WIND>40→L:ALERT",
+        "W:WIND>40→W:ALERT",
+        "W:WIND>40→U:NOTIFY",
+        "W:WIND>40→U:ALERT",
+        "W:WIND?>40→U:NOTIFY",
+        "W:WIND?>40→L:ALERT"
+      ],
+      "original_id": "WX-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-04-V4",
+      "domain": "WEATHER",
+      "shape": "conditional_alert",
+      "nl": "please alert when wind exceeds 40",
+      "expected_sal": [
+        "W:WIND>40→L:ALERT",
+        "W:WIND>40→W:ALERT",
+        "W:WIND>40→U:NOTIFY",
+        "W:WIND>40→U:ALERT",
+        "W:WIND?>40→U:NOTIFY",
+        "W:WIND?>40→L:ALERT"
+      ],
+      "original_id": "WX-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-05-V1",
+      "domain": "WEATHER",
+      "shape": "multi_read",
+      "nl": "show temp and humidity",
+      "expected_sal": [
+        "E:TH∧E:HU",
+        "E:EQ?TH:0∧?HU:0"
+      ],
+      "original_id": "WX-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-05-V2",
+      "domain": "WEATHER",
+      "shape": "multi_read",
+      "nl": "please report temp and humidity",
+      "expected_sal": [
+        "E:TH∧E:HU",
+        "E:EQ?TH:0∧?HU:0"
+      ],
+      "original_id": "WX-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-05-V3",
+      "domain": "WEATHER",
+      "shape": "multi_read",
+      "nl": "tell me temp and humidity",
+      "expected_sal": [
+        "E:TH∧E:HU",
+        "E:EQ?TH:0∧?HU:0"
+      ],
+      "original_id": "WX-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-05-V4",
+      "domain": "WEATHER",
+      "shape": "multi_read",
+      "nl": "report the temp and humidity",
+      "expected_sal": [
+        "E:TH∧E:HU",
+        "E:EQ?TH:0∧?HU:0"
+      ],
+      "original_id": "WX-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-06-V1",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "atmospheric pressure.",
+      "expected_sal": [
+        "E:PU",
+        "E:PU?"
+      ],
+      "original_id": "WX-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-06-V2",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "atmospheric pressure?",
+      "expected_sal": [
+        "E:PU",
+        "E:PU?"
+      ],
+      "original_id": "WX-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-06-V3",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "atmospheric the pressure",
+      "expected_sal": [
+        "E:PU",
+        "E:PU?"
+      ],
+      "original_id": "WX-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-06-V4",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "please atmospheric pressure",
+      "expected_sal": [
+        "E:PU",
+        "E:PU?"
+      ],
+      "original_id": "WX-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-07-V1",
+      "domain": "WEATHER",
+      "shape": "conditional_alert",
+      "nl": "warn when wind above 35?",
+      "expected_sal": [
+        "W:WIND>35→W:ALERT",
+        "W:WIND>35→L:ALERT",
+        "W:WIND>35→U:NOTIFY",
+        "W:WIND>35→U:ALERT",
+        "W:WIND?>35→U:NOTIFY",
+        "W:WIND?>35→L:ALERT"
+      ],
+      "original_id": "WX-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-07-V2",
+      "domain": "WEATHER",
+      "shape": "conditional_alert",
+      "nl": "please warn when wind above 35",
+      "expected_sal": [
+        "W:WIND>35→W:ALERT",
+        "W:WIND>35→L:ALERT",
+        "W:WIND>35→U:NOTIFY",
+        "W:WIND>35→U:ALERT",
+        "W:WIND?>35→U:NOTIFY",
+        "W:WIND?>35→L:ALERT"
+      ],
+      "original_id": "WX-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-07-V3",
+      "domain": "WEATHER",
+      "shape": "conditional_alert",
+      "nl": "alert when wind above 35",
+      "expected_sal": [
+        "W:WIND>35→W:ALERT",
+        "W:WIND>35→L:ALERT",
+        "W:WIND>35→U:NOTIFY",
+        "W:WIND>35→U:ALERT",
+        "W:WIND?>35→U:NOTIFY",
+        "W:WIND?>35→L:ALERT"
+      ],
+      "original_id": "WX-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-07-V4",
+      "domain": "WEATHER",
+      "shape": "conditional_alert",
+      "nl": "could you warn when wind above 35",
+      "expected_sal": [
+        "W:WIND>35→W:ALERT",
+        "W:WIND>35→L:ALERT",
+        "W:WIND>35→U:NOTIFY",
+        "W:WIND>35→U:ALERT",
+        "W:WIND?>35→U:NOTIFY",
+        "W:WIND?>35→L:ALERT"
+      ],
+      "original_id": "WX-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-08-V1",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "current temperature?",
+      "expected_sal": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "original_id": "WX-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-08-V2",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "current temperature.",
+      "expected_sal": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "original_id": "WX-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-08-V3",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "could you current temperature",
+      "expected_sal": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "original_id": "WX-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "WX-08-V4",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "please current temperature",
+      "expected_sal": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "original_id": "WX-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-01-V1",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_query",
+      "nl": "please read sensor 4A",
+      "expected_sal": [
+        "E:TH@4A",
+        "E:TH@4A?"
+      ],
+      "original_id": "SEN-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-01-V2",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_query",
+      "nl": "could you read sensor 4A",
+      "expected_sal": [
+        "E:TH@4A",
+        "E:TH@4A?"
+      ],
+      "original_id": "SEN-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-01-V3",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_query",
+      "nl": "read sensor 4A.",
+      "expected_sal": [
+        "E:TH@4A",
+        "E:TH@4A?"
+      ],
+      "original_id": "SEN-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-01-V4",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_query",
+      "nl": "read the sensor 4A",
+      "expected_sal": [
+        "E:TH@4A",
+        "E:TH@4A?"
+      ],
+      "original_id": "SEN-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-02-V1",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "humidity the reading",
+      "expected_sal": [
+        "E:HU",
+        "E:HU?"
+      ],
+      "original_id": "SEN-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-02-V2",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "humidity reading?",
+      "expected_sal": [
+        "E:HU",
+        "E:HU?"
+      ],
+      "original_id": "SEN-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-02-V3",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "could you humidity reading",
+      "expected_sal": [
+        "E:HU",
+        "E:HU?"
+      ],
+      "original_id": "SEN-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-02-V4",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "humidity reading.",
+      "expected_sal": [
+        "E:HU",
+        "E:HU?"
+      ],
+      "original_id": "SEN-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-03-V1",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_multi_read",
+      "nl": "give the me temp and humidity from sensor node 4A",
+      "expected_sal": [
+        "E:TH@4A∧E:HU@4A",
+        "E:EQ@4A?TH:0∧?HU:0",
+        "E:TH∧E:HU"
+      ],
+      "original_id": "SEN-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-03-V2",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_multi_read",
+      "nl": "give me temp and humidity from sensor node 4A?",
+      "expected_sal": [
+        "E:TH@4A∧E:HU@4A",
+        "E:EQ@4A?TH:0∧?HU:0",
+        "E:TH∧E:HU"
+      ],
+      "original_id": "SEN-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-03-V3",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_multi_read",
+      "nl": "could you give me temp and humidity from sensor node 4A",
+      "expected_sal": [
+        "E:TH@4A∧E:HU@4A",
+        "E:EQ@4A?TH:0∧?HU:0",
+        "E:TH∧E:HU"
+      ],
+      "original_id": "SEN-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-03-V4",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_multi_read",
+      "nl": "please give me temp and humidity from sensor node 4A",
+      "expected_sal": [
+        "E:TH@4A∧E:HU@4A",
+        "E:EQ@4A?TH:0∧?HU:0",
+        "E:TH∧E:HU"
+      ],
+      "original_id": "SEN-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-04-V1",
+      "domain": "SENSOR_ARRAY",
+      "shape": "conditional_alert",
+      "nl": "warn when humidity above 80",
+      "expected_sal": [
+        "E:HU>80→U:NOTIFY",
+        "E:HU>80→L:ALERT"
+      ],
+      "original_id": "SEN-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-04-V2",
+      "domain": "SENSOR_ARRAY",
+      "shape": "conditional_alert",
+      "nl": "alert when humidity above 80?",
+      "expected_sal": [
+        "E:HU>80→U:NOTIFY",
+        "E:HU>80→L:ALERT"
+      ],
+      "original_id": "SEN-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-04-V3",
+      "domain": "SENSOR_ARRAY",
+      "shape": "conditional_alert",
+      "nl": "alert when humidity above 80.",
+      "expected_sal": [
+        "E:HU>80→U:NOTIFY",
+        "E:HU>80→L:ALERT"
+      ],
+      "original_id": "SEN-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-04-V4",
+      "domain": "SENSOR_ARRAY",
+      "shape": "conditional_alert",
+      "nl": "notify when humidity above 80",
+      "expected_sal": [
+        "E:HU>80→U:NOTIFY",
+        "E:HU>80→L:ALERT"
+      ],
+      "original_id": "SEN-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-05-V1",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "could you air quality",
+      "expected_sal": [
+        "E:EQ",
+        "E:EQ?"
+      ],
+      "original_id": "SEN-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-05-V2",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "air quality.",
+      "expected_sal": [
+        "E:EQ",
+        "E:EQ?"
+      ],
+      "original_id": "SEN-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-05-V3",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "air the quality",
+      "expected_sal": [
+        "E:EQ",
+        "E:EQ?"
+      ],
+      "original_id": "SEN-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-05-V4",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "please air quality",
+      "expected_sal": [
+        "E:EQ",
+        "E:EQ?"
+      ],
+      "original_id": "SEN-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-06-V1",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "temperature now.",
+      "expected_sal": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "original_id": "SEN-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-06-V2",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "temperature the now",
+      "expected_sal": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "original_id": "SEN-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-06-V3",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "could you temperature now",
+      "expected_sal": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "original_id": "SEN-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-06-V4",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "temperature now?",
+      "expected_sal": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "original_id": "SEN-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-07-V1",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_query",
+      "nl": "humidity at node 9?",
+      "expected_sal": [
+        "E:HU@9",
+        "E:HU@9?"
+      ],
+      "original_id": "SEN-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-07-V2",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_query",
+      "nl": "please humidity at node 9",
+      "expected_sal": [
+        "E:HU@9",
+        "E:HU@9?"
+      ],
+      "original_id": "SEN-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-07-V3",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_query",
+      "nl": "could you humidity at node 9",
+      "expected_sal": [
+        "E:HU@9",
+        "E:HU@9?"
+      ],
+      "original_id": "SEN-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-07-V4",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_query",
+      "nl": "humidity the at node 9",
+      "expected_sal": [
+        "E:HU@9",
+        "E:HU@9?"
+      ],
+      "original_id": "SEN-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-08-V1",
+      "domain": "SENSOR_ARRAY",
+      "shape": "conditional_alert",
+      "nl": "could you alert if temperature above 100",
+      "expected_sal": [
+        "E:TH>100→L:ALERT",
+        "E:TH>100→U:NOTIFY"
+      ],
+      "original_id": "SEN-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-08-V2",
+      "domain": "SENSOR_ARRAY",
+      "shape": "conditional_alert",
+      "nl": "warn if temperature above 100",
+      "expected_sal": [
+        "E:TH>100→L:ALERT",
+        "E:TH>100→U:NOTIFY"
+      ],
+      "original_id": "SEN-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-08-V3",
+      "domain": "SENSOR_ARRAY",
+      "shape": "conditional_alert",
+      "nl": "please alert if temperature above 100",
+      "expected_sal": [
+        "E:TH>100→L:ALERT",
+        "E:TH>100→U:NOTIFY"
+      ],
+      "original_id": "SEN-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "SEN-08-V4",
+      "domain": "SENSOR_ARRAY",
+      "shape": "conditional_alert",
+      "nl": "alert if temperature above 100?",
+      "expected_sal": [
+        "E:TH>100→L:ALERT",
+        "E:TH>100→U:NOTIFY"
+      ],
+      "original_id": "SEN-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-01-V1",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "could you emergency stop",
+      "expected_sal": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "original_id": "ROB-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-01-V2",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "emergency stop?",
+      "expected_sal": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "original_id": "ROB-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-01-V3",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "emergency cease",
+      "expected_sal": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "original_id": "ROB-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-01-V4",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "please emergency stop",
+      "expected_sal": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "original_id": "ROB-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-02-V1",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "please turn on the camera",
+      "expected_sal": [
+        "R:CAM↻",
+        "R:CAM↺"
+      ],
+      "original_id": "ROB-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-02-V2",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "turn the on the camera",
+      "expected_sal": [
+        "R:CAM↻",
+        "R:CAM↺"
+      ],
+      "original_id": "ROB-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-02-V3",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "could you turn on the camera",
+      "expected_sal": [
+        "R:CAM↻",
+        "R:CAM↺"
+      ],
+      "original_id": "ROB-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-02-V4",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "turn on camera",
+      "expected_sal": [
+        "R:CAM↻",
+        "R:CAM↺"
+      ],
+      "original_id": "ROB-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-03-V1",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "activate haptic feedback.",
+      "expected_sal": [
+        "R:HAPTIC↻",
+        "R:HAPTIC↺"
+      ],
+      "original_id": "ROB-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-03-V2",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "activate haptic feedback?",
+      "expected_sal": [
+        "R:HAPTIC↻",
+        "R:HAPTIC↺"
+      ],
+      "original_id": "ROB-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-03-V3",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "could you activate haptic feedback",
+      "expected_sal": [
+        "R:HAPTIC↻",
+        "R:HAPTIC↺"
+      ],
+      "original_id": "ROB-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-03-V4",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "activate the haptic feedback",
+      "expected_sal": [
+        "R:HAPTIC↻",
+        "R:HAPTIC↺"
+      ],
+      "original_id": "ROB-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-04-V1",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "targeted_action",
+      "nl": "turn the on flashlight on node BRAVO",
+      "expected_sal": [
+        "R:TORCH↻@BRAVO",
+        "R:TORCH↺@BRAVO"
+      ],
+      "original_id": "ROB-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-04-V2",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "targeted_action",
+      "nl": "please turn on flashlight on node BRAVO",
+      "expected_sal": [
+        "R:TORCH↻@BRAVO",
+        "R:TORCH↺@BRAVO"
+      ],
+      "original_id": "ROB-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-04-V3",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "targeted_action",
+      "nl": "turn on flashlight on node BRAVO.",
+      "expected_sal": [
+        "R:TORCH↻@BRAVO",
+        "R:TORCH↺@BRAVO"
+      ],
+      "original_id": "ROB-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-04-V4",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "targeted_action",
+      "nl": "turn on flashlight on node BRAVO?",
+      "expected_sal": [
+        "R:TORCH↻@BRAVO",
+        "R:TORCH↺@BRAVO"
+      ],
+      "original_id": "ROB-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-05-V1",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "could you stop everything immediately, emergency",
+      "expected_sal": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "original_id": "ROB-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-05-V2",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "halt everything immediately, emergency",
+      "expected_sal": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "original_id": "ROB-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-05-V3",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "stop everything immediately, emergency.",
+      "expected_sal": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "original_id": "ROB-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-05-V4",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "stop everything immediately, emergency?",
+      "expected_sal": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "original_id": "ROB-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-06-V1",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "please vibrate",
+      "expected_sal": [
+        "R:VIBE↺",
+        "R:VIBE↻",
+        "R:HAPTIC↺"
+      ],
+      "original_id": "ROB-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-06-V2",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "vibrate.",
+      "expected_sal": [
+        "R:VIBE↺",
+        "R:VIBE↻",
+        "R:HAPTIC↺"
+      ],
+      "original_id": "ROB-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-06-V3",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "vibrate?",
+      "expected_sal": [
+        "R:VIBE↺",
+        "R:VIBE↻",
+        "R:HAPTIC↺"
+      ],
+      "original_id": "ROB-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-06-V4",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "could you vibrate",
+      "expected_sal": [
+        "R:VIBE↺",
+        "R:VIBE↻",
+        "R:HAPTIC↺"
+      ],
+      "original_id": "ROB-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-07-V1",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "activate microphone?",
+      "expected_sal": [
+        "R:MIC↻",
+        "R:MIC↺"
+      ],
+      "original_id": "ROB-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-07-V2",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "activate the microphone",
+      "expected_sal": [
+        "R:MIC↻",
+        "R:MIC↺"
+      ],
+      "original_id": "ROB-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-07-V3",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "could you activate microphone",
+      "expected_sal": [
+        "R:MIC↻",
+        "R:MIC↺"
+      ],
+      "original_id": "ROB-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-07-V4",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "please activate microphone",
+      "expected_sal": [
+        "R:MIC↻",
+        "R:MIC↺"
+      ],
+      "original_id": "ROB-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-08-V1",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "turn the on speaker",
+      "expected_sal": [
+        "R:SPKR↻",
+        "R:SPKR↺"
+      ],
+      "original_id": "ROB-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-08-V2",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "turn on speaker.",
+      "expected_sal": [
+        "R:SPKR↻",
+        "R:SPKR↺"
+      ],
+      "original_id": "ROB-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-08-V3",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "please turn on speaker",
+      "expected_sal": [
+        "R:SPKR↻",
+        "R:SPKR↺"
+      ],
+      "original_id": "ROB-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-08-V4",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "turn on speaker?",
+      "expected_sal": [
+        "R:SPKR↻",
+        "R:SPKR↺"
+      ],
+      "original_id": "ROB-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-09-V1",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "halt immediately?",
+      "expected_sal": [
+        "R:ESTOP",
+        "R:STOP↺"
+      ],
+      "original_id": "ROB-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-09-V2",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "stop immediately",
+      "expected_sal": [
+        "R:ESTOP",
+        "R:STOP↺"
+      ],
+      "original_id": "ROB-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-09-V3",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "could you halt immediately",
+      "expected_sal": [
+        "R:ESTOP",
+        "R:STOP↺"
+      ],
+      "original_id": "ROB-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-09-V4",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "halt immediately.",
+      "expected_sal": [
+        "R:ESTOP",
+        "R:STOP↺"
+      ],
+      "original_id": "ROB-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-10-V1",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "enable the bluetooth",
+      "expected_sal": [
+        "R:BT↺",
+        "R:BT↻"
+      ],
+      "original_id": "ROB-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-10-V2",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "please enable bluetooth",
+      "expected_sal": [
+        "R:BT↺",
+        "R:BT↻"
+      ],
+      "original_id": "ROB-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-10-V3",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "could you enable bluetooth",
+      "expected_sal": [
+        "R:BT↺",
+        "R:BT↻"
+      ],
+      "original_id": "ROB-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "ROB-10-V4",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "enable bluetooth.",
+      "expected_sal": [
+        "R:BT↺",
+        "R:BT↻"
+      ],
+      "original_id": "ROB-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-01-V1",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "could you sign the payload",
+      "expected_sal": [
+        "S:SIGN"
+      ],
+      "original_id": "CRY-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-01-V2",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "sign payload",
+      "expected_sal": [
+        "S:SIGN"
+      ],
+      "original_id": "CRY-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-01-V3",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "please sign the payload",
+      "expected_sal": [
+        "S:SIGN"
+      ],
+      "original_id": "CRY-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-01-V4",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "sign the payload.",
+      "expected_sal": [
+        "S:SIGN"
+      ],
+      "original_id": "CRY-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-02-V1",
+      "domain": "CRYPTO_AUTH",
+      "shape": "chain_sequential",
+      "nl": "please generate a key pair, then sign the payload, then send to node BRAVO",
+      "expected_sal": [
+        "S:KEYGEN;S:SIGN;D:PUSH@BRAVO"
+      ],
+      "original_id": "CRY-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-02-V2",
+      "domain": "CRYPTO_AUTH",
+      "shape": "chain_sequential",
+      "nl": "generate a key pair, then sign the payload, then deliver to node bravo",
+      "expected_sal": [
+        "S:KEYGEN;S:SIGN;D:PUSH@BRAVO"
+      ],
+      "original_id": "CRY-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-02-V3",
+      "domain": "CRYPTO_AUTH",
+      "shape": "chain_sequential",
+      "nl": "generate key pair, then sign the payload, then send to node bravo",
+      "expected_sal": [
+        "S:KEYGEN;S:SIGN;D:PUSH@BRAVO"
+      ],
+      "original_id": "CRY-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-02-V4",
+      "domain": "CRYPTO_AUTH",
+      "shape": "chain_sequential",
+      "nl": "generate a key pair, then sign payload, then send to node bravo",
+      "expected_sal": [
+        "S:KEYGEN;S:SIGN;D:PUSH@BRAVO"
+      ],
+      "original_id": "CRY-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-03-V1",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_query",
+      "nl": "check identity",
+      "expected_sal": [
+        "I:ID",
+        "A:VERIFY[I:ID]"
+      ],
+      "original_id": "CRY-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-03-V2",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_query",
+      "nl": "please verify identity",
+      "expected_sal": [
+        "I:ID",
+        "A:VERIFY[I:ID]"
+      ],
+      "original_id": "CRY-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-03-V3",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_query",
+      "nl": "verify the identity",
+      "expected_sal": [
+        "I:ID",
+        "A:VERIFY[I:ID]"
+      ],
+      "original_id": "CRY-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-03-V4",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_query",
+      "nl": "confirm identity",
+      "expected_sal": [
+        "I:ID",
+        "A:VERIFY[I:ID]"
+      ],
+      "original_id": "CRY-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-04-V1",
+      "domain": "CRYPTO_AUTH",
+      "shape": "chain_sequential",
+      "nl": "encrypt the this payload then send it to the central server",
+      "expected_sal": [
+        "S:ENC;D:PUSH@CENTRAL",
+        "S:ENC;D:PUSH"
+      ],
+      "original_id": "CRY-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-04-V2",
+      "domain": "CRYPTO_AUTH",
+      "shape": "chain_sequential",
+      "nl": "encrypt this payload then send it to the central server?",
+      "expected_sal": [
+        "S:ENC;D:PUSH@CENTRAL",
+        "S:ENC;D:PUSH"
+      ],
+      "original_id": "CRY-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-04-V3",
+      "domain": "CRYPTO_AUTH",
+      "shape": "chain_sequential",
+      "nl": "encrypt this payload then deliver it to the central server",
+      "expected_sal": [
+        "S:ENC;D:PUSH@CENTRAL",
+        "S:ENC;D:PUSH"
+      ],
+      "original_id": "CRY-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-04-V4",
+      "domain": "CRYPTO_AUTH",
+      "shape": "chain_sequential",
+      "nl": "encrypt this payload then send it to the central server.",
+      "expected_sal": [
+        "S:ENC;D:PUSH@CENTRAL",
+        "S:ENC;D:PUSH"
+      ],
+      "original_id": "CRY-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-05-V1",
+      "domain": "CRYPTO_AUTH",
+      "shape": "authorized_action",
+      "nl": "process the payment but only if a human approves",
+      "expected_sal": [
+        "I:§→K:PAY",
+        "U:APPROVE→K:PAY"
+      ],
+      "original_id": "CRY-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-05-V2",
+      "domain": "CRYPTO_AUTH",
+      "shape": "authorized_action",
+      "nl": "process payment but only if human approves",
+      "expected_sal": [
+        "I:§→K:PAY",
+        "U:APPROVE→K:PAY"
+      ],
+      "original_id": "CRY-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-05-V3",
+      "domain": "CRYPTO_AUTH",
+      "shape": "authorized_action",
+      "nl": "could you process payment but only if a human approves",
+      "expected_sal": [
+        "I:§→K:PAY",
+        "U:APPROVE→K:PAY"
+      ],
+      "original_id": "CRY-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-05-V4",
+      "domain": "CRYPTO_AUTH",
+      "shape": "authorized_action",
+      "nl": "process payment but only if a human approves.",
+      "expected_sal": [
+        "I:§→K:PAY",
+        "U:APPROVE→K:PAY"
+      ],
+      "original_id": "CRY-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-06-V1",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "cipher this message",
+      "expected_sal": [
+        "S:ENC"
+      ],
+      "original_id": "CRY-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-06-V2",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "encrypt this message.",
+      "expected_sal": [
+        "S:ENC"
+      ],
+      "original_id": "CRY-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-06-V3",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "encrypt this message?",
+      "expected_sal": [
+        "S:ENC"
+      ],
+      "original_id": "CRY-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-06-V4",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "please encrypt this message",
+      "expected_sal": [
+        "S:ENC"
+      ],
+      "original_id": "CRY-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-07-V1",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "rotate keys?",
+      "expected_sal": [
+        "S:ROTATE",
+        "S:KEYGEN"
+      ],
+      "original_id": "CRY-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-07-V2",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "rotate the keys",
+      "expected_sal": [
+        "S:ROTATE",
+        "S:KEYGEN"
+      ],
+      "original_id": "CRY-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-07-V3",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "rotate keys.",
+      "expected_sal": [
+        "S:ROTATE",
+        "S:KEYGEN"
+      ],
+      "original_id": "CRY-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-07-V4",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "please rotate keys",
+      "expected_sal": [
+        "S:ROTATE",
+        "S:KEYGEN"
+      ],
+      "original_id": "CRY-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-08-V1",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "please hash this file",
+      "expected_sal": [
+        "S:HASH"
+      ],
+      "original_id": "CRY-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-08-V2",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "hash this file.",
+      "expected_sal": [
+        "S:HASH"
+      ],
+      "original_id": "CRY-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-08-V3",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "hash this file?",
+      "expected_sal": [
+        "S:HASH"
+      ],
+      "original_id": "CRY-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-08-V4",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "could you hash this file",
+      "expected_sal": [
+        "S:HASH"
+      ],
+      "original_id": "CRY-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-09-V1",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_query",
+      "nl": "authenticate the peer.",
+      "expected_sal": [
+        "I:ID@PEER",
+        "I:ID"
+      ],
+      "original_id": "CRY-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-09-V2",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_query",
+      "nl": "authenticate the peer?",
+      "expected_sal": [
+        "I:ID@PEER",
+        "I:ID"
+      ],
+      "original_id": "CRY-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-09-V3",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_query",
+      "nl": "authenticate peer",
+      "expected_sal": [
+        "I:ID@PEER",
+        "I:ID"
+      ],
+      "original_id": "CRY-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-09-V4",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_query",
+      "nl": "please authenticate the peer",
+      "expected_sal": [
+        "I:ID@PEER",
+        "I:ID"
+      ],
+      "original_id": "CRY-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-10-V1",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "verify the signature",
+      "expected_sal": [
+        "S:VFY"
+      ],
+      "original_id": "CRY-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-10-V2",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "please verify signature",
+      "expected_sal": [
+        "S:VFY"
+      ],
+      "original_id": "CRY-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-10-V3",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "check signature",
+      "expected_sal": [
+        "S:VFY"
+      ],
+      "original_id": "CRY-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "CRY-10-V4",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "confirm signature",
+      "expected_sal": [
+        "S:VFY"
+      ],
+      "original_id": "CRY-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-01-V1",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "simple_action",
+      "nl": "update config.",
+      "expected_sal": [
+        "N:CFG"
+      ],
+      "original_id": "CFG-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-01-V2",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "simple_action",
+      "nl": "update config?",
+      "expected_sal": [
+        "N:CFG"
+      ],
+      "original_id": "CFG-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-01-V3",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "simple_action",
+      "nl": "modify config",
+      "expected_sal": [
+        "N:CFG"
+      ],
+      "original_id": "CFG-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-01-V4",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "simple_action",
+      "nl": "update the config",
+      "expected_sal": [
+        "N:CFG"
+      ],
+      "original_id": "CFG-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-02-V1",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "set the threshold to 30.",
+      "expected_sal": [
+        "N:CFG[threshold:30]"
+      ],
+      "original_id": "CFG-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-02-V2",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "please set the threshold to 30",
+      "expected_sal": [
+        "N:CFG[threshold:30]"
+      ],
+      "original_id": "CFG-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-02-V3",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "could you set the threshold to 30",
+      "expected_sal": [
+        "N:CFG[threshold:30]"
+      ],
+      "original_id": "CFG-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-02-V4",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "set the the threshold to 30",
+      "expected_sal": [
+        "N:CFG[threshold:30]"
+      ],
+      "original_id": "CFG-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-03-V1",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_action",
+      "nl": "please back up the database tonight at 2am",
+      "expected_sal": [
+        "N:BK@2AM",
+        "T:SCHED@2AM→N:BK"
+      ],
+      "original_id": "CFG-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-03-V2",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_action",
+      "nl": "back up database tonight at 2am",
+      "expected_sal": [
+        "N:BK@2AM",
+        "T:SCHED@2AM→N:BK"
+      ],
+      "original_id": "CFG-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-03-V3",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_action",
+      "nl": "back up the database tonight at 2am?",
+      "expected_sal": [
+        "N:BK@2AM",
+        "T:SCHED@2AM→N:BK"
+      ],
+      "original_id": "CFG-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-03-V4",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_action",
+      "nl": "could you back up the database tonight at 2am",
+      "expected_sal": [
+        "N:BK@2AM",
+        "T:SCHED@2AM→N:BK"
+      ],
+      "original_id": "CFG-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-04-V1",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_chain",
+      "nl": "could you ping every 30 seconds",
+      "expected_sal": [
+        "T:SCHED[30s]→A:PING",
+        "T:SCHED[30s];A:PING",
+        "T:SCHED[30]→A:PING"
+      ],
+      "original_id": "CFG-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-04-V2",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_chain",
+      "nl": "ping every 30 seconds?",
+      "expected_sal": [
+        "T:SCHED[30s]→A:PING",
+        "T:SCHED[30s];A:PING",
+        "T:SCHED[30]→A:PING"
+      ],
+      "original_id": "CFG-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-04-V3",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_chain",
+      "nl": "please ping every 30 seconds",
+      "expected_sal": [
+        "T:SCHED[30s]→A:PING",
+        "T:SCHED[30s];A:PING",
+        "T:SCHED[30]→A:PING"
+      ],
+      "original_id": "CFG-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-04-V4",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_chain",
+      "nl": "ping every 30 seconds.",
+      "expected_sal": [
+        "T:SCHED[30s]→A:PING",
+        "T:SCHED[30s];A:PING",
+        "T:SCHED[30]→A:PING"
+      ],
+      "original_id": "CFG-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-05-V1",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "expire this token in 1 hour?",
+      "expected_sal": [
+        "T:EXP[1h]"
+      ],
+      "original_id": "CFG-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-05-V2",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "expire the this token in 1 hour",
+      "expected_sal": [
+        "T:EXP[1h]"
+      ],
+      "original_id": "CFG-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-05-V3",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "please expire this token in 1 hour",
+      "expected_sal": [
+        "T:EXP[1h]"
+      ],
+      "original_id": "CFG-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-05-V4",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "could you expire this token in 1 hour",
+      "expected_sal": [
+        "T:EXP[1h]"
+      ],
+      "original_id": "CFG-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-06-V1",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "set the max retries to 5",
+      "expected_sal": [
+        "N:CFG[max_retries:5]",
+        "N:CFG[retries:5]"
+      ],
+      "original_id": "CFG-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-06-V2",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "set max retries to 5.",
+      "expected_sal": [
+        "N:CFG[max_retries:5]",
+        "N:CFG[retries:5]"
+      ],
+      "original_id": "CFG-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-06-V3",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "set max retries to 5?",
+      "expected_sal": [
+        "N:CFG[max_retries:5]",
+        "N:CFG[retries:5]"
+      ],
+      "original_id": "CFG-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-06-V4",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "modify max retries to 5",
+      "expected_sal": [
+        "N:CFG[max_retries:5]",
+        "N:CFG[retries:5]"
+      ],
+      "original_id": "CFG-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-07-V1",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_action",
+      "nl": "reboot at midnight.",
+      "expected_sal": [
+        "C:RSTRT@00:00",
+        "T:SCHED@00:00→C:RSTRT",
+        "T:SCHED@MIDNIGHT→C:RSTRT"
+      ],
+      "original_id": "CFG-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-07-V2",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_action",
+      "nl": "reboot at midnight?",
+      "expected_sal": [
+        "C:RSTRT@00:00",
+        "T:SCHED@00:00→C:RSTRT",
+        "T:SCHED@MIDNIGHT→C:RSTRT"
+      ],
+      "original_id": "CFG-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-07-V3",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_action",
+      "nl": "please reboot at midnight",
+      "expected_sal": [
+        "C:RSTRT@00:00",
+        "T:SCHED@00:00→C:RSTRT",
+        "T:SCHED@MIDNIGHT→C:RSTRT"
+      ],
+      "original_id": "CFG-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-07-V4",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_action",
+      "nl": "could you reboot at midnight",
+      "expected_sal": [
+        "C:RSTRT@00:00",
+        "T:SCHED@00:00→C:RSTRT",
+        "T:SCHED@MIDNIGHT→C:RSTRT"
+      ],
+      "original_id": "CFG-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-08-V1",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_chain",
+      "nl": "alert the daily at 9am",
+      "expected_sal": [
+        "T:SCHED@09:00→L:ALERT",
+        "T:SCHED@9AM→L:ALERT",
+        "L:ALERT",
+        "U:NOTIFY",
+        "U:ALERT"
+      ],
+      "note": "canonical T:SCHED chain busts BAEL on this short input; alert opcode alone acceptable",
+      "original_id": "CFG-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-08-V2",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_chain",
+      "nl": "notify daily at 9am",
+      "expected_sal": [
+        "T:SCHED@09:00→L:ALERT",
+        "T:SCHED@9AM→L:ALERT",
+        "L:ALERT",
+        "U:NOTIFY",
+        "U:ALERT"
+      ],
+      "note": "canonical T:SCHED chain busts BAEL on this short input; alert opcode alone acceptable",
+      "original_id": "CFG-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-08-V3",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_chain",
+      "nl": "alert daily at 9am.",
+      "expected_sal": [
+        "T:SCHED@09:00→L:ALERT",
+        "T:SCHED@9AM→L:ALERT",
+        "L:ALERT",
+        "U:NOTIFY",
+        "U:ALERT"
+      ],
+      "note": "canonical T:SCHED chain busts BAEL on this short input; alert opcode alone acceptable",
+      "original_id": "CFG-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "CFG-08-V4",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_chain",
+      "nl": "alert daily at 9am?",
+      "expected_sal": [
+        "T:SCHED@09:00→L:ALERT",
+        "T:SCHED@9AM→L:ALERT",
+        "L:ALERT",
+        "U:NOTIFY",
+        "U:ALERT"
+      ],
+      "note": "canonical T:SCHED chain busts BAEL on this short input; alert opcode alone acceptable",
+      "original_id": "CFG-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-01-V1",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "please vehicle position",
+      "expected_sal": [
+        "V:POS",
+        "V:POS?",
+        "G:POS"
+      ],
+      "original_id": "VIT-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-01-V2",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "could you vehicle position",
+      "expected_sal": [
+        "V:POS",
+        "V:POS?",
+        "G:POS"
+      ],
+      "original_id": "VIT-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-01-V3",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "vehicle position?",
+      "expected_sal": [
+        "V:POS",
+        "V:POS?",
+        "G:POS"
+      ],
+      "original_id": "VIT-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-01-V4",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "vehicle the position",
+      "expected_sal": [
+        "V:POS",
+        "V:POS?",
+        "G:POS"
+      ],
+      "original_id": "VIT-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-02-V1",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "fleet the status",
+      "expected_sal": [
+        "V:FLEET",
+        "V:FLEET?"
+      ],
+      "original_id": "VIT-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-02-V2",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "please fleet status",
+      "expected_sal": [
+        "V:FLEET",
+        "V:FLEET?"
+      ],
+      "original_id": "VIT-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-02-V3",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "could you fleet status",
+      "expected_sal": [
+        "V:FLEET",
+        "V:FLEET?"
+      ],
+      "original_id": "VIT-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-02-V4",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "fleet status.",
+      "expected_sal": [
+        "V:FLEET",
+        "V:FLEET?"
+      ],
+      "original_id": "VIT-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-03-V1",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "ais position tell me",
+      "expected_sal": [
+        "V:AIS"
+      ],
+      "original_id": "VIT-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-03-V2",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "ais position give me",
+      "expected_sal": [
+        "V:AIS"
+      ],
+      "original_id": "VIT-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-03-V3",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "ais position what is",
+      "expected_sal": [
+        "V:AIS"
+      ],
+      "original_id": "VIT-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-03-V4",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "AIS position report?",
+      "expected_sal": [
+        "V:AIS"
+      ],
+      "original_id": "VIT-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-04-V1",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "could you vessel heading",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "VIT-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-04-V2",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "vessel heading.",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "VIT-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-04-V3",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "vessel heading?",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "VIT-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-04-V4",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "please vessel heading",
+      "expected_sal": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "original_id": "VIT-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-05-V1",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "control the station position",
+      "expected_sal": [
+        "V:POS",
+        "G:POS",
+        "V:POS?",
+        "G:POS?"
+      ],
+      "note": "V:CSPOS not loaded in active ASD; V:POS or G:POS acceptable",
+      "original_id": "VIT-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-05-V2",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "could you control station position",
+      "expected_sal": [
+        "V:POS",
+        "G:POS",
+        "V:POS?",
+        "G:POS?"
+      ],
+      "note": "V:CSPOS not loaded in active ASD; V:POS or G:POS acceptable",
+      "original_id": "VIT-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-05-V3",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "please control station position",
+      "expected_sal": [
+        "V:POS",
+        "G:POS",
+        "V:POS?",
+        "G:POS?"
+      ],
+      "note": "V:CSPOS not loaded in active ASD; V:POS or G:POS acceptable",
+      "original_id": "VIT-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "VIT-05-V4",
+      "domain": "VEHICLE_FLEET",
+      "shape": "simple_query",
+      "nl": "control station position.",
+      "expected_sal": [
+        "V:POS",
+        "G:POS",
+        "V:POS?",
+        "G:POS?"
+      ],
+      "note": "V:CSPOS not loaded in active ASD; V:POS or G:POS acceptable",
+      "original_id": "VIT-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-01-V1",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "battery level.",
+      "expected_sal": [
+        "X:STORE",
+        "X:STORE?"
+      ],
+      "original_id": "ENERGY-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-01-V2",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "battery the level",
+      "expected_sal": [
+        "X:STORE",
+        "X:STORE?"
+      ],
+      "original_id": "ENERGY-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-01-V3",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "battery level?",
+      "expected_sal": [
+        "X:STORE",
+        "X:STORE?"
+      ],
+      "original_id": "ENERGY-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-01-V4",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "please battery level",
+      "expected_sal": [
+        "X:STORE",
+        "X:STORE?"
+      ],
+      "original_id": "ENERGY-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-02-V1",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "grid the frequency",
+      "expected_sal": [
+        "X:FREQ",
+        "X:FREQ?"
+      ],
+      "original_id": "ENERGY-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-02-V2",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "please grid frequency",
+      "expected_sal": [
+        "X:FREQ",
+        "X:FREQ?"
+      ],
+      "original_id": "ENERGY-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-02-V3",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "could you grid frequency",
+      "expected_sal": [
+        "X:FREQ",
+        "X:FREQ?"
+      ],
+      "original_id": "ENERGY-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-02-V4",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "grid frequency.",
+      "expected_sal": [
+        "X:FREQ",
+        "X:FREQ?"
+      ],
+      "original_id": "ENERGY-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-03-V1",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "could you voltage reading",
+      "expected_sal": [
+        "X:VOLT",
+        "X:VOLT?"
+      ],
+      "original_id": "ENERGY-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-03-V2",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "voltage reading.",
+      "expected_sal": [
+        "X:VOLT",
+        "X:VOLT?"
+      ],
+      "original_id": "ENERGY-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-03-V3",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "voltage the reading",
+      "expected_sal": [
+        "X:VOLT",
+        "X:VOLT?"
+      ],
+      "original_id": "ENERGY-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-03-V4",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "voltage reading?",
+      "expected_sal": [
+        "X:VOLT",
+        "X:VOLT?"
+      ],
+      "original_id": "ENERGY-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-04-V1",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "wind farm production.",
+      "expected_sal": [
+        "X:WND",
+        "X:WND?",
+        "X:PROD"
+      ],
+      "original_id": "ENERGY-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-04-V2",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "please wind farm production",
+      "expected_sal": [
+        "X:WND",
+        "X:WND?",
+        "X:PROD"
+      ],
+      "original_id": "ENERGY-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-04-V3",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "could you wind farm production",
+      "expected_sal": [
+        "X:WND",
+        "X:WND?",
+        "X:PROD"
+      ],
+      "original_id": "ENERGY-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-04-V4",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "wind farm production?",
+      "expected_sal": [
+        "X:WND",
+        "X:WND?",
+        "X:PROD"
+      ],
+      "original_id": "ENERGY-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-05-V1",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "ev charging state.",
+      "expected_sal": [
+        "X:CHG",
+        "X:CHG?"
+      ],
+      "original_id": "ENERGY-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-05-V2",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "ev the charging state",
+      "expected_sal": [
+        "X:CHG",
+        "X:CHG?"
+      ],
+      "original_id": "ENERGY-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-05-V3",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "please ev charging state",
+      "expected_sal": [
+        "X:CHG",
+        "X:CHG?"
+      ],
+      "original_id": "ENERGY-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "ENERGY-05-V4",
+      "domain": "ENERGY_GRID",
+      "shape": "simple_query",
+      "nl": "could you ev charging state",
+      "expected_sal": [
+        "X:CHG",
+        "X:CHG?"
+      ],
+      "original_id": "ENERGY-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-01-V1",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "please store this to memory",
+      "expected_sal": [
+        "Y:STORE"
+      ],
+      "original_id": "MEMORY-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-01-V2",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "store the this to memory",
+      "expected_sal": [
+        "Y:STORE"
+      ],
+      "original_id": "MEMORY-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-01-V3",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "store this to memory.",
+      "expected_sal": [
+        "Y:STORE"
+      ],
+      "original_id": "MEMORY-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-01-V4",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "store this to memory?",
+      "expected_sal": [
+        "Y:STORE"
+      ],
+      "original_id": "MEMORY-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-02-V1",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "could you fetch from memory by key",
+      "expected_sal": [
+        "Y:FETCH"
+      ],
+      "original_id": "MEMORY-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-02-V2",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "fetch the from memory by key",
+      "expected_sal": [
+        "Y:FETCH"
+      ],
+      "original_id": "MEMORY-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-02-V3",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "please fetch from memory by key",
+      "expected_sal": [
+        "Y:FETCH"
+      ],
+      "original_id": "MEMORY-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-02-V4",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "fetch from memory by key.",
+      "expected_sal": [
+        "Y:FETCH"
+      ],
+      "original_id": "MEMORY-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-03-V1",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "forget the this memory",
+      "expected_sal": [
+        "Y:FORGET"
+      ],
+      "original_id": "MEMORY-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-03-V2",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "forget this memory?",
+      "expected_sal": [
+        "Y:FORGET"
+      ],
+      "original_id": "MEMORY-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-03-V3",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "please forget this memory",
+      "expected_sal": [
+        "Y:FORGET"
+      ],
+      "original_id": "MEMORY-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-03-V4",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "could you forget this memory",
+      "expected_sal": [
+        "Y:FORGET"
+      ],
+      "original_id": "MEMORY-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-04-V1",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "could you page out memory",
+      "expected_sal": [
+        "Y:PAGEOUT"
+      ],
+      "original_id": "MEMORY-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-04-V2",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "page out memory.",
+      "expected_sal": [
+        "Y:PAGEOUT"
+      ],
+      "original_id": "MEMORY-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-04-V3",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "page the out memory",
+      "expected_sal": [
+        "Y:PAGEOUT"
+      ],
+      "original_id": "MEMORY-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "MEMORY-04-V4",
+      "domain": "MEMORY",
+      "shape": "simple_action",
+      "nl": "please page out memory",
+      "expected_sal": [
+        "Y:PAGEOUT"
+      ],
+      "original_id": "MEMORY-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-01-V1",
+      "domain": "INFERENCE",
+      "shape": "simple_query",
+      "nl": "please inference cost",
+      "expected_sal": [
+        "Z:COST",
+        "Z:COST?"
+      ],
+      "original_id": "INF-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-01-V2",
+      "domain": "INFERENCE",
+      "shape": "simple_query",
+      "nl": "inference cost?",
+      "expected_sal": [
+        "Z:COST",
+        "Z:COST?"
+      ],
+      "original_id": "INF-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-01-V3",
+      "domain": "INFERENCE",
+      "shape": "simple_query",
+      "nl": "could you inference cost",
+      "expected_sal": [
+        "Z:COST",
+        "Z:COST?"
+      ],
+      "original_id": "INF-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-01-V4",
+      "domain": "INFERENCE",
+      "shape": "simple_query",
+      "nl": "inference cost.",
+      "expected_sal": [
+        "Z:COST",
+        "Z:COST?"
+      ],
+      "original_id": "INF-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-02-V1",
+      "domain": "INFERENCE",
+      "shape": "simple_query",
+      "nl": "context window?",
+      "expected_sal": [
+        "Z:CTX",
+        "Z:CTX?"
+      ],
+      "original_id": "INF-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-02-V2",
+      "domain": "INFERENCE",
+      "shape": "simple_query",
+      "nl": "could you context window",
+      "expected_sal": [
+        "Z:CTX",
+        "Z:CTX?"
+      ],
+      "original_id": "INF-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-02-V3",
+      "domain": "INFERENCE",
+      "shape": "simple_query",
+      "nl": "context window.",
+      "expected_sal": [
+        "Z:CTX",
+        "Z:CTX?"
+      ],
+      "original_id": "INF-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-02-V4",
+      "domain": "INFERENCE",
+      "shape": "simple_query",
+      "nl": "context the window",
+      "expected_sal": [
+        "Z:CTX",
+        "Z:CTX?"
+      ],
+      "original_id": "INF-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-03-V1",
+      "domain": "INFERENCE",
+      "shape": "simple_query",
+      "nl": "could you token count",
+      "expected_sal": [
+        "Z:TOKENS",
+        "Z:TOKENS?"
+      ],
+      "original_id": "INF-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-03-V2",
+      "domain": "INFERENCE",
+      "shape": "simple_query",
+      "nl": "token the count",
+      "expected_sal": [
+        "Z:TOKENS",
+        "Z:TOKENS?"
+      ],
+      "original_id": "INF-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-03-V3",
+      "domain": "INFERENCE",
+      "shape": "simple_query",
+      "nl": "token count?",
+      "expected_sal": [
+        "Z:TOKENS",
+        "Z:TOKENS?"
+      ],
+      "original_id": "INF-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-03-V4",
+      "domain": "INFERENCE",
+      "shape": "simple_query",
+      "nl": "please token count",
+      "expected_sal": [
+        "Z:TOKENS",
+        "Z:TOKENS?"
+      ],
+      "original_id": "INF-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-04-V1",
+      "domain": "INFERENCE",
+      "shape": "simple_action",
+      "nl": "please run inference",
+      "expected_sal": [
+        "Z:INF"
+      ],
+      "original_id": "INF-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-04-V2",
+      "domain": "INFERENCE",
+      "shape": "simple_action",
+      "nl": "run inference?",
+      "expected_sal": [
+        "Z:INF"
+      ],
+      "original_id": "INF-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-04-V3",
+      "domain": "INFERENCE",
+      "shape": "simple_action",
+      "nl": "run the inference",
+      "expected_sal": [
+        "Z:INF"
+      ],
+      "original_id": "INF-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "INF-04-V4",
+      "domain": "INFERENCE",
+      "shape": "simple_action",
+      "nl": "run inference.",
+      "expected_sal": [
+        "Z:INF"
+      ],
+      "original_id": "INF-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "FLOW-01-V1",
+      "domain": "FLOW",
+      "shape": "simple_action",
+      "nl": "could you request flow authorization",
+      "expected_sal": [
+        "F:AV"
+      ],
+      "original_id": "FLOW-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "FLOW-01-V2",
+      "domain": "FLOW",
+      "shape": "simple_action",
+      "nl": "request the flow authorization",
+      "expected_sal": [
+        "F:AV"
+      ],
+      "original_id": "FLOW-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "FLOW-01-V3",
+      "domain": "FLOW",
+      "shape": "simple_action",
+      "nl": "please request flow authorization",
+      "expected_sal": [
+        "F:AV"
+      ],
+      "original_id": "FLOW-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "FLOW-01-V4",
+      "domain": "FLOW",
+      "shape": "simple_action",
+      "nl": "request flow authorization.",
+      "expected_sal": [
+        "F:AV"
+      ],
+      "original_id": "FLOW-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "FLOW-02-V1",
+      "domain": "FLOW",
+      "shape": "simple_action",
+      "nl": "wait for next signal.",
+      "expected_sal": [
+        "F:WAIT"
+      ],
+      "original_id": "FLOW-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "FLOW-02-V2",
+      "domain": "FLOW",
+      "shape": "simple_action",
+      "nl": "wait the for next signal",
+      "expected_sal": [
+        "F:WAIT"
+      ],
+      "original_id": "FLOW-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "FLOW-02-V3",
+      "domain": "FLOW",
+      "shape": "simple_action",
+      "nl": "wait for next signal?",
+      "expected_sal": [
+        "F:WAIT"
+      ],
+      "original_id": "FLOW-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "FLOW-02-V4",
+      "domain": "FLOW",
+      "shape": "simple_action",
+      "nl": "please wait for next signal",
+      "expected_sal": [
+        "F:WAIT"
+      ],
+      "original_id": "FLOW-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-01-V1",
+      "domain": "DEVICE_CONTROL",
+      "shape": "paraphrase",
+      "nl": "shut the conveyor down?",
+      "expected_sal": [
+        "C:KILL",
+        "R:STOP↺",
+        "R:STOP↻",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "original_id": "PARA-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-01-V2",
+      "domain": "DEVICE_CONTROL",
+      "shape": "paraphrase",
+      "nl": "could you shut the conveyor down",
+      "expected_sal": [
+        "C:KILL",
+        "R:STOP↺",
+        "R:STOP↻",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "original_id": "PARA-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-01-V3",
+      "domain": "DEVICE_CONTROL",
+      "shape": "paraphrase",
+      "nl": "please shut the conveyor down",
+      "expected_sal": [
+        "C:KILL",
+        "R:STOP↺",
+        "R:STOP↻",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "original_id": "PARA-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-01-V4",
+      "domain": "DEVICE_CONTROL",
+      "shape": "paraphrase",
+      "nl": "shut the conveyor down.",
+      "expected_sal": [
+        "C:KILL",
+        "R:STOP↺",
+        "R:STOP↻",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "original_id": "PARA-01",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-02-V1",
+      "domain": "MEDICAL",
+      "shape": "paraphrase",
+      "nl": "what is patient's heart rate",
+      "expected_sal": [
+        "H:HR",
+        "H:HR?"
+      ],
+      "original_id": "PARA-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-02-V2",
+      "domain": "MEDICAL",
+      "shape": "paraphrase",
+      "nl": "what is the patient's heart rate.",
+      "expected_sal": [
+        "H:HR",
+        "H:HR?"
+      ],
+      "original_id": "PARA-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-02-V3",
+      "domain": "MEDICAL",
+      "shape": "paraphrase",
+      "nl": "what is the patient's heart rate?",
+      "expected_sal": [
+        "H:HR",
+        "H:HR?"
+      ],
+      "original_id": "PARA-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-02-V4",
+      "domain": "MEDICAL",
+      "shape": "paraphrase",
+      "nl": "please what is the patient's heart rate",
+      "expected_sal": [
+        "H:HR",
+        "H:HR?"
+      ],
+      "original_id": "PARA-02",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-03-V1",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "paraphrase",
+      "nl": "please tell me where I am",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "PARA-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-03-V2",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "paraphrase",
+      "nl": "tell the me where I am",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "PARA-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-03-V3",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "paraphrase",
+      "nl": "tell me where I am?",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "PARA-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-03-V4",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "paraphrase",
+      "nl": "tell me where I am.",
+      "expected_sal": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "original_id": "PARA-03",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-04-V1",
+      "domain": "WEATHER",
+      "shape": "paraphrase",
+      "nl": "how fast is wind",
+      "expected_sal": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "original_id": "PARA-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-04-V2",
+      "domain": "WEATHER",
+      "shape": "paraphrase",
+      "nl": "how the fast is the wind",
+      "expected_sal": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "original_id": "PARA-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-04-V3",
+      "domain": "WEATHER",
+      "shape": "paraphrase",
+      "nl": "please how fast is the wind",
+      "expected_sal": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "original_id": "PARA-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-04-V4",
+      "domain": "WEATHER",
+      "shape": "paraphrase",
+      "nl": "could you how fast is the wind",
+      "expected_sal": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "original_id": "PARA-04",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-05-V1",
+      "domain": "MEDICAL",
+      "shape": "paraphrase",
+      "nl": "give me bp",
+      "expected_sal": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "original_id": "PARA-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-05-V2",
+      "domain": "MEDICAL",
+      "shape": "paraphrase",
+      "nl": "give me the BP?",
+      "expected_sal": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "original_id": "PARA-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-05-V3",
+      "domain": "MEDICAL",
+      "shape": "paraphrase",
+      "nl": "could you give me the BP",
+      "expected_sal": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "original_id": "PARA-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-05-V4",
+      "domain": "MEDICAL",
+      "shape": "paraphrase",
+      "nl": "give me the BP.",
+      "expected_sal": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "original_id": "PARA-05",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-06-V1",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "paraphrase",
+      "nl": "engage the camera.",
+      "expected_sal": [
+        "R:CAM↺",
+        "R:CAM↻"
+      ],
+      "original_id": "PARA-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-06-V2",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "paraphrase",
+      "nl": "engage camera",
+      "expected_sal": [
+        "R:CAM↺",
+        "R:CAM↻"
+      ],
+      "original_id": "PARA-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-06-V3",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "paraphrase",
+      "nl": "engage the the camera",
+      "expected_sal": [
+        "R:CAM↺",
+        "R:CAM↻"
+      ],
+      "original_id": "PARA-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-06-V4",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "paraphrase",
+      "nl": "engage the camera?",
+      "expected_sal": [
+        "R:CAM↺",
+        "R:CAM↻"
+      ],
+      "original_id": "PARA-06",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-07-V1",
+      "domain": "MESHTASTIC",
+      "shape": "paraphrase",
+      "nl": "show the me the mesh status",
+      "expected_sal": [
+        "O:MESH",
+        "O:MESH?",
+        "N:STS"
+      ],
+      "original_id": "PARA-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-07-V2",
+      "domain": "MESHTASTIC",
+      "shape": "paraphrase",
+      "nl": "report me the mesh status",
+      "expected_sal": [
+        "O:MESH",
+        "O:MESH?",
+        "N:STS"
+      ],
+      "original_id": "PARA-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-07-V3",
+      "domain": "MESHTASTIC",
+      "shape": "paraphrase",
+      "nl": "show me mesh status",
+      "expected_sal": [
+        "O:MESH",
+        "O:MESH?",
+        "N:STS"
+      ],
+      "original_id": "PARA-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-07-V4",
+      "domain": "MESHTASTIC",
+      "shape": "paraphrase",
+      "nl": "give me me the mesh status",
+      "expected_sal": [
+        "O:MESH",
+        "O:MESH?",
+        "N:STS"
+      ],
+      "original_id": "PARA-07",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-08-V1",
+      "domain": "DEVICE_CONTROL",
+      "shape": "paraphrase",
+      "nl": "kill the conveyor?",
+      "expected_sal": [
+        "C:KILL@CONVEYOR",
+        "C:KILL",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "original_id": "PARA-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-08-V2",
+      "domain": "DEVICE_CONTROL",
+      "shape": "paraphrase",
+      "nl": "could you kill the conveyor",
+      "expected_sal": [
+        "C:KILL@CONVEYOR",
+        "C:KILL",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "original_id": "PARA-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-08-V3",
+      "domain": "DEVICE_CONTROL",
+      "shape": "paraphrase",
+      "nl": "kill conveyor",
+      "expected_sal": [
+        "C:KILL@CONVEYOR",
+        "C:KILL",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "original_id": "PARA-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-08-V4",
+      "domain": "DEVICE_CONTROL",
+      "shape": "paraphrase",
+      "nl": "kill the conveyor.",
+      "expected_sal": [
+        "C:KILL@CONVEYOR",
+        "C:KILL",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "original_id": "PARA-08",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-09-V1",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "paraphrase",
+      "nl": "modify the settings",
+      "expected_sal": [
+        "N:CFG"
+      ],
+      "original_id": "PARA-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-09-V2",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "paraphrase",
+      "nl": "modify settings.",
+      "expected_sal": [
+        "N:CFG"
+      ],
+      "original_id": "PARA-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-09-V3",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "paraphrase",
+      "nl": "modify settings?",
+      "expected_sal": [
+        "N:CFG"
+      ],
+      "original_id": "PARA-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-09-V4",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "paraphrase",
+      "nl": "modify configuretings",
+      "expected_sal": [
+        "N:CFG"
+      ],
+      "original_id": "PARA-09",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-10-V1",
+      "domain": "MEDICAL",
+      "shape": "paraphrase",
+      "nl": "examine oxygen sat",
+      "expected_sal": [
+        "H:SPO2",
+        "H:SPO2?"
+      ],
+      "original_id": "PARA-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-10-V2",
+      "domain": "MEDICAL",
+      "shape": "paraphrase",
+      "nl": "please check oxygen sat",
+      "expected_sal": [
+        "H:SPO2",
+        "H:SPO2?"
+      ],
+      "original_id": "PARA-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-10-V3",
+      "domain": "MEDICAL",
+      "shape": "paraphrase",
+      "nl": "check the oxygen sat",
+      "expected_sal": [
+        "H:SPO2",
+        "H:SPO2?"
+      ],
+      "original_id": "PARA-10",
+      "transform": "permutation"
+    },
+    {
+      "id": "PARA-10-V4",
+      "domain": "MEDICAL",
+      "shape": "paraphrase",
+      "nl": "check oxygen sat?",
+      "expected_sal": [
+        "H:SPO2",
+        "H:SPO2?"
+      ],
+      "original_id": "PARA-10",
+      "transform": "permutation"
+    }
+  ]
+}

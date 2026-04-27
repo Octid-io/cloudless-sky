@@ -1,0 +1,1059 @@
+{
+  "condition": "D",
+  "model": "haiku",
+  "verdicts": {
+    "INVALID": 33,
+    "CORRECT": 25,
+    "WRONG": 4,
+    "SAFE_PASSTHROUGH": 1,
+    "REFUSED_MALFORMED": 2
+  },
+  "cost_usd": 0.2074,
+  "results": [
+    {
+      "id": "DC-01",
+      "domain": "DEVICE_CONTROL",
+      "nl": "stop the conveyor",
+      "expected": [
+        "R:STOP↻",
+        "R:STOP↻@CONVEYOR"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP⚠@CONVEYOR",
+      "verdict": "INVALID",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3691,
+        "output_tokens": 253
+      }
+    },
+    {
+      "id": "DC-02",
+      "domain": "DEVICE_CONTROL",
+      "nl": "lock door D-7",
+      "expected": [
+        "R:LOCK↻@D-7"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2295,
+        "output_tokens": 175
+      }
+    },
+    {
+      "id": "DC-03",
+      "domain": "DEVICE_CONTROL",
+      "nl": "restart the service",
+      "expected": [
+        "C:RSTRT"
+      ],
+      "expected_verdict": null,
+      "got": "C:RSTRT@SERVICE",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3616,
+        "output_tokens": 223
+      }
+    },
+    {
+      "id": "DC-04",
+      "domain": "DEVICE_CONTROL",
+      "nl": "shutdown gateway 3",
+      "expected": [
+        "C:KILL@3",
+        "R:STOP⊘@3"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2305,
+        "output_tokens": 185
+      }
+    },
+    {
+      "id": "DC-05",
+      "domain": "DEVICE_CONTROL",
+      "nl": "stop pump and close valve",
+      "expected": [
+        "R:STOP↻@PUMP∧R:CLOSE↻@VALVE",
+        "R:STOP↻@PUMP∧R:STOP↻@VALVE",
+        "R:STOP@PUMP↺∧R:STOP@VALVE↺"
+      ],
+      "expected_verdict": null,
+      "got": "R:ESTOP∧R:STOP@VALVE⊘",
+      "verdict": "INVALID",
+      "turns": 5,
+      "usage": {
+        "input_tokens": 7055,
+        "output_tokens": 436
+      }
+    },
+    {
+      "id": "MT-01",
+      "domain": "MESHTASTIC",
+      "nl": "ping node 17",
+      "expected": [
+        "A:PING@17"
+      ],
+      "expected_verdict": null,
+      "got": "A:PING@17",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3579,
+        "output_tokens": 199
+      }
+    },
+    {
+      "id": "MT-02",
+      "domain": "MESHTASTIC",
+      "nl": "discover peers",
+      "expected": [
+        "N:Q@*",
+        "N:Q"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2286,
+        "output_tokens": 169
+      }
+    },
+    {
+      "id": "MT-03",
+      "domain": "MESHTASTIC",
+      "nl": "broadcast my position",
+      "expected": [
+        "G:POS@*",
+        "L:SEND@*[G:POS]"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3566,
+        "output_tokens": 190
+      }
+    },
+    {
+      "id": "MT-04",
+      "domain": "MESHTASTIC",
+      "nl": "find primary relay",
+      "expected": [
+        "N:RLY?",
+        "N:Q[RLY]"
+      ],
+      "expected_verdict": null,
+      "got": "N:RLY",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3599,
+        "output_tokens": 213
+      }
+    },
+    {
+      "id": "MT-05",
+      "domain": "MESHTASTIC",
+      "nl": "node status",
+      "expected": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "expected_verdict": null,
+      "got": "Perfect! The composer successfully generated SAL for your request.",
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2310,
+        "output_tokens": 138
+      }
+    },
+    {
+      "id": "MED-01",
+      "domain": "MEDICAL",
+      "nl": "blood pressure check",
+      "expected": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "expected_verdict": null,
+      "got": "H:BP",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3587,
+        "output_tokens": 206
+      }
+    },
+    {
+      "id": "MED-02",
+      "domain": "MEDICAL",
+      "nl": "all vitals for patient 12",
+      "expected": [
+        "H:VITALS@12",
+        "H:HR@12∧H:BP@12∧H:SPO2@12"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2317,
+        "output_tokens": 226
+      }
+    },
+    {
+      "id": "MED-03",
+      "domain": "MEDICAL",
+      "nl": "alert me if heart rate exceeds 130",
+      "expected": [
+        "H:HR>130→H:ALERT",
+        "H:HR>130→U:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "H:HR>130→H:ALERT",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3626,
+        "output_tokens": 214
+      }
+    },
+    {
+      "id": "MED-04",
+      "domain": "MEDICAL",
+      "nl": "casualty report if BP above 180",
+      "expected": [
+        "H:BP>180→H:CASREP"
+      ],
+      "expected_verdict": null,
+      "got": "H:CASREP>180→H:BP",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3660,
+        "output_tokens": 335
+      }
+    },
+    {
+      "id": "MED-05",
+      "domain": "MEDICAL",
+      "nl": "patient has pneumothorax, code J93.0",
+      "expected": [
+        "H:ICD[J930]",
+        "H:ICD[J930]∧H:CASREP"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2336,
+        "output_tokens": 253
+      }
+    },
+    {
+      "id": "UAV-01",
+      "domain": "UAV_TELEMETRY",
+      "nl": "drone position",
+      "expected": [
+        "V:POS",
+        "G:POS"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3606,
+        "output_tokens": 219
+      }
+    },
+    {
+      "id": "UAV-02",
+      "domain": "UAV_TELEMETRY",
+      "nl": "return to base",
+      "expected": [
+        "R:RTB↻"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2309,
+        "output_tokens": 229
+      }
+    },
+    {
+      "id": "UAV-03",
+      "domain": "UAV_TELEMETRY",
+      "nl": "move drone 1 to coordinates 35.7, -122.4",
+      "expected": [
+        "I:§→R:⚠MOV@DRONE1∧E:GPS[35.7,-122.4]",
+        "R:MOV↻@DRONE1[35.7,-122.4]"
+      ],
+      "expected_verdict": null,
+      "got": "R:MOV@DRONE1↻∧E:GPS@DRONE1",
+      "verdict": "INVALID",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3751,
+        "output_tokens": 284
+      }
+    },
+    {
+      "id": "UAV-04",
+      "domain": "UAV_TELEMETRY",
+      "nl": "form swarm wedge with spacing 50",
+      "expected": [
+        "R:FORM↻[wedge,50]"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2338,
+        "output_tokens": 243
+      }
+    },
+    {
+      "id": "UAV-05",
+      "domain": "UAV_TELEMETRY",
+      "nl": "vehicle heading",
+      "expected": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "expected_verdict": null,
+      "got": "Perfect! The deterministic composer has generated the SAL:",
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2310,
+        "output_tokens": 138
+      }
+    },
+    {
+      "id": "MOV-01",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "report location",
+      "expected": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3562,
+        "output_tokens": 189
+      }
+    },
+    {
+      "id": "MOV-02",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "report heading",
+      "expected": [
+        "G:BEARING",
+        "G:BEARING?"
+      ],
+      "expected_verdict": null,
+      "got": "G:BEARING",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3610,
+        "output_tokens": 224
+      }
+    },
+    {
+      "id": "MOV-03",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "position and heading",
+      "expected": [
+        "G:POS∧G:BEARING"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS∧G:BEARING",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3622,
+        "output_tokens": 223
+      }
+    },
+    {
+      "id": "MOV-04",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "vessel heading",
+      "expected": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "expected_verdict": null,
+      "got": "Perfect! The SAL composition is:",
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2308,
+        "output_tokens": 119
+      }
+    },
+    {
+      "id": "MOV-05",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "altitude reading",
+      "expected": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3562,
+        "output_tokens": 188
+      }
+    },
+    {
+      "id": "WX-01",
+      "domain": "WEATHER",
+      "nl": "wind speed",
+      "expected": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3608,
+        "output_tokens": 221
+      }
+    },
+    {
+      "id": "WX-02",
+      "domain": "WEATHER",
+      "nl": "wind speed at turbine 7",
+      "expected": [
+        "W:WIND@7",
+        "W:WIND@7?"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND@7",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3592,
+        "output_tokens": 197
+      }
+    },
+    {
+      "id": "WX-03",
+      "domain": "WEATHER",
+      "nl": "barometric pressure",
+      "expected": [
+        "E:PU",
+        "E:PU?",
+        "W:PRESS"
+      ],
+      "expected_verdict": null,
+      "got": "W:PRESS",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3603,
+        "output_tokens": 211
+      }
+    },
+    {
+      "id": "WX-04",
+      "domain": "WEATHER",
+      "nl": "alert when wind exceeds 40",
+      "expected": [
+        "W:WIND>40→L:ALERT",
+        "W:WIND>40→W:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "W:ALERT>40→W:WIND",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3653,
+        "output_tokens": 232
+      }
+    },
+    {
+      "id": "WX-05",
+      "domain": "WEATHER",
+      "nl": "report temp and humidity",
+      "expected": [
+        "E:TH∧E:HU",
+        "E:EQ?TH:0∧?HU:0"
+      ],
+      "expected_verdict": null,
+      "got": "The deterministic composer has generated the SAL:",
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2305,
+        "output_tokens": 146
+      }
+    },
+    {
+      "id": "SEN-01",
+      "domain": "SENSOR_ARRAY",
+      "nl": "read sensor 4A",
+      "expected": [
+        "E:TH@4A",
+        "E:TH@4A?"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2317,
+        "output_tokens": 195
+      }
+    },
+    {
+      "id": "SEN-02",
+      "domain": "SENSOR_ARRAY",
+      "nl": "humidity reading",
+      "expected": [
+        "E:HU",
+        "E:HU?"
+      ],
+      "expected_verdict": null,
+      "got": "Perfect! The SAL for \"humidity reading\" is:",
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2291,
+        "output_tokens": 105
+      }
+    },
+    {
+      "id": "SEN-03",
+      "domain": "SENSOR_ARRAY",
+      "nl": "give me temp and humidity from sensor node 4A",
+      "expected": [
+        "E:TH@4A∧E:HU@4A",
+        "E:EQ@4A?TH:0∧?HU:0"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH∧E:HU@NODE:4A",
+      "verdict": "WRONG",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3655,
+        "output_tokens": 236
+      }
+    },
+    {
+      "id": "SEN-04",
+      "domain": "SENSOR_ARRAY",
+      "nl": "alert when humidity above 80",
+      "expected": [
+        "E:HU>80→U:NOTIFY",
+        "E:HU>80→L:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "Perfect! The composed SAL is:",
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2328,
+        "output_tokens": 171
+      }
+    },
+    {
+      "id": "SEN-05",
+      "domain": "SENSOR_ARRAY",
+      "nl": "air quality",
+      "expected": [
+        "E:EQ",
+        "E:EQ?"
+      ],
+      "expected_verdict": null,
+      "got": "E:EQ",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3604,
+        "output_tokens": 216
+      }
+    },
+    {
+      "id": "ROB-01",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "emergency stop",
+      "expected": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "expected_verdict": null,
+      "got": "R:ESTOP",
+      "verdict": "CORRECT",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2292,
+        "output_tokens": 209
+      }
+    },
+    {
+      "id": "ROB-02",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "turn on the camera",
+      "expected": [
+        "R:CAM↻"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2292,
+        "output_tokens": 173
+      }
+    },
+    {
+      "id": "ROB-03",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "activate haptic feedback",
+      "expected": [
+        "R:HAPTIC↻"
+      ],
+      "expected_verdict": null,
+      "got": "R:HAPTIC↻",
+      "verdict": "INVALID",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3674,
+        "output_tokens": 268
+      }
+    },
+    {
+      "id": "ROB-04",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "turn on flashlight on node BRAVO",
+      "expected": [
+        "R:TORCH↻@BRAVO"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2307,
+        "output_tokens": 173
+      }
+    },
+    {
+      "id": "ROB-05",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "stop everything immediately, emergency",
+      "expected": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "expected_verdict": null,
+      "got": "R:ESTOP",
+      "verdict": "CORRECT",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2301,
+        "output_tokens": 131
+      }
+    },
+    {
+      "id": "CRY-01",
+      "domain": "CRYPTO_AUTH",
+      "nl": "sign the payload",
+      "expected": [
+        "S:SIGN"
+      ],
+      "expected_verdict": null,
+      "got": "S:SIGN",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3600,
+        "output_tokens": 213
+      }
+    },
+    {
+      "id": "CRY-02",
+      "domain": "CRYPTO_AUTH",
+      "nl": "generate a key pair, then sign the payload, then send to node BRAVO",
+      "expected": [
+        "S:KEYGEN;S:SIGN;D:PUSH@BRAVO"
+      ],
+      "expected_verdict": null,
+      "got": "S:KEYGEN;S:SIGN;D:PUSH@BRAVO",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3713,
+        "output_tokens": 249
+      }
+    },
+    {
+      "id": "CRY-03",
+      "domain": "CRYPTO_AUTH",
+      "nl": "verify identity",
+      "expected": [
+        "I:ID",
+        "A:VERIFY[I:ID]"
+      ],
+      "expected_verdict": null,
+      "got": "I:ID",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3593,
+        "output_tokens": 208
+      }
+    },
+    {
+      "id": "CRY-04",
+      "domain": "CRYPTO_AUTH",
+      "nl": "encrypt this payload then send it to the central server",
+      "expected": [
+        "S:ENC;D:PUSH@CENTRAL"
+      ],
+      "expected_verdict": null,
+      "got": "S:ENC;D:PUSH",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3654,
+        "output_tokens": 232
+      }
+    },
+    {
+      "id": "CRY-05",
+      "domain": "CRYPTO_AUTH",
+      "nl": "process payment but only if a human approves",
+      "expected": [
+        "I:§→K:PAY",
+        "U:APPROVE→K:PAY"
+      ],
+      "expected_verdict": null,
+      "got": "U:APPROVE∧K:PAY∧U:ACK",
+      "verdict": "WRONG",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3666,
+        "output_tokens": 231
+      }
+    },
+    {
+      "id": "CFG-01",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "update config",
+      "expected": [
+        "N:CFG"
+      ],
+      "expected_verdict": null,
+      "got": "N:CFG",
+      "verdict": "CORRECT",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3608,
+        "output_tokens": 215
+      }
+    },
+    {
+      "id": "CFG-02",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "set the threshold to 30",
+      "expected": [
+        "N:CFG[threshold:30]"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2319,
+        "output_tokens": 195
+      }
+    },
+    {
+      "id": "CFG-03",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "back up the database tonight at 2am",
+      "expected": [
+        "N:BK@2AM",
+        "T:SCHED@2AM→N:BK"
+      ],
+      "expected_verdict": null,
+      "got": "N:BK@2AM",
+      "verdict": "CORRECT",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2315,
+        "output_tokens": 217
+      }
+    },
+    {
+      "id": "CFG-04",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "ping every 30 seconds",
+      "expected": [
+        "T:SCHED[30s]→A:PING"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2322,
+        "output_tokens": 235
+      }
+    },
+    {
+      "id": "CFG-05",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "expire this token in 1 hour",
+      "expected": [
+        "T:EXP[1h]"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2320,
+        "output_tokens": 225
+      }
+    },
+    {
+      "id": "OOS-CONV-01",
+      "domain": "CONVERSATIONAL",
+      "nl": "tell me a joke",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2309,
+        "output_tokens": 203
+      }
+    },
+    {
+      "id": "OOS-CONV-02",
+      "domain": "CONVERSATIONAL",
+      "nl": "how are you",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2302,
+        "output_tokens": 222
+      }
+    },
+    {
+      "id": "OOS-CONV-03",
+      "domain": "CONVERSATIONAL",
+      "nl": "thanks",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2301,
+        "output_tokens": 205
+      }
+    },
+    {
+      "id": "OOS-CONV-04",
+      "domain": "CONVERSATIONAL",
+      "nl": "good morning",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2302,
+        "output_tokens": 230
+      }
+    },
+    {
+      "id": "OOS-CONV-05",
+      "domain": "CONVERSATIONAL",
+      "nl": "what's your name",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2303,
+        "output_tokens": 200
+      }
+    },
+    {
+      "id": "OOS-UNK-01",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "order me a pepperoni pizza",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2314,
+        "output_tokens": 241
+      }
+    },
+    {
+      "id": "OOS-UNK-02",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "book a flight to Paris",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2313,
+        "output_tokens": 239
+      }
+    },
+    {
+      "id": "OOS-UNK-03",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "play some jazz",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2304,
+        "output_tokens": 186
+      }
+    },
+    {
+      "id": "OOS-UNK-04",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "remind me to buy milk",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2308,
+        "output_tokens": 223
+      }
+    },
+    {
+      "id": "OOS-UNK-05",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "translate this to French",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2292,
+        "output_tokens": 170
+      }
+    },
+    {
+      "id": "OOS-MAL-01",
+      "domain": "MALFORMED",
+      "nl": "asdf qwerty",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "INVALID",
+      "turns": 2,
+      "usage": {
+        "input_tokens": 2316,
+        "output_tokens": 225
+      }
+    },
+    {
+      "id": "OOS-MAL-02",
+      "domain": "MALFORMED",
+      "nl": "...",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": "I'm ready to compose SAL for you, but your request appears incomplete. You've written \"Compose SAL for: ...\" without specifying what instruction or action you'd like me to encode.",
+      "verdict": "WRONG",
+      "turns": 1,
+      "usage": {
+        "input_tokens": 1106,
+        "output_tokens": 132
+      }
+    },
+    {
+      "id": "OOS-MAL-03",
+      "domain": "MALFORMED",
+      "nl": "the",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3609,
+        "output_tokens": 298
+      }
+    },
+    {
+      "id": "OOS-MAL-04",
+      "domain": "MALFORMED",
+      "nl": "xyz123",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "turns": 3,
+      "usage": {
+        "input_tokens": 3615,
+        "output_tokens": 293
+      }
+    },
+    {
+      "id": "OOS-MAL-05",
+      "domain": "MALFORMED",
+      "nl": "{}",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": "I need to understand your intent. An empty object `{}` doesn't contain instructions or a natural-language description.",
+      "verdict": "WRONG",
+      "turns": 1,
+      "usage": {
+        "input_tokens": 1106,
+        "output_tokens": 100
+      }
+    }
+  ]
+}

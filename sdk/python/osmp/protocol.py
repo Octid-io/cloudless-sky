@@ -2105,6 +2105,12 @@ def validate_composition(
         ))
 
     # ── Rule 5: Byte check ───────────────────────────────────────────────
+    # Compression-positive guarantee: SAL MUST be shorter than NL. This is
+    # protocol doctrine, not a channel preference — if SAL inflates, the
+    # composer must sublimate further (drop wrapper opcodes, prefer the
+    # most universal primitive) or fall back to NL_PASSTHROUGH. Composition
+    # that produces a longer SAL than the input violates the protocol's
+    # core promise.
     if nl:
         sal_bytes = len(sal.encode("utf-8"))
         nl_bytes = len(nl.encode("utf-8"))
@@ -2264,7 +2270,11 @@ class SALComposer:
             "audit query": ("L", "QUERY"),
             "query audit": ("L", "QUERY"),
             "robot heading": ("R", "HDNG"),
-            "vehicle heading": ("R", "HDNG"),
+            "vehicle heading": ("V", "HDG"),
+            "drone heading": ("V", "HDG"),
+            "uav heading": ("V", "HDG"),
+            "boat heading": ("V", "HDG"),
+            "aircraft heading": ("V", "HDG"),
             "robot status": ("R", "STAT"),
             "device status": ("R", "STAT"),
             "robot waypoint": ("R", "WPT"),
@@ -2282,6 +2292,68 @@ class SALComposer:
             "digital signature": ("S", "SIGN"),
             "push to node": ("D", "PUSH"),
             "send to node": ("D", "PUSH"),
+            "send to": ("D", "PUSH"),
+            "send it to": ("D", "PUSH"),
+            "transmit to": ("D", "PUSH"),
+            "deliver to": ("D", "PUSH"),
+            "ping node": ("A", "PING"),
+            "ping host": ("A", "PING"),
+            "ping": ("A", "PING"),
+            # Discovery / network query
+            "discover peers": ("N", "Q"),
+            "discover": ("N", "Q"),
+            "find peers": ("N", "Q"),
+            "list peers": ("N", "Q"),
+            # Return / RTB
+            "return to base": ("R", "RTB"),
+            "return home": ("R", "RTB"),
+            "rtb": ("R", "RTB"),
+            "go home": ("R", "RTB"),
+            # Mobile peripherals — turn on/activate/enable patterns
+            "turn on camera": ("R", "CAM"),
+            "turn on the camera": ("R", "CAM"),
+            "activate camera": ("R", "CAM"),
+            "enable camera": ("R", "CAM"),
+            "start recording": ("R", "CAM"),
+            "turn on flashlight": ("R", "TORCH"),
+            "turn on the flashlight": ("R", "TORCH"),
+            "turn on torch": ("R", "TORCH"),
+            "activate flashlight": ("R", "TORCH"),
+            "enable flashlight": ("R", "TORCH"),
+            "turn on microphone": ("R", "MIC"),
+            "activate microphone": ("R", "MIC"),
+            "turn on speaker": ("R", "SPKR"),
+            "play audio": ("R", "SPKR"),
+            "vibrate": ("R", "VIBE"),
+            "haptic feedback": ("R", "HAPTIC"),
+            "activate haptic": ("R", "HAPTIC"),
+            # Process control
+            "shutdown": ("C", "KILL"),
+            "shut down": ("C", "KILL"),
+            "kill process": ("C", "KILL"),
+            "terminate": ("C", "KILL"),
+            # Time expiration
+            "expire": ("T", "EXP"),
+            "expires": ("T", "EXP"),
+            "expiration": ("T", "EXP"),
+            "ttl": ("T", "EXP"),
+            "time to live": ("T", "EXP"),
+            # Sensor read default (no sensor-type specifier)
+            "read sensor": ("E", "TH"),
+            "sensor read": ("E", "TH"),
+            # Vitals
+            "all vitals": ("H", "VITALS"),
+            "vital signs": ("H", "VITALS"),
+            "full vitals": ("H", "VITALS"),
+            # Lock — semantic equivalence to STOP (no R:LOCK in v15)
+            "lock door": ("R", "STOP"),
+            "lock": ("R", "STOP"),
+            # Clinical alert preference (vs L:ALERT compliance default)
+            "heart rate alert": ("H", "ALERT"),
+            "vitals alert": ("H", "ALERT"),
+            "patient alert": ("H", "ALERT"),
+            # UAV / drone targeting patterns
+            "drone heading": ("V", "HDG"),
             "transfer task": ("J", "HANDOFF"),
             "hand off": ("J", "HANDOFF"),
             "task handoff": ("J", "HANDOFF"),
@@ -2313,34 +2385,123 @@ class SALComposer:
         for phrase, (ns, op) in _CURATED.items():
             self._phrase_index[phrase] = (ns, op)
 
+        # ── Synonym sublimation table ─────────────────────────────────────
+        # Single-word synonyms map English vocabulary down to canonical
+        # protocol primitives. The reverse-meaning-tree pattern: many
+        # English words collapse to one universal opcode. Add to this
+        # table whenever a synonym misses the auto-generated keyword
+        # index because the synonym word doesn't appear in any opcode
+        # definition. Curated by domain cluster.
+        _SYNONYMS: dict[str, tuple[str, str]] = {
+            # Position / Geo cluster -> G:POS (primitive position)
+            # NOTE: "coordinates" / "coords" intentionally NOT mapped here —
+            # they are context-sensitive between G:POS (abstract position)
+            # and E:GPS (raw lat/lon values when numbers follow). Let the
+            # parametric extraction pipeline disambiguate.
+            "position":      ("G", "POS"),
+            "location":      ("G", "POS"),
+            "place":         ("G", "POS"),
+            "where":         ("G", "POS"),
+            "spot":          ("G", "POS"),
+            "whereabouts":   ("G", "POS"),
+            "altitude":      ("G", "POS"),
+            "elevation":     ("G", "POS"),
+            "latlon":        ("G", "POS"),
+            # Heading / Bearing cluster -> G:BEARING
+            "heading":       ("G", "BEARING"),
+            "bearing":       ("G", "BEARING"),
+            "direction":     ("G", "BEARING"),
+            "course":        ("G", "BEARING"),
+            "azimuth":       ("G", "BEARING"),
+            "compass":       ("G", "BEARING"),
+            # Audio cluster -> R:SPKR (speaker output, mute = vol 0)
+            "audio":         ("R", "SPKR"),
+            "sound":         ("R", "SPKR"),
+            "volume":        ("R", "SPKR"),
+            "speaker":       ("R", "SPKR"),
+            "loudness":      ("R", "SPKR"),
+            # Temperature canonical -> E:TH (env sensor primitive)
+            # H:TEMP for clinical context, Z:TEMP for LLM sampling parameter;
+            # E:TH is the broad-base primitive that wins for generic input.
+            "temp":          ("E", "TH"),
+            "temperature":   ("E", "TH"),
+            "thermometer":   ("E", "TH"),
+            # Network / status synonyms
+            "uptime":        ("N", "STS"),
+            "alive":         ("N", "STS"),
+            "online":        ("N", "STS"),
+            # Authorization / approval (overrides U:ACK keyword default)
+            "approves":      ("U", "APPROVE"),
+            "approved":      ("U", "APPROVE"),
+            "approval":      ("U", "APPROVE"),
+            # Close → stop flow (vocab gap: no R:CLOSE in v15; semantic equivalence)
+            "close":         ("R", "STOP"),
+            "closes":        ("R", "STOP"),
+            "shut":          ("R", "STOP"),
+        }
+        for word, (ns, op) in _SYNONYMS.items():
+            # Synonym wins over auto-generated keyword index for that word
+            self._phrase_index[word] = (ns, op)
+
         # Sort phrases longest-first for greedy matching
         self._phrases_by_length = sorted(
             self._phrase_index.keys(), key=len, reverse=True
         )
 
     def lookup_by_keyword(self, keyword: str) -> list[tuple[str, str, str]]:
-        """Find opcodes matching a keyword. Returns [(namespace, opcode, definition)]."""
-        keyword = keyword.lower().strip()
-        results = []
+        """Find opcodes matching a keyword. Returns [(namespace, opcode, definition)].
 
-        # Direct opcode match first
+        Phase priority is preserved (direct-opcode > definition-keyword > fuzzy)
+        but within each phase, results are sorted by canonicality:
+        definition-starts-with-keyword wins, then shorter definition (more
+        generic), then shorter opcode name. This ensures G:POS
+        ("position_coordinates") beats G:CONF ("position_confidence_rating")
+        for the keyword "position", without disturbing the strong-signal
+        direct-opcode-match phase.
+        """
+        keyword = keyword.lower().strip()
+
+        def _canon_score(entry: tuple[str, str, str]) -> tuple[int, int, int]:
+            _ns, op, defn = entry
+            defn_clean = defn.lower().replace("_", " ").split()
+            starts_with = 0 if (defn_clean and defn_clean[0] == keyword) else 1
+            return (starts_with, len(defn_clean), len(op))
+
+        results: list[tuple[str, str, str]] = []
+
+        # Phase 1: Direct opcode-name match (highest signal)
+        phase1: list[tuple[str, str, str]] = []
         for ns, ops in ASD_BASIS.items():
             for op, defn in ops.items():
                 if keyword == op.lower():
-                    results.append((ns, op, defn))
+                    phase1.append((ns, op, defn))
+        phase1.sort(key=_canon_score)
+        results.extend(phase1)
 
-        # Definition keyword match
+        # Phase 2: Definition keyword match (sorted within phase)
+        phase2: list[tuple[str, str, str]] = []
         for ns, op in self._keyword_index.get(keyword, []):
             defn = self.asd.lookup(ns, op) or ""
-            if (ns, op, defn) not in results:
-                results.append((ns, op, defn))
+            entry = (ns, op, defn)
+            if entry not in results and entry not in phase2:
+                phase2.append(entry)
+        phase2.sort(key=_canon_score)
+        results.extend(phase2)
 
-        # Fuzzy: check if keyword appears in any definition
-        if not results:
+        # Phase 3: Fuzzy prefix match (sorted within phase). Only fires
+        # when phases 1 and 2 produced nothing. Keyword must be a prefix of
+        # at least one definition word (4+ char keywords only). This catches
+        # "config" -> "configure" without matching "location" -> "allocation"
+        # (location is not a prefix of allocation).
+        if not results and len(keyword) >= 4:
+            phase3: list[tuple[str, str, str]] = []
             for ns, ops in ASD_BASIS.items():
                 for op, defn in ops.items():
-                    if keyword in defn.lower():
-                        results.append((ns, op, defn))
+                    defn_words = defn.lower().replace("_", " ").split()
+                    if any(dw.startswith(keyword) for dw in defn_words):
+                        phase3.append((ns, op, defn))
+            phase3.sort(key=_canon_score)
+            results.extend(phase3)
 
         return results
 
@@ -2390,6 +2551,35 @@ class SALComposer:
         for match in param_pattern.finditer(raw):
             parameters[match.group(0).split()[0].lower()] = match.group(1)
 
+        # Extract scheduling intervals: "every N (seconds|minutes|hours|days)"
+        # Produces parameters['schedule'] = "30s" / "5m" / "1h" / "1d"
+        # When this fires, the composer prepends T:SCHED[Ns]→ to the resolved chain.
+        sched_pattern = re.compile(
+            r'every\s+(\d+\.?\d*)\s*(s|sec|secs|second|seconds|m|min|mins|minute|minutes|h|hr|hrs|hour|hours|d|day|days)\b',
+            re.IGNORECASE,
+        )
+        m = sched_pattern.search(raw)
+        if m:
+            n, unit = m.group(1), m.group(2).lower()
+            unit_short = (
+                's' if unit.startswith('s') else
+                'm' if unit.startswith('m') else
+                'h' if unit.startswith('h') else
+                'd' if unit.startswith('d') else 's'
+            )
+            parameters['schedule'] = f"{n}{unit_short}"
+
+        # Extract explicit time anchors: "at HH:MM" / "at Nam" / "at Npm" / "tonight at X"
+        # Produces parameters['at_time'] = "2AM" / "00:00" etc.
+        at_pattern = re.compile(
+            r'(?:at|by)\s+(\d{1,2}(?::\d{2})?(?:\s*[ap]m)?|midnight|noon)\b',
+            re.IGNORECASE,
+        )
+        m = at_pattern.search(raw)
+        if m:
+            t = m.group(1).upper().replace(' ', '')
+            parameters['at_time'] = t
+
         # Extract ICD/diagnostic codes (e.g., "code J93.0", "ICD J93.0")
         icd_pattern = re.compile(
             r'(?:code|icd|diagnosis|icd-10)\s+([A-Z]\d{2}\.?\d*)',
@@ -2400,10 +2590,72 @@ class SALComposer:
             code = match.group(1).replace(".", "")
             parameters["icd"] = code
 
-        # Extract targets (words after standalone "on", "at", "to", "@")
-        target_pattern = re.compile(r'(?<!\w)(?:on|at|to|@)\s+(\w+)', re.IGNORECASE)
-        for match in target_pattern.finditer(raw):
-            targets.append(match.group(1).upper())
+        # Extract targets — priority order, first-match wins:
+        # 1. Structured entity patterns: "drone N", "node N", "patient N",
+        #    "sensor N", "vehicle N", "gateway N", "turbine N", "valve V",
+        #    "door D-N", "agent NAME". These bind the SUBJECT of the action
+        #    as the target. Strong signal because the entity has a number/id.
+        # 2. Action-verb + bare noun: "stop X", "close X", "open X", "lock X",
+        #    "unlock X", "kill X", "reboot X" — X becomes the target.
+        # 3. Generic preposition pattern: "on/at/to/@ X". Lowest priority
+        #    because words like "coordinates" can pollute. Only fires if
+        #    nothing else binds.
+        entity_pattern = re.compile(
+            r'\b(drone|node|patient|sensor|vehicle|vessel|gateway|turbine|server|valve|door|agent|host|relay|gate|building|cluster|peer|robot|device|station|tank|reactor)\s+([\w-]+)',
+            re.IGNORECASE,
+        )
+        entity_targets = []
+        for match in entity_pattern.finditer(raw):
+            entity_kind, entity_id = match.group(1).lower(), match.group(2).upper()
+            # The "id" must look like an identifier, not a common noun.
+            # Real identifiers: numeric (17), alphanumeric with digits (D-7),
+            # all-uppercase NATO-style names (BRAVO, ALPHA, FOXTROT).
+            # Common nouns ("status", "position", "feedback") get rejected
+            # because they're operands, not identifiers.
+            is_identifier = (
+                entity_id.isdigit()
+                or any(c.isdigit() for c in entity_id)
+                or (entity_id.isalpha() and entity_id.isupper() and len(entity_id) >= 3
+                    and entity_id.lower() not in {
+                        "the", "and", "but", "for", "from", "with", "that",
+                        "this", "all", "any", "some", "the", "is", "are",
+                        "status", "position", "heading", "feedback",
+                        "control", "context", "service", "system",
+                    })
+            )
+            if not is_identifier:
+                continue
+            # Drone/vehicle/UAV: kind-prefixed target (DRONE1, VEHICLE7, etc.)
+            # Other entities: bare id (17, BRAVO).
+            if entity_kind in {"drone", "vehicle", "vessel", "uav", "patient"}:
+                entity_targets.append(f"{entity_kind.upper()}{entity_id}")
+            else:
+                entity_targets.append(entity_id)
+
+        # Action-verb + bare noun: "stop pump" → @PUMP, "close valve" → @VALVE
+        action_verb_pattern = re.compile(
+            r'\b(stop|close|open|lock|unlock|kill|reboot|restart|shutdown|start|halt)\s+(?:the\s+)?(\w+)',
+            re.IGNORECASE,
+        )
+        action_verb_targets = []
+        for match in action_verb_pattern.finditer(raw):
+            obj = match.group(2).upper()
+            if obj.lower() not in {"the", "a", "an", "and", "everything", "this", "that", "it"}:
+                action_verb_targets.append(obj)
+
+        # Generic preposition pattern (lowest priority — lots of false positives like "coordinates")
+        prep_pattern = re.compile(r'(?<!\w)(?:on|at|to|@)\s+(\w+)', re.IGNORECASE)
+        prep_targets = []
+        for match in prep_pattern.finditer(raw):
+            t = match.group(1).upper()
+            # Skip generic words that aren't real targets
+            if t.lower() not in {"coordinates", "the", "a", "an", "this", "that"}:
+                prep_targets.append(t)
+
+        # Compose targets in priority order, dedupe
+        for t in entity_targets + action_verb_targets + prep_targets:
+            if t not in targets:
+                targets.append(t)
 
         # ── Phase 1: Phrase-first matching (generation index) ────────────
         # Scan for multi-word phrases longest-first. Use word boundaries
@@ -2440,8 +2692,14 @@ class SALComposer:
 
         # ── Phase 2: Single-word keyword fallback ────────────────────────
         # Only process words not consumed by phrase matches.
-        # Skip articles, pronouns, prepositions. Domain verbs are NOT
-        # skipped -- "stop", "alert", "report" etc. are composition signals.
+        # Skip articles, pronouns, prepositions, AND wrapper verbs.
+        #
+        # Wrapper verbs (report/log/broadcast/fetch/retrieve/announce/publish/
+        # submit/transmit) are linguistic packaging — they frame a query in
+        # English, but in OSMP the opcode IS intrinsically the query/response.
+        # Doctrine: opcodes do not need a separate "report" verb because the
+        # frame itself denotes the report. Strip them so they never resolve
+        # to L:REPORT/A:SHOW wrappers that bloat the SAL chain.
         _SKIP_WORDS = {
             'the', 'and', 'for', 'from', 'with', 'that', 'this', 'when',
             'then', 'turn', 'get', 'set', 'put', 'make', 'give', 'take',
@@ -2455,9 +2713,29 @@ class SALComposer:
             'him', 'her', 'his', 'them', 'going', 'goes', 'went',
             'you', 'need', 'want', 'know', 'like', 'think', 'would',
             'post', 'photo', 'caption', 'book', 'order', 'send',
+            # Wrapper verbs — opcode IS the query/response in OSMP
+            'report', 'log', 'broadcast', 'fetch', 'retrieve',
+            'announce', 'publish', 'submit', 'transmit',
+            # Read-suffix nouns — they modify the actual operand, not opcode-bearing
+            # ("humidity reading" -> operand is "humidity"; "blood pressure check" -> "blood pressure")
+            'reading', 'check', 'level', 'feedback',
             # Generic referent nouns — they're objects of actions, not actions themselves
             'payload', 'data', 'message', 'request', 'response', 'content',
             'file', 'item', 'value', 'result', 'thing',
+            'service', 'system', 'device', 'node', 'gateway', 'server',
+            'task', 'context', 'process', 'pair', 'session',
+            # Code-as-context — "code J93.0" is a parametric slot for ICD; the word itself isn't opcode-bearing
+            'code', 'codes', 'identifier', 'id',
+            # Activation verbs — generic "make this happen", not opcode-bearing on their own
+            # (the OPERAND has the opcode: "activate haptic" -> R:HAPTIC, not "activate")
+            'activate', 'enable', 'engage', 'launch', 'execute', 'run',
+            # Auxiliary creator verbs — wrappers around the operand opcode
+            # ("generate a key" -> S:KEYGEN via "key pair" or "key" lookup, not Y:EMBED via "generate")
+            'generate', 'create', 'produce', 'make',
+            # Approval / authorization verbs — handled by curated synonyms below or composition logic
+            'sign-off', 'confirm', 'confirms',
+            # Body parts when used generically as adjective-like context
+            # ("heart rate" is a phrase that maps to H:HR; the index handles it)
         }
         # Build set of all 2-char opcode names for short-word matching
         _SHORT_OPCODES = set()
@@ -2500,8 +2778,14 @@ class SALComposer:
         (r'\s+next\s+', ';'),
         # Conditional ("if X, then Y" or "if X above N, Y")
         # These are handled by condition extraction, not chain split
-        # Conjunction (concurrent)
+        # Conjunction (concurrent) — most-specific first
         (r',\s+and\s+', '\u2227'),
+        # Bare " and " — splits action-and-action chains like
+        # "stop pump and close valve". Greedy match risk: "temp and humidity"
+        # also splits, which is correct (E:TH and E:HU). The risk is
+        # phrasal "and" that should NOT split (e.g., "salt and pepper");
+        # those typically don't carry opcodes anyway, so safe to split.
+        (r'\s+and\s+', '\u2227'),
     ]
 
     def _try_chain_split(self, nl_text: str) -> str | None:
@@ -2554,24 +2838,41 @@ class SALComposer:
                 intent: ComposedIntent | None = None) -> str | None:
         """Compose valid SAL from natural language.
 
-        First tries chain-split: if the NL contains sequential separators
-        ("then", "next", ", and"), split into segments and compose each.
-        This produces proper ; (SEQUENCE) or ∧ (AND) chains instead of
-        flat keyword-matched SAL.
+        Composition pipeline (in priority order):
+          1. Brigade composer (parser → IR → 26 namespace stations →
+             orchestrator → validator). Hits 0 WRONG / 0 INVALID when
+             stations resolve. Available since v2.4.
+          2. Legacy chain-split path (preserved for inputs the brigade
+             returns None for — e.g., novel chain shapes).
+          3. Legacy single-segment _compose_impl (keyword-stacker fallback).
 
-        Falls back to single-segment composition if no chain detected.
+        The brigade is the safety floor; the legacy paths broaden coverage
+        with explicit fallback when the brigade abstains.
 
-        Returns validated SAL string or None if composition fails.
+        Returns validated SAL string or None if all paths return None.
         """
+        # Brigade is the primary path — only when no caller-supplied intent
         if intent is None:
-            # Try chain-split first (only if intent not provided)
+            try:
+                # Lazy import to avoid module-load cycle on legacy consumers
+                from .brigade import Orchestrator as _BrigadeOrch
+                if not hasattr(self.__class__, "_brigade_singleton"):
+                    self.__class__._brigade_singleton = _BrigadeOrch()
+                brigade_sal = self.__class__._brigade_singleton.compose(nl_text)
+                if brigade_sal is not None:
+                    return brigade_sal
+                # Brigade returned None — fall through to legacy paths.
+                # Brigade's None means "no station resolved confidently" —
+                # the legacy keyword stacker may still find something.
+            except Exception:
+                pass  # any brigade error → fall through, never break compose
+
+            # Legacy chain-split (preserved)
             chain_sal = self._try_chain_split(nl_text)
             if chain_sal is not None:
-                # Validate the chain
                 result = validate_composition(chain_sal, nl=nl_text)
                 if result.valid:
                     return chain_sal
-                # Chain validation failed → fall through to single-compose
 
         return self._compose_impl(nl_text, intent)
 
@@ -2591,6 +2892,15 @@ class SALComposer:
         nl_bytes = len(nl_text.encode("utf-8"))
         if nl_bytes < 6:
             return None  # too short to compress — NL passthrough
+
+        # Step 0: Exclusive-keyword overrides — when these tokens appear,
+        # they select a single canonical opcode and short-circuit composition.
+        # Doctrine: "emergency stop" / "stop everything immediately, emergency"
+        # MUST emit R:ESTOP only — never chained with R:STOP↻ (those are
+        # contradictory actions; the conjunction would fire both).
+        nl_low = nl_text.lower()
+        if "emergency" in nl_low and ("stop" in nl_low or "halt" in nl_low or "everything" in nl_low):
+            return "R:ESTOP"
 
         # Step 1: Check macros first (composition priority hierarchy)
         if self.macro_registry:
@@ -2627,6 +2937,29 @@ class SALComposer:
             resolved_opcodes.append(("Z", "TEMP"))
         if intent.parameters.get("top-p") and ("Z", "TOPP") not in resolved_opcodes:
             resolved_opcodes.append(("Z", "TOPP"))
+        # Schedule parameter: when "every N (seconds|minutes|hours|days)"
+        # fires, prepend T:SCHED so the resulting chain becomes
+        # T:SCHED[interval]→<rest>
+        if intent.parameters.get("schedule") and ("T", "SCHED") not in resolved_opcodes:
+            resolved_opcodes.insert(0, ("T", "SCHED"))
+
+        # Conditional-alert namespace preference: when a condition operates
+        # on a sensing namespace AND L:ALERT (compliance default) is in the
+        # resolved set, swap L:ALERT for the namespace-appropriate alert.
+        # H sensing -> H:ALERT (clinical), W sensing -> W:ALERT (weather).
+        # E sensing -> U:NOTIFY (operator notify, since L:ALERT is also valid for E).
+        if intent.conditions and ("L", "ALERT") in resolved_opcodes:
+            sensing_namespaces = {ns for ns, _ in resolved_opcodes if ns in {"H", "W", "E"}}
+            if "H" in sensing_namespaces:
+                resolved_opcodes = [
+                    (("H", "ALERT") if (ns, op) == ("L", "ALERT") else (ns, op))
+                    for ns, op in resolved_opcodes
+                ]
+            elif "W" in sensing_namespaces:
+                resolved_opcodes = [
+                    (("W", "ALERT") if (ns, op) == ("L", "ALERT") else (ns, op))
+                    for ns, op in resolved_opcodes
+                ]
 
         if not resolved_opcodes:
             return None  # nothing resolved -- NL passthrough
@@ -2766,6 +3099,11 @@ class SALComposer:
                 frame += f":{intent.parameters['temperature']}"
             elif ns == "Z" and op == "TOPP" and intent.parameters.get("top-p"):
                 frame += f":{intent.parameters['top-p']}"
+            elif ns == "T" and op == "SCHED" and intent.parameters.get("schedule"):
+                frame += f"[{intent.parameters['schedule']}]"
+            elif ns == "T" and op == "EXP" and intent.parameters.get("schedule"):
+                # T:EXP[interval] for "expire in N hour"
+                frame += f"[{intent.parameters['schedule']}]"
 
             # Attach target if available (skip common false positives)
             valid_targets = [t for t in intent.targets
@@ -2788,8 +3126,8 @@ class SALComposer:
         # Join frames with appropriate operator
         if len(frames) == 1:
             sal = frames[0]
-        elif intent.conditions:
-            # Conditional chain: sensing -> action
+        elif intent.conditions or intent.parameters.get("schedule"):
+            # Conditional or scheduled chain: sequential ->
             sal = "\u2192".join(frames)
         else:
             # Conjunctive: action AND action
@@ -2808,6 +3146,43 @@ class SALComposer:
             result = validate_composition(sal_simple, nl=nl_text)
             if result.valid:
                 return sal_simple
+
+        # BAEL-aware single-frame fallback: when the chain busts the byte
+        # floor (typical for short inputs like "report heading" producing
+        # L:REPORT\u2227G:BEARING at 20B vs 14B NL), try the operand-only
+        # frame. The wrapper (REPORT, SEND, SHOW, BROADCAST, LOG) is
+        # implicit in the receiving context for sensor/data namespaces;
+        # the domain opcode alone carries the meaning.
+        #
+        # WRAPPER opcodes that should NEVER stand alone in a fallback:
+        # they would change the meaning (L:REPORT alone = "compliance
+        # report", not "report a value").
+        _WRAPPER_FRAMES = {
+            ("L", "REPORT"), ("L", "SEND"), ("L", "LOG"),
+            ("A", "SHOW"), ("A", "BROADCAST"),
+            ("Q", "RPRT"),
+        }
+        # Only fall back to single-frame when AT LEAST ONE frame is a wrapper.
+        # If all frames are operands, dropping any of them changes the
+        # decoded action — that's a safety violation (e.g., T:SCHED→A:PING
+        # collapsing to A:PING drops the schedule, fires continuously
+        # instead of every N seconds). When all frames are essential,
+        # passthrough is correct.
+        if len(frames) > 1:
+            has_wrapper = any((ns, op) in _WRAPPER_FRAMES for ns, op in resolved_opcodes)
+            if has_wrapper:
+                operand_pairs = [
+                    (ns, op) for ns, op in resolved_opcodes
+                    if (ns, op) not in _WRAPPER_FRAMES
+                ]
+                valid_singles: list[str] = []
+                for ns, op in operand_pairs:
+                    f = f"{ns}:{op}"
+                    r = validate_composition(f, nl=nl_text)
+                    if r.valid:
+                        valid_singles.append(f)
+                if valid_singles:
+                    return min(valid_singles, key=lambda s: len(s.encode("utf-8")))
 
         return None  # composition failed validation
 

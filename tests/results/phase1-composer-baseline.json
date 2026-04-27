@@ -1,0 +1,925 @@
+{
+  "iteration": "baseline",
+  "corpus_version": "v1",
+  "summary": {
+    "total": 65,
+    "buckets": {
+      "CORRECT": 24,
+      "SAFE_PASSTHROUGH": 20,
+      "WRONG": 16,
+      "REFUSED_MALFORMED": 5
+    },
+    "safe": 49,
+    "fatal": 16,
+    "correct_pct": 36.92,
+    "wrong_pct": 24.62,
+    "invalid_pct": 0.0,
+    "by_domain": {
+      "DEVICE_CONTROL": {
+        "CORRECT": 1,
+        "SAFE_PASSTHROUGH": 2,
+        "WRONG": 2
+      },
+      "MESHTASTIC": {
+        "WRONG": 1,
+        "SAFE_PASSTHROUGH": 1,
+        "CORRECT": 3
+      },
+      "MEDICAL": {
+        "CORRECT": 2,
+        "SAFE_PASSTHROUGH": 1,
+        "WRONG": 2
+      },
+      "UAV_TELEMETRY": {
+        "CORRECT": 2,
+        "SAFE_PASSTHROUGH": 1,
+        "WRONG": 2
+      },
+      "MOVEMENT_POSITIONING": {
+        "CORRECT": 4,
+        "WRONG": 1
+      },
+      "WEATHER": {
+        "CORRECT": 5
+      },
+      "SENSOR_ARRAY": {
+        "SAFE_PASSTHROUGH": 1,
+        "WRONG": 2,
+        "CORRECT": 2
+      },
+      "ROBOTIC_CAPABILITIES": {
+        "CORRECT": 1,
+        "SAFE_PASSTHROUGH": 2,
+        "WRONG": 2
+      },
+      "CRYPTO_AUTH": {
+        "CORRECT": 2,
+        "WRONG": 3
+      },
+      "CONFIG_SCHEDULE": {
+        "CORRECT": 2,
+        "SAFE_PASSTHROUGH": 2,
+        "WRONG": 1
+      },
+      "CONVERSATIONAL": {
+        "SAFE_PASSTHROUGH": 5
+      },
+      "UNKNOWN_DOMAIN": {
+        "SAFE_PASSTHROUGH": 5
+      },
+      "MALFORMED": {
+        "REFUSED_MALFORMED": 5
+      }
+    }
+  },
+  "detailed": [
+    {
+      "id": "DC-01",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "stop the conveyor",
+      "expected": [
+        "R:STOP↻",
+        "R:STOP↻@CONVEYOR"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP↺",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "DC-02",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "lock door D-7",
+      "expected": [
+        "R:LOCK↻@D-7"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer returned None for in-scope input (coverage gap)"
+    },
+    {
+      "id": "DC-03",
+      "domain": "DEVICE_CONTROL",
+      "shape": "simple_action",
+      "nl": "restart the service",
+      "expected": [
+        "C:RSTRT"
+      ],
+      "expected_verdict": null,
+      "got": "C:RSTRT∧V:MMSI",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "DC-04",
+      "domain": "DEVICE_CONTROL",
+      "shape": "targeted_action",
+      "nl": "shutdown gateway 3",
+      "expected": [
+        "C:KILL@3",
+        "R:STOP⊘@3"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer returned None for in-scope input (coverage gap)"
+    },
+    {
+      "id": "DC-05",
+      "domain": "DEVICE_CONTROL",
+      "shape": "chain_conjunctive",
+      "nl": "stop pump and close valve",
+      "expected": [
+        "R:STOP↻@PUMP∧R:CLOSE↻@VALVE"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP↺",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "MT-01",
+      "domain": "MESHTASTIC",
+      "shape": "targeted_query",
+      "nl": "ping node 17",
+      "expected": [
+        "A:PING@17"
+      ],
+      "expected_verdict": null,
+      "got": "N:Q∧N:BK",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "MT-02",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "discover peers",
+      "expected": [
+        "N:Q@*",
+        "N:Q"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer returned None for in-scope input (coverage gap)"
+    },
+    {
+      "id": "MT-03",
+      "domain": "MESHTASTIC",
+      "shape": "simple_action",
+      "nl": "broadcast my position",
+      "expected": [
+        "G:POS@*",
+        "L:SEND@*[G:POS]"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "MT-04",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "find primary relay",
+      "expected": [
+        "N:RLY?",
+        "N:Q[RLY]"
+      ],
+      "expected_verdict": null,
+      "got": "N:RLY",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "MT-05",
+      "domain": "MESHTASTIC",
+      "shape": "simple_query",
+      "nl": "node status",
+      "expected": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "expected_verdict": null,
+      "got": "N:STS",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "MED-01",
+      "domain": "MEDICAL",
+      "shape": "simple_query",
+      "nl": "blood pressure check",
+      "expected": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "expected_verdict": null,
+      "got": "H:BP",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "MED-02",
+      "domain": "MEDICAL",
+      "shape": "targeted_multi_read",
+      "nl": "all vitals for patient 12",
+      "expected": [
+        "H:VITALS@12",
+        "H:HR@12∧H:BP@12∧H:SPO2@12"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer returned None for in-scope input (coverage gap)"
+    },
+    {
+      "id": "MED-03",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "alert me if heart rate exceeds 130",
+      "expected": [
+        "H:HR>130→H:ALERT",
+        "H:HR>130→U:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "H:HR>130→L:ALERT",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "MED-04",
+      "domain": "MEDICAL",
+      "shape": "conditional_alert",
+      "nl": "casualty report if BP above 180",
+      "expected": [
+        "H:BP>180→H:CASREP"
+      ],
+      "expected_verdict": null,
+      "got": "H:CASREP>180→H:BP",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "MED-05",
+      "domain": "MEDICAL",
+      "shape": "parametric_action",
+      "nl": "patient has pneumothorax, code J93.0",
+      "expected": [
+        "H:ICD[J930]",
+        "H:ICD[J930]∧H:CASREP"
+      ],
+      "expected_verdict": null,
+      "got": "H:ICD[J930]∧P:CODE",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "UAV-01",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "drone position",
+      "expected": [
+        "V:POS",
+        "G:POS"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "UAV-02",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_action",
+      "nl": "return to base",
+      "expected": [
+        "R:RTB↻"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer returned None for in-scope input (coverage gap)"
+    },
+    {
+      "id": "UAV-03",
+      "domain": "UAV_TELEMETRY",
+      "shape": "authorized_targeted_action",
+      "nl": "move drone 1 to coordinates 35.7, -122.4",
+      "expected": [
+        "I:§→R:⚠MOV@DRONE1∧E:GPS[35.7,-122.4]",
+        "R:MOV↻@DRONE1[35.7,-122.4]"
+      ],
+      "expected_verdict": null,
+      "got": "R:MOV@COORDINATES↺∧E:GPS@COORDINATES",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "UAV-04",
+      "domain": "UAV_TELEMETRY",
+      "shape": "parametric_action",
+      "nl": "form swarm wedge with spacing 50",
+      "expected": [
+        "R:FORM↻[wedge,50]"
+      ],
+      "expected_verdict": null,
+      "got": "R:FORM↺",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "UAV-05",
+      "domain": "UAV_TELEMETRY",
+      "shape": "simple_query",
+      "nl": "vehicle heading",
+      "expected": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "expected_verdict": null,
+      "got": "R:HDNG↺",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "MOV-01",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "report location",
+      "expected": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "MOV-02",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "report heading",
+      "expected": [
+        "G:BEARING",
+        "G:BEARING?"
+      ],
+      "expected_verdict": null,
+      "got": "G:BEARING",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "MOV-03",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "multi_read",
+      "nl": "position and heading",
+      "expected": [
+        "G:POS∧G:BEARING"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS∧G:BEARING",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "MOV-04",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "vessel heading",
+      "expected": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "expected_verdict": null,
+      "got": "V:HDG",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "MOV-05",
+      "domain": "MOVEMENT_POSITIONING",
+      "shape": "simple_query",
+      "nl": "altitude reading",
+      "expected": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS∧X:LOAD",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "WX-01",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "wind speed",
+      "expected": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "WX-02",
+      "domain": "WEATHER",
+      "shape": "targeted_query",
+      "nl": "wind speed at turbine 7",
+      "expected": [
+        "W:WIND@7",
+        "W:WIND@7?"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND@TURBINE",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "WX-03",
+      "domain": "WEATHER",
+      "shape": "simple_query",
+      "nl": "barometric pressure",
+      "expected": [
+        "E:PU",
+        "E:PU?",
+        "W:PRESS"
+      ],
+      "expected_verdict": null,
+      "got": "W:PRESS",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "WX-04",
+      "domain": "WEATHER",
+      "shape": "conditional_alert",
+      "nl": "alert when wind exceeds 40",
+      "expected": [
+        "W:WIND>40→L:ALERT",
+        "W:WIND>40→W:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND>40→L:ALERT",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "WX-05",
+      "domain": "WEATHER",
+      "shape": "multi_read",
+      "nl": "report temp and humidity",
+      "expected": [
+        "E:TH∧E:HU",
+        "E:EQ?TH:0∧?HU:0"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH∧E:HU",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "SEN-01",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_query",
+      "nl": "read sensor 4A",
+      "expected": [
+        "E:TH@4A",
+        "E:TH@4A?"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer returned None for in-scope input (coverage gap)"
+    },
+    {
+      "id": "SEN-02",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "humidity reading",
+      "expected": [
+        "E:HU",
+        "E:HU?"
+      ],
+      "expected_verdict": null,
+      "got": "E:HU∧X:LOAD",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "SEN-03",
+      "domain": "SENSOR_ARRAY",
+      "shape": "targeted_multi_read",
+      "nl": "give me temp and humidity from sensor node 4A",
+      "expected": [
+        "E:TH@4A∧E:HU@4A",
+        "E:EQ@4A?TH:0∧?HU:0"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH∧E:HU∧N:BK",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "SEN-04",
+      "domain": "SENSOR_ARRAY",
+      "shape": "conditional_alert",
+      "nl": "alert when humidity above 80",
+      "expected": [
+        "E:HU>80→U:NOTIFY",
+        "E:HU>80→L:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "E:HU>80→L:ALERT",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "SEN-05",
+      "domain": "SENSOR_ARRAY",
+      "shape": "simple_query",
+      "nl": "air quality",
+      "expected": [
+        "E:EQ",
+        "E:EQ?"
+      ],
+      "expected_verdict": null,
+      "got": "E:EQ",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "ROB-01",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "emergency stop",
+      "expected": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "expected_verdict": null,
+      "got": "R:ESTOP",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "ROB-02",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "turn on the camera",
+      "expected": [
+        "R:CAM↻"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer returned None for in-scope input (coverage gap)"
+    },
+    {
+      "id": "ROB-03",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "simple_action",
+      "nl": "activate haptic feedback",
+      "expected": [
+        "R:HAPTIC↻"
+      ],
+      "expected_verdict": null,
+      "got": "R:HAPTIC↺∧U:FEEDBACK",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "ROB-04",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "targeted_action",
+      "nl": "turn on flashlight on node BRAVO",
+      "expected": [
+        "R:TORCH↻@BRAVO"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer returned None for in-scope input (coverage gap)"
+    },
+    {
+      "id": "ROB-05",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "shape": "emergency_action",
+      "nl": "stop everything immediately, emergency",
+      "expected": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP↺∧R:ESTOP",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "CRY-01",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_action",
+      "nl": "sign the payload",
+      "expected": [
+        "S:SIGN"
+      ],
+      "expected_verdict": null,
+      "got": "S:SIGN",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "CRY-02",
+      "domain": "CRYPTO_AUTH",
+      "shape": "chain_sequential",
+      "nl": "generate a key pair, then sign the payload, then send to node BRAVO",
+      "expected": [
+        "S:KEYGEN;S:SIGN;D:PUSH@BRAVO"
+      ],
+      "expected_verdict": null,
+      "got": "S:KEYGEN∧Y:EMBED;S:SIGN;D:PUSH@NODE",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "CRY-03",
+      "domain": "CRYPTO_AUTH",
+      "shape": "simple_query",
+      "nl": "verify identity",
+      "expected": [
+        "I:ID",
+        "A:VERIFY[I:ID]"
+      ],
+      "expected_verdict": null,
+      "got": "I:ID",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "CRY-04",
+      "domain": "CRYPTO_AUTH",
+      "shape": "chain_sequential",
+      "nl": "encrypt this payload then send it to the central server",
+      "expected": [
+        "S:ENC;D:PUSH@CENTRAL"
+      ],
+      "expected_verdict": null,
+      "got": "S:ENC",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "CRY-05",
+      "domain": "CRYPTO_AUTH",
+      "shape": "authorized_action",
+      "nl": "process payment but only if a human approves",
+      "expected": [
+        "I:§→K:PAY",
+        "U:APPROVE→K:PAY"
+      ],
+      "expected_verdict": null,
+      "got": "C:KILL∧K:PAY∧U:ACK",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "CFG-01",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "simple_action",
+      "nl": "update config",
+      "expected": [
+        "N:CFG"
+      ],
+      "expected_verdict": null,
+      "got": "N:CFG",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "CFG-02",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "set the threshold to 30",
+      "expected": [
+        "N:CFG[threshold:30]"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer returned None for in-scope input (coverage gap)"
+    },
+    {
+      "id": "CFG-03",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_action",
+      "nl": "back up the database tonight at 2am",
+      "expected": [
+        "N:BK@2AM",
+        "T:SCHED@2AM→N:BK"
+      ],
+      "expected_verdict": null,
+      "got": "N:BK@2AM",
+      "verdict": "CORRECT",
+      "reason": "exact or opcode-set match"
+    },
+    {
+      "id": "CFG-04",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "scheduled_chain",
+      "nl": "ping every 30 seconds",
+      "expected": [
+        "T:SCHED[30s]→A:PING"
+      ],
+      "expected_verdict": null,
+      "got": "N:Q",
+      "verdict": "WRONG",
+      "reason": "valid SAL but does not match any expected variant"
+    },
+    {
+      "id": "CFG-05",
+      "domain": "CONFIG_SCHEDULE",
+      "shape": "parametric_action",
+      "nl": "expire this token in 1 hour",
+      "expected": [
+        "T:EXP[1h]"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer returned None for in-scope input (coverage gap)"
+    },
+    {
+      "id": "OOS-CONV-01",
+      "domain": "CONVERSATIONAL",
+      "shape": "passthrough",
+      "nl": "tell me a joke",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer correctly passed through"
+    },
+    {
+      "id": "OOS-CONV-02",
+      "domain": "CONVERSATIONAL",
+      "shape": "passthrough",
+      "nl": "how are you",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer correctly passed through"
+    },
+    {
+      "id": "OOS-CONV-03",
+      "domain": "CONVERSATIONAL",
+      "shape": "passthrough",
+      "nl": "thanks",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer correctly passed through"
+    },
+    {
+      "id": "OOS-CONV-04",
+      "domain": "CONVERSATIONAL",
+      "shape": "passthrough",
+      "nl": "good morning",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer correctly passed through"
+    },
+    {
+      "id": "OOS-CONV-05",
+      "domain": "CONVERSATIONAL",
+      "shape": "passthrough",
+      "nl": "what's your name",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer correctly passed through"
+    },
+    {
+      "id": "OOS-UNK-01",
+      "domain": "UNKNOWN_DOMAIN",
+      "shape": "passthrough",
+      "nl": "order me a pepperoni pizza",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer correctly passed through"
+    },
+    {
+      "id": "OOS-UNK-02",
+      "domain": "UNKNOWN_DOMAIN",
+      "shape": "passthrough",
+      "nl": "book a flight to Paris",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer correctly passed through"
+    },
+    {
+      "id": "OOS-UNK-03",
+      "domain": "UNKNOWN_DOMAIN",
+      "shape": "passthrough",
+      "nl": "play some jazz",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer correctly passed through"
+    },
+    {
+      "id": "OOS-UNK-04",
+      "domain": "UNKNOWN_DOMAIN",
+      "shape": "passthrough",
+      "nl": "remind me to buy milk",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer correctly passed through"
+    },
+    {
+      "id": "OOS-UNK-05",
+      "domain": "UNKNOWN_DOMAIN",
+      "shape": "passthrough",
+      "nl": "translate this to French",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "composer correctly passed through"
+    },
+    {
+      "id": "OOS-MAL-01",
+      "domain": "MALFORMED",
+      "shape": "refuse_malformed",
+      "nl": "asdf qwerty",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "composer returned None for malformed input"
+    },
+    {
+      "id": "OOS-MAL-02",
+      "domain": "MALFORMED",
+      "shape": "refuse_malformed",
+      "nl": "...",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "composer returned None for malformed input"
+    },
+    {
+      "id": "OOS-MAL-03",
+      "domain": "MALFORMED",
+      "shape": "refuse_malformed",
+      "nl": "the",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "composer returned None for malformed input"
+    },
+    {
+      "id": "OOS-MAL-04",
+      "domain": "MALFORMED",
+      "shape": "refuse_malformed",
+      "nl": "xyz123",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "composer returned None for malformed input"
+    },
+    {
+      "id": "OOS-MAL-05",
+      "domain": "MALFORMED",
+      "shape": "refuse_malformed",
+      "nl": "{}",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "composer returned None for malformed input"
+    }
+  ]
+}

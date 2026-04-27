@@ -1,0 +1,277 @@
+{
+  "results": [
+    {
+      "id": "ZT-VOCAB-01",
+      "nl": "open valve V12",
+      "note": "Tests R:OPEN gap. False=converges to R:STOP / R:UNLOCK / etc. True=panel picks R:OPEN unanimously OR diverges.",
+      "per_model": {
+        "haiku": {
+          "sal": "R:DRVE@V12",
+          "opcodes": [
+            [
+              "R",
+              "DRVE"
+            ]
+          ]
+        },
+        "sonnet": {
+          "sal": "R:OPEN@V12",
+          "opcodes": [
+            [
+              "R",
+              "OPEN"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "sal": "NL_PASSTHROUGH",
+          "opcodes": []
+        }
+      },
+      "verdict": "DIVERGED",
+      "consensus": null
+    },
+    {
+      "id": "ZT-VOCAB-02",
+      "nl": "start the engine",
+      "note": "Tests R:START gap. Could reduce to R:DRVE/R:THR/R:TKOF for vehicle context.",
+      "per_model": {
+        "haiku": {
+          "sal": "R:DRVE@*",
+          "opcodes": [
+            [
+              "R",
+              "DRVE"
+            ]
+          ]
+        },
+        "sonnet": {
+          "sal": "R:DRVE@*⚠I:§→R:DRVE",
+          "opcodes": [
+            [
+              "I",
+              "§"
+            ],
+            [
+              "R",
+              "DRVE"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "sal": "NL_PASSTHROUGH",
+          "opcodes": []
+        }
+      },
+      "verdict": "CONVERGED",
+      "consensus": [
+        "R",
+        "DRVE"
+      ]
+    },
+    {
+      "id": "ZT-VOCAB-03",
+      "nl": "close valve V12",
+      "note": "Tests R:CLOSE. I claim it reduces to R:STOP. ZTOLE verifies.",
+      "per_model": {
+        "haiku": {
+          "sal": "R:STOP@V12",
+          "opcodes": [
+            [
+              "R",
+              "STOP"
+            ]
+          ]
+        },
+        "sonnet": {
+          "sal": "R:V12:STOP⚠→I:§",
+          "opcodes": [
+            [
+              "R",
+              "V12"
+            ],
+            [
+              "I",
+              "§"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "sal": "NL_PASSTHROUGH",
+          "opcodes": []
+        }
+      },
+      "verdict": "DIVERGED",
+      "consensus": null
+    },
+    {
+      "id": "ZT-VOCAB-04",
+      "nl": "lock the door",
+      "note": "Tests R:LOCK. I claim it reduces to R:STOP. ZTOLE verifies.",
+      "per_model": {
+        "haiku": {
+          "sal": "R:STOP@*",
+          "opcodes": [
+            [
+              "R",
+              "STOP"
+            ]
+          ]
+        },
+        "sonnet": {
+          "sal": "R:LOCK⚠→I:§",
+          "opcodes": [
+            [
+              "I",
+              "§"
+            ],
+            [
+              "R",
+              "LOCK"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "sal": "NL_PASSTHROUGH",
+          "opcodes": []
+        }
+      },
+      "verdict": "DIVERGED",
+      "consensus": null
+    },
+    {
+      "id": "ZT-VOCAB-05",
+      "nl": "broadcast my position to all peers",
+      "note": "Tests L:SEND. I claim it reduces to D:PUSH or G:POS@*. ZTOLE verifies.",
+      "per_model": {
+        "haiku": {
+          "sal": "R:POS@*",
+          "opcodes": [
+            [
+              "R",
+              "POS"
+            ]
+          ]
+        },
+        "sonnet": {
+          "sal": "R:POS@*",
+          "opcodes": [
+            [
+              "R",
+              "POS"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "sal": "R:GPS@*;⚠",
+          "opcodes": [
+            [
+              "R",
+              "GPS"
+            ]
+          ]
+        }
+      },
+      "verdict": "CONVERGED",
+      "consensus": [
+        "R",
+        "POS"
+      ]
+    },
+    {
+      "id": "ZT-VOCAB-06",
+      "nl": "report control station position",
+      "note": "Tests V:CSPOS (loader bug — opcode IS in v15 CSV but not loaded as Tier 2).",
+      "per_model": {
+        "haiku": {
+          "sal": "G:POS@*",
+          "opcodes": [
+            [
+              "G",
+              "POS"
+            ]
+          ]
+        },
+        "sonnet": {
+          "sal": "N:Q@*→G:POS",
+          "opcodes": [
+            [
+              "N",
+              "Q"
+            ],
+            [
+              "G",
+              "POS"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "sal": "NL_PASSTHROUGH",
+          "opcodes": []
+        }
+      },
+      "verdict": "CONVERGED",
+      "consensus": [
+        "G",
+        "POS"
+      ]
+    },
+    {
+      "id": "ZT-VOCAB-07",
+      "nl": "vibration sensor reading from sensor 4A",
+      "note": "Tests E:VIB gap. No existing E-opcode captures vibration.",
+      "per_model": {
+        "haiku": {
+          "sal": "R:VIBE@4A",
+          "opcodes": [
+            [
+              "R",
+              "VIBE"
+            ]
+          ]
+        },
+        "sonnet": {
+          "sal": "D:Q@4A",
+          "opcodes": [
+            [
+              "D",
+              "Q"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "sal": "NL_PASSTHROUGH",
+          "opcodes": []
+        }
+      },
+      "verdict": "DIVERGED",
+      "consensus": null
+    },
+    {
+      "id": "ZT-VOCAB-08",
+      "nl": "delete the database table",
+      "note": "Tests D:DEL gap. D:ABORT exists for processes. ZTOLE checks if models reduce or diverge.",
+      "per_model": {
+        "haiku": {
+          "sal": "R:KILL@*",
+          "opcodes": [
+            [
+              "R",
+              "KILL"
+            ]
+          ]
+        },
+        "sonnet": {
+          "sal": "```",
+          "opcodes": []
+        },
+        "gpt-4o-mini": {
+          "sal": "NL_PASSTHROUGH",
+          "opcodes": []
+        }
+      },
+      "verdict": "SINGLE_VOTE",
+      "consensus": null
+    }
+  ]
+}

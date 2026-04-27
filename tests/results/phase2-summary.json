@@ -1,0 +1,19 @@
+{
+  "conditions": {
+    "A-haiku": {
+      "verdicts": {
+        "UNKNOWN": 30
+      },
+      "cost_usd": 0.0028,
+      "n": 30
+    },
+    "A-gpt": {
+      "verdicts": {
+        "UNKNOWN": 30
+      },
+      "cost_usd": 0.0004,
+      "n": 30
+    }
+  },
+  "total_cost_usd": 0.0032
+}

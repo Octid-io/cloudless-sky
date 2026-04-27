@@ -1,0 +1,1579 @@
+{
+  "condition": "C",
+  "model": "haiku",
+  "verdicts": {
+    "INVALID": 13,
+    "WRONG": 10,
+    "CORRECT": 27,
+    "SAFE_PASSTHROUGH": 11,
+    "REFUSED_MALFORMED": 4
+  },
+  "cost_usd": 0.1628,
+  "results": [
+    {
+      "id": "DC-01",
+      "domain": "DEVICE_CONTROL",
+      "nl": "stop the conveyor",
+      "expected": [
+        "R:STOP↻",
+        "R:STOP↻@CONVEYOR"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP@*",
+      "raw_response": "R:STOP@*",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3072,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "DC-02",
+      "domain": "DEVICE_CONTROL",
+      "nl": "lock door D-7",
+      "expected": [
+        "R:LOCK↻@D-7"
+      ],
+      "expected_verdict": null,
+      "got": "R:ESTOP@D-7",
+      "raw_response": "R:ESTOP@D-7\n\nWait, that's wrong. ESTOP is emergency stop, not door lock.\n\nLooking at the opcodes, there's no door lock opcode in the R (robot/device control) namespace or elsewhere in the 352 opcodes ",
+      "verdict": "WRONG",
+      "usage": {
+        "input_tokens": 3073,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 72,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "DC-03",
+      "domain": "DEVICE_CONTROL",
+      "nl": "restart the service",
+      "expected": [
+        "C:RSTRT"
+      ],
+      "expected_verdict": null,
+      "got": "R:RSTRT",
+      "raw_response": "R:RSTRT",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3071,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "DC-04",
+      "domain": "DEVICE_CONTROL",
+      "nl": "shutdown gateway 3",
+      "expected": [
+        "C:KILL@3",
+        "R:STOP⊘@3"
+      ],
+      "expected_verdict": null,
+      "got": "R:KILL@3",
+      "raw_response": "R:KILL@3",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3072,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "DC-05",
+      "domain": "DEVICE_CONTROL",
+      "nl": "stop pump and close valve",
+      "expected": [
+        "R:STOP↻@PUMP∧R:CLOSE↻@VALVE",
+        "R:STOP↻@PUMP∧R:STOP↻@VALVE",
+        "R:STOP@PUMP↺∧R:STOP@VALVE↺"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP@pump;R:STOP@valve",
+      "raw_response": "R:STOP@pump;R:STOP@valve",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3073,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 16,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MT-01",
+      "domain": "MESHTASTIC",
+      "nl": "ping node 17",
+      "expected": [
+        "A:PING@17"
+      ],
+      "expected_verdict": null,
+      "got": "A:PING@17",
+      "raw_response": "A:PING@17",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3072,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MT-02",
+      "domain": "MESHTASTIC",
+      "nl": "discover peers",
+      "expected": [
+        "N:Q@*",
+        "N:Q"
+      ],
+      "expected_verdict": null,
+      "got": "N:Q",
+      "raw_response": "N:Q",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 6,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MT-03",
+      "domain": "MESHTASTIC",
+      "nl": "broadcast my position",
+      "expected": [
+        "G:POS@*",
+        "L:SEND@*[G:POS]"
+      ],
+      "expected_verdict": null,
+      "got": "R:STAT@*",
+      "raw_response": "R:STAT@*",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3071,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MT-04",
+      "domain": "MESHTASTIC",
+      "nl": "find primary relay",
+      "expected": [
+        "N:RLY?",
+        "N:Q[RLY]"
+      ],
+      "expected_verdict": null,
+      "got": "N:RLY",
+      "raw_response": "N:RLY",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3071,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 8,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MT-05",
+      "domain": "MESHTASTIC",
+      "nl": "node status",
+      "expected": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "expected_verdict": null,
+      "got": "N:STS",
+      "raw_response": "N:STS",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MED-01",
+      "domain": "MEDICAL",
+      "nl": "blood pressure check",
+      "expected": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "expected_verdict": null,
+      "got": "H:BP",
+      "raw_response": "H:BP",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3071,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 6,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MED-02",
+      "domain": "MEDICAL",
+      "nl": "all vitals for patient 12",
+      "expected": [
+        "H:VITALS@12",
+        "H:HR@12∧H:BP@12∧H:SPO2@12"
+      ],
+      "expected_verdict": null,
+      "got": "H:VITALS@12",
+      "raw_response": "H:VITALS@12",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3075,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 10,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MED-03",
+      "domain": "MEDICAL",
+      "nl": "alert me if heart rate exceeds 130",
+      "expected": [
+        "H:HR>130→H:ALERT",
+        "H:HR>130→U:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "H:HR>130→U:ALERT",
+      "raw_response": "H:HR>130→U:ALERT",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3077,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 13,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MED-04",
+      "domain": "MEDICAL",
+      "nl": "casualty report if BP above 180",
+      "expected": [
+        "H:BP>180→H:CASREP"
+      ],
+      "expected_verdict": null,
+      "got": "H:CASREP∨H:BP>180",
+      "raw_response": "H:CASREP∨H:BP>180",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3076,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 16,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MED-05",
+      "domain": "MEDICAL",
+      "nl": "patient has pneumothorax, code J93.0",
+      "expected": [
+        "H:ICD[J930]",
+        "H:ICD[J930]∧H:CASREP"
+      ],
+      "expected_verdict": null,
+      "got": "H:ICD@J93.0",
+      "raw_response": "H:ICD@J93.0",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3080,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 12,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "UAV-01",
+      "domain": "UAV_TELEMETRY",
+      "nl": "drone position",
+      "expected": [
+        "V:POS",
+        "G:POS"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS",
+      "raw_response": "G:POS",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "UAV-02",
+      "domain": "UAV_TELEMETRY",
+      "nl": "return to base",
+      "expected": [
+        "R:RTB↻"
+      ],
+      "expected_verdict": null,
+      "got": "R:RTH",
+      "raw_response": "R:RTH",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3071,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "UAV-03",
+      "domain": "UAV_TELEMETRY",
+      "nl": "move drone 1 to coordinates 35.7, -122.4",
+      "expected": [
+        "I:§→R:⚠MOV@DRONE1∧E:GPS[35.7,-122.4]",
+        "R:MOV↻@DRONE1[35.7,-122.4]"
+      ],
+      "expected_verdict": null,
+      "got": "R:MOV@1;G:POS@1=35.7,-122.4",
+      "raw_response": "R:MOV@1;G:POS@1=35.7,-122.4",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3084,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 24,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "UAV-04",
+      "domain": "UAV_TELEMETRY",
+      "nl": "form swarm wedge with spacing 50",
+      "expected": [
+        "R:FORM↻[wedge,50]"
+      ],
+      "expected_verdict": null,
+      "got": "R:FORM@*∧R:ZONE→50",
+      "raw_response": "R:FORM@*∧R:ZONE→50",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3077,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 17,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "UAV-05",
+      "domain": "UAV_TELEMETRY",
+      "nl": "vehicle heading",
+      "expected": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "expected_verdict": null,
+      "got": "G:BEARING",
+      "raw_response": "G:BEARING",
+      "verdict": "WRONG",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MOV-01",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "report location",
+      "expected": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS",
+      "raw_response": "G:POS",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MOV-02",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "report heading",
+      "expected": [
+        "G:BEARING",
+        "G:BEARING?"
+      ],
+      "expected_verdict": null,
+      "got": "G:BEARING",
+      "raw_response": "G:BEARING",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MOV-03",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "position and heading",
+      "expected": [
+        "G:POS∧G:BEARING"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS;G:BEARING",
+      "raw_response": "G:POS;G:BEARING",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3071,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 12,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MOV-04",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "vessel heading",
+      "expected": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "expected_verdict": null,
+      "got": "G:BEARING",
+      "raw_response": "G:BEARING",
+      "verdict": "WRONG",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "MOV-05",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "altitude reading",
+      "expected": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "expected_verdict": null,
+      "got": "G:ELEV",
+      "raw_response": "G:ELEV",
+      "verdict": "WRONG",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 8,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "WX-01",
+      "domain": "WEATHER",
+      "nl": "wind speed",
+      "expected": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND",
+      "raw_response": "W:WIND",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "WX-02",
+      "domain": "WEATHER",
+      "nl": "wind speed at turbine 7",
+      "expected": [
+        "W:WIND@7",
+        "W:WIND@7?"
+      ],
+      "expected_verdict": null,
+      "got": "G:RANGE@7",
+      "raw_response": "G:RANGE@7",
+      "verdict": "WRONG",
+      "usage": {
+        "input_tokens": 3075,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "WX-03",
+      "domain": "WEATHER",
+      "nl": "barometric pressure",
+      "expected": [
+        "E:PU",
+        "E:PU?",
+        "W:PRESS"
+      ],
+      "expected_verdict": null,
+      "got": "E:PU",
+      "raw_response": "E:PU",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3071,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "WX-04",
+      "domain": "WEATHER",
+      "nl": "alert when wind exceeds 40",
+      "expected": [
+        "W:WIND>40→L:ALERT",
+        "W:WIND>40→W:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND>40→L:ALERT",
+      "raw_response": "W:WIND>40→L:ALERT",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3075,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 14,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "WX-05",
+      "domain": "WEATHER",
+      "nl": "report temp and humidity",
+      "expected": [
+        "E:TH∧E:HU",
+        "E:EQ?TH:0∧?HU:0"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH;E:HU",
+      "raw_response": "E:TH;E:HU",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3072,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 12,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "SEN-01",
+      "domain": "SENSOR_ARRAY",
+      "nl": "read sensor 4A",
+      "expected": [
+        "E:TH@4A",
+        "E:TH@4A?"
+      ],
+      "expected_verdict": null,
+      "got": "R:STAT@4A",
+      "raw_response": "R:STAT@4A",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3073,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 10,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "SEN-02",
+      "domain": "SENSOR_ARRAY",
+      "nl": "humidity reading",
+      "expected": [
+        "E:HU",
+        "E:HU?"
+      ],
+      "expected_verdict": null,
+      "got": "E:HU",
+      "raw_response": "E:HU",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "SEN-03",
+      "domain": "SENSOR_ARRAY",
+      "nl": "give me temp and humidity from sensor node 4A",
+      "expected": [
+        "E:TH@4A∧E:HU@4A",
+        "E:EQ@4A?TH:0∧?HU:0"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH@4A",
+      "raw_response": "E:TH@4A",
+      "verdict": "WRONG",
+      "usage": {
+        "input_tokens": 3079,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 10,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "SEN-04",
+      "domain": "SENSOR_ARRAY",
+      "nl": "alert when humidity above 80",
+      "expected": [
+        "E:HU>80→U:NOTIFY",
+        "E:HU>80→L:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "E:HU>80→L:ALERT",
+      "raw_response": "E:HU>80→L:ALERT",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3074,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 14,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "SEN-05",
+      "domain": "SENSOR_ARRAY",
+      "nl": "air quality",
+      "expected": [
+        "E:EQ",
+        "E:EQ?"
+      ],
+      "expected_verdict": null,
+      "got": "E:EQ",
+      "raw_response": "E:EQ",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "ROB-01",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "emergency stop",
+      "expected": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "expected_verdict": null,
+      "got": "R:ESTOP",
+      "raw_response": "R:ESTOP",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 8,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "ROB-02",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "turn on the camera",
+      "expected": [
+        "R:CAM↻"
+      ],
+      "expected_verdict": null,
+      "got": "R:CAM",
+      "raw_response": "R:CAM",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3072,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "ROB-03",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "activate haptic feedback",
+      "expected": [
+        "R:HAPTIC↻"
+      ],
+      "expected_verdict": null,
+      "got": "R:HAPTIC",
+      "raw_response": "R:HAPTIC",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3072,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 8,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "ROB-04",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "turn on flashlight on node BRAVO",
+      "expected": [
+        "R:TORCH↻@BRAVO"
+      ],
+      "expected_verdict": null,
+      "got": "R:TORCH@BRAVO",
+      "raw_response": "R:TORCH@BRAVO",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3077,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 11,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "ROB-05",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "stop everything immediately, emergency",
+      "expected": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "expected_verdict": null,
+      "got": "R:ESTOP",
+      "raw_response": "R:ESTOP",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3073,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 8,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "CRY-01",
+      "domain": "CRYPTO_AUTH",
+      "nl": "sign the payload",
+      "expected": [
+        "S:SIGN"
+      ],
+      "expected_verdict": null,
+      "got": "S:SIGN",
+      "raw_response": "S:SIGN",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3071,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "CRY-02",
+      "domain": "CRYPTO_AUTH",
+      "nl": "generate a key pair, then sign the payload, then send to node BRAVO",
+      "expected": [
+        "S:KEYGEN;S:SIGN;D:PUSH@BRAVO"
+      ],
+      "expected_verdict": null,
+      "got": "S:KEYGEN;S:SIGN;D:PUSH@BRAVO",
+      "raw_response": "S:KEYGEN;S:SIGN;D:PUSH@BRAVO",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3085,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 22,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "CRY-03",
+      "domain": "CRYPTO_AUTH",
+      "nl": "verify identity",
+      "expected": [
+        "I:ID",
+        "A:VERIFY[I:ID]"
+      ],
+      "expected_verdict": null,
+      "got": "I:ID;S:VFY",
+      "raw_response": "I:ID;S:VFY",
+      "verdict": "WRONG",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 12,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "CRY-04",
+      "domain": "CRYPTO_AUTH",
+      "nl": "encrypt this payload then send it to the central server",
+      "expected": [
+        "S:ENC;D:PUSH@CENTRAL"
+      ],
+      "expected_verdict": null,
+      "got": "S:ENC;D:PUSH@*",
+      "raw_response": "S:ENC;D:PUSH@*",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3078,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 14,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "CRY-05",
+      "domain": "CRYPTO_AUTH",
+      "nl": "process payment but only if a human approves",
+      "expected": [
+        "I:§→K:PAY",
+        "U:APPROVE→K:PAY"
+      ],
+      "expected_verdict": null,
+      "got": "K:PAY⚠I:§",
+      "raw_response": "K:PAY⚠I:§",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3077,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 13,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "CFG-01",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "update config",
+      "expected": [
+        "N:CFG"
+      ],
+      "expected_verdict": null,
+      "got": "N:CFG",
+      "raw_response": "N:CFG",
+      "verdict": "CORRECT",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 7,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "CFG-02",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "set the threshold to 30",
+      "expected": [
+        "N:CFG[threshold:30]"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "SAFE_PASSTHROUGH",
+      "usage": {
+        "input_tokens": 3074,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "CFG-03",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "back up the database tonight at 2am",
+      "expected": [
+        "N:BK@2AM",
+        "T:SCHED@2AM→N:BK"
+      ],
+      "expected_verdict": null,
+      "got": "T:SCHED@NOW∧D:XFER@*;T:ALARM@02:00→C:CHKPT",
+      "raw_response": "T:SCHED@NOW∧D:XFER@*;T:ALARM@02:00→C:CHKPT",
+      "verdict": "INVALID",
+      "usage": {
+        "input_tokens": 3077,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 35,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "CFG-04",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "ping every 30 seconds",
+      "expected": [
+        "T:SCHED[30s]→A:PING"
+      ],
+      "expected_verdict": null,
+      "got": "T:REPEAT@30s;A:PING",
+      "raw_response": "T:REPEAT@30s;A:PING",
+      "verdict": "WRONG",
+      "usage": {
+        "input_tokens": 3074,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 15,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "CFG-05",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "expire this token in 1 hour",
+      "expected": [
+        "T:EXP[1h]"
+      ],
+      "expected_verdict": null,
+      "got": "T:EXP;T:DELAY@3600",
+      "raw_response": "T:EXP;T:DELAY@3600",
+      "verdict": "WRONG",
+      "usage": {
+        "input_tokens": 3076,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 16,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-CONV-01",
+      "domain": "CONVERSATIONAL",
+      "nl": "tell me a joke",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "SAFE_PASSTHROUGH",
+      "usage": {
+        "input_tokens": 3072,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-CONV-02",
+      "domain": "CONVERSATIONAL",
+      "nl": "how are you",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "SAFE_PASSTHROUGH",
+      "usage": {
+        "input_tokens": 3071,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-CONV-03",
+      "domain": "CONVERSATIONAL",
+      "nl": "thanks",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "SAFE_PASSTHROUGH",
+      "usage": {
+        "input_tokens": 3069,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-CONV-04",
+      "domain": "CONVERSATIONAL",
+      "nl": "good morning",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "SAFE_PASSTHROUGH",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-CONV-05",
+      "domain": "CONVERSATIONAL",
+      "nl": "what's your name",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "SAFE_PASSTHROUGH",
+      "usage": {
+        "input_tokens": 3072,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-UNK-01",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "order me a pepperoni pizza",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "SAFE_PASSTHROUGH",
+      "usage": {
+        "input_tokens": 3075,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-UNK-02",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "book a flight to Paris",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "SAFE_PASSTHROUGH",
+      "usage": {
+        "input_tokens": 3073,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-UNK-03",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "play some jazz",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "SAFE_PASSTHROUGH",
+      "usage": {
+        "input_tokens": 3071,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-UNK-04",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "remind me to buy milk",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "SAFE_PASSTHROUGH",
+      "usage": {
+        "input_tokens": 3073,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-UNK-05",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "translate this to French",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "SAFE_PASSTHROUGH",
+      "usage": {
+        "input_tokens": 3072,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-MAL-01",
+      "domain": "MALFORMED",
+      "nl": "asdf qwerty",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "REFUSED_MALFORMED",
+      "usage": {
+        "input_tokens": 3073,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-MAL-02",
+      "domain": "MALFORMED",
+      "nl": "...",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": "I'm ready to compose SAL (Structured Agent Language) instructions. Please provide the natural language instruction you'd like me to convert.",
+      "raw_response": "I'm ready to compose SAL (Structured Agent Language) instructions. Please provide the natural language instruction you'd like me to convert.",
+      "verdict": "WRONG",
+      "usage": {
+        "input_tokens": 3069,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 31,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-MAL-03",
+      "domain": "MALFORMED",
+      "nl": "the",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "REFUSED_MALFORMED",
+      "usage": {
+        "input_tokens": 3069,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-MAL-04",
+      "domain": "MALFORMED",
+      "nl": "xyz123",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "REFUSED_MALFORMED",
+      "usage": {
+        "input_tokens": 3070,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "id": "OOS-MAL-05",
+      "domain": "MALFORMED",
+      "nl": "{}",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "raw_response": "NL_PASSTHROUGH",
+      "verdict": "REFUSED_MALFORMED",
+      "usage": {
+        "input_tokens": 3069,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 9,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    }
+  ]
+}

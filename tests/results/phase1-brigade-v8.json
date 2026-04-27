@@ -1,0 +1,1928 @@
+{
+  "iteration": "v8",
+  "summary": {
+    "total": 147,
+    "buckets": {
+      "CORRECT": 112,
+      "SAFE_PASSTHROUGH": 26,
+      "WRONG": 2,
+      "REFUSED_MALFORMED": 7
+    },
+    "safe": 145,
+    "fatal": 2,
+    "correct_pct": 76.19,
+    "wrong_pct": 1.36,
+    "invalid_pct": 0.0,
+    "by_domain": {
+      "DEVICE_CONTROL": {
+        "CORRECT": 10,
+        "SAFE_PASSTHROUGH": 3
+      },
+      "MESHTASTIC": {
+        "CORRECT": 10,
+        "SAFE_PASSTHROUGH": 1
+      },
+      "MEDICAL": {
+        "CORRECT": 13,
+        "SAFE_PASSTHROUGH": 1
+      },
+      "UAV_TELEMETRY": {
+        "CORRECT": 8,
+        "SAFE_PASSTHROUGH": 2
+      },
+      "MOVEMENT_POSITIONING": {
+        "CORRECT": 9,
+        "SAFE_PASSTHROUGH": 1
+      },
+      "WEATHER": {
+        "CORRECT": 9
+      },
+      "SENSOR_ARRAY": {
+        "CORRECT": 8,
+        "SAFE_PASSTHROUGH": 1
+      },
+      "ROBOTIC_CAPABILITIES": {
+        "CORRECT": 10,
+        "SAFE_PASSTHROUGH": 1
+      },
+      "CRYPTO_AUTH": {
+        "CORRECT": 10
+      },
+      "CONFIG_SCHEDULE": {
+        "CORRECT": 7,
+        "WRONG": 1,
+        "SAFE_PASSTHROUGH": 1
+      },
+      "VEHICLE_FLEET": {
+        "CORRECT": 4,
+        "WRONG": 1
+      },
+      "ENERGY_GRID": {
+        "CORRECT": 5
+      },
+      "MEMORY": {
+        "CORRECT": 4
+      },
+      "INFERENCE": {
+        "CORRECT": 4
+      },
+      "FLOW": {
+        "CORRECT": 1,
+        "SAFE_PASSTHROUGH": 1
+      },
+      "CONVERSATIONAL": {
+        "SAFE_PASSTHROUGH": 7
+      },
+      "UNKNOWN_DOMAIN": {
+        "SAFE_PASSTHROUGH": 7
+      },
+      "MALFORMED": {
+        "REFUSED_MALFORMED": 7
+      }
+    }
+  },
+  "detailed": [
+    {
+      "id": "DC-01",
+      "domain": "DEVICE_CONTROL",
+      "nl": "stop the conveyor",
+      "expected": [
+        "R:STOP↻",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "DC-02",
+      "domain": "DEVICE_CONTROL",
+      "nl": "lock door D-7",
+      "expected": [
+        "R:LOCK↻@D-7",
+        "R:STOP↺@D-7",
+        "R:STOP↻@D-7"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP↺@D-7",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "DC-03",
+      "domain": "DEVICE_CONTROL",
+      "nl": "restart the service",
+      "expected": [
+        "C:RSTRT"
+      ],
+      "expected_verdict": null,
+      "got": "C:RSTRT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "DC-04",
+      "domain": "DEVICE_CONTROL",
+      "nl": "shutdown gateway 3",
+      "expected": [
+        "C:KILL@3",
+        "R:STOP⊘@3"
+      ],
+      "expected_verdict": null,
+      "got": "C:KILL@3",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "DC-05",
+      "domain": "DEVICE_CONTROL",
+      "nl": "stop pump and close valve",
+      "expected": [
+        "R:STOP↻@PUMP∧R:CLOSE↻@VALVE",
+        "R:STOP↻@PUMP∧R:STOP↻@VALVE",
+        "R:STOP@PUMP↺∧R:STOP@VALVE↺"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP↺∧R:STOP↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "DC-06",
+      "domain": "DEVICE_CONTROL",
+      "nl": "halt the pump",
+      "expected": [
+        "R:STOP↺@PUMP",
+        "R:STOP↻@PUMP",
+        "R:STOP↺",
+        "R:STOP↻"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "DC-07",
+      "domain": "DEVICE_CONTROL",
+      "nl": "open valve V12",
+      "expected": [
+        "R:OPEN↺@V12",
+        "R:OPEN↻@V12"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "in-scope passthrough"
+    },
+    {
+      "id": "DC-08",
+      "domain": "DEVICE_CONTROL",
+      "nl": "kill the worker process",
+      "expected": [
+        "C:KILL"
+      ],
+      "expected_verdict": null,
+      "got": "C:KILL@WORKER",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "DC-09",
+      "domain": "DEVICE_CONTROL",
+      "nl": "reboot server BRAVO",
+      "expected": [
+        "C:RSTRT@BRAVO"
+      ],
+      "expected_verdict": null,
+      "got": "C:RSTRT@BRAVO",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "DC-10",
+      "domain": "DEVICE_CONTROL",
+      "nl": "start the engine",
+      "expected": [
+        "R:START↺",
+        "R:START↻",
+        "R:START↺@ENGINE",
+        "R:START↻@ENGINE"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "in-scope passthrough"
+    },
+    {
+      "id": "MT-01",
+      "domain": "MESHTASTIC",
+      "nl": "ping node 17",
+      "expected": [
+        "A:PING@17"
+      ],
+      "expected_verdict": null,
+      "got": "A:PING@17",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MT-02",
+      "domain": "MESHTASTIC",
+      "nl": "discover peers",
+      "expected": [
+        "N:Q@*",
+        "N:Q"
+      ],
+      "expected_verdict": null,
+      "got": "N:Q@*",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MT-03",
+      "domain": "MESHTASTIC",
+      "nl": "broadcast my position",
+      "expected": [
+        "G:POS@*",
+        "L:SEND@*[G:POS]"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS@*",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MT-04",
+      "domain": "MESHTASTIC",
+      "nl": "find primary relay",
+      "expected": [
+        "N:RLY?",
+        "N:Q[RLY]",
+        "N:RLY"
+      ],
+      "expected_verdict": null,
+      "got": "N:RLY?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MT-05",
+      "domain": "MESHTASTIC",
+      "nl": "node status",
+      "expected": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "expected_verdict": null,
+      "got": "N:STS?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MT-06",
+      "domain": "MESHTASTIC",
+      "nl": "ping all peers",
+      "expected": [
+        "A:PING@*"
+      ],
+      "expected_verdict": null,
+      "got": "A:PING@*",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MT-07",
+      "domain": "MESHTASTIC",
+      "nl": "rebroadcast last message",
+      "expected": [
+        "L:SEND@*",
+        "L:SEND"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "in-scope passthrough"
+    },
+    {
+      "id": "MT-08",
+      "domain": "MESHTASTIC",
+      "nl": "mesh topology",
+      "expected": [
+        "O:MESH",
+        "O:MESH?"
+      ],
+      "expected_verdict": null,
+      "got": "O:MESH",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MT-09",
+      "domain": "MESHTASTIC",
+      "nl": "ping host BRAVO",
+      "expected": [
+        "A:PING@BRAVO"
+      ],
+      "expected_verdict": null,
+      "got": "A:PING@BRAVO",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MT-10",
+      "domain": "MESHTASTIC",
+      "nl": "uptime",
+      "expected": [
+        "N:STS",
+        "N:STS?"
+      ],
+      "expected_verdict": null,
+      "got": "N:STS",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MED-01",
+      "domain": "MEDICAL",
+      "nl": "blood pressure check",
+      "expected": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "expected_verdict": null,
+      "got": "H:BP?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MED-02",
+      "domain": "MEDICAL",
+      "nl": "all vitals for patient 12",
+      "expected": [
+        "H:VITALS@12",
+        "H:VITALS@PATIENT12",
+        "H:HR@12∧H:BP@12∧H:SPO2@12"
+      ],
+      "expected_verdict": null,
+      "got": "H:VITALS@PATIENT12?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MED-03",
+      "domain": "MEDICAL",
+      "nl": "alert me if heart rate exceeds 130",
+      "expected": [
+        "H:HR>130→H:ALERT",
+        "H:HR>130→U:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "H:HR>130→H:ALERT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MED-04",
+      "domain": "MEDICAL",
+      "nl": "casualty report if BP above 180",
+      "expected": [
+        "H:BP>180→H:CASREP"
+      ],
+      "expected_verdict": null,
+      "got": "H:BP?>180→H:CASREP",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MED-05",
+      "domain": "MEDICAL",
+      "nl": "patient has pneumothorax, code J93.0",
+      "expected": [
+        "H:ICD[J930]",
+        "H:ICD[J930]∧H:CASREP"
+      ],
+      "expected_verdict": null,
+      "got": "H:ICD@PATIENTHAS[J930]",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MED-06",
+      "domain": "MEDICAL",
+      "nl": "oxygen level",
+      "expected": [
+        "H:SPO2",
+        "H:SPO2?"
+      ],
+      "expected_verdict": null,
+      "got": "H:SPO2?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MED-07",
+      "domain": "MEDICAL",
+      "nl": "patient pulse",
+      "expected": [
+        "H:HR",
+        "H:HR?"
+      ],
+      "expected_verdict": null,
+      "got": "H:HR?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MED-08",
+      "domain": "MEDICAL",
+      "nl": "body temperature",
+      "expected": [
+        "H:TEMP",
+        "H:TEMP?"
+      ],
+      "expected_verdict": null,
+      "got": "H:TEMP?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MED-09",
+      "domain": "MEDICAL",
+      "nl": "warn if oxygen drops below 90",
+      "expected": [
+        "H:SPO2<90→H:ALERT",
+        "H:SPO2<90→U:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "H:SPO2<90→H:ALERT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MED-10",
+      "domain": "MEDICAL",
+      "nl": "blood pressure of patient 7",
+      "expected": [
+        "H:BP@7",
+        "H:BP@PATIENT7"
+      ],
+      "expected_verdict": null,
+      "got": "H:BP@PATIENT7?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "UAV-01",
+      "domain": "UAV_TELEMETRY",
+      "nl": "drone position",
+      "expected": [
+        "V:POS",
+        "G:POS",
+        "V:POS?",
+        "G:POS?"
+      ],
+      "expected_verdict": null,
+      "got": "V:POS",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "UAV-02",
+      "domain": "UAV_TELEMETRY",
+      "nl": "return to base",
+      "expected": [
+        "R:RTH↺",
+        "R:RTH↻",
+        "R:RTB↻"
+      ],
+      "expected_verdict": null,
+      "got": "R:RTH↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "UAV-03",
+      "domain": "UAV_TELEMETRY",
+      "nl": "move drone 1 to coordinates 35.7, -122.4",
+      "expected": [
+        "I:§→R:⚠MOV@DRONE1∧E:GPS[35.7,-122.4]",
+        "R:MOV↻@DRONE1[35.7,-122.4]",
+        "R:MOV↺@DRONE1[35.7,-122.4]"
+      ],
+      "expected_verdict": null,
+      "got": "R:MOV↺@DRONE1[35.7,-122.4]",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "UAV-04",
+      "domain": "UAV_TELEMETRY",
+      "nl": "form swarm wedge with spacing 50",
+      "expected": [
+        "R:FORM↻[wedge,50]",
+        "R:FORM↺[wedge,50]"
+      ],
+      "expected_verdict": null,
+      "got": "R:FORM↺[wedge]",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "UAV-05",
+      "domain": "UAV_TELEMETRY",
+      "nl": "vehicle heading",
+      "expected": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "expected_verdict": null,
+      "got": "V:HDG",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "UAV-06",
+      "domain": "UAV_TELEMETRY",
+      "nl": "drone return home",
+      "expected": [
+        "R:RTH↺",
+        "R:RTH↻"
+      ],
+      "expected_verdict": null,
+      "got": "R:RTH↺@DRONERETURN",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "UAV-07",
+      "domain": "UAV_TELEMETRY",
+      "nl": "drone 2 altitude",
+      "expected": [
+        "V:POS@DRONE2",
+        "V:POS@DRONE2?",
+        "G:POS@DRONE2"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS@DRONE2",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "UAV-08",
+      "domain": "UAV_TELEMETRY",
+      "nl": "form column with spacing 25",
+      "expected": [
+        "R:FORM↺[column,25]",
+        "R:FORM↻[column,25]"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "in-scope passthrough"
+    },
+    {
+      "id": "UAV-09",
+      "domain": "UAV_TELEMETRY",
+      "nl": "swarm RTB",
+      "expected": [
+        "R:RTH↺",
+        "R:RTH↻"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "in-scope passthrough"
+    },
+    {
+      "id": "UAV-10",
+      "domain": "UAV_TELEMETRY",
+      "nl": "uav heading",
+      "expected": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "expected_verdict": null,
+      "got": "V:HDG",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MOV-01",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "report location",
+      "expected": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MOV-02",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "report heading",
+      "expected": [
+        "G:BEARING",
+        "G:BEARING?",
+        "V:HDG"
+      ],
+      "expected_verdict": null,
+      "got": "G:BEARING?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MOV-03",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "position and heading",
+      "expected": [
+        "G:POS∧G:BEARING",
+        "G:POS∧V:HDG"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS∧G:BEARING",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MOV-04",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "vessel heading",
+      "expected": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "expected_verdict": null,
+      "got": "V:HDG",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MOV-05",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "altitude reading",
+      "expected": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MOV-06",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "where am I",
+      "expected": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MOV-07",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "show coordinates",
+      "expected": [
+        "G:POS",
+        "G:POS?",
+        "E:GPS"
+      ],
+      "expected_verdict": null,
+      "got": "E:GPS?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MOV-08",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "compass bearing",
+      "expected": [
+        "G:BEARING",
+        "G:BEARING?"
+      ],
+      "expected_verdict": null,
+      "got": "G:BEARING",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "WX-01",
+      "domain": "WEATHER",
+      "nl": "wind speed",
+      "expected": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "WX-02",
+      "domain": "WEATHER",
+      "nl": "wind speed at turbine 7",
+      "expected": [
+        "W:WIND@7",
+        "W:WIND@7?"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND@7?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "WX-03",
+      "domain": "WEATHER",
+      "nl": "barometric pressure",
+      "expected": [
+        "E:PU",
+        "E:PU?",
+        "W:PRESS"
+      ],
+      "expected_verdict": null,
+      "got": "E:PU?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "WX-04",
+      "domain": "WEATHER",
+      "nl": "alert when wind exceeds 40",
+      "expected": [
+        "W:WIND>40→L:ALERT",
+        "W:WIND>40→W:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND?>40→W:ALERT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "WX-05",
+      "domain": "WEATHER",
+      "nl": "report temp and humidity",
+      "expected": [
+        "E:TH∧E:HU",
+        "E:EQ?TH:0∧?HU:0"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH?∧E:HU?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "WX-06",
+      "domain": "WEATHER",
+      "nl": "atmospheric pressure",
+      "expected": [
+        "E:PU",
+        "E:PU?"
+      ],
+      "expected_verdict": null,
+      "got": "E:PU?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "WX-07",
+      "domain": "WEATHER",
+      "nl": "warn when wind above 35",
+      "expected": [
+        "W:WIND>35→W:ALERT",
+        "W:WIND>35→L:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND?>35→L:ALERT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "WX-08",
+      "domain": "WEATHER",
+      "nl": "current temperature",
+      "expected": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "SEN-01",
+      "domain": "SENSOR_ARRAY",
+      "nl": "read sensor 4A",
+      "expected": [
+        "E:TH@4A",
+        "E:TH@4A?"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH@4A?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "SEN-02",
+      "domain": "SENSOR_ARRAY",
+      "nl": "humidity reading",
+      "expected": [
+        "E:HU",
+        "E:HU?"
+      ],
+      "expected_verdict": null,
+      "got": "E:HU?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "SEN-03",
+      "domain": "SENSOR_ARRAY",
+      "nl": "give me temp and humidity from sensor node 4A",
+      "expected": [
+        "E:TH@4A∧E:HU@4A",
+        "E:EQ@4A?TH:0∧?HU:0",
+        "E:TH∧E:HU"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH?∧E:HU@NODE?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "SEN-04",
+      "domain": "SENSOR_ARRAY",
+      "nl": "alert when humidity above 80",
+      "expected": [
+        "E:HU>80→U:NOTIFY",
+        "E:HU>80→L:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "E:HU?>80→L:ALERT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "SEN-05",
+      "domain": "SENSOR_ARRAY",
+      "nl": "air quality",
+      "expected": [
+        "E:EQ",
+        "E:EQ?"
+      ],
+      "expected_verdict": null,
+      "got": "E:EQ?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "SEN-06",
+      "domain": "SENSOR_ARRAY",
+      "nl": "temperature now",
+      "expected": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "SEN-07",
+      "domain": "SENSOR_ARRAY",
+      "nl": "humidity at node 9",
+      "expected": [
+        "E:HU@9",
+        "E:HU@9?"
+      ],
+      "expected_verdict": null,
+      "got": "E:HU@9?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "SEN-08",
+      "domain": "SENSOR_ARRAY",
+      "nl": "alert if temperature above 100",
+      "expected": [
+        "E:TH>100→L:ALERT",
+        "E:TH>100→U:NOTIFY"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH>100→L:ALERT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "SEN-09",
+      "domain": "SENSOR_ARRAY",
+      "nl": "vibration sensor reading",
+      "expected": [
+        "E:VIB",
+        "E:VIB?"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "in-scope passthrough"
+    },
+    {
+      "id": "ROB-01",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "emergency stop",
+      "expected": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "expected_verdict": null,
+      "got": "R:ESTOP",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ROB-02",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "turn on the camera",
+      "expected": [
+        "R:CAM↻",
+        "R:CAM↺"
+      ],
+      "expected_verdict": null,
+      "got": "R:CAM↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ROB-03",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "activate haptic feedback",
+      "expected": [
+        "R:HAPTIC↻",
+        "R:HAPTIC↺"
+      ],
+      "expected_verdict": null,
+      "got": "R:HAPTIC↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ROB-04",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "turn on flashlight on node BRAVO",
+      "expected": [
+        "R:TORCH↻@BRAVO",
+        "R:TORCH↺@BRAVO"
+      ],
+      "expected_verdict": null,
+      "got": "R:TORCH↺@BRAVO",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ROB-05",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "stop everything immediately, emergency",
+      "expected": [
+        "R:ESTOP",
+        "R:ESTOP@*"
+      ],
+      "expected_verdict": null,
+      "got": "R:ESTOP",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ROB-06",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "vibrate",
+      "expected": [
+        "R:VIBE↺",
+        "R:VIBE↻",
+        "R:HAPTIC↺"
+      ],
+      "expected_verdict": null,
+      "got": "R:HAPTIC↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ROB-07",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "activate microphone",
+      "expected": [
+        "R:MIC↻",
+        "R:MIC↺"
+      ],
+      "expected_verdict": null,
+      "got": "R:MIC↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ROB-08",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "turn on speaker",
+      "expected": [
+        "R:SPKR↻",
+        "R:SPKR↺"
+      ],
+      "expected_verdict": null,
+      "got": "R:SPKR↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ROB-09",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "halt immediately",
+      "expected": [
+        "R:ESTOP",
+        "R:STOP↺"
+      ],
+      "expected_verdict": null,
+      "got": "R:ESTOP",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ROB-10",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "enable bluetooth",
+      "expected": [
+        "R:BT↺",
+        "R:BT↻"
+      ],
+      "expected_verdict": null,
+      "got": "R:BT↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CRY-01",
+      "domain": "CRYPTO_AUTH",
+      "nl": "sign the payload",
+      "expected": [
+        "S:SIGN"
+      ],
+      "expected_verdict": null,
+      "got": "S:SIGN",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CRY-02",
+      "domain": "CRYPTO_AUTH",
+      "nl": "generate a key pair, then sign the payload, then send to node BRAVO",
+      "expected": [
+        "S:KEYGEN;S:SIGN;D:PUSH@BRAVO"
+      ],
+      "expected_verdict": null,
+      "got": "S:KEYGEN;S:SIGN;D:PUSH@BRAVO",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CRY-03",
+      "domain": "CRYPTO_AUTH",
+      "nl": "verify identity",
+      "expected": [
+        "I:ID",
+        "A:VERIFY[I:ID]"
+      ],
+      "expected_verdict": null,
+      "got": "I:ID",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CRY-04",
+      "domain": "CRYPTO_AUTH",
+      "nl": "encrypt this payload then send it to the central server",
+      "expected": [
+        "S:ENC;D:PUSH@CENTRAL",
+        "S:ENC;D:PUSH"
+      ],
+      "expected_verdict": null,
+      "got": "S:ENC;D:PUSH@CENTRAL",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CRY-05",
+      "domain": "CRYPTO_AUTH",
+      "nl": "process payment but only if a human approves",
+      "expected": [
+        "I:§→K:PAY",
+        "U:APPROVE→K:PAY"
+      ],
+      "expected_verdict": null,
+      "got": "I:§→K:PAY",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CRY-06",
+      "domain": "CRYPTO_AUTH",
+      "nl": "encrypt this message",
+      "expected": [
+        "S:ENC"
+      ],
+      "expected_verdict": null,
+      "got": "S:ENC",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CRY-07",
+      "domain": "CRYPTO_AUTH",
+      "nl": "rotate keys",
+      "expected": [
+        "S:ROTATE",
+        "S:KEYGEN"
+      ],
+      "expected_verdict": null,
+      "got": "S:ROTATE",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CRY-08",
+      "domain": "CRYPTO_AUTH",
+      "nl": "hash this file",
+      "expected": [
+        "S:HASH"
+      ],
+      "expected_verdict": null,
+      "got": "S:HASH",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CRY-09",
+      "domain": "CRYPTO_AUTH",
+      "nl": "authenticate the peer",
+      "expected": [
+        "I:ID@PEER",
+        "I:ID"
+      ],
+      "expected_verdict": null,
+      "got": "I:ID",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CRY-10",
+      "domain": "CRYPTO_AUTH",
+      "nl": "verify signature",
+      "expected": [
+        "S:VFY"
+      ],
+      "expected_verdict": null,
+      "got": "S:VFY",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CFG-01",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "update config",
+      "expected": [
+        "N:CFG"
+      ],
+      "expected_verdict": null,
+      "got": "N:CFG",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CFG-02",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "set the threshold to 30",
+      "expected": [
+        "N:CFG[threshold:30]"
+      ],
+      "expected_verdict": null,
+      "got": "N:CFG@30[threshold:30]",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CFG-03",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "back up the database tonight at 2am",
+      "expected": [
+        "N:BK@2AM",
+        "T:SCHED@2AM→N:BK"
+      ],
+      "expected_verdict": null,
+      "got": "T:SCHED[2AM]→N:BK@2AM",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CFG-04",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "ping every 30 seconds",
+      "expected": [
+        "T:SCHED[30s]→A:PING",
+        "T:SCHED[30s];A:PING",
+        "T:SCHED[30]→A:PING"
+      ],
+      "expected_verdict": null,
+      "got": "T:SCHED[30s];A:PING",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CFG-05",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "expire this token in 1 hour",
+      "expected": [
+        "T:EXP[1h]"
+      ],
+      "expected_verdict": null,
+      "got": "T:EXP[1h]",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CFG-06",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "set max retries to 5",
+      "expected": [
+        "N:CFG[max_retries:5]",
+        "N:CFG[retries:5]"
+      ],
+      "expected_verdict": null,
+      "got": "N:CFG@5[retries:5]",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CFG-07",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "reboot at midnight",
+      "expected": [
+        "C:RSTRT@00:00",
+        "T:SCHED@00:00→C:RSTRT",
+        "T:SCHED@MIDNIGHT→C:RSTRT"
+      ],
+      "expected_verdict": null,
+      "got": "C:RSTRT@AT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "CFG-08",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "alert daily at 9am",
+      "expected": [
+        "T:SCHED@09:00→L:ALERT",
+        "T:SCHED@9AM→L:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "L:ALERT",
+      "verdict": "WRONG",
+      "reason": "valid SAL but doesn't match expected"
+    },
+    {
+      "id": "VIT-01",
+      "domain": "VEHICLE_FLEET",
+      "nl": "vehicle position",
+      "expected": [
+        "V:POS",
+        "V:POS?",
+        "G:POS"
+      ],
+      "expected_verdict": null,
+      "got": "V:POS",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "VIT-02",
+      "domain": "VEHICLE_FLEET",
+      "nl": "fleet status",
+      "expected": [
+        "V:FLEET",
+        "V:FLEET?"
+      ],
+      "expected_verdict": null,
+      "got": "V:FLEET?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "VIT-03",
+      "domain": "VEHICLE_FLEET",
+      "nl": "AIS position report",
+      "expected": [
+        "V:AIS"
+      ],
+      "expected_verdict": null,
+      "got": "V:AIS",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "VIT-04",
+      "domain": "VEHICLE_FLEET",
+      "nl": "vessel heading",
+      "expected": [
+        "V:HDG",
+        "V:HDG?"
+      ],
+      "expected_verdict": null,
+      "got": "V:HDG",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "VIT-05",
+      "domain": "VEHICLE_FLEET",
+      "nl": "control station position",
+      "expected": [
+        "V:CSPOS"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS",
+      "verdict": "WRONG",
+      "reason": "valid SAL but doesn't match expected"
+    },
+    {
+      "id": "ENERGY-01",
+      "domain": "ENERGY_GRID",
+      "nl": "battery level",
+      "expected": [
+        "X:STORE",
+        "X:STORE?"
+      ],
+      "expected_verdict": null,
+      "got": "X:STORE?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ENERGY-02",
+      "domain": "ENERGY_GRID",
+      "nl": "grid frequency",
+      "expected": [
+        "X:FREQ",
+        "X:FREQ?"
+      ],
+      "expected_verdict": null,
+      "got": "X:FREQ?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ENERGY-03",
+      "domain": "ENERGY_GRID",
+      "nl": "voltage reading",
+      "expected": [
+        "X:VOLT",
+        "X:VOLT?"
+      ],
+      "expected_verdict": null,
+      "got": "X:VOLT?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ENERGY-04",
+      "domain": "ENERGY_GRID",
+      "nl": "wind farm production",
+      "expected": [
+        "X:WND",
+        "X:WND?",
+        "X:PROD"
+      ],
+      "expected_verdict": null,
+      "got": "X:PROD?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "ENERGY-05",
+      "domain": "ENERGY_GRID",
+      "nl": "ev charging state",
+      "expected": [
+        "X:CHG",
+        "X:CHG?"
+      ],
+      "expected_verdict": null,
+      "got": "X:CHG?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MEMORY-01",
+      "domain": "MEMORY",
+      "nl": "store this to memory",
+      "expected": [
+        "Y:STORE"
+      ],
+      "expected_verdict": null,
+      "got": "Y:STORE",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MEMORY-02",
+      "domain": "MEMORY",
+      "nl": "fetch from memory by key",
+      "expected": [
+        "Y:FETCH"
+      ],
+      "expected_verdict": null,
+      "got": "Y:FETCH",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MEMORY-03",
+      "domain": "MEMORY",
+      "nl": "forget this memory",
+      "expected": [
+        "Y:FORGET"
+      ],
+      "expected_verdict": null,
+      "got": "Y:FORGET",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "MEMORY-04",
+      "domain": "MEMORY",
+      "nl": "page out memory",
+      "expected": [
+        "Y:PAGEOUT"
+      ],
+      "expected_verdict": null,
+      "got": "Y:PAGEOUT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "INF-01",
+      "domain": "INFERENCE",
+      "nl": "inference cost",
+      "expected": [
+        "Z:COST",
+        "Z:COST?"
+      ],
+      "expected_verdict": null,
+      "got": "Z:COST",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "INF-02",
+      "domain": "INFERENCE",
+      "nl": "context window",
+      "expected": [
+        "Z:CTX",
+        "Z:CTX?"
+      ],
+      "expected_verdict": null,
+      "got": "Z:CTX",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "INF-03",
+      "domain": "INFERENCE",
+      "nl": "token count",
+      "expected": [
+        "Z:TOKENS",
+        "Z:TOKENS?"
+      ],
+      "expected_verdict": null,
+      "got": "Z:TOKENS",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "INF-04",
+      "domain": "INFERENCE",
+      "nl": "run inference",
+      "expected": [
+        "Z:INF"
+      ],
+      "expected_verdict": null,
+      "got": "Z:INF",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "FLOW-01",
+      "domain": "FLOW",
+      "nl": "request flow authorization",
+      "expected": [
+        "F:AV"
+      ],
+      "expected_verdict": null,
+      "got": "F:AV",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "FLOW-02",
+      "domain": "FLOW",
+      "nl": "wait for next signal",
+      "expected": [
+        "F:WAIT"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "in-scope passthrough"
+    },
+    {
+      "id": "TYPO-01",
+      "domain": "DEVICE_CONTROL",
+      "nl": "stp the conveyor",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "TYPO-02",
+      "domain": "MEDICAL",
+      "nl": "blod presure",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "TYPO-03",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "report locaton",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "PARA-01",
+      "domain": "DEVICE_CONTROL",
+      "nl": "shut the conveyor down",
+      "expected": [
+        "C:KILL",
+        "R:STOP↺",
+        "R:STOP↻",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "expected_verdict": null,
+      "got": "C:KILL",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "PARA-02",
+      "domain": "MEDICAL",
+      "nl": "what is the patient's heart rate",
+      "expected": [
+        "H:HR",
+        "H:HR?"
+      ],
+      "expected_verdict": null,
+      "got": "H:HR?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "PARA-03",
+      "domain": "MOVEMENT_POSITIONING",
+      "nl": "tell me where I am",
+      "expected": [
+        "G:POS",
+        "G:POS?"
+      ],
+      "expected_verdict": null,
+      "got": "G:POS?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "PARA-04",
+      "domain": "WEATHER",
+      "nl": "how fast is the wind",
+      "expected": [
+        "W:WIND",
+        "W:WIND?"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "PARA-05",
+      "domain": "MEDICAL",
+      "nl": "give me the BP",
+      "expected": [
+        "H:BP",
+        "H:BP?"
+      ],
+      "expected_verdict": null,
+      "got": "H:BP?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "PARA-06",
+      "domain": "ROBOTIC_CAPABILITIES",
+      "nl": "engage the camera",
+      "expected": [
+        "R:CAM↺",
+        "R:CAM↻"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "in-scope passthrough"
+    },
+    {
+      "id": "PARA-07",
+      "domain": "MESHTASTIC",
+      "nl": "show me the mesh status",
+      "expected": [
+        "O:MESH",
+        "O:MESH?",
+        "N:STS"
+      ],
+      "expected_verdict": null,
+      "got": "N:STS?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "PARA-08",
+      "domain": "DEVICE_CONTROL",
+      "nl": "kill the conveyor",
+      "expected": [
+        "C:KILL@CONVEYOR",
+        "C:KILL",
+        "R:STOP↺@CONVEYOR"
+      ],
+      "expected_verdict": null,
+      "got": "C:KILL",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "PARA-09",
+      "domain": "CONFIG_SCHEDULE",
+      "nl": "modify settings",
+      "expected": [
+        "N:CFG"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "in-scope passthrough"
+    },
+    {
+      "id": "PARA-10",
+      "domain": "MEDICAL",
+      "nl": "check oxygen sat",
+      "expected": [
+        "H:SPO2",
+        "H:SPO2?"
+      ],
+      "expected_verdict": null,
+      "got": "H:SPO2?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "OOS-CONV-01",
+      "domain": "CONVERSATIONAL",
+      "nl": "tell me a joke",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-CONV-02",
+      "domain": "CONVERSATIONAL",
+      "nl": "how are you",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-CONV-03",
+      "domain": "CONVERSATIONAL",
+      "nl": "thanks",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-CONV-04",
+      "domain": "CONVERSATIONAL",
+      "nl": "good morning",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-CONV-05",
+      "domain": "CONVERSATIONAL",
+      "nl": "what's your name",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-CONV-06",
+      "domain": "CONVERSATIONAL",
+      "nl": "I love this product",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-CONV-07",
+      "domain": "CONVERSATIONAL",
+      "nl": "have a nice day",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-UNK-01",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "order me a pepperoni pizza",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-UNK-02",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "book a flight to Paris",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-UNK-03",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "play some jazz",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-UNK-04",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "remind me to buy milk",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-UNK-05",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "translate this to French",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-UNK-06",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "find me a recipe for pasta",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-UNK-07",
+      "domain": "UNKNOWN_DOMAIN",
+      "nl": "what time is the meeting",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "OOS-MAL-01",
+      "domain": "MALFORMED",
+      "nl": "asdf qwerty",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "rejected malformed"
+    },
+    {
+      "id": "OOS-MAL-02",
+      "domain": "MALFORMED",
+      "nl": "...",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "rejected malformed"
+    },
+    {
+      "id": "OOS-MAL-03",
+      "domain": "MALFORMED",
+      "nl": "the",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "rejected malformed"
+    },
+    {
+      "id": "OOS-MAL-04",
+      "domain": "MALFORMED",
+      "nl": "xyz123",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "rejected malformed"
+    },
+    {
+      "id": "OOS-MAL-05",
+      "domain": "MALFORMED",
+      "nl": "{}",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "rejected malformed"
+    },
+    {
+      "id": "OOS-MAL-06",
+      "domain": "MALFORMED",
+      "nl": "lorem ipsum dolor",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "rejected malformed"
+    },
+    {
+      "id": "OOS-MAL-07",
+      "domain": "MALFORMED",
+      "nl": "????",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "rejected malformed"
+    }
+  ]
+}

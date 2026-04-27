@@ -1,0 +1,397 @@
+{
+  "iteration": "edges-bridge",
+  "summary": {
+    "total": 31,
+    "buckets": {
+      "SAFE_PASSTHROUGH": 13,
+      "CORRECT": 15,
+      "INVALID": 1,
+      "REFUSED_MALFORMED": 2
+    },
+    "safe": 30,
+    "fatal": 1,
+    "correct_pct": 48.39,
+    "wrong_pct": 0.0,
+    "invalid_pct": 3.23,
+    "by_domain": {
+      "EDGE": {
+        "SAFE_PASSTHROUGH": 13,
+        "CORRECT": 15,
+        "INVALID": 1,
+        "REFUSED_MALFORMED": 2
+      }
+    }
+  },
+  "detailed": [
+    {
+      "id": "EDGE-NEG-01",
+      "domain": "EDGE",
+      "nl": "don't stop the conveyor",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "EDGE-NEG-02",
+      "domain": "EDGE",
+      "nl": "do not move the drone",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "EDGE-NEG-03",
+      "domain": "EDGE",
+      "nl": "never restart the service",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "EDGE-AMB-01",
+      "domain": "EDGE",
+      "nl": "do it",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "EDGE-AMB-02",
+      "domain": "EDGE",
+      "nl": "stop that",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "EDGE-AMB-03",
+      "domain": "EDGE",
+      "nl": "send this",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "EDGE-MIX-01",
+      "domain": "EDGE",
+      "nl": "stop the conveyor and order pizza",
+      "expected": [
+        "R:STOP↺@CONVEYOR",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "in-scope passthrough"
+    },
+    {
+      "id": "EDGE-MIX-02",
+      "domain": "EDGE",
+      "nl": "report temperature and tell me a joke",
+      "expected": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "in-scope passthrough"
+    },
+    {
+      "id": "EDGE-LONG-01",
+      "domain": "EDGE",
+      "nl": "Please report the current temperature reading from sensor node 4A and also broadcast my position to all peers in the mesh network now",
+      "expected": [
+        "E:TH@4A∧G:POS@*",
+        "E:TH@NODE?∧G:POS@*",
+        "E:TH@4A",
+        "E:TH@4A?",
+        "G:POS"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH@NODE?∧G:POS@*",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-SHORT-01",
+      "domain": "EDGE",
+      "nl": "go",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "EDGE-SHORT-02",
+      "domain": "EDGE",
+      "nl": "stop",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "EDGE-SHORT-03",
+      "domain": "EDGE",
+      "nl": "ping",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "EDGE-PUNCT-01",
+      "domain": "EDGE",
+      "nl": "stop, the!! conveyor??",
+      "expected": [
+        "R:STOP↺@CONVEYOR",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-CASE-01",
+      "domain": "EDGE",
+      "nl": "STOP THE CONVEYOR",
+      "expected": [
+        "R:STOP↺@CONVEYOR",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-CASE-02",
+      "domain": "EDGE",
+      "nl": "rEpOrT TeMpErAtUrE",
+      "expected": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-NUM-01",
+      "domain": "EDGE",
+      "nl": "alert me if heart rate exceeds -1",
+      "expected": [
+        "H:HR>-1→H:ALERT",
+        "H:HR>-1→U:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "H:HR>-1→H:ALERT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-NUM-02",
+      "domain": "EDGE",
+      "nl": "alert me if heart rate exceeds 999999",
+      "expected": [
+        "H:HR>999999→H:ALERT",
+        "H:HR>999999→U:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "H:HR>999999→H:ALERT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-NUM-03",
+      "domain": "EDGE",
+      "nl": "set threshold to 0.0001",
+      "expected": [
+        "N:CFG[threshold:0.0001]"
+      ],
+      "expected_verdict": null,
+      "got": null,
+      "verdict": "INVALID",
+      "reason": "compose raised NameError: name 'BRIDGE_FORBIDDEN_FRAMES' is not defined"
+    },
+    {
+      "id": "EDGE-LANG-01",
+      "domain": "EDGE",
+      "nl": "ping the noeud BRAVO",
+      "expected": [
+        "A:PING@BRAVO"
+      ],
+      "expected_verdict": null,
+      "got": "A:PING",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-INJECT-01",
+      "domain": "EDGE",
+      "nl": "please send R:STOP to the conveyor",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "EDGE-EMPTY-01",
+      "domain": "EDGE",
+      "nl": "",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "rejected malformed"
+    },
+    {
+      "id": "EDGE-EMPTY-02",
+      "domain": "EDGE",
+      "nl": "   ",
+      "expected": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED",
+      "reason": "rejected malformed"
+    },
+    {
+      "id": "EDGE-NOM-01",
+      "domain": "EDGE",
+      "nl": "temperature",
+      "expected": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-NOM-02",
+      "domain": "EDGE",
+      "nl": "humidity reading from sensor 7",
+      "expected": [
+        "E:HU@7",
+        "E:HU@7?"
+      ],
+      "expected_verdict": null,
+      "got": "E:HU@7?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-QUERY-01",
+      "domain": "EDGE",
+      "nl": "what is the heart rate?",
+      "expected": [
+        "H:HR",
+        "H:HR?"
+      ],
+      "expected_verdict": null,
+      "got": "H:HR?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-QUERY-02",
+      "domain": "EDGE",
+      "nl": "where is drone 3?",
+      "expected": [
+        "V:POS@DRONE3",
+        "G:POS",
+        "V:POS"
+      ],
+      "expected_verdict": null,
+      "got": "V:POS@DRONE3?",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-FILLER-01",
+      "domain": "EDGE",
+      "nl": "uh, can you, like, maybe, stop the conveyor please",
+      "expected": [
+        "R:STOP↺@CONVEYOR",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺"
+      ],
+      "expected_verdict": null,
+      "got": "R:STOP↺",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-AUTH-01",
+      "domain": "EDGE",
+      "nl": "process payment, requires sign-off",
+      "expected": [
+        "I:§→K:PAY"
+      ],
+      "expected_verdict": null,
+      "got": "I:§→K:PAY",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-AUTH-02",
+      "domain": "EDGE",
+      "nl": "delete the database, but only with approval",
+      "expected": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH",
+      "reason": "correct passthrough"
+    },
+    {
+      "id": "EDGE-COND-01",
+      "domain": "EDGE",
+      "nl": "alert me when temperature drops below 65",
+      "expected": [
+        "E:TH<65→L:ALERT",
+        "E:TH<65→U:ALERT",
+        "E:TH<65→U:NOTIFY"
+      ],
+      "expected_verdict": null,
+      "got": "E:TH?<65→L:ALERT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    },
+    {
+      "id": "EDGE-COND-02",
+      "domain": "EDGE",
+      "nl": "warn while wind exceeds 50",
+      "expected": [
+        "W:WIND>50→W:ALERT",
+        "W:WIND>50→L:ALERT"
+      ],
+      "expected_verdict": null,
+      "got": "W:WIND>50→L:ALERT",
+      "verdict": "CORRECT",
+      "reason": "match"
+    }
+  ]
+}

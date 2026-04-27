@@ -1,0 +1,324 @@
+{
+  "results": [
+    {
+      "intent": "geographic position of control station",
+      "opcode": "C:POS",
+      "len": 5,
+      "recog_rate": 0.6666666666666666,
+      "responses": {
+        "haiku": {
+          "resp": "Position control for a robotic manipulator or actuator arm.",
+          "recognized": true
+        },
+        "sonnet": {
+          "resp": "Reports or retrieves the current position of a camera or cursor.",
+          "recognized": false
+        },
+        "gpt-4o-mini": {
+          "resp": "Trigger the position control action.",
+          "recognized": true
+        }
+      }
+    },
+    {
+      "intent": "geographic position of control station",
+      "opcode": "CS:POS",
+      "len": 6,
+      "recog_rate": 0.3333333333333333,
+      "responses": {
+        "haiku": {
+          "resp": "Returns the current position coordinates.",
+          "recognized": false
+        },
+        "sonnet": {
+          "resp": "Reports or retrieves the current position of a control surface.",
+          "recognized": true
+        },
+        "gpt-4o-mini": {
+          "resp": "Trigger the position of a coordinate system.",
+          "recognized": false
+        }
+      }
+    },
+    {
+      "intent": "start an engine or motor",
+      "opcode": "E:START",
+      "len": 7,
+      "recog_rate": 0.0,
+      "responses": {
+        "haiku": {
+          "resp": "Activates the environmental monitoring system.",
+          "recognized": false
+        },
+        "sonnet": {
+          "resp": "Begin environmental monitoring or activate environmental sensors.",
+          "recognized": false
+        },
+        "gpt-4o-mini": {
+          "resp": "Initiate environmental monitoring.",
+          "recognized": false
+        }
+      }
+    },
+    {
+      "intent": "start an engine or motor",
+      "opcode": "EN:START",
+      "len": 8,
+      "recog_rate": 0.0,
+      "responses": {
+        "haiku": {
+          "resp": "Enables or activates the environmental monitoring system.",
+          "recognized": false
+        },
+        "sonnet": {
+          "resp": "Begin energy system or enable engine operation.",
+          "recognized": false
+        },
+        "gpt-4o-mini": {
+          "resp": "Initiate the environmental monitoring system.",
+          "recognized": false
+        }
+      }
+    },
+    {
+      "intent": "vibration sensor reading",
+      "opcode": "S:VIB",
+      "len": 5,
+      "recog_rate": 0.6666666666666666,
+      "responses": {
+        "haiku": {
+          "resp": "Measure vibration levels from a sensor.",
+          "recognized": true
+        },
+        "sonnet": {
+          "resp": "Activates a vibration sensor or triggers a vibration motor in the syst",
+          "recognized": true
+        },
+        "gpt-4o-mini": {
+          "resp": "Trigger a vibration alert.",
+          "recognized": false
+        }
+      }
+    },
+    {
+      "intent": "vibration sensor reading",
+      "opcode": "VB:SNS",
+      "len": 6,
+      "recog_rate": 0.3333333333333333,
+      "responses": {
+        "haiku": {
+          "resp": "Activate the vestibular balance sensor.",
+          "recognized": false
+        },
+        "sonnet": {
+          "resp": "Visual/vision-based sensor reading or activation.",
+          "recognized": true
+        },
+        "gpt-4o-mini": {
+          "resp": "Trigger a voice broadcast for sensor notifications.",
+          "recognized": false
+        }
+      }
+    },
+    {
+      "intent": "open a valve",
+      "opcode": "V:OPE",
+      "len": 5,
+      "recog_rate": 0.6666666666666666,
+      "responses": {
+        "haiku": {
+          "resp": "Opens the valve.",
+          "recognized": true
+        },
+        "sonnet": {
+          "resp": "Opens a valve.",
+          "recognized": true
+        },
+        "gpt-4o-mini": {
+          "resp": "Trigger an operation for a vehicle.",
+          "recognized": false
+        }
+      }
+    },
+    {
+      "intent": "open a valve",
+      "opcode": "VL:OPE",
+      "len": 6,
+      "recog_rate": 0.6666666666666666,
+      "responses": {
+        "haiku": {
+          "resp": "Opens the valve.",
+          "recognized": true
+        },
+        "sonnet": {
+          "resp": "Open a valve.",
+          "recognized": true
+        },
+        "gpt-4o-mini": {
+          "resp": "Trigger an operation related to vehicle location.",
+          "recognized": false
+        }
+      }
+    },
+    {
+      "intent": "close a valve",
+      "opcode": "V:CL",
+      "len": 4,
+      "recog_rate": 0.6666666666666666,
+      "responses": {
+        "haiku": {
+          "resp": "Close the valve.",
+          "recognized": true
+        },
+        "sonnet": {
+          "resp": "Close or actuate a valve.",
+          "recognized": true
+        },
+        "gpt-4o-mini": {
+          "resp": "Trigger a climate control action.",
+          "recognized": false
+        }
+      }
+    },
+    {
+      "intent": "close a valve",
+      "opcode": "VL:CL",
+      "len": 5,
+      "recog_rate": 0.3333333333333333,
+      "responses": {
+        "haiku": {
+          "resp": "Displays or activates a visual/display element (likely clearing or clo",
+          "recognized": false
+        },
+        "sonnet": {
+          "resp": "Close or retract a valve.",
+          "recognized": true
+        },
+        "gpt-4o-mini": {
+          "resp": "Trigger a vehicle's climate control system.",
+          "recognized": false
+        }
+      }
+    },
+    {
+      "intent": "drop a database table",
+      "opcode": "D:DROP",
+      "len": 6,
+      "recog_rate": 0.0,
+      "responses": {
+        "haiku": {
+          "resp": "Releases or dispenses the held object.",
+          "recognized": false
+        },
+        "sonnet": {
+          "resp": "Remove or delete an item from a data structure.",
+          "recognized": false
+        },
+        "gpt-4o-mini": {
+          "resp": "The action triggers the dropping of an object or item.",
+          "recognized": false
+        }
+      }
+    },
+    {
+      "intent": "drop a database table",
+      "opcode": "DB:DROP",
+      "len": 7,
+      "recog_rate": 1.0,
+      "responses": {
+        "haiku": {
+          "resp": "Deletes or removes a database table or object.",
+          "recognized": true
+        },
+        "sonnet": {
+          "resp": "Drops (deletes) a database table or database.",
+          "recognized": true
+        },
+        "gpt-4o-mini": {
+          "resp": "Trigger a drop action for a database operation.",
+          "recognized": true
+        }
+      }
+    },
+    {
+      "intent": "broadcast a message to all peers (network)",
+      "opcode": "N:BCST",
+      "len": 6,
+      "recog_rate": 0.0,
+      "responses": {
+        "haiku": {
+          "resp": "Broadcast a message to the network.",
+          "recognized": false
+        },
+        "sonnet": {
+          "resp": "Broadcast a message over the network.",
+          "recognized": false
+        },
+        "gpt-4o-mini": {
+          "resp": "Broadcast a message or signal.",
+          "recognized": false
+        }
+      }
+    },
+    {
+      "intent": "broadcast a message to all peers (network)",
+      "opcode": "NW:BCST",
+      "len": 7,
+      "recog_rate": 0.3333333333333333,
+      "responses": {
+        "haiku": {
+          "resp": "Broadcast a network message to all connected devices.",
+          "recognized": true
+        },
+        "sonnet": {
+          "resp": "Broadcasts a message over the network.",
+          "recognized": false
+        },
+        "gpt-4o-mini": {
+          "resp": "Broadcast a notification.",
+          "recognized": false
+        }
+      }
+    },
+    {
+      "intent": "robotic stop / actuator stop",
+      "opcode": "R:STOP",
+      "len": 6,
+      "recog_rate": 0.6666666666666666,
+      "responses": {
+        "haiku": {
+          "resp": "Triggers an emergency stop for the robotic system.",
+          "recognized": true
+        },
+        "sonnet": {
+          "resp": "Immediately halts all robotic movement and operations.",
+          "recognized": false
+        },
+        "gpt-4o-mini": {
+          "resp": "Trigger an emergency stop for the robot.",
+          "recognized": true
+        }
+      }
+    },
+    {
+      "intent": "robotic stop / actuator stop",
+      "opcode": "RB:STOP",
+      "len": 7,
+      "recog_rate": 1.0,
+      "responses": {
+        "haiku": {
+          "resp": "Stops all robotic arm or manipulator movements.",
+          "recognized": true
+        },
+        "sonnet": {
+          "resp": "Stop or halt the robotic system immediately.",
+          "recognized": true
+        },
+        "gpt-4o-mini": {
+          "resp": "Trigger a stop action for a robotic system.",
+          "recognized": true
+        }
+      }
+    }
+  ]
+}

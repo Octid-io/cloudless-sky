@@ -1,0 +1,19 @@
+{
+  "version": "ztole-vocab-v1",
+  "description": "ZTOLE-mode-1 convergence measurement on the 8 disputed vocab chips. Tests whether panel models converge on a single opcode (false gap — reduces to existing) OR diverge (true vocab gap — no existing opcode captures intent).",
+  "scoring": {
+    "verdicts": ["CORRECT", "SAFE_BRIDGE", "SAFE_PASSTHROUGH", "REFUSED_MALFORMED", "REFUSED", "INVALID", "WRONG"],
+    "fatal": ["WRONG", "INVALID"],
+    "safe": ["CORRECT", "SAFE_BRIDGE", "SAFE_PASSTHROUGH", "REFUSED_MALFORMED", "REFUSED"]
+  },
+  "inputs": [
+    {"id": "ZT-VOCAB-01", "domain": "DEVICE_CONTROL", "nl": "open valve V12", "expected_sal": [], "note": "Tests R:OPEN gap. False=converges to R:STOP / R:UNLOCK / etc. True=panel picks R:OPEN unanimously OR diverges."},
+    {"id": "ZT-VOCAB-02", "domain": "DEVICE_CONTROL", "nl": "start the engine", "expected_sal": [], "note": "Tests R:START gap. Could reduce to R:DRVE/R:THR/R:TKOF for vehicle context."},
+    {"id": "ZT-VOCAB-03", "domain": "DEVICE_CONTROL", "nl": "close valve V12", "expected_sal": [], "note": "Tests R:CLOSE. I claim it reduces to R:STOP. ZTOLE verifies."},
+    {"id": "ZT-VOCAB-04", "domain": "DEVICE_CONTROL", "nl": "lock the door", "expected_sal": [], "note": "Tests R:LOCK. I claim it reduces to R:STOP. ZTOLE verifies."},
+    {"id": "ZT-VOCAB-05", "domain": "MESHTASTIC", "nl": "broadcast my position to all peers", "expected_sal": [], "note": "Tests L:SEND. I claim it reduces to D:PUSH or G:POS@*. ZTOLE verifies."},
+    {"id": "ZT-VOCAB-06", "domain": "VEHICLE_FLEET", "nl": "report control station position", "expected_sal": [], "note": "Tests V:CSPOS (loader bug — opcode IS in v15 CSV but not loaded as Tier 2)."},
+    {"id": "ZT-VOCAB-07", "domain": "SENSOR_ARRAY", "nl": "vibration sensor reading from sensor 4A", "expected_sal": [], "note": "Tests E:VIB gap. No existing E-opcode captures vibration."},
+    {"id": "ZT-VOCAB-08", "domain": "DATA", "nl": "delete the database table", "expected_sal": [], "note": "Tests D:DEL gap. D:ABORT exists for processes. ZTOLE checks if models reduce or diverge."}
+  ]
+}

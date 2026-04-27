@@ -22,3 +22,7 @@ build/
 dist/
 *.whl
 *.tar.gz
+# API keys and secrets — never commit
+.env
+.env.*
+*.key

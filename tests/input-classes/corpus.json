@@ -1,0 +1,92 @@
+{
+  "version": "v1",
+  "date": "2026-04-26",
+  "description": "OSMP composer test corpus, stratified by subject domain.",
+  "scoring": {
+    "verdicts": ["CORRECT", "SAFE_BRIDGE", "SAFE_PASSTHROUGH", "REFUSED_MALFORMED", "REFUSED", "INVALID", "WRONG"],
+    "fatal": ["WRONG", "INVALID"],
+    "safe": ["CORRECT", "SAFE_BRIDGE", "SAFE_PASSTHROUGH", "REFUSED_MALFORMED", "REFUSED"],
+    "bar_correct_pct": 99,
+    "bar_wrong_pct": 0,
+    "bar_invalid_pct": 0
+  },
+  "inputs": [
+    {"id": "DC-01", "domain": "DEVICE_CONTROL", "shape": "simple_action", "nl": "stop the conveyor", "expected_sal": ["R:STOP\u21bb", "R:STOP\u21bb@CONVEYOR"]},
+    {"id": "DC-02", "domain": "DEVICE_CONTROL", "shape": "targeted_action", "nl": "lock door D-7", "expected_sal": ["R:LOCK\u21bb@D-7", "R:STOP\u21ba@D-7", "R:STOP\u21bb@D-7"]},
+    {"id": "DC-03", "domain": "DEVICE_CONTROL", "shape": "simple_action", "nl": "restart the service", "expected_sal": ["C:RSTRT"]},
+    {"id": "DC-04", "domain": "DEVICE_CONTROL", "shape": "targeted_action", "nl": "shutdown gateway 3", "expected_sal": ["C:KILL@3", "R:STOP\u2298@3"]},
+    {"id": "DC-05", "domain": "DEVICE_CONTROL", "shape": "chain_conjunctive", "nl": "stop pump and close valve", "expected_sal": ["R:STOP\u21bb@PUMP\u2227R:CLOSE\u21bb@VALVE", "R:STOP\u21bb@PUMP\u2227R:STOP\u21bb@VALVE", "R:STOP@PUMP\u21ba\u2227R:STOP@VALVE\u21ba"]},
+
+    {"id": "MT-01", "domain": "MESHTASTIC", "shape": "targeted_query", "nl": "ping node 17", "expected_sal": ["A:PING@17"]},
+    {"id": "MT-02", "domain": "MESHTASTIC", "shape": "simple_query", "nl": "discover peers", "expected_sal": ["N:Q@*", "N:Q"]},
+    {"id": "MT-03", "domain": "MESHTASTIC", "shape": "simple_action", "nl": "broadcast my position", "expected_sal": ["G:POS@*", "L:SEND@*[G:POS]"]},
+    {"id": "MT-04", "domain": "MESHTASTIC", "shape": "simple_query", "nl": "find primary relay", "expected_sal": ["N:RLY?", "N:Q[RLY]"]},
+    {"id": "MT-05", "domain": "MESHTASTIC", "shape": "simple_query", "nl": "node status", "expected_sal": ["N:STS", "N:STS?"]},
+
+    {"id": "MED-01", "domain": "MEDICAL", "shape": "simple_query", "nl": "blood pressure check", "expected_sal": ["H:BP", "H:BP?"]},
+    {"id": "MED-02", "domain": "MEDICAL", "shape": "targeted_multi_read", "nl": "all vitals for patient 12", "expected_sal": ["H:VITALS@12", "H:HR@12\u2227H:BP@12\u2227H:SPO2@12"]},
+    {"id": "MED-03", "domain": "MEDICAL", "shape": "conditional_alert", "nl": "alert me if heart rate exceeds 130", "expected_sal": ["H:HR>130\u2192H:ALERT", "H:HR>130\u2192U:ALERT"]},
+    {"id": "MED-04", "domain": "MEDICAL", "shape": "conditional_alert", "nl": "casualty report if BP above 180", "expected_sal": ["H:BP>180\u2192H:CASREP"]},
+    {"id": "MED-05", "domain": "MEDICAL", "shape": "parametric_action", "nl": "patient has pneumothorax, code J93.0", "expected_sal": ["H:ICD[J930]", "H:ICD[J930]\u2227H:CASREP"]},
+
+    {"id": "UAV-01", "domain": "UAV_TELEMETRY", "shape": "simple_query", "nl": "drone position", "expected_sal": ["V:POS", "G:POS"]},
+    {"id": "UAV-02", "domain": "UAV_TELEMETRY", "shape": "simple_action", "nl": "return to base", "expected_sal": ["R:RTH\u21ba", "R:RTH\u21bb", "R:RTB\u21bb"], "note": "v15 ASD has R:RTH (return-to-home), not R:RTB"},
+    {"id": "UAV-03", "domain": "UAV_TELEMETRY", "shape": "authorized_targeted_action", "nl": "move drone 1 to coordinates 35.7, -122.4", "expected_sal": ["I:\u00a7\u2192R:\u26a0MOV@DRONE1\u2227E:GPS[35.7,-122.4]", "R:MOV\u21bb@DRONE1[35.7,-122.4]"]},
+    {"id": "UAV-04", "domain": "UAV_TELEMETRY", "shape": "parametric_action", "nl": "form swarm wedge with spacing 50", "expected_sal": ["R:FORM\u21bb[wedge,50]"]},
+    {"id": "UAV-05", "domain": "UAV_TELEMETRY", "shape": "simple_query", "nl": "vehicle heading", "expected_sal": ["V:HDG", "V:HDG?"]},
+
+    {"id": "MOV-01", "domain": "MOVEMENT_POSITIONING", "shape": "simple_query", "nl": "report location", "expected_sal": ["G:POS", "G:POS?"]},
+    {"id": "MOV-02", "domain": "MOVEMENT_POSITIONING", "shape": "simple_query", "nl": "report heading", "expected_sal": ["G:BEARING", "G:BEARING?"]},
+    {"id": "MOV-03", "domain": "MOVEMENT_POSITIONING", "shape": "multi_read", "nl": "position and heading", "expected_sal": ["G:POS\u2227G:BEARING"]},
+    {"id": "MOV-04", "domain": "MOVEMENT_POSITIONING", "shape": "simple_query", "nl": "vessel heading", "expected_sal": ["V:HDG", "V:HDG?"]},
+    {"id": "MOV-05", "domain": "MOVEMENT_POSITIONING", "shape": "simple_query", "nl": "altitude reading", "expected_sal": ["G:POS", "G:POS?"]},
+
+    {"id": "WX-01", "domain": "WEATHER", "shape": "simple_query", "nl": "wind speed", "expected_sal": ["W:WIND", "W:WIND?"]},
+    {"id": "WX-02", "domain": "WEATHER", "shape": "targeted_query", "nl": "wind speed at turbine 7", "expected_sal": ["W:WIND@7", "W:WIND@7?"]},
+    {"id": "WX-03", "domain": "WEATHER", "shape": "simple_query", "nl": "barometric pressure", "expected_sal": ["E:PU", "E:PU?", "W:PRESS"]},
+    {"id": "WX-04", "domain": "WEATHER", "shape": "conditional_alert", "nl": "alert when wind exceeds 40", "expected_sal": ["W:WIND>40\u2192L:ALERT", "W:WIND>40\u2192W:ALERT"]},
+    {"id": "WX-05", "domain": "WEATHER", "shape": "multi_read", "nl": "report temp and humidity", "expected_sal": ["E:TH\u2227E:HU", "E:EQ?TH:0\u2227?HU:0"]},
+
+    {"id": "SEN-01", "domain": "SENSOR_ARRAY", "shape": "targeted_query", "nl": "read sensor 4A", "expected_sal": ["E:TH@4A", "E:TH@4A?"]},
+    {"id": "SEN-02", "domain": "SENSOR_ARRAY", "shape": "simple_query", "nl": "humidity reading", "expected_sal": ["E:HU", "E:HU?"]},
+    {"id": "SEN-03", "domain": "SENSOR_ARRAY", "shape": "targeted_multi_read", "nl": "give me temp and humidity from sensor node 4A", "expected_sal": ["E:TH@4A\u2227E:HU@4A", "E:EQ@4A?TH:0\u2227?HU:0"]},
+    {"id": "SEN-04", "domain": "SENSOR_ARRAY", "shape": "conditional_alert", "nl": "alert when humidity above 80", "expected_sal": ["E:HU>80\u2192U:NOTIFY", "E:HU>80\u2192L:ALERT"]},
+    {"id": "SEN-05", "domain": "SENSOR_ARRAY", "shape": "simple_query", "nl": "air quality", "expected_sal": ["E:EQ", "E:EQ?"]},
+
+    {"id": "ROB-01", "domain": "ROBOTIC_CAPABILITIES", "shape": "emergency_action", "nl": "emergency stop", "expected_sal": ["R:ESTOP", "R:ESTOP@*"]},
+    {"id": "ROB-02", "domain": "ROBOTIC_CAPABILITIES", "shape": "simple_action", "nl": "turn on the camera", "expected_sal": ["R:CAM\u21bb"]},
+    {"id": "ROB-03", "domain": "ROBOTIC_CAPABILITIES", "shape": "simple_action", "nl": "activate haptic feedback", "expected_sal": ["R:HAPTIC\u21bb"]},
+    {"id": "ROB-04", "domain": "ROBOTIC_CAPABILITIES", "shape": "targeted_action", "nl": "turn on flashlight on node BRAVO", "expected_sal": ["R:TORCH\u21bb@BRAVO"]},
+    {"id": "ROB-05", "domain": "ROBOTIC_CAPABILITIES", "shape": "emergency_action", "nl": "stop everything immediately, emergency", "expected_sal": ["R:ESTOP", "R:ESTOP@*"]},
+
+    {"id": "CRY-01", "domain": "CRYPTO_AUTH", "shape": "simple_action", "nl": "sign the payload", "expected_sal": ["S:SIGN"]},
+    {"id": "CRY-02", "domain": "CRYPTO_AUTH", "shape": "chain_sequential", "nl": "generate a key pair, then sign the payload, then send to node BRAVO", "expected_sal": ["S:KEYGEN;S:SIGN;D:PUSH@BRAVO"]},
+    {"id": "CRY-03", "domain": "CRYPTO_AUTH", "shape": "simple_query", "nl": "verify identity", "expected_sal": ["I:ID", "A:VERIFY[I:ID]"]},
+    {"id": "CRY-04", "domain": "CRYPTO_AUTH", "shape": "chain_sequential", "nl": "encrypt this payload then send it to the central server", "expected_sal": ["S:ENC;D:PUSH@CENTRAL"]},
+    {"id": "CRY-05", "domain": "CRYPTO_AUTH", "shape": "authorized_action", "nl": "process payment but only if a human approves", "expected_sal": ["I:\u00a7\u2192K:PAY", "U:APPROVE\u2192K:PAY"]},
+
+    {"id": "CFG-01", "domain": "CONFIG_SCHEDULE", "shape": "simple_action", "nl": "update config", "expected_sal": ["N:CFG"]},
+    {"id": "CFG-02", "domain": "CONFIG_SCHEDULE", "shape": "parametric_action", "nl": "set the threshold to 30", "expected_sal": ["N:CFG[threshold:30]"]},
+    {"id": "CFG-03", "domain": "CONFIG_SCHEDULE", "shape": "scheduled_action", "nl": "back up the database tonight at 2am", "expected_sal": ["N:BK@2AM", "T:SCHED@2AM\u2192N:BK"]},
+    {"id": "CFG-04", "domain": "CONFIG_SCHEDULE", "shape": "scheduled_chain", "nl": "ping every 30 seconds", "expected_sal": ["T:SCHED[30s]\u2192A:PING", "T:SCHED[30s];A:PING", "T:SCHED[30]\u2192A:PING"], "note": "canonical T:SCHED[30s]\u2192A:PING is 21B = 21B NL, busts BAEL; semicolon variant fits"},
+    {"id": "CFG-05", "domain": "CONFIG_SCHEDULE", "shape": "parametric_action", "nl": "expire this token in 1 hour", "expected_sal": ["T:EXP[1h]"]},
+
+    {"id": "OOS-CONV-01", "domain": "CONVERSATIONAL", "shape": "passthrough", "nl": "tell me a joke", "expected_sal": [], "expected_verdict": "SAFE_PASSTHROUGH"},
+    {"id": "OOS-CONV-02", "domain": "CONVERSATIONAL", "shape": "passthrough", "nl": "how are you", "expected_sal": [], "expected_verdict": "SAFE_PASSTHROUGH"},
+    {"id": "OOS-CONV-03", "domain": "CONVERSATIONAL", "shape": "passthrough", "nl": "thanks", "expected_sal": [], "expected_verdict": "SAFE_PASSTHROUGH"},
+    {"id": "OOS-CONV-04", "domain": "CONVERSATIONAL", "shape": "passthrough", "nl": "good morning", "expected_sal": [], "expected_verdict": "SAFE_PASSTHROUGH"},
+    {"id": "OOS-CONV-05", "domain": "CONVERSATIONAL", "shape": "passthrough", "nl": "what's your name", "expected_sal": [], "expected_verdict": "SAFE_PASSTHROUGH"},
+
+    {"id": "OOS-UNK-01", "domain": "UNKNOWN_DOMAIN", "shape": "passthrough", "nl": "order me a pepperoni pizza", "expected_sal": [], "expected_verdict": "SAFE_PASSTHROUGH"},
+    {"id": "OOS-UNK-02", "domain": "UNKNOWN_DOMAIN", "shape": "passthrough", "nl": "book a flight to Paris", "expected_sal": [], "expected_verdict": "SAFE_PASSTHROUGH"},
+    {"id": "OOS-UNK-03", "domain": "UNKNOWN_DOMAIN", "shape": "passthrough", "nl": "play some jazz", "expected_sal": [], "expected_verdict": "SAFE_PASSTHROUGH"},
+    {"id": "OOS-UNK-04", "domain": "UNKNOWN_DOMAIN", "shape": "passthrough", "nl": "remind me to buy milk", "expected_sal": [], "expected_verdict": "SAFE_PASSTHROUGH"},
+    {"id": "OOS-UNK-05", "domain": "UNKNOWN_DOMAIN", "shape": "passthrough", "nl": "translate this to French", "expected_sal": [], "expected_verdict": "SAFE_PASSTHROUGH"},
+
+    {"id": "OOS-MAL-01", "domain": "MALFORMED", "shape": "refuse_malformed", "nl": "asdf qwerty", "expected_sal": [], "expected_verdict": "REFUSED_MALFORMED"},
+    {"id": "OOS-MAL-02", "domain": "MALFORMED", "shape": "refuse_malformed", "nl": "...", "expected_sal": [], "expected_verdict": "REFUSED_MALFORMED"},
+    {"id": "OOS-MAL-03", "domain": "MALFORMED", "shape": "refuse_malformed", "nl": "the", "expected_sal": [], "expected_verdict": "REFUSED_MALFORMED"},
+    {"id": "OOS-MAL-04", "domain": "MALFORMED", "shape": "refuse_malformed", "nl": "xyz123", "expected_sal": [], "expected_verdict": "REFUSED_MALFORMED"},
+    {"id": "OOS-MAL-05", "domain": "MALFORMED", "shape": "refuse_malformed", "nl": "{}", "expected_sal": [], "expected_verdict": "REFUSED_MALFORMED"}
+  ]
+}

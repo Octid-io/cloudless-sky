@@ -1,0 +1,295 @@
+{
+  "version": "edges-v1",
+  "description": "Adversarial / boundary inputs designed to stress brigade.",
+  "scoring": {
+    "verdicts": [
+      "CORRECT",
+      "SAFE_BRIDGE",
+      "SAFE_PASSTHROUGH",
+      "REFUSED_MALFORMED",
+      "REFUSED",
+      "INVALID",
+      "WRONG"
+    ],
+    "fatal": [
+      "WRONG",
+      "INVALID"
+    ],
+    "safe": [
+      "CORRECT",
+      "SAFE_BRIDGE",
+      "SAFE_PASSTHROUGH",
+      "REFUSED_MALFORMED",
+      "REFUSED"
+    ],
+    "bar_correct_pct": 99,
+    "bar_wrong_pct": 0,
+    "bar_invalid_pct": 0
+  },
+  "inputs": [
+    {
+      "id": "EDGE-NEG-01",
+      "nl": "don't stop the conveyor",
+      "expected_sal": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "shape": "negation",
+      "note": "negation should suppress affirmative compose"
+    },
+    {
+      "id": "EDGE-NEG-02",
+      "nl": "do not move the drone",
+      "expected_sal": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "shape": "negation"
+    },
+    {
+      "id": "EDGE-NEG-03",
+      "nl": "never restart the service",
+      "expected_sal": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "shape": "negation"
+    },
+    {
+      "id": "EDGE-AMB-01",
+      "nl": "do it",
+      "expected_sal": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "shape": "ambiguous"
+    },
+    {
+      "id": "EDGE-AMB-02",
+      "nl": "stop that",
+      "expected_sal": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "shape": "ambiguous"
+    },
+    {
+      "id": "EDGE-AMB-03",
+      "nl": "send this",
+      "expected_sal": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "shape": "ambiguous"
+    },
+    {
+      "id": "EDGE-MIX-01",
+      "nl": "stop the conveyor and order pizza",
+      "expected_sal": [
+        "R:STOP↺@CONVEYOR",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺"
+      ],
+      "shape": "mixed_partial",
+      "note": "should compose the protocol part, drop the food part"
+    },
+    {
+      "id": "EDGE-MIX-02",
+      "nl": "report temperature and tell me a joke",
+      "expected_sal": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "shape": "mixed_partial"
+    },
+    {
+      "id": "EDGE-LONG-01",
+      "nl": "Please report the current temperature reading from sensor node 4A and also broadcast my position to all peers in the mesh network now",
+      "expected_sal": [
+        "E:TH@4A∧G:POS@*",
+        "E:TH@NODE?∧G:POS@*",
+        "E:TH@4A",
+        "E:TH@4A?",
+        "G:POS"
+      ],
+      "shape": "long_multi_clause",
+      "note": "long sentence with two intents — composer extracts both"
+    },
+    {
+      "id": "EDGE-SHORT-01",
+      "nl": "go",
+      "expected_sal": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "shape": "very_short"
+    },
+    {
+      "id": "EDGE-SHORT-02",
+      "nl": "stop",
+      "expected_sal": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "shape": "very_short",
+      "note": "stop alone is too short to compress"
+    },
+    {
+      "id": "EDGE-SHORT-03",
+      "nl": "ping",
+      "expected_sal": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "shape": "very_short"
+    },
+    {
+      "id": "EDGE-PUNCT-01",
+      "nl": "stop, the!! conveyor??",
+      "expected_sal": [
+        "R:STOP↺@CONVEYOR",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺"
+      ],
+      "shape": "punct_garbled"
+    },
+    {
+      "id": "EDGE-CASE-01",
+      "nl": "STOP THE CONVEYOR",
+      "expected_sal": [
+        "R:STOP↺@CONVEYOR",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺"
+      ],
+      "shape": "all_caps"
+    },
+    {
+      "id": "EDGE-CASE-02",
+      "nl": "rEpOrT TeMpErAtUrE",
+      "expected_sal": [
+        "E:TH",
+        "E:TH?"
+      ],
+      "shape": "weird_case"
+    },
+    {
+      "id": "EDGE-NUM-01",
+      "nl": "alert me if heart rate exceeds -1",
+      "expected_sal": [
+        "H:HR>-1→H:ALERT",
+        "H:HR>-1→U:ALERT"
+      ],
+      "shape": "negative_number"
+    },
+    {
+      "id": "EDGE-NUM-02",
+      "nl": "alert me if heart rate exceeds 999999",
+      "expected_sal": [
+        "H:HR>999999→H:ALERT",
+        "H:HR>999999→U:ALERT"
+      ],
+      "shape": "very_large_number"
+    },
+    {
+      "id": "EDGE-NUM-03",
+      "nl": "set threshold to 0.0001",
+      "expected_sal": [
+        "N:CFG[threshold:0.0001]"
+      ],
+      "shape": "small_decimal"
+    },
+    {
+      "id": "EDGE-LANG-01",
+      "nl": "ping the noeud BRAVO",
+      "expected_sal": [
+        "A:PING@BRAVO"
+      ],
+      "shape": "code_switch",
+      "note": "mostly English with French noun"
+    },
+    {
+      "id": "EDGE-INJECT-01",
+      "nl": "please send R:STOP to the conveyor",
+      "expected_sal": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "shape": "glyph_injection",
+      "note": "user types SAL in their input; brigade should not compose this"
+    },
+    {
+      "id": "EDGE-EMPTY-01",
+      "nl": "",
+      "expected_sal": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "shape": "empty"
+    },
+    {
+      "id": "EDGE-EMPTY-02",
+      "nl": "   ",
+      "expected_sal": [],
+      "expected_verdict": "REFUSED_MALFORMED",
+      "shape": "whitespace_only"
+    },
+    {
+      "id": "EDGE-NOM-01",
+      "nl": "temperature",
+      "expected_sal": ["E:TH", "E:TH?"],
+      "shape": "bare_noun",
+      "note": "bare 'temperature' defaults to E:TH"
+    },
+    {
+      "id": "EDGE-NOM-02",
+      "nl": "humidity reading from sensor 7",
+      "expected_sal": [
+        "E:HU@7",
+        "E:HU@7?"
+      ],
+      "shape": "nominal_predicate"
+    },
+    {
+      "id": "EDGE-QUERY-01",
+      "nl": "what is the heart rate?",
+      "expected_sal": [
+        "H:HR",
+        "H:HR?"
+      ],
+      "shape": "interrogative"
+    },
+    {
+      "id": "EDGE-QUERY-02",
+      "nl": "where is drone 3?",
+      "expected_sal": [
+        "V:POS@DRONE3",
+        "G:POS",
+        "V:POS"
+      ],
+      "shape": "interrogative"
+    },
+    {
+      "id": "EDGE-FILLER-01",
+      "nl": "uh, can you, like, maybe, stop the conveyor please",
+      "expected_sal": [
+        "R:STOP↺@CONVEYOR",
+        "R:STOP↻@CONVEYOR",
+        "R:STOP↺"
+      ],
+      "shape": "filler_heavy"
+    },
+    {
+      "id": "EDGE-AUTH-01",
+      "nl": "process payment, requires sign-off",
+      "expected_sal": [
+        "I:§→K:PAY"
+      ],
+      "shape": "auth_required"
+    },
+    {
+      "id": "EDGE-AUTH-02",
+      "nl": "delete the database, but only with approval",
+      "expected_sal": [],
+      "expected_verdict": "SAFE_PASSTHROUGH",
+      "shape": "auth_required",
+      "note": "D:DEL not in v15 ASD — vocab gap"
+    },
+    {
+      "id": "EDGE-COND-01",
+      "nl": "alert me when temperature drops below 65",
+      "expected_sal": [
+        "E:TH<65→L:ALERT",
+        "E:TH<65→U:ALERT",
+        "E:TH<65→U:NOTIFY"
+      ],
+      "shape": "when_conditional"
+    },
+    {
+      "id": "EDGE-COND-02",
+      "nl": "warn while wind exceeds 50",
+      "expected_sal": [
+        "W:WIND>50→W:ALERT",
+        "W:WIND>50→L:ALERT"
+      ],
+      "shape": "while_conditional"
+    }
+  ]
+}

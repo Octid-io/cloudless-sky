@@ -1,0 +1,429 @@
+{
+  "results": [
+    {
+      "full_opcode": "V:OPEN",
+      "intent": "open a valve",
+      "lotus_optimal": "V:OPE",
+      "savings_pct": 16.7,
+      "per_form": [
+        {
+          "form": "V:OPEN",
+          "len": 6,
+          "recog_rate": 1.0,
+          "responses": {
+            "haiku": {
+              "resp": "Opens the valve.",
+              "recognized": true
+            },
+            "sonnet": {
+              "resp": "Open a valve.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "The action triggered is to open a valve.",
+              "recognized": true
+            }
+          }
+        },
+        {
+          "form": "V:OPN",
+          "len": 5,
+          "recog_rate": 1.0,
+          "responses": {
+            "haiku": {
+              "resp": "Opens the valve.",
+              "recognized": true
+            },
+            "sonnet": {
+              "resp": "Open the valve.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "Open the valve.",
+              "recognized": true
+            }
+          }
+        },
+        {
+          "form": "V:OPE",
+          "len": 5,
+          "recog_rate": 1.0,
+          "responses": {
+            "haiku": {
+              "resp": "Opens the valve.",
+              "recognized": true
+            },
+            "sonnet": {
+              "resp": "Open a valve.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "The opcode V:OPE triggers the action to open a valve.",
+              "recognized": true
+            }
+          }
+        },
+        {
+          "form": "V:OP",
+          "len": 4,
+          "recog_rate": 0.3333333333333333,
+          "responses": {
+            "haiku": {
+              "resp": "# V:OP",
+              "recognized": false
+            },
+            "sonnet": {
+              "resp": "Open or activate a valve.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "The opcode V:OP triggers the action to initiate a video operation.",
+              "recognized": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "full_opcode": "V:CLOSE",
+      "intent": "close a valve",
+      "lotus_optimal": "V:CL",
+      "savings_pct": 42.9,
+      "per_form": [
+        {
+          "form": "V:CLOSE",
+          "len": 7,
+          "recog_rate": 1.0,
+          "responses": {
+            "haiku": {
+              "resp": "Closes the valve.",
+              "recognized": true
+            },
+            "sonnet": {
+              "resp": "Close the valve.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "The action triggered is to close a valve.",
+              "recognized": true
+            }
+          }
+        },
+        {
+          "form": "V:CLS",
+          "len": 5,
+          "recog_rate": 0.6666666666666666,
+          "responses": {
+            "haiku": {
+              "resp": "Close the current view or window.",
+              "recognized": true
+            },
+            "sonnet": {
+              "resp": "Close the valve.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "The action triggered is to clear the display.",
+              "recognized": false
+            }
+          }
+        },
+        {
+          "form": "V:CLOS",
+          "len": 6,
+          "recog_rate": 1.0,
+          "responses": {
+            "haiku": {
+              "resp": "Close the valve.",
+              "recognized": true
+            },
+            "sonnet": {
+              "resp": "Close the valve.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "Close the valve.",
+              "recognized": true
+            }
+          }
+        },
+        {
+          "form": "V:CLO",
+          "len": 5,
+          "recog_rate": 1.0,
+          "responses": {
+            "haiku": {
+              "resp": "Closes the valve.",
+              "recognized": true
+            },
+            "sonnet": {
+              "resp": "Close the valve.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "The action triggered is to close a valve.",
+              "recognized": true
+            }
+          }
+        },
+        {
+          "form": "V:CL",
+          "len": 4,
+          "recog_rate": 0.6666666666666666,
+          "responses": {
+            "haiku": {
+              "resp": "Close the valve.",
+              "recognized": true
+            },
+            "sonnet": {
+              "resp": "Close the valve.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "Trigger the cooling system.",
+              "recognized": false
+            }
+          }
+        },
+        {
+          "form": "V:C",
+          "len": 3,
+          "recog_rate": 0.0,
+          "responses": {
+            "haiku": {
+              "resp": "# V:C",
+              "recognized": false
+            },
+            "sonnet": {
+              "resp": "Activates the visual/video camera or capture function.",
+              "recognized": false
+            },
+            "gpt-4o-mini": {
+              "resp": "The opcode V:C triggers the action to \"activate the vacuum.\"",
+              "recognized": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "full_opcode": "C:POS",
+      "intent": "geographic position of control station",
+      "lotus_optimal": "C:POS",
+      "savings_pct": 0,
+      "per_form": [
+        {
+          "form": "C:POS",
+          "len": 5,
+          "recog_rate": 0.0,
+          "responses": {
+            "haiku": {
+              "resp": "Move to the specified position.",
+              "recognized": false
+            },
+            "sonnet": {
+              "resp": "Reports or retrieves the current position of the camera.",
+              "recognized": false
+            },
+            "gpt-4o-mini": {
+              "resp": "The action triggered is to change the position.",
+              "recognized": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "full_opcode": "N:BCAST",
+      "intent": "broadcast a message to all peers",
+      "lotus_optimal": "N:BCST",
+      "savings_pct": 14.3,
+      "per_form": [
+        {
+          "form": "N:BCAST",
+          "len": 7,
+          "recog_rate": 1.0,
+          "responses": {
+            "haiku": {
+              "resp": "Broadcast a message to all networked systems.",
+              "recognized": true
+            },
+            "sonnet": {
+              "resp": "Broadcasts a message over the network.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "Broadcast a message to all connected devices.",
+              "recognized": true
+            }
+          }
+        },
+        {
+          "form": "N:BCST",
+          "len": 6,
+          "recog_rate": 1.0,
+          "responses": {
+            "haiku": {
+              "resp": "Broadcast a message to all connected systems or devices.",
+              "recognized": true
+            },
+            "sonnet": {
+              "resp": "Broadcasts a message over the network.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "Broadcast a message to all connected devices.",
+              "recognized": true
+            }
+          }
+        },
+        {
+          "form": "N:BCAS",
+          "len": 6,
+          "recog_rate": 0.0,
+          "responses": {
+            "haiku": {
+              "resp": "# N:BCAS",
+              "recognized": false
+            },
+            "sonnet": {
+              "resp": "Init",
+              "recognized": false
+            },
+            "gpt-4o-mini": {
+              "resp": "Trigger the broadcast of an alert signal.",
+              "recognized": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "full_opcode": "E:START",
+      "intent": "start an engine or motor",
+      "lotus_optimal": "E:START",
+      "savings_pct": 0,
+      "per_form": [
+        {
+          "form": "E:START",
+          "len": 7,
+          "recog_rate": 0.0,
+          "responses": {
+            "haiku": {
+              "resp": "Activates environmental systems to begin operation.",
+              "recognized": false
+            },
+            "sonnet": {
+              "resp": "Start or initialize the environmental system.",
+              "recognized": false
+            },
+            "gpt-4o-mini": {
+              "resp": "Initiate environmental monitoring.",
+              "recognized": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "full_opcode": "S:VIB",
+      "intent": "vibration sensor reading",
+      "lotus_optimal": "S:VIB",
+      "savings_pct": 0,
+      "per_form": [
+        {
+          "form": "S:VIB",
+          "len": 5,
+          "recog_rate": 0.0,
+          "responses": {
+            "haiku": {
+              "resp": "Activate or control vibration in the system.",
+              "recognized": false
+            },
+            "sonnet": {
+              "resp": "Activate safety/security vibration alert or alarm.",
+              "recognized": false
+            },
+            "gpt-4o-mini": {
+              "resp": "Trigger a vibration alert.",
+              "recognized": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "full_opcode": "D:DEL",
+      "intent": "delete data from storage",
+      "lotus_optimal": "D:DEL",
+      "savings_pct": 0,
+      "per_form": [
+        {
+          "form": "D:DEL",
+          "len": 5,
+          "recog_rate": 0.6666666666666666,
+          "responses": {
+            "haiku": {
+              "resp": "Deletes or removes the specified data or file.",
+              "recognized": true
+            },
+            "sonnet": {
+              "resp": "Delete data or remove a stored item.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "Delete the specified item.",
+              "recognized": false
+            }
+          }
+        },
+        {
+          "form": "D:DL",
+          "len": 4,
+          "recog_rate": 0.3333333333333333,
+          "responses": {
+            "haiku": {
+              "resp": "# D:DL",
+              "recognized": false
+            },
+            "sonnet": {
+              "resp": "Delete a file or data entry.",
+              "recognized": true
+            },
+            "gpt-4o-mini": {
+              "resp": "The action triggered is to \"download data.\"",
+              "recognized": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "full_opcode": "D:DROP",
+      "intent": "drop a database table",
+      "lotus_optimal": "D:DROP",
+      "savings_pct": 0,
+      "per_form": [
+        {
+          "form": "D:DROP",
+          "len": 6,
+          "recog_rate": 0.0,
+          "responses": {
+            "haiku": {
+              "resp": "Releases or lets go of the currently held object.",
+              "recognized": false
+            },
+            "sonnet": {
+              "resp": "Release or dispense an item from a gripper or holding mechanism.",
+              "recognized": false
+            },
+            "gpt-4o-mini": {
+              "resp": "The action triggered is to drop an object.",
+              "recognized": false
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

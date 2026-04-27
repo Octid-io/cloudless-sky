@@ -1,0 +1,404 @@
+{
+  "condition": "C",
+  "model": "sonnet",
+  "verdicts": {
+    "INVALID": 17,
+    "CORRECT": 24,
+    "WRONG": 12,
+    "SAFE_PASSTHROUGH": 8,
+    "REFUSED_MALFORMED": 4
+  },
+  "cost_usd": 0.6128,
+  "results": [
+    {
+      "id": "DC-01",
+      "nl": "stop the conveyor",
+      "sal": "R:STOP\u26a0",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "DC-02",
+      "nl": "lock door D-7",
+      "sal": "R:MOV@D-7",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "DC-03",
+      "nl": "restart the service",
+      "sal": "R:RSTRT",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "DC-04",
+      "nl": "shutdown gateway 3",
+      "sal": "R:STOP@3",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "DC-05",
+      "nl": "stop pump and close valve",
+      "sal": "R:STOP\u2227R:STOP",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "MT-01",
+      "nl": "ping node 17",
+      "sal": "A:PING@17",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MT-02",
+      "nl": "discover peers",
+      "sal": "N:Q",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MT-03",
+      "nl": "broadcast my position",
+      "sal": "R:POS@*",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "MT-04",
+      "nl": "find primary relay",
+      "sal": "N:Q\u2227O:MODE=RLY",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "MT-05",
+      "nl": "node status",
+      "sal": "N:STS",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-01",
+      "nl": "blood pressure check",
+      "sal": "H:BP",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-02",
+      "nl": "all vitals for patient 12",
+      "sal": "H:VITALS@12",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-03",
+      "nl": "alert me if heart rate exceeds 130",
+      "sal": "H:HR>130\u2192U:ALERT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-04",
+      "nl": "casualty report if BP above 180",
+      "sal": "I:\u00a7\u2192H:BP>180\u2192H:CASREP",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "MED-05",
+      "nl": "patient has pneumothorax, code J93.0",
+      "sal": "I:\u00a7\u2192H:ICD:J93.0\u2192H:TRIAGE",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "UAV-01",
+      "nl": "drone position",
+      "sal": "G:POS",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "UAV-02",
+      "nl": "return to base",
+      "sal": "R:RTH",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "UAV-03",
+      "nl": "move drone 1 to coordinates 35.7, -122.4",
+      "sal": "R:MOV@1\u2192G:POS(35.7,-122.4)",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "UAV-04",
+      "nl": "form swarm wedge with spacing 50",
+      "sal": "R:FORM@*\u2227R:ZONE@*",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "UAV-05",
+      "nl": "vehicle heading",
+      "sal": "G:BEARING",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "MOV-01",
+      "nl": "report location",
+      "sal": "G:POS",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MOV-02",
+      "nl": "report heading",
+      "sal": "G:BEARING",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MOV-03",
+      "nl": "position and heading",
+      "sal": "G:POS\u2227G:BEARING",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MOV-04",
+      "nl": "vessel heading",
+      "sal": "G:BEARING",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "MOV-05",
+      "nl": "altitude reading",
+      "sal": "E:ELEV",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "WX-01",
+      "nl": "wind speed",
+      "sal": "W:WIND",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "WX-02",
+      "nl": "wind speed at turbine 7",
+      "sal": "R:STAT@7\u2192W:WIND",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "WX-03",
+      "nl": "barometric pressure",
+      "sal": "E:PU",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "WX-04",
+      "nl": "alert when wind exceeds 40",
+      "sal": "W:WIND>40\u2192L:ALERT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "WX-05",
+      "nl": "report temp and humidity",
+      "sal": "E:TH",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "SEN-01",
+      "nl": "read sensor 4A",
+      "sal": "R:STAT@4A",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "SEN-02",
+      "nl": "humidity reading",
+      "sal": "E:HU",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "SEN-03",
+      "nl": "give me temp and humidity from sensor node 4A",
+      "sal": "E:TH@4A",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "SEN-04",
+      "nl": "alert when humidity above 80",
+      "sal": "E:HU>80\u2192L:ALERT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "SEN-05",
+      "nl": "air quality",
+      "sal": "E:EQ",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ROB-01",
+      "nl": "emergency stop",
+      "sal": "R:ESTOP",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ROB-02",
+      "nl": "turn on the camera",
+      "sal": "R:CAM",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "ROB-03",
+      "nl": "activate haptic feedback",
+      "sal": "R:HAPTIC",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "ROB-04",
+      "nl": "turn on flashlight on node BRAVO",
+      "sal": "R:TORCH@BRAVO",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "ROB-05",
+      "nl": "stop everything immediately, emergency",
+      "sal": "R:ESTOP",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-01",
+      "nl": "sign the payload",
+      "sal": "S:SIGN",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-02",
+      "nl": "generate a key pair, then sign the payload, then send to node BRAVO",
+      "sal": "S:KEYGEN;S:SIGN;D:PUSH@BRAVO",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-03",
+      "nl": "verify identity",
+      "sal": "I:ID",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-04",
+      "nl": "encrypt this payload then send it to the central server",
+      "sal": "S:ENC;D:PUSH@central",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-05",
+      "nl": "process payment but only if a human approves",
+      "sal": "I:\u00a7\u2192K:PAY",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CFG-01",
+      "nl": "update config",
+      "sal": "N:CFG",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CFG-02",
+      "nl": "set the threshold to 30",
+      "sal": "Looking at this instruction, I need to determine what type of threshold is being set. The instruction \"set the threshold to 30\" is too ambiguous without context - it could refer to:",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "CFG-03",
+      "nl": "back up the database tonight at 2am",
+      "sal": "R:\u26a0\u2192I:\u00a7\u2192T:ALARM@02:00\u2192C:CHKPT\u2192N:BK",
+      "verdict": "INVALID"
+    },
+    {
+      "id": "CFG-04",
+      "nl": "ping every 30 seconds",
+      "sal": "T:REPEAT@30\u2192A:PING",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "CFG-05",
+      "nl": "expire this token in 1 hour",
+      "sal": "T:EXP\u2192T:AFTER@1h",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "OOS-CONV-01",
+      "nl": "tell me a joke",
+      "sal": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-CONV-02",
+      "nl": "how are you",
+      "sal": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-CONV-03",
+      "nl": "thanks",
+      "sal": "SAL: A:ACK",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "OOS-CONV-04",
+      "nl": "good morning",
+      "sal": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-CONV-05",
+      "nl": "what's your name",
+      "sal": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-UNK-01",
+      "nl": "order me a pepperoni pizza",
+      "sal": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-UNK-02",
+      "nl": "book a flight to Paris",
+      "sal": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-UNK-03",
+      "nl": "play some jazz",
+      "sal": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-UNK-04",
+      "nl": "remind me to buy milk",
+      "sal": "T:ALARM\u2192U:NOTIFY",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "OOS-UNK-05",
+      "nl": "translate this to French",
+      "sal": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-MAL-01",
+      "nl": "asdf qwerty",
+      "sal": null,
+      "verdict": "REFUSED_MALFORMED"
+    },
+    {
+      "id": "OOS-MAL-02",
+      "nl": "...",
+      "sal": "I'm ready to compose SAL for your instruction. Please provide the natural language instruction you'd like me to convert.",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "OOS-MAL-03",
+      "nl": "the",
+      "sal": null,
+      "verdict": "REFUSED_MALFORMED"
+    },
+    {
+      "id": "OOS-MAL-04",
+      "nl": "xyz123",
+      "sal": null,
+      "verdict": "REFUSED_MALFORMED"
+    },
+    {
+      "id": "OOS-MAL-05",
+      "nl": "{}",
+      "sal": null,
+      "verdict": "REFUSED_MALFORMED"
+    }
+  ]
+}

@@ -1,0 +1,580 @@
+{
+  "mode2": [
+    {
+      "id": "ZT-VOCAB-01",
+      "nl": "open valve V12",
+      "composer_sal": null,
+      "composer_opcodes": [],
+      "panel_opcodes": [
+        [
+          "R",
+          "DRVE"
+        ],
+        [
+          "R",
+          "OPEN"
+        ]
+      ],
+      "category": "PANEL_ONLY",
+      "panel_found_new": [
+        [
+          "R",
+          "DRVE"
+        ],
+        [
+          "R",
+          "OPEN"
+        ]
+      ],
+      "composer_found_new": []
+    },
+    {
+      "id": "ZT-VOCAB-02",
+      "nl": "start the engine",
+      "composer_sal": null,
+      "composer_opcodes": [],
+      "panel_opcodes": [
+        [
+          "R",
+          "DRVE"
+        ],
+        [
+          "I",
+          "§"
+        ]
+      ],
+      "category": "PANEL_ONLY",
+      "panel_found_new": [
+        [
+          "R",
+          "DRVE"
+        ],
+        [
+          "I",
+          "§"
+        ]
+      ],
+      "composer_found_new": []
+    },
+    {
+      "id": "ZT-VOCAB-03",
+      "nl": "close valve V12",
+      "composer_sal": "R:STOP↺@V12",
+      "composer_opcodes": [
+        [
+          "R",
+          "STOP"
+        ]
+      ],
+      "panel_opcodes": [
+        [
+          "R",
+          "V12"
+        ],
+        [
+          "R",
+          "STOP"
+        ],
+        [
+          "I",
+          "§"
+        ]
+      ],
+      "category": "PARTIAL_OVERLAP",
+      "panel_found_new": [
+        [
+          "R",
+          "V12"
+        ],
+        [
+          "I",
+          "§"
+        ]
+      ],
+      "composer_found_new": []
+    },
+    {
+      "id": "ZT-VOCAB-04",
+      "nl": "lock the door",
+      "composer_sal": "R:STOP↺",
+      "composer_opcodes": [
+        [
+          "R",
+          "STOP"
+        ]
+      ],
+      "panel_opcodes": [
+        [
+          "R",
+          "STOP"
+        ],
+        [
+          "I",
+          "§"
+        ],
+        [
+          "R",
+          "LOCK"
+        ]
+      ],
+      "category": "PARTIAL_OVERLAP",
+      "panel_found_new": [
+        [
+          "I",
+          "§"
+        ],
+        [
+          "R",
+          "LOCK"
+        ]
+      ],
+      "composer_found_new": []
+    },
+    {
+      "id": "ZT-VOCAB-05",
+      "nl": "broadcast my position to all peers",
+      "composer_sal": "G:POS@*",
+      "composer_opcodes": [
+        [
+          "G",
+          "POS"
+        ]
+      ],
+      "panel_opcodes": [
+        [
+          "R",
+          "POS"
+        ],
+        [
+          "R",
+          "GPS"
+        ]
+      ],
+      "category": "DISAGREE",
+      "panel_found_new": [
+        [
+          "R",
+          "POS"
+        ],
+        [
+          "R",
+          "GPS"
+        ]
+      ],
+      "composer_found_new": [
+        [
+          "G",
+          "POS"
+        ]
+      ]
+    },
+    {
+      "id": "ZT-VOCAB-06",
+      "nl": "report control station position",
+      "composer_sal": "G:POS?",
+      "composer_opcodes": [
+        [
+          "G",
+          "POS"
+        ]
+      ],
+      "panel_opcodes": [
+        [
+          "G",
+          "POS"
+        ],
+        [
+          "N",
+          "Q"
+        ]
+      ],
+      "category": "PARTIAL_OVERLAP",
+      "panel_found_new": [
+        [
+          "N",
+          "Q"
+        ]
+      ],
+      "composer_found_new": []
+    },
+    {
+      "id": "ZT-VOCAB-07",
+      "nl": "vibration sensor reading from sensor 4A",
+      "composer_sal": null,
+      "composer_opcodes": [],
+      "panel_opcodes": [
+        [
+          "R",
+          "VIBE"
+        ],
+        [
+          "D",
+          "Q"
+        ]
+      ],
+      "category": "PANEL_ONLY",
+      "panel_found_new": [
+        [
+          "R",
+          "VIBE"
+        ],
+        [
+          "D",
+          "Q"
+        ]
+      ],
+      "composer_found_new": []
+    },
+    {
+      "id": "ZT-VOCAB-08",
+      "nl": "delete the database table",
+      "composer_sal": null,
+      "composer_opcodes": [],
+      "panel_opcodes": [
+        [
+          "R",
+          "KILL"
+        ]
+      ],
+      "category": "PANEL_ONLY",
+      "panel_found_new": [
+        [
+          "R",
+          "KILL"
+        ]
+      ],
+      "composer_found_new": []
+    }
+  ],
+  "mode3": [
+    {
+      "id": "ZT-VOCAB-01",
+      "nl": "open valve V12",
+      "per_model": {
+        "haiku": {
+          "emit": "V:OPEN",
+          "opcodes": [
+            [
+              "V",
+              "OPEN"
+            ]
+          ]
+        },
+        "sonnet": {
+          "emit": "V:OPEN",
+          "opcodes": [
+            [
+              "V",
+              "OPEN"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "emit": "V:OPEN",
+          "opcodes": [
+            [
+              "V",
+              "OPEN"
+            ]
+          ]
+        }
+      },
+      "invented_counts": {
+        "V:OPEN": 3
+      },
+      "consensus_invented": [
+        "V",
+        "OPEN"
+      ],
+      "verdict": "CONVERGED_INVENT"
+    },
+    {
+      "id": "ZT-VOCAB-02",
+      "nl": "start the engine",
+      "per_model": {
+        "haiku": {
+          "emit": "M:START",
+          "opcodes": [
+            [
+              "M",
+              "START"
+            ]
+          ]
+        },
+        "sonnet": {
+          "emit": "E:START",
+          "opcodes": [
+            [
+              "E",
+              "START"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "emit": "E:START",
+          "opcodes": [
+            [
+              "E",
+              "START"
+            ]
+          ]
+        }
+      },
+      "invented_counts": {
+        "M:START": 1,
+        "E:START": 2
+      },
+      "consensus_invented": [
+        "E",
+        "START"
+      ],
+      "verdict": "CONVERGED_INVENT"
+    },
+    {
+      "id": "ZT-VOCAB-03",
+      "nl": "close valve V12",
+      "per_model": {
+        "haiku": {
+          "emit": "V:CLOSE",
+          "opcodes": [
+            [
+              "V",
+              "CLOSE"
+            ]
+          ]
+        },
+        "sonnet": {
+          "emit": "V:CLOSE",
+          "opcodes": [
+            [
+              "V",
+              "CLOSE"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "emit": "V:CLOSE",
+          "opcodes": [
+            [
+              "V",
+              "CLOSE"
+            ]
+          ]
+        }
+      },
+      "invented_counts": {
+        "V:CLOSE": 3
+      },
+      "consensus_invented": [
+        "V",
+        "CLOSE"
+      ],
+      "verdict": "CONVERGED_INVENT"
+    },
+    {
+      "id": "ZT-VOCAB-04",
+      "nl": "lock the door",
+      "per_model": {
+        "haiku": {
+          "emit": "S:LOCK",
+          "opcodes": [
+            [
+              "S",
+              "LOCK"
+            ]
+          ]
+        },
+        "sonnet": {
+          "emit": "L:LOCK",
+          "opcodes": [
+            [
+              "L",
+              "LOCK"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "emit": "D:LOCK",
+          "opcodes": [
+            [
+              "D",
+              "LOCK"
+            ]
+          ]
+        }
+      },
+      "invented_counts": {
+        "S:LOCK": 1,
+        "L:LOCK": 1,
+        "D:LOCK": 1
+      },
+      "consensus_invented": null,
+      "verdict": "DIVERGED_INVENT"
+    },
+    {
+      "id": "ZT-VOCAB-05",
+      "nl": "broadcast my position to all peers",
+      "per_model": {
+        "haiku": {
+          "emit": "N:BCAST",
+          "opcodes": [
+            [
+              "N",
+              "BCAST"
+            ]
+          ]
+        },
+        "sonnet": {
+          "emit": "N:BCAST",
+          "opcodes": [
+            [
+              "N",
+              "BCAST"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "emit": "P:BROADCAST",
+          "opcodes": [
+            [
+              "P",
+              "BROADCAST"
+            ]
+          ]
+        }
+      },
+      "invented_counts": {
+        "N:BCAST": 2,
+        "P:BROADCAST": 1
+      },
+      "consensus_invented": [
+        "N",
+        "BCAST"
+      ],
+      "verdict": "CONVERGED_INVENT"
+    },
+    {
+      "id": "ZT-VOCAB-06",
+      "nl": "report control station position",
+      "per_model": {
+        "haiku": {
+          "emit": "C:POS",
+          "opcodes": [
+            [
+              "C",
+              "POS"
+            ]
+          ]
+        },
+        "sonnet": {
+          "emit": "C:POS",
+          "opcodes": [
+            [
+              "C",
+              "POS"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "emit": "C:POS",
+          "opcodes": [
+            [
+              "C",
+              "POS"
+            ]
+          ]
+        }
+      },
+      "invented_counts": {
+        "C:POS": 3
+      },
+      "consensus_invented": [
+        "C",
+        "POS"
+      ],
+      "verdict": "CONVERGED_INVENT"
+    },
+    {
+      "id": "ZT-VOCAB-07",
+      "nl": "vibration sensor reading from sensor 4A",
+      "per_model": {
+        "haiku": {
+          "emit": "S:VIB",
+          "opcodes": [
+            [
+              "S",
+              "VIB"
+            ]
+          ]
+        },
+        "sonnet": {
+          "emit": "S:VIB",
+          "opcodes": [
+            [
+              "S",
+              "VIB"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "emit": "V:READ",
+          "opcodes": [
+            [
+              "V",
+              "READ"
+            ]
+          ]
+        }
+      },
+      "invented_counts": {
+        "S:VIB": 2,
+        "V:READ": 1
+      },
+      "consensus_invented": [
+        "S",
+        "VIB"
+      ],
+      "verdict": "CONVERGED_INVENT"
+    },
+    {
+      "id": "ZT-VOCAB-08",
+      "nl": "delete the database table",
+      "per_model": {
+        "haiku": {
+          "emit": "D:DROP",
+          "opcodes": [
+            [
+              "D",
+              "DROP"
+            ]
+          ]
+        },
+        "sonnet": {
+          "emit": "D:DELTBL",
+          "opcodes": [
+            [
+              "D",
+              "DELTBL"
+            ]
+          ]
+        },
+        "gpt-4o-mini": {
+          "emit": "D:DEL",
+          "opcodes": [
+            [
+              "D",
+              "DEL"
+            ]
+          ]
+        }
+      },
+      "invented_counts": {
+        "D:DROP": 1,
+        "D:DELTBL": 1,
+        "D:DEL": 1
+      },
+      "consensus_invented": null,
+      "verdict": "DIVERGED_INVENT"
+    }
+  ]
+}

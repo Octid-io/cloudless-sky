@@ -1,0 +1,12 @@
+{
+  "C_llm_coarse": {
+    "name": "C. LLM + coarse osmp_compose only",
+    "verdicts": {
+      "CORRECT": 118,
+      "SAFE_PASSTHROUGH": 22,
+      "REFUSED_MALFORMED": 7
+    },
+    "cost": 0.3544432,
+    "n": 147
+  }
+}

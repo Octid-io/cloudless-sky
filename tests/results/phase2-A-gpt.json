@@ -1,0 +1,580 @@
+{
+  "condition": "A",
+  "model": "gpt",
+  "verdicts": {
+    "UNKNOWN": 30
+  },
+  "cost_usd": 0.0004,
+  "results": [
+    {
+      "sal": "R:STOP↻",
+      "response": "The system would likely stop or pause an ongoing process.",
+      "usage": {
+        "prompt_tokens": 61,
+        "completion_tokens": 11,
+        "total_tokens": 72,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "R:LOCK↻@D-7",
+      "response": "The system would likely initiate a lock action with a specified parameter or command.",
+      "usage": {
+        "prompt_tokens": 65,
+        "completion_tokens": 15,
+        "total_tokens": 80,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "C:RSTRT",
+      "response": "The system would likely attempt to access or reference a resource or command associated with \"RSTRT\" on drive \"C:\".",
+      "usage": {
+        "prompt_tokens": 60,
+        "completion_tokens": 25,
+        "total_tokens": 85,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "C:KILL@3",
+      "response": "The system would likely attempt to terminate a process with the identifier 3.",
+      "usage": {
+        "prompt_tokens": 62,
+        "completion_tokens": 15,
+        "total_tokens": 77,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "R:STOP↻@PUMP∧R:CLOSE↻@VALVE",
+      "response": "The system would likely execute a stop action at a pump and close a valve.",
+      "usage": {
+        "prompt_tokens": 74,
+        "completion_tokens": 16,
+        "total_tokens": 90,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "A:PING@17",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 61,
+        "completion_tokens": 1,
+        "total_tokens": 62,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "N:Q@*",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 60,
+        "completion_tokens": 1,
+        "total_tokens": 61,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "G:POS@*",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 60,
+        "completion_tokens": 1,
+        "total_tokens": 61,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "N:RLY?",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 59,
+        "completion_tokens": 1,
+        "total_tokens": 60,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "N:STS",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 59,
+        "completion_tokens": 1,
+        "total_tokens": 60,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "H:BP",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 59,
+        "completion_tokens": 1,
+        "total_tokens": 60,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "H:VITALS@12",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 63,
+        "completion_tokens": 1,
+        "total_tokens": 64,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "H:HR>130→H:ALERT",
+      "response": "The system would likely trigger an alert due to the heart rate exceeding 130.",
+      "usage": {
+        "prompt_tokens": 66,
+        "completion_tokens": 16,
+        "total_tokens": 82,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "H:BP>180→H:CASREP",
+      "response": "The system would likely route or direct a message from \"H:BP\" to \"H:CASREP\" if the condition \"BP>180\" is met.",
+      "usage": {
+        "prompt_tokens": 66,
+        "completion_tokens": 33,
+        "total_tokens": 99,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "H:ICD[J930]",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 62,
+        "completion_tokens": 1,
+        "total_tokens": 63,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "V:POS",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 59,
+        "completion_tokens": 1,
+        "total_tokens": 60,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "R:RTB↻",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 62,
+        "completion_tokens": 1,
+        "total_tokens": 63,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "I:§→R:⚠MOV@DRONE1∧E:GPS[35.7,-122.4]",
+      "response": "The system would likely initiate a movement command for a drone to a specified GPS location.",
+      "usage": {
+        "prompt_tokens": 82,
+        "completion_tokens": 17,
+        "total_tokens": 99,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "R:FORM↻[wedge,50]",
+      "response": "The system would likely interpret the string as a command to perform a specific action related to a \"wedge\" with a value of 50.",
+      "usage": {
+        "prompt_tokens": 66,
+        "completion_tokens": 29,
+        "total_tokens": 95,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "V:HDG",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 60,
+        "completion_tokens": 1,
+        "total_tokens": 61,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "G:POS",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 59,
+        "completion_tokens": 1,
+        "total_tokens": 60,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "G:BEARING",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 60,
+        "completion_tokens": 1,
+        "total_tokens": 61,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "G:POS∧G:BEARING",
+      "response": "The system would likely parse the string to extract the values associated with \"G:POS\" and \"G:BEARING.\"",
+      "usage": {
+        "prompt_tokens": 65,
+        "completion_tokens": 25,
+        "total_tokens": 90,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "V:HDG",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 60,
+        "completion_tokens": 1,
+        "total_tokens": 61,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "G:POS",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 59,
+        "completion_tokens": 1,
+        "total_tokens": 60,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "W:WIND",
+      "response": "The system would likely interpret it as a command to open or control a window related to wind.",
+      "usage": {
+        "prompt_tokens": 60,
+        "completion_tokens": 19,
+        "total_tokens": 79,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "W:WIND@7",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 62,
+        "completion_tokens": 1,
+        "total_tokens": 63,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "E:PU",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 59,
+        "completion_tokens": 1,
+        "total_tokens": 60,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "W:WIND>40→L:ALERT",
+      "response": "The system would likely trigger an alert for wind conditions exceeding 40.",
+      "usage": {
+        "prompt_tokens": 67,
+        "completion_tokens": 14,
+        "total_tokens": 81,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    },
+    {
+      "sal": "E:TH∧E:HU",
+      "response": "UNKNOWN",
+      "usage": {
+        "prompt_tokens": 64,
+        "completion_tokens": 1,
+        "total_tokens": 65,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      }
+    }
+  ]
+}

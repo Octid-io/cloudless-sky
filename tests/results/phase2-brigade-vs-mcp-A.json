@@ -1,0 +1,887 @@
+{
+  "name": "brigade",
+  "results": [
+    {
+      "id": "DC-01",
+      "nl": "stop the conveyor",
+      "got": "R:STOP↺",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "DC-02",
+      "nl": "lock door D-7",
+      "got": "R:STOP↺@D-7",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "DC-03",
+      "nl": "restart the service",
+      "got": "C:RSTRT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "DC-04",
+      "nl": "shutdown gateway 3",
+      "got": "C:KILL@3",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "DC-05",
+      "nl": "stop pump and close valve",
+      "got": "R:STOP↺∧R:STOP↺",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "DC-06",
+      "nl": "halt the pump",
+      "got": "R:STOP↺",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "DC-07",
+      "nl": "open valve V12",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "DC-08",
+      "nl": "kill the worker process",
+      "got": "C:KILL@WORKER",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "DC-09",
+      "nl": "reboot server BRAVO",
+      "got": "C:RSTRT@BRAVO",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "DC-10",
+      "nl": "start the engine",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MT-01",
+      "nl": "ping node 17",
+      "got": "A:PING@17",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MT-02",
+      "nl": "discover peers",
+      "got": "N:Q@*",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MT-03",
+      "nl": "broadcast my position",
+      "got": "G:POS@*",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MT-04",
+      "nl": "find primary relay",
+      "got": "N:RLY?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MT-05",
+      "nl": "node status",
+      "got": "N:STS?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MT-06",
+      "nl": "ping all peers",
+      "got": "A:PING@*",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MT-07",
+      "nl": "rebroadcast last message",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MT-08",
+      "nl": "mesh topology",
+      "got": "O:MESH",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MT-09",
+      "nl": "ping host BRAVO",
+      "got": "A:PING@BRAVO",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MT-10",
+      "nl": "uptime",
+      "got": "N:STS",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-01",
+      "nl": "blood pressure check",
+      "got": "H:BP?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-02",
+      "nl": "all vitals for patient 12",
+      "got": "H:VITALS@PATIENT12?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-03",
+      "nl": "alert me if heart rate exceeds 130",
+      "got": "H:HR>130→H:ALERT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-04",
+      "nl": "casualty report if BP above 180",
+      "got": "H:BP?>180→H:CASREP",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-05",
+      "nl": "patient has pneumothorax, code J93.0",
+      "got": "H:ICD@PATIENTHAS[J930]",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-06",
+      "nl": "oxygen level",
+      "got": "H:SPO2?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-07",
+      "nl": "patient pulse",
+      "got": "H:HR?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-08",
+      "nl": "body temperature",
+      "got": "H:TEMP?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-09",
+      "nl": "warn if oxygen drops below 90",
+      "got": "H:SPO2<90→H:ALERT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MED-10",
+      "nl": "blood pressure of patient 7",
+      "got": "H:BP@PATIENT7?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "UAV-01",
+      "nl": "drone position",
+      "got": "V:POS",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "UAV-02",
+      "nl": "return to base",
+      "got": "R:RTH↺",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "UAV-03",
+      "nl": "move drone 1 to coordinates 35.7, -122.4",
+      "got": "R:MOV↺@DRONE1[35.7,-122.4]",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "UAV-04",
+      "nl": "form swarm wedge with spacing 50",
+      "got": "R:FORM↺[wedge]",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "UAV-05",
+      "nl": "vehicle heading",
+      "got": "V:HDG",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "UAV-06",
+      "nl": "drone return home",
+      "got": "R:RTH↺@DRONERETURN",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "UAV-07",
+      "nl": "drone 2 altitude",
+      "got": "G:POS@DRONE2",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "UAV-08",
+      "nl": "form column with spacing 25",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "UAV-09",
+      "nl": "swarm RTB",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "UAV-10",
+      "nl": "uav heading",
+      "got": "V:HDG",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MOV-01",
+      "nl": "report location",
+      "got": "G:POS?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MOV-02",
+      "nl": "report heading",
+      "got": "G:BEARING?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MOV-03",
+      "nl": "position and heading",
+      "got": "G:POS∧G:BEARING",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MOV-04",
+      "nl": "vessel heading",
+      "got": "V:HDG",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MOV-05",
+      "nl": "altitude reading",
+      "got": "G:POS?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MOV-06",
+      "nl": "where am I",
+      "got": "G:POS?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MOV-07",
+      "nl": "show coordinates",
+      "got": "E:GPS?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MOV-08",
+      "nl": "compass bearing",
+      "got": "G:BEARING",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "WX-01",
+      "nl": "wind speed",
+      "got": "W:WIND?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "WX-02",
+      "nl": "wind speed at turbine 7",
+      "got": "W:WIND@7?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "WX-03",
+      "nl": "barometric pressure",
+      "got": "E:PU?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "WX-04",
+      "nl": "alert when wind exceeds 40",
+      "got": "W:WIND?>40→W:ALERT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "WX-05",
+      "nl": "report temp and humidity",
+      "got": "E:TH?∧E:HU?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "WX-06",
+      "nl": "atmospheric pressure",
+      "got": "E:PU?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "WX-07",
+      "nl": "warn when wind above 35",
+      "got": "W:WIND?>35→L:ALERT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "WX-08",
+      "nl": "current temperature",
+      "got": "E:TH?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "SEN-01",
+      "nl": "read sensor 4A",
+      "got": "E:TH@4A?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "SEN-02",
+      "nl": "humidity reading",
+      "got": "E:HU?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "SEN-03",
+      "nl": "give me temp and humidity from sensor node 4A",
+      "got": "E:TH?∧E:HU@NODE?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "SEN-04",
+      "nl": "alert when humidity above 80",
+      "got": "E:HU?>80→L:ALERT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "SEN-05",
+      "nl": "air quality",
+      "got": "E:EQ?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "SEN-06",
+      "nl": "temperature now",
+      "got": "E:TH?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "SEN-07",
+      "nl": "humidity at node 9",
+      "got": "E:HU@9?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "SEN-08",
+      "nl": "alert if temperature above 100",
+      "got": "E:TH>100→L:ALERT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "SEN-09",
+      "nl": "vibration sensor reading",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "ROB-01",
+      "nl": "emergency stop",
+      "got": "R:ESTOP",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ROB-02",
+      "nl": "turn on the camera",
+      "got": "R:CAM↺",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ROB-03",
+      "nl": "activate haptic feedback",
+      "got": "R:HAPTIC↺",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ROB-04",
+      "nl": "turn on flashlight on node BRAVO",
+      "got": "R:TORCH↺@BRAVO",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ROB-05",
+      "nl": "stop everything immediately, emergency",
+      "got": "R:ESTOP",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ROB-06",
+      "nl": "vibrate",
+      "got": "R:HAPTIC↺",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ROB-07",
+      "nl": "activate microphone",
+      "got": "R:MIC↺",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ROB-08",
+      "nl": "turn on speaker",
+      "got": "R:SPKR↺",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ROB-09",
+      "nl": "halt immediately",
+      "got": "R:ESTOP",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ROB-10",
+      "nl": "enable bluetooth",
+      "got": "R:BT↺",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-01",
+      "nl": "sign the payload",
+      "got": "S:SIGN",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-02",
+      "nl": "generate a key pair, then sign the payload, then send to node BRAVO",
+      "got": "S:KEYGEN;S:SIGN;D:PUSH@BRAVO",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-03",
+      "nl": "verify identity",
+      "got": "I:ID",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-04",
+      "nl": "encrypt this payload then send it to the central server",
+      "got": "S:ENC;D:PUSH@CENTRAL",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-05",
+      "nl": "process payment but only if a human approves",
+      "got": "I:§→K:PAY",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-06",
+      "nl": "encrypt this message",
+      "got": "S:ENC",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-07",
+      "nl": "rotate keys",
+      "got": "S:ROTATE",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-08",
+      "nl": "hash this file",
+      "got": "S:HASH",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-09",
+      "nl": "authenticate the peer",
+      "got": "I:ID",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CRY-10",
+      "nl": "verify signature",
+      "got": "S:VFY",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CFG-01",
+      "nl": "update config",
+      "got": "N:CFG",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CFG-02",
+      "nl": "set the threshold to 30",
+      "got": "N:CFG@30[threshold:30]",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CFG-03",
+      "nl": "back up the database tonight at 2am",
+      "got": "T:SCHED[2AM]→N:BK@2AM",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CFG-04",
+      "nl": "ping every 30 seconds",
+      "got": "T:SCHED[30s];A:PING",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CFG-05",
+      "nl": "expire this token in 1 hour",
+      "got": "T:EXP[1h]",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CFG-06",
+      "nl": "set max retries to 5",
+      "got": "N:CFG@5[retries:5]",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CFG-07",
+      "nl": "reboot at midnight",
+      "got": "C:RSTRT@AT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "CFG-08",
+      "nl": "alert daily at 9am",
+      "got": "L:ALERT",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "VIT-01",
+      "nl": "vehicle position",
+      "got": "V:POS",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "VIT-02",
+      "nl": "fleet status",
+      "got": "V:FLEET?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "VIT-03",
+      "nl": "AIS position report",
+      "got": "V:AIS",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "VIT-04",
+      "nl": "vessel heading",
+      "got": "V:HDG",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "VIT-05",
+      "nl": "control station position",
+      "got": "G:POS",
+      "verdict": "WRONG"
+    },
+    {
+      "id": "ENERGY-01",
+      "nl": "battery level",
+      "got": "X:STORE?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ENERGY-02",
+      "nl": "grid frequency",
+      "got": "X:FREQ?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ENERGY-03",
+      "nl": "voltage reading",
+      "got": "X:VOLT?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ENERGY-04",
+      "nl": "wind farm production",
+      "got": "X:PROD?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "ENERGY-05",
+      "nl": "ev charging state",
+      "got": "X:CHG?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MEMORY-01",
+      "nl": "store this to memory",
+      "got": "Y:STORE",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MEMORY-02",
+      "nl": "fetch from memory by key",
+      "got": "Y:FETCH",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MEMORY-03",
+      "nl": "forget this memory",
+      "got": "Y:FORGET",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MEMORY-04",
+      "nl": "page out memory",
+      "got": "Y:PAGEOUT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "INF-01",
+      "nl": "inference cost",
+      "got": "Z:COST",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "INF-02",
+      "nl": "context window",
+      "got": "Z:CTX",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "INF-03",
+      "nl": "token count",
+      "got": "Z:TOKENS",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "INF-04",
+      "nl": "run inference",
+      "got": "Z:INF",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "FLOW-01",
+      "nl": "request flow authorization",
+      "got": "F:AV",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "FLOW-02",
+      "nl": "wait for next signal",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "TYPO-01",
+      "nl": "stp the conveyor",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "TYPO-02",
+      "nl": "blod presure",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "TYPO-03",
+      "nl": "report locaton",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "PARA-01",
+      "nl": "shut the conveyor down",
+      "got": "C:KILL",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "PARA-02",
+      "nl": "what is the patient's heart rate",
+      "got": "H:HR?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "PARA-03",
+      "nl": "tell me where I am",
+      "got": "G:POS?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "PARA-04",
+      "nl": "how fast is the wind",
+      "got": "W:WIND?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "PARA-05",
+      "nl": "give me the BP",
+      "got": "H:BP?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "PARA-06",
+      "nl": "engage the camera",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "PARA-07",
+      "nl": "show me the mesh status",
+      "got": "N:STS?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "PARA-08",
+      "nl": "kill the conveyor",
+      "got": "C:KILL",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "PARA-09",
+      "nl": "modify settings",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "PARA-10",
+      "nl": "check oxygen sat",
+      "got": "H:SPO2?",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "OOS-CONV-01",
+      "nl": "tell me a joke",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-CONV-02",
+      "nl": "how are you",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-CONV-03",
+      "nl": "thanks",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-CONV-04",
+      "nl": "good morning",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-CONV-05",
+      "nl": "what's your name",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-CONV-06",
+      "nl": "I love this product",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-CONV-07",
+      "nl": "have a nice day",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-UNK-01",
+      "nl": "order me a pepperoni pizza",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-UNK-02",
+      "nl": "book a flight to Paris",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-UNK-03",
+      "nl": "play some jazz",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-UNK-04",
+      "nl": "remind me to buy milk",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-UNK-05",
+      "nl": "translate this to French",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-UNK-06",
+      "nl": "find me a recipe for pasta",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-UNK-07",
+      "nl": "what time is the meeting",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "OOS-MAL-01",
+      "nl": "asdf qwerty",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED"
+    },
+    {
+      "id": "OOS-MAL-02",
+      "nl": "...",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED"
+    },
+    {
+      "id": "OOS-MAL-03",
+      "nl": "the",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED"
+    },
+    {
+      "id": "OOS-MAL-04",
+      "nl": "xyz123",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED"
+    },
+    {
+      "id": "OOS-MAL-05",
+      "nl": "{}",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED"
+    },
+    {
+      "id": "OOS-MAL-06",
+      "nl": "lorem ipsum dolor",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED"
+    },
+    {
+      "id": "OOS-MAL-07",
+      "nl": "????",
+      "got": null,
+      "verdict": "REFUSED_MALFORMED"
+    }
+  ]
+}

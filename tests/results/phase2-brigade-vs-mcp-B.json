@@ -1,0 +1,186 @@
+{
+  "name": "llm_brigade_tools",
+  "results": [
+    {
+      "id": "DC-01",
+      "nl": "stop the conveyor",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "DC-02",
+      "nl": "lock door D-7",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "DC-03",
+      "nl": "restart the service",
+      "got": "C:RSTRT",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "DC-04",
+      "nl": "shutdown gateway 3",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "DC-05",
+      "nl": "stop pump and close valve",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MT-01",
+      "nl": "ping node 17",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MT-02",
+      "nl": "discover peers",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MT-03",
+      "nl": "broadcast my position",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MT-04",
+      "nl": "find primary relay",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MT-05",
+      "nl": "node status",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MED-01",
+      "nl": "blood pressure check",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MED-02",
+      "nl": "all vitals for patient 12",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MED-03",
+      "nl": "alert me if heart rate exceeds 130",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MED-04",
+      "nl": "casualty report if BP above 180",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MED-05",
+      "nl": "patient has pneumothorax, code J93.0",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "UAV-01",
+      "nl": "drone position",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "UAV-02",
+      "nl": "return to base",
+      "got": "R:RTH↺",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "UAV-03",
+      "nl": "move drone 1 to coordinates 35.7, -122.4",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "UAV-04",
+      "nl": "form swarm wedge with spacing 50",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "UAV-05",
+      "nl": "vehicle heading",
+      "got": "V:HDG",
+      "verdict": "CORRECT"
+    },
+    {
+      "id": "MOV-01",
+      "nl": "report location",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MOV-02",
+      "nl": "report heading",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MOV-03",
+      "nl": "position and heading",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MOV-04",
+      "nl": "vessel heading",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "MOV-05",
+      "nl": "altitude reading",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "WX-01",
+      "nl": "wind speed",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "WX-02",
+      "nl": "wind speed at turbine 7",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "WX-03",
+      "nl": "barometric pressure",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "WX-04",
+      "nl": "alert when wind exceeds 40",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    },
+    {
+      "id": "WX-05",
+      "nl": "report temp and humidity",
+      "got": null,
+      "verdict": "SAFE_PASSTHROUGH"
+    }
+  ],
+  "cost": 0.1046088
+}
