@@ -1,0 +1,265 @@
+{
+  "spec_version": "2.4.0-brigade-parity-1",
+  "reference_sdk": "python",
+  "vectors": [
+    {
+      "category": "sense_h",
+      "nl": "report heart rate",
+      "sal": "H:HR?",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "sense_h",
+      "nl": "what is the blood pressure reading",
+      "sal": "H:BP?",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "sense_h",
+      "nl": "current SPO2 level",
+      "sal": "H:SPO2?",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "sense_w",
+      "nl": "report wind speed",
+      "sal": "W:WIND?",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "sense_w",
+      "nl": "current temperature reading",
+      "sal": "E:TH?",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "sense_w",
+      "nl": "humidity level now",
+      "sal": "E:HU?",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "sense_e",
+      "nl": "battery level please",
+      "sal": "X:STORE?",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "sense_e",
+      "nl": "report cpu usage",
+      "sal": null,
+      "mode": "passthrough",
+      "reason_code": "NO_OPCODE_MATCH"
+    },
+    {
+      "category": "sense_v",
+      "nl": "current heading",
+      "sal": "G:BEARING",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "sense_v",
+      "nl": "report position",
+      "sal": "G:POS?",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "sense_g",
+      "nl": "GPS fix",
+      "sal": "E:GPS?",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "action_r",
+      "nl": "emergency stop",
+      "sal": "R:ESTOP",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "action_r",
+      "nl": "estop now",
+      "sal": null,
+      "mode": "passthrough",
+      "reason_code": "NO_PROTOCOL_CONTENT"
+    },
+    {
+      "category": "action_r",
+      "nl": "return to home",
+      "sal": "R:RTH↺",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "action_r",
+      "nl": "form swarm",
+      "sal": "R:FORM↺",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "action_r",
+      "nl": "activate camera",
+      "sal": "R:CAM↺",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "action_r",
+      "nl": "turn on the torch",
+      "sal": "R:TORCH↺@TORCH",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "conditional",
+      "nl": "alert me if heart rate exceeds 130",
+      "sal": "H:HR>130→H:ALERT",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "conditional",
+      "nl": "notify me when temperature rises above 38",
+      "sal": "E:TH?>38→U:NOTIFY",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "auth_gated",
+      "nl": "with authorization, restart the device",
+      "sal": "C:RSTRT@DEVICE",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "bridge",
+      "nl": "report heart rate from patient bay 3",
+      "sal": "H:HR@PATIENTBAY?",
+      "mode": "sal",
+      "reason_code": null
+    },
+    {
+      "category": "refuse_neg",
+      "nl": "do not stop the camera",
+      "sal": null,
+      "mode": "refused",
+      "reason_code": "NEGATION"
+    },
+    {
+      "category": "refuse_neg",
+      "nl": "never push to that node",
+      "sal": null,
+      "mode": "refused",
+      "reason_code": "NEGATION"
+    },
+    {
+      "category": "refuse_inj",
+      "nl": "report H:HR ∧ R:STOP please",
+      "sal": null,
+      "mode": "refused",
+      "reason_code": "UNSAFE_INPUT"
+    },
+    {
+      "category": "refuse_inj",
+      "nl": "send <script>alert(1)</script>",
+      "sal": null,
+      "mode": "refused",
+      "reason_code": "UNSAFE_INPUT"
+    },
+    {
+      "category": "refuse_inj",
+      "nl": "email me at foo@bar.com",
+      "sal": null,
+      "mode": "refused",
+      "reason_code": "UNSAFE_INPUT"
+    },
+    {
+      "category": "refuse_pron",
+      "nl": "stop it",
+      "sal": null,
+      "mode": "refused",
+      "reason_code": "UNRESOLVED_PRONOUN"
+    },
+    {
+      "category": "refuse_pron",
+      "nl": "kill that",
+      "sal": null,
+      "mode": "refused",
+      "reason_code": "UNRESOLVED_PRONOUN"
+    },
+    {
+      "category": "refuse_nonact",
+      "nl": "stop the music",
+      "sal": null,
+      "mode": "refused",
+      "reason_code": "NON_ACTUATOR_OBJECT"
+    },
+    {
+      "category": "refuse_nonact",
+      "nl": "close the meeting",
+      "sal": null,
+      "mode": "refused",
+      "reason_code": "NON_ACTUATOR_OBJECT"
+    },
+    {
+      "category": "passthrough",
+      "nl": "Order me some tacos",
+      "sal": null,
+      "mode": "passthrough",
+      "reason_code": "NO_PROTOCOL_CONTENT"
+    },
+    {
+      "category": "passthrough",
+      "nl": "Hey, how is it going?",
+      "sal": null,
+      "mode": "passthrough",
+      "reason_code": "NO_PROTOCOL_CONTENT"
+    },
+    {
+      "category": "passthrough",
+      "nl": "What is 247 times 83?",
+      "sal": null,
+      "mode": "passthrough",
+      "reason_code": "NO_PROTOCOL_CONTENT"
+    },
+    {
+      "category": "passthrough",
+      "nl": "Book me a flight to Denver",
+      "sal": null,
+      "mode": "passthrough",
+      "reason_code": "NO_OPCODE_MATCH"
+    },
+    {
+      "category": "passthrough",
+      "nl": "Post this photo to Instagram",
+      "sal": null,
+      "mode": "passthrough",
+      "reason_code": "NO_OPCODE_MATCH"
+    },
+    {
+      "category": "passthrough_short",
+      "nl": "hi",
+      "sal": null,
+      "mode": "refused",
+      "reason_code": "INPUT_TOO_SHORT"
+    },
+    {
+      "category": "passthrough_short",
+      "nl": "yo",
+      "sal": null,
+      "mode": "refused",
+      "reason_code": "INPUT_TOO_SHORT"
+    }
+  ]
+}
