@@ -28,7 +28,7 @@ Three commercial services require a direct request. Gating is intentional: each 
 
 ### Omega Namespace Extensions
 
-The OSMP grammar reserves extension namespaces for domain-specific opcodes beyond the 352-opcode public ASD. Organizations deploying OSMP in specialized domains — clinical specialties, defense-vertical taxonomies, industrial-control vocabularies, proprietary agent frameworks, multi-tenant enterprise platforms — can register custom namespace opcodes under the Omega extension protocol. Registered Omega namespaces sit outside the core patent claim scope (third-party sovereign extensions are the intellectual property of their respective authors) while retaining wire-level compatibility with the public grammar.
+The OSMP grammar reserves extension namespaces for domain-specific opcodes beyond the 356-opcode public ASD. Organizations deploying OSMP in specialized domains — clinical specialties, defense-vertical taxonomies, industrial-control vocabularies, proprietary agent frameworks, multi-tenant enterprise platforms — can register custom namespace opcodes under the Omega extension protocol. Registered Omega namespaces sit outside the core patent claim scope (third-party sovereign extensions are the intellectual property of their respective authors) while retaining wire-level compatibility with the public grammar.
 
 **Request Omega namespace registration:** `ack@octid.io` — subject: *Omega namespace request*
 

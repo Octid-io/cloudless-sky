@@ -63,7 +63,7 @@ export const DICT_UPDATE_MODES = {
     "←": { unicode: "U+2190", name: "REPLACE", bytes: 3 },
     "†": { unicode: "U+2020", name: "DEPRECATE", bytes: 3 },
 };
-// ASD_BASIS — 26 namespaces, 352 opcodes
+// ASD_BASIS — 26 namespaces, 356 opcodes
 // Source: dictionary v15
 export const ASD_BASIS = {
     "A": {
@@ -120,6 +120,7 @@ export const ASD_BASIS = {
         "ABORT": "abort_transfer",
         "CHUNK": "file_chunk_payload",
         "CSUM": "checksum_verification",
+        "DEL": "delete_data_irreversible",
         "FEED": "data_feed",
         "LOG": "log_entry",
         "PACK": "two_tier_corpus_encoding_for_at_rest_storage",
@@ -298,6 +299,7 @@ export const ASD_BASIS = {
         "BRK": "brake_actuator",
         "BT": "bluetooth_state",
         "CAM": "camera_activation",
+        "CLOSE": "close_actuator",
         "COLLAB": "collaborative_mode",
         "DECEL": "decelerate_behavioral",
         "DISP": "display_brightness_or_state",
@@ -310,10 +312,12 @@ export const ASD_BASIS = {
         "HAPTIC": "haptic_feedback_pattern",
         "HDNG": "heading",
         "LAND": "landing",
+        "LOCK": "lock_actuator",
         "MIC": "microphone_activation",
         "MOV": "move",
         "NFC": "nfc_read_write",
         "NOTIF": "push_notification_to_device",
+        "OPEN": "open_actuator",
         "RTH": "return_to_home_origin",
         "SCRN": "screen_capture",
         "SPKR": "speaker_audio_output",

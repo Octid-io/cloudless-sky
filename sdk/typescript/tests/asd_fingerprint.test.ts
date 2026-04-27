@@ -24,7 +24,7 @@ import { AdaptiveSharedDictionary } from "../src/asd.js";
 import { ASD_BASIS } from "../src/glyphs.js";
 
 // --- AUTO-UPDATED by tools/gen_asd.py --- do not edit manually ---
-// The canonical ASD fingerprint for dictionary v15 (352 opcodes, 26 namespaces).
+// The canonical ASD fingerprint for dictionary v15 (356 opcodes, 26 namespaces).
 // This value MUST match the output of the equivalent Python computation:
 //
 //   python3 -c "import sys; sys.path.insert(0, 'sdk/python'); \
@@ -33,7 +33,7 @@ import { ASD_BASIS } from "../src/glyphs.js";
 //
 // If this test fails, run: python3 tools/gen_asd.py
 // That regenerates glyphs AND this constant from the canonical Python source.
-const CANONICAL_FINGERPRINT_V15 = "1c125bb41b1838e1";
+const CANONICAL_FINGERPRINT_V15 = "9ecc507e2c24c4a7";
 // --- END AUTO-UPDATED ---
 
 describe("ASD Cross-SDK Fingerprint", () => {
@@ -57,12 +57,12 @@ describe("ASD Cross-SDK Fingerprint", () => {
     expect(Object.keys(ASD_BASIS).length).toBe(26);
   });
 
-  it("ASD_BASIS contains 352 opcodes total", () => {
+  it("ASD_BASIS contains 356 opcodes total", () => {
     let total = 0;
     for (const ops of Object.values(ASD_BASIS)) {
       total += Object.keys(ops).length;
     }
-    expect(total).toBe(352);
+    expect(total).toBe(356);
   });
 
   it("canonical JSON is deterministic", () => {

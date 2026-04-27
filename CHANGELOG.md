@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [Unreleased] — Brigade composer + ASD v15.1
+
+### Added
+
+- **Brigade composer architecture (NL → SAL).** All three SDKs gain a deterministic kitchen-brigade pipeline (parser + ParsedRequest IR + 26 namespace stations + orchestrator + bridge mode + structured `ComposeResult` with teaching hint). Python landed in commit `5f96d58`; TypeScript and Go ports landed in `dc74ab2` with byte-identical parity locked via `tests/parity/brigade_parity_vectors.json` (37 curated NL inputs across single-frame compose, conditional chains, auth-gated frames, bridge mode, refusal categories, passthrough). Refusal taxonomy: `INPUT_TOO_SHORT`, `NEGATION`, `UNSAFE_INPUT`, `UNRESOLVED_PRONOUN`, `NON_ACTUATOR_OBJECT`, `CHAIN_INCOMPLETE`, `NO_PROTOCOL_CONTENT`, `NO_OPCODE_MATCH`. Bridge mode emits `SAL::residue` for sensing namespaces only when the residue does not contain a modifier marker and the composite stays compression-positive against the NL.
+- **ASD v15.1 — 4 opcode additions.** ZTOLE-confirmed gaps now in the canonical dictionary:
+  - `R:OPEN` — open_actuator (door, hatch, valve, gate)
+  - `R:CLOSE` — close_actuator
+  - `R:LOCK` — lock_actuator
+  - `D:DEL` — delete_data_irreversible
+- Total opcode count: **352 → 356**. ASD fingerprint regenerated via `tools/gen_asd.py` and propagated to TS/Go glyph tables and the cross-SDK fingerprint test.
+
+### Notes
+
+- The 95.7% opcode coverage figure carried in the public READMEs was measured against the v15.0 baseline (352 opcodes). v15.1 adds 4 opcodes; re-measurement against the new denominator is pending. README copy now anchors the percentage to the v15.0 baseline rather than the current count to avoid silent drift.
+- Brigade verb lexicon currently maps `close → R:STOP` and `lock → R:STOP` for compatibility. A follow-on can re-route these to `R:CLOSE` / `R:LOCK` respectively once new parity vectors are accepted.
+
+---
+
 ## [v2.3.4] — 2026-04-24
 
 Cross-SDK parity restoration. The TypeScript and Go composers had been frozen at the April 16 snapshot — missing the macro registry, chain-split, and tighter phrase-matching that already landed in Python's 2.3.3. This patch closes the drift in both downstream SDKs so the protocol's behavior is byte-identical across all three. The protocol itself did not change; this is the work that should have shipped inside 2.3.3.

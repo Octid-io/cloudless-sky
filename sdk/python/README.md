@@ -1,6 +1,6 @@
 # OSMP Python SDK
 
-Reference implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, composes, and validates agentic AI instructions using SAL (Semantic Assembly Language). 352 opcodes across 26 namespaces. SALComposer for deterministic NL-to-SAL composition (95.7% opcode coverage). MacroRegistry for pre-validated chain templates (16 Meshtastic macros shipped). Deterministic decode to structured instructions. No inference.
+Reference implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, composes, and validates agentic AI instructions using SAL (Semantic Assembly Language). 356 opcodes across 26 namespaces (v15.1: 352 base + R:OPEN, R:CLOSE, R:LOCK, D:DEL). SALComposer for deterministic NL-to-SAL composition (95.7% opcode coverage on the v15.0 baseline). MacroRegistry for pre-validated chain templates (16 Meshtastic macros shipped). Deterministic decode to structured instructions. No inference.
 
 ## Install
 
@@ -205,7 +205,7 @@ sal, is_sal = composer.compose_or_passthrough("Order me some tacos")
 # sal = "Order me some tacos", is_sal = False (NL passthrough)
 ```
 
-95.7% opcode coverage on the full 352-opcode dictionary. Generation index with 358 phrase triggers. Confidence gate prevents false positives on common English words.
+95.7% opcode coverage measured on the v15.0 baseline (352 opcodes). v15.1 adds 4 opcodes (R:OPEN, R:CLOSE, R:LOCK, D:DEL) — re-measurement pending. Generation index with 358 phrase triggers. Confidence gate prevents false positives on common English words.
 
 ## MCP Server
 

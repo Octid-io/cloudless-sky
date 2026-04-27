@@ -62,7 +62,7 @@ var DictUpdateModeGlyphs = map[string]string{
 }
 
 // ASDFloorBasis is the compiled-in ASD basis set.
-// Source: dictionary v15 (26 namespaces, 352 opcodes)
+// Source: dictionary v15 (26 namespaces, 356 opcodes)
 var ASDFloorBasis = map[string]map[string]string{
 	"A": {
 		"ACCEPT": "accept_proposed_action",
@@ -118,6 +118,7 @@ var ASDFloorBasis = map[string]map[string]string{
 		"ABORT": "abort_transfer",
 		"CHUNK": "file_chunk_payload",
 		"CSUM": "checksum_verification",
+		"DEL": "delete_data_irreversible",
 		"FEED": "data_feed",
 		"LOG": "log_entry",
 		"PACK": "two_tier_corpus_encoding_for_at_rest_storage",
@@ -296,6 +297,7 @@ var ASDFloorBasis = map[string]map[string]string{
 		"BRK": "brake_actuator",
 		"BT": "bluetooth_state",
 		"CAM": "camera_activation",
+		"CLOSE": "close_actuator",
 		"COLLAB": "collaborative_mode",
 		"DECEL": "decelerate_behavioral",
 		"DISP": "display_brightness_or_state",
@@ -308,10 +310,12 @@ var ASDFloorBasis = map[string]map[string]string{
 		"HAPTIC": "haptic_feedback_pattern",
 		"HDNG": "heading",
 		"LAND": "landing",
+		"LOCK": "lock_actuator",
 		"MIC": "microphone_activation",
 		"MOV": "move",
 		"NFC": "nfc_read_write",
 		"NOTIF": "push_notification_to_device",
+		"OPEN": "open_actuator",
 		"RTH": "return_to_home_origin",
 		"SCRN": "screen_capture",
 		"SPKR": "speaker_audio_output",

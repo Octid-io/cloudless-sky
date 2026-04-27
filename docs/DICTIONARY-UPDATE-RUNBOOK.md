@@ -76,7 +76,7 @@ Expected output:
 
 ```
 Dictionary version: v15
-ASD_BASIS: 26 namespaces, 352 opcodes
+ASD_BASIS: 26 namespaces, 356 opcodes
 
 Checking TypeScript: sdk/typescript/src/glyphs.ts
   OK (in sync)

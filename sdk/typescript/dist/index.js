@@ -127,4 +127,5 @@ export { FNPSession, FNP_MSG_ADV, FNP_MSG_ACK, FNP_MSG_NACK, FNP_MATCH_EXACT, FN
 export { ADPSession, asdVersionPack, asdVersionUnpack, asdVersionStr, asdVersionParse, asdVersionIsBreaking, deltaToSal, deltaHasBreaking, deltaOpToSal, deltaOpIsBreaking, ADP_PRIORITY_MISSION, ADP_PRIORITY_MICRO, ADP_PRIORITY_DELTA, ADP_PRIORITY_TRICKLE } from "./adp.js";
 export { SALBridge } from "./bridge.js";
 export { SALComposer } from "./sal_composer.js";
+export { SlotDefinition, MacroTemplate, MacroRegistry } from "./macro.js";
 //# sourceMappingURL=index.js.map

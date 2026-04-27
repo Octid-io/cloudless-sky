@@ -28,7 +28,7 @@ When AI agents communicate in JSON over HTTP, the cost compounds at every hop.
 R:MOV@BOT1:WPT:WP1↺
 ```
 
-21 bytes. Decode is deterministic. Fits a single LoRa packet at maximum-range spreading factor. No inference required at the receiving node. The agent calls `osmp_compose` and the deterministic pipeline handles opcode selection, grammar assembly, and validation. 95.7% opcode coverage on the full 352-opcode dictionary. 98.6% with LLM fallback. What OSMP changes is the output format, and the decode layer: the receiving node decodes a structured instruction without inference.
+21 bytes. Decode is deterministic. Fits a single LoRa packet at maximum-range spreading factor. No inference required at the receiving node. The agent calls `osmp_compose` and the deterministic pipeline handles opcode selection, grammar assembly, and validation. 95.7% opcode coverage on the v15.0 ASD baseline (352 opcodes; v15.1 adds R:OPEN, R:CLOSE, R:LOCK, D:DEL → 356). 98.6% with LLM fallback. What OSMP changes is the output format, and the decode layer: the receiving node decodes a structured instruction without inference.
 
 ---
 
@@ -335,7 +335,7 @@ Run it yourself. The numbers are real and independently reproducible across all 
 | Component | Function |
 |---|---|
 | **ADP** — ASD Distribution Protocol | Dictionary delta synchronization across nodes |
-| **ASD** — Adaptive Shared Dictionary | 352-opcode version-pinned compression dictionary |
+| **ASD** — Adaptive Shared Dictionary | 356-opcode version-pinned compression dictionary |
 | **BAEL** — Bandwidth-Agnostic Efficiency Layer | Adaptive encoding across any channel capacity |
 | **FNP** — Frame Negotiation Protocol | Capability negotiation, session handshake, FALLBACK/ACQUIRED states for non-OSMP peers |
 | **MDR** — Managed Dictionary Registry | Domain-specific controlled vocabulary corpora (ICD-10-CM, ISO 20022, MITRE ATT&CK) packaged as D:PACK/BLK binaries for edge-local resolution without network access |
@@ -352,7 +352,7 @@ Run it yourself. The numbers are real and independently reproducible across all 
 
 Everything here is operational from the floor ASD without MDR, cloud access, or additional tooling.
 
-**Instruction encoding across all 26 standard namespaces** — 352 opcodes drawn from authoritative sources: IEC 61850 (energy), ICD-10/SNOMED CT/CPT (clinical), ISO 20022/FIX/SWIFT (financial), ISO 10218-1:2025 (robotics), FEMA ICS/NIMS (emergency management), BDI/PDDL/HTN (cognitive AI), OpenAI/Anthropic APIs (model operations). Registered macro architecture with 16 Meshtastic macros (pre-validated multi-opcode chain templates invoked via `A:MACRO[name]`).
+**Instruction encoding across all 26 standard namespaces** — 356 opcodes drawn from authoritative sources: IEC 61850 (energy), ICD-10/SNOMED CT/CPT (clinical), ISO 20022/FIX/SWIFT (financial), ISO 10218-1:2025 (robotics), FEMA ICS/NIMS (emergency management), BDI/PDDL/HTN (cognitive AI), OpenAI/Anthropic APIs (model operations). Registered macro architecture with 16 Meshtastic macros (pre-validated multi-opcode chain templates invoked via `A:MACRO[name]`).
 
 **Four AI-native namespaces** — J (Cognitive Execution State), Q (Quality/Evaluation/Grounding), Y (Memory + Retrieval), Z (Model/Inference Operations). No prior agent communication protocol defines these. They encode what agents do internally, not just what they communicate between themselves. The J→Y→Z→Q chain encodes the full AI cognitive pipeline as a single transmissible SAL instruction sequence, decodable by ASD lookup without neural inference.
 
