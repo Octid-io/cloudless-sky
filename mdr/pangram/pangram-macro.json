@@ -1,0 +1,49 @@
+{
+  "corpus_id": "pangram-handshake-v1",
+  "version": "1.0.0",
+  "description": "OSMP Pangram Handshake — single canonical demonstration instruction registered as macro. Receiver acquires protocol grammar from one transmission via either deterministic decode (dictionary lookup) or inference-driven single-shot exemplar pattern recognition.",
+  "asd_version": "v15.1",
+  "asd_basis_fingerprint_pinned_at_release": null,
+  "specification_reference": "C:\\Users\\clay\\Desktop\\Transcripts and files for coordination\\IP Current\\MEMO-pangram-handshake-claim-cluster-apr25.md",
+  "build_provenance": {
+    "step0_enumeration": "mdr/pangram/STEP0-essential-primitives-enumeration.md",
+    "step1_mode3_generation": "mdr/pangram/STEP1-mode3-convergence.md",
+    "step1_5_synthesis": "mdr/pangram/STEP1_5-pangram-body-synthesis.md",
+    "synthesis_method": "Theoretical MUST/SHOULD enumeration (STEP0) + ZTOLE Mode 3 panel convergence (STEP1, preliminary 2-lineage) + safety-doctrine completion of non-convergent MUST primitives (target_named, cc_reversible, cc_irreversible)"
+  },
+  "macros": [
+    {
+      "macro_id": "PANGRAM",
+      "chain_template": "I:§→R:MOV@DRONE1[lat:34.05,lon:-118.25]⚠;H:HR>130→H:ALERT@*∧L:LOG@AUDIT;I:§→D:DEL@RECORD42⊘;G:POS@FLEET?∧T:SCHED[every:1h];A:MACRO[MESH:HLTH]→⊤;N:CFG[Δ:{ttl:30}]↺",
+      "description": "Canonical pangram handshake demonstration instruction. Exercises the essential grammatical primitives of SAL across nine namespaces. Registered under macro_id PANGRAM and reserved by the protocol specification for the pangram handshake purpose per claim 3 of the pangram-handshake claim cluster.",
+      "slots": [],
+      "triggers": [],
+      "byte_length_utf8": 185,
+      "namespace_coverage": ["A", "D", "G", "H", "I", "L", "N", "R", "T"],
+      "primitive_coverage": {
+        "frame_NS_OPCODE": true,
+        "ns_op_colon_delimiter": true,
+        "target_named": true,
+        "target_wildcard": true,
+        "slot_brackets": true,
+        "slot_multi_kv": true,
+        "operator_sequence": true,
+        "operator_then": true,
+        "operator_conjunction": true,
+        "operator_threshold": true,
+        "operator_query": true,
+        "consequence_class_reversible": true,
+        "consequence_class_hazardous": true,
+        "consequence_class_irreversible": true,
+        "consequence_class_authorized": true,
+        "auth_precondition_pattern": true,
+        "outcome_state_pass": true,
+        "macro_invocation": true,
+        "cat4_designator_delta": true
+      },
+      "hash_sha256": "fcefe9363ab737be174829dd8c12f4ca365fefb3601464514dd2aa4e1e0332ba",
+      "hash_sha256_truncated_16": "fcefe9363ab737be",
+      "purpose": "First-or-among-first handshake message in a bridged session. The first agent transmits this byte-identical canonical demonstration to a second agent in a pre-acquisition state. The second agent, regardless of class (deterministic-decoder or inference-driven), acquires protocol grammar from the single transmission. Receivers verify the canonical form by SHA-256 hash compare to the registered hash above; mismatch causes reversion to pre-acquisition state without applying received content (bounded-infection property, claim 2 of the cluster)."
+    }
+  ]
+}

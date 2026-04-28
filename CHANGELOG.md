@@ -6,6 +6,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [v2.5.0] — 2026-04-27
+
+Pangram Handshake — canonical demonstration instruction registered as a hash-locked macro across all three SDKs. The pangram is byte-identical across Python, TypeScript, and Go conforming implementations and is verified at module load against a registered SHA-256 fingerprint; any drift trips a runtime error at import. Receivers verify the canonical form by SHA-256 hash compare; mismatch causes reversion to the pre-acquisition state without applying received content (bounded-infection property).
+
+The canonical pangram body exercises a representative subset of SAL grammar across nine namespaces (A, D, G, H, I, L, N, R, T) — frame structure, named target syntax, broadcast wildcard, multi-slot encoding, sequence operator, THEN operator, conjunction operator, threshold operator, query suffix, three consequence-class designators (↺ ⚠ ⊘), the I:§ authorization precondition pattern, an outcome-state designator (⊤), a parameter designator (Δ), and a macro invocation reference. 185 UTF-8 bytes. SHA-256 `fcefe9363ab737be174829dd8c12f4ca365fefb3601464514dd2aa4e1e0332ba`.
+
+A short-form companion (`PANGRAM_TINY`) is provided for channels with payload size below the standard-form envelope (e.g., LoRa floor at 51 bytes). 48 UTF-8 bytes; same v15.1 ASD basis; SHA-256 `91c807dbbf3693ca57fb9b10ca39a5092d69de63df19b019217460e5e9c04564`. The `ChannelTier` enumeration plus `emit_for_tier(...)` and `verify_for_tier(...)` functions provide tier-aware sender/receiver APIs.
+
+**Package versions shipped with this release:**
+- `osmp` (Python / PyPI): 2.4.0 → **2.5.0**
+- `osmp-mcp` (PyPI): 1.2.0 → **1.3.0** (depends on `osmp[dpack]>=2.5.0`)
+- `osmp-protocol` (npm): 2.4.0 → **2.5.0**
+- `osmp-mcp` server.json: wrapper 1.2.0 → 1.2.1, package 1.2.0 → 1.3.0 (lag-of-one convention)
+- Go module: tag **v2.5.0** (no `go.mod` edit, pre-v2 import path)
+
+### Added
+
+- **`osmp.pangram` module (Python).** New module at `sdk/python/osmp/pangram.py` exporting: `PANGRAM_BODY`, `PANGRAM_MACRO_ID`, `PANGRAM_ASD_VERSION`, `PANGRAM_SHA256`, `PANGRAM_SHA256_TRUNCATED_16`, `PANGRAM_UTF8_BYTES`, `EXPECTED_PANGRAM_SHA256`, `verify_received(...)`, `emit()`, `emit_bytes()`, `macro_invocation()`, `metadata()`, plus tier-2 constants (`PANGRAM_TINY_*`) and tier-aware API (`ChannelTier`, `emit_for_tier(...)`, `verify_for_tier(...)`). 28 unit tests pass (`sdk/python/tests/test_pangram.py`).
+
+- **`pangram` module (TypeScript).** Parallel module at `sdk/typescript/src/pangram.ts` with the same API surface camelCased (`PANGRAM_BODY`, `verifyReceived`, `emit`, `emitBytes`, `macroInvocation`, `metadata`, `ChannelTier`, `emitForTier`, `verifyForTier`). 25 unit tests pass (`sdk/typescript/tests/pangram.test.ts`).
+
+- **`osmp.Pangram*` constants (Go).** Parallel module at `sdk/go/osmp/pangram.go` with capitalized identifiers (`PangramBody`, `PangramSHA256`, `EmitPangram`, `EmitPangramBytes`, `VerifyReceived`, `VerifyReceivedString`, `PangramMacroInvocation`, `PangramMetadataInfo`, `EmitForTier`, `VerifyForTier`, `VerifyForTierString`, `ChannelTier{Standard,LoraFloor}`). All pangram tests pass.
+
+- **Cross-SDK byte-identicalness contract.** Each SDK's pangram module hardcodes `EXPECTED_PANGRAM_SHA256` and `EXPECTED_PANGRAM_TINY_SHA256` as registered fingerprints and computes the actual SHA-256 over `PANGRAM_BODY` / `PANGRAM_TINY_BODY` at module load. Mismatch trips a runtime error (Python `RuntimeError`, TypeScript `Error`, Go `panic`). Any divergence between any SDK and the registered fingerprint is detected at import. Fingerprints verified independently across all three SDKs at this release.
+
+- **Canonical macro registration JSON.** `mdr/pangram/pangram-macro.json` contains the canonical macro registration with body, byte length, namespace coverage, and registered SHA-256 fingerprint. Macro identifier: `PANGRAM`. Tier-2 identifier: `PANGRAM_TINY`. ASD basis: v15.1.
+
+### Notes
+
+- The pangram source is designed for public publication; cluster-claim language explicitly recites the pangram as "byte-identical across all conforming implementations" — public publication is the structural prerequisite for the byte-identicalness property to be third-party verifiable. Any reader can run `pip install osmp==2.5.0` (or `npm install osmp-protocol@2.5.0`, or import the Go module) and verify the SHA-256 fingerprint against the registered constant.
+- The pangram body is locked at v15.1 of the OSMP Adaptive Shared Dictionary. Future ASD basis bumps (v15.2, v16, etc.) may introduce a new pangram body; the canonical body in v2.5.0 remains stable as long as v15.1 is the active basis.
+
+### Tests
+
+- Python: 28/28 pangram tests pass; full SDK suite still passes.
+- TypeScript: 25/25 pangram tests pass; full SDK suite (now 221 total) still passes.
+- Go: all pangram tests pass; full module suite still passes.
+
+---
+
 ## [v2.4.0] — 2026-04-27
 
 Brigade composer architecture across all three SDKs + ASD v15.1 (4 new opcodes). The composition pipeline now runs `macro → brigade → legacy` in priority order. Brigade is the safety floor (3% WRONG vs 6-23% for LLMs in measurement); legacy keyword stacker is preserved as fallback for inputs the brigade abstains on.
