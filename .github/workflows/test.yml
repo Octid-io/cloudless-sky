@@ -143,7 +143,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             sdk/rust/target
-          key: ${{ runner.os }}-cargo-${{ matrix.rust-version }}-${{ hashFiles('sdk/rust/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-${{ matrix.rust-version }}-${{ hashFiles('sdk/rust/Cargo.toml') }}
           restore-keys: |
             ${{ runner.os }}-cargo-${{ matrix.rust-version }}-
       - name: Build

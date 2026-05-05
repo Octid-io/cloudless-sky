@@ -30,3 +30,5 @@ dist/
 # Rust SDK build artifacts
 sdk/rust/target/
 
+sdk/rust/Cargo.lock
+sdk/typescript/*.tgz
