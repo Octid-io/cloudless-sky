@@ -66,7 +66,7 @@ jobs:
           pip install -e osmp_mcp
       - name: Run pytest
         run: |
-          python -m pytest tests/ -v --tb=short
+          python -m pytest sdk/python/tests/ -v --tb=short
 
   # ── TypeScript SDK ────────────────────────────────────────────────
   typescript-tests:
