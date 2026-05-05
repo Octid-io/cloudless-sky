@@ -11,7 +11,6 @@
 // The compose-time macro priority check (a registered macro is preferred over
 // individual opcode composition) is wired in composer.go.
 //
-// Patent pending -- inventor Clay Holberg
 // License: Apache 2.0
 
 package osmp

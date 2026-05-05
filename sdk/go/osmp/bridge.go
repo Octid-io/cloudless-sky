@@ -7,7 +7,6 @@
 //
 // OSMP does not spread by installation. It spreads by contact.
 //
-// Patent pending — inventor Clay Holberg
 // License: Apache 2.0
 package osmp
 

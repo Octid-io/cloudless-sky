@@ -16,7 +16,7 @@
  *
  * Cross-SDK byte-identical to Python `osmp.pangram` and Go `osmp.Pangram*`.
  *
- * Patent pending. Inventor: Clay Holberg. License: Apache 2.0.
+ * License: Apache 2.0.
  */
 
 import { createHash } from "crypto";

@@ -217,9 +217,9 @@ function buildOpcodeTables(dictPath?: string): [OpcodeIndex, IndexOpcode] {
 // determines a node's SAIL intern table by pure-function construction. Two
 // nodes loading the same ordered basis produce byte-identical intern tables
 // and unlock SAIL with each other; nodes with different bases interoperate in
-// SAL-only mode via FNP capability grading (spec §9.5).
+// SAL-only mode via FNP capability grading.
 //
-// See ADR-004 and spec §9.8.
+// See ADR-004.
 
 export interface CorpusEntry {
   /** Stable UTF-8 identifier (1-255 bytes), e.g. "asd-v15" */
@@ -267,7 +267,7 @@ export class DictionaryBasis {
   }
 
   /**
-   * Canonical wire form per spec §9.3.
+   * Canonical wire form.
    * For each entry in basis order:
    *   corpus_id_length (1 byte) || corpus_id (UTF-8 bytes) || corpus_hash (32 bytes)
    */
@@ -283,7 +283,7 @@ export class DictionaryBasis {
   }
 
   /**
-   * 8-byte basis fingerprint per spec §9.3.
+   * 8-byte basis fingerprint.
    * First 8 bytes of SHA-256 over the canonical serialization.
    */
   fingerprint(): Buffer {
@@ -483,7 +483,7 @@ export class SAILCodec {
     this.refToStr = new Map(internTable.map((s, i) => [i, s]));
   }
 
-  /** 8-byte basis fingerprint for FNP capability negotiation (spec §9.3). */
+  /** 8-byte basis fingerprint for FNP capability negotiation. */
   basisFingerprint(): Buffer {
     return this.basis.fingerprint();
   }
@@ -890,7 +890,7 @@ export class OSMPWireCodec {
     return this.sail.basis;
   }
 
-  /** 8-byte basis fingerprint for FNP capability negotiation (spec §9.3). */
+  /** 8-byte basis fingerprint for FNP capability negotiation. */
   basisFingerprint(): Buffer {
     return this.sail.basisFingerprint();
   }

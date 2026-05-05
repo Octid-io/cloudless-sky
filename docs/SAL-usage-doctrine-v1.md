@@ -5,8 +5,7 @@
 **Status:** Normative supplement to MCP server system prompt
 **Scope:** Teaches an LLM how to SELECT opcodes from the ASD, not just how to FORMAT them
 **Prerequisite:** Agent must have access to osmp_lookup, osmp_encode, osmp_decode, and osmp_discover tools
-**Architect:** Clay Holberg
-**Protocol:** OSMP v1.0 | Patent pending | Apache 2.0 with express patent grant
+**Protocol:** OSMP v1.0 | Apache 2.0
 
 **Architectural Layer Separation:** This document governs agent-layer composition behavior. It does not modify protocol-layer decode properties. Decode remains deterministic per the protocol specification. Composition uses the agent's native inference capability, constrained by these rules. The agent is a dictionary consumer, not a dictionary author. Dictionary authorship is a sovereign node operator function exercised through FNP, MDR registration, or local Omega registration. The agent composes from what exists in the local ASD at the moment of composition, no more, no less.
 
@@ -707,7 +706,7 @@ If SAL is longer than the NL, send the NL. Floor: 51 bytes.
 
 ## Appendix B: Canonical Composition Patterns
 
-These are recurring multi-frame patterns drawn from the spec and patent documents. When the natural language matches one of these patterns, use the canonical form.
+These are recurring multi-frame patterns drawn from the spec. When the natural language matches one of these patterns, use the canonical form.
 
 | Pattern Name | SAL | Natural Language |
 |---|---|---|

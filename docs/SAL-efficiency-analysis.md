@@ -4,10 +4,9 @@
 
 **Version 2.2 | March 2026**
 **Octid Semantic Mesh Protocol (OSMP) v1.0 | Cloudless Sky Project**
-**Author: Clay Holberg**
 **Contact: ack@octid.io | octid.io**
 **Repository: github.com/octid-io/cloudless-sky**
-**License: Apache 2.0 with express patent grant**
+**License: Apache 2.0**
 
 ---
 
@@ -15,7 +14,7 @@
 
 This paper presents a multi-layer efficiency analysis comparing Semantic Assembly Language (SAL), the instruction encoding format of the Octid Semantic Mesh Protocol (OSMP), against JSON-RPC, MessagePack, and Protocol Buffers. The primary evidence base is a 29-vector empirical benchmark drawn from five production frameworks (MCP, OpenAI, Google A2A, CrewAI, Microsoft AutoGen), measured across three dimensions: byte reduction, LLM token economics (GPT-4 cl100k_base tokenizer), and binary serialization comparison (MessagePack and compiled Protocol Buffers). Supplementary analysis includes a 1,000-point grammar-level structural overhead sweep, Shannon entropy measurement of structural token streams, and a production token economics model extrapolating per-instruction savings across cited real-world multipliers (conversation history accumulation, multi-step tool chains, retry loops, context window saturation, and aggregate system inefficiency).
 
-Principal findings on the 29-vector benchmark: SAL achieves 76.0% mean token reduction (GPT-4 cl100k_base), 86.8% mean byte reduction versus minified JSON, 70.5% versus compiled Protocol Buffers, and 84.5% versus MessagePack. Protocol Buffers captures much of JSON's structural overhead (55.4% reduction); SAL's remaining advantage over protobuf derives primarily from semantic content compression through a shared opcode vocabulary, not from superior structural encoding alone. The paper includes an adversarial prosecution section, explicit methodological assumptions, and honest disclosure of cases where SAL underperforms protobuf on numeric-heavy payloads.
+Principal findings on the 29-vector benchmark: SAL achieves 76.0% mean token reduction (GPT-4 cl100k_base), 86.8% mean byte reduction versus minified JSON, 70.5% versus compiled Protocol Buffers, and 84.5% versus MessagePack. Protocol Buffers captures much of JSON's structural overhead (55.4% reduction); SAL's remaining advantage over protobuf derives primarily from semantic content compression through a shared opcode vocabulary, not from superior structural encoding alone. The paper includes an adversarial counterargument section, explicit methodological assumptions, and honest disclosure of cases where SAL underperforms protobuf on numeric-heavy payloads.
 
 All methodologies, data, source code, and test vectors are published in the open repository. The protocol has zero production deployments, zero third-party adoption, no independent audit, and no formal verification. This paper measures encoding properties, not production readiness.
 
@@ -39,7 +38,7 @@ SAL does not replace JSON for arbitrary data serialization, and it does not repl
 
 ### 1.2 Methodological Disclosure
 
-This paper was authored by the protocol's inventor. It has been subjected to independent adversarial review, and the prosecution section (Section 10) incorporates findings from that review. However, the data, models, and analysis originate from the same source as the protocol itself. Independent replication using the published code and test vectors is encouraged.
+This paper was authored by the protocol's designer. It has been subjected to independent adversarial review, and the counterargument section (Section 10) incorporates findings from that review. However, the data, models, and analysis originate from the same source as the protocol itself. Independent replication using the published code and test vectors is encouraged.
 
 ---
 
@@ -568,14 +567,13 @@ The Protocol Buffers byte counts were initially computed analytically from wire 
 | Component | Status |
 |-----------|--------|
 | Specification | OSMP v1.0, SAL EBNF grammar, semantic dictionary v12 |
-| Patent | Patent pending |
 | Python SDK (reference) | 167 tests passing |
 | TypeScript SDK | 52 tests passing |
 | Go SDK | 12 tests passing |
 | MCP Server | PyPI v1.0.12, 8 tools, 6 resources, 3 MDR corpora |
 | Canonical benchmark | 55 vectors, 60.8% mean SAL-vs-NL reduction, CONFORMANT |
 | Website | octid.io (static, Netlify) |
-| License | Apache 2.0 with express patent grant |
+| License | Apache 2.0 |
 | Production deployments | **Zero** |
 | Third-party adoption | **Zero** |
 | Independent audit | **None** |
@@ -681,7 +679,3 @@ Protocol Buffers schemas: benchmark.proto (compiled with protoc 3.21.12). Two-ti
 [25] Neontri (2026). "AI Agent Development Cost in 2026: Full Budget Guide." neontri.com/blog/ai-agent-development-cost/. Retrieved March 2026. (Production agent: 2,000 conversations/day, ~90M tokens/month at 1,500 tokens/conversation with 1:2 input-to-output ratio.)
 
 [26] Spheron (2026). "How to Build GPU Infrastructure for AI Agents: The 2026 Compute Playbook." spheron.network/blog/gpu-infrastructure-ai-agents-2026/. Retrieved March 2026. (Customer service agent: 10,000 conversations/day x 5 turns x 200 tokens = 10M tokens/day.)
-
----
-
-*OSMP is patent pending. This paper describes measurement methodology and competitive analysis applied to the disclosed protocol. The analytical frameworks (Shannon entropy, grammar production comparison, token cost measurement) are measurement tools, not protocol extensions. The benchmark results, format comparisons, and economic projections are analytical work product not present in the patent application. Readers should not treat this paper as a definitive scope statement regarding the patent's disclosure.*

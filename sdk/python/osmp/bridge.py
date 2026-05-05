@@ -15,7 +15,6 @@ agents. It does four things:
 
 OSMP does not spread by installation. It spreads by contact.
 
-Patent pending — inventor Clay Holberg
 License: Apache 2.0
 """
 

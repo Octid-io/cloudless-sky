@@ -1,13 +1,10 @@
 # ADR-005: Behavioral Command Layer vs Actuator Command Layer in R Namespace
 
-Status: Accepted
-Date: April 8, 2026
-Priority: v15 dictionary refinement
-Related: OSMP-SPEC-v1.0.2.md, OSMP-semantic-dictionary-v15.csv
+Related: `protocol/spec/OSMP-SPEC-v1.0.2.md`, `protocol/OSMP-semantic-dictionary-v15.csv`
 
 ## Context
 
-The OSMP R namespace (Robotic / Physical Agent) carries opcodes that command physical actions on robotic and autonomous vehicle systems. During the v14 to v15 dictionary refinement, a structural distinction was identified in how physical motion commands operate across autonomous system architectures. This ADR captures that distinction as a formal namespace design pattern and explains why v15 adds paired command entries rather than single unified entries for acceleration and deceleration semantics.
+The OSMP R namespace (Robotic / Physical Agent) carries opcodes that command physical actions on robotic and autonomous vehicle systems. Physical motion commands operate at two distinct abstraction layers across autonomous system architectures, and the dictionary needs paired entries to encode the distinction at the wire format. This ADR formalizes the pattern and explains why the dictionary contains paired command entries for acceleration and deceleration rather than single unified entries.
 
 ## Problem
 
@@ -68,10 +65,3 @@ The ADR does not affect existing v14 scope. R:ACCEL remains as accelerometer_dat
 - ROS2 nav_msgs vs control_msgs package separation
 - IEC 61131-3 (industrial control system command hierarchy) as a parallel precedent for the behavioral/actuator distinction in non-autonomous-vehicle control contexts
 
-## Decision Record
-
-Decision: Adopt paired behavioral/actuator entries for motion commands in R namespace starting with v15.
-Approved by: Clay Holberg (inventor).
-Implementation: v15 dictionary contains the four new R-namespace entries.
-Supersedes: None (new pattern).
-Superseded by: None.

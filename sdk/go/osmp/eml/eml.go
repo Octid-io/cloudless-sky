@@ -1,7 +1,7 @@
 // Package eml — Universal Binary Operator Evaluator (UBOT public reference).
 //
 // Reference implementation of the Universal Binary Operator for mathematical
-// instruction encoding. Patent pending.
+// instruction encoding.
 //
 // Based on Odrzywołek (2026, arXiv:2603.21852):
 //

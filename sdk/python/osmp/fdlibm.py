@@ -29,7 +29,7 @@ Algorithm:
 The implementation uses only IEEE-754-exact basic arithmetic (+, -, *, /)
 and the frexp/ldexp primitives.
 
-Patent pending | License: Apache 2.0
+License: Apache 2.0
 """
 import math
 

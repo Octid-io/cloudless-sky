@@ -23,7 +23,7 @@ To enable precision mode:
 The commercial precision pack replaces this stub file with a real
 implementation exposing the same API (exp, log, AVAILABLE = True).
 
-Patent pending | Stub: Apache 2.0 | Precision pack: commercial license
+Stub: Apache 2.0 | Precision pack: commercial license
 """
 from __future__ import annotations
 

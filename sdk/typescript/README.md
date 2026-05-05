@@ -186,7 +186,7 @@ npm run build
 
 ## License
 
-Apache 2.0. Patent pending.
+Apache 2.0.
 
 ## SALBridge: Mixed Environment Integration
 

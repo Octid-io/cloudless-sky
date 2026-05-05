@@ -224,7 +224,7 @@ This means a constrained-channel instruction can carry its own math: a 51-byte L
 ### Dual-Mode Precision
 
 - **Fast mode** (default) — fdlibm-derived, 1-ULP accurate. Correct for LoRa/BLE/edge-ML, drone swarm coordination, and general scientific computation. **Ships publicly.**
-- **Precision mode** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license.** Contact `ack@octid.io` or see [PATENTS.md](PATENT-NOTICE.md).
+- **Precision mode** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license.** Contact `ack@octid.io`.
 
 ### Cross-Device Determinism
 
@@ -236,7 +236,7 @@ fast-mode fingerprint: e9a4a71383f14624472fe0602ca5e0ff1959e00b09725a62d584e1361
 
 Identical across Python / Go / TypeScript.
 
-See the [Python SDK eml section](sdk/python/README.md#eml--universal-binary-operator-evaluator), [Go SDK eml section](sdk/go/README.md#eml--universal-binary-operator-evaluator), or [TypeScript SDK eml section](sdk/typescript/README.md#eml--universal-binary-operator-evaluator) for usage details. Patent pending.
+See the [Python SDK eml section](sdk/python/README.md#eml--universal-binary-operator-evaluator), [Go SDK eml section](sdk/go/README.md#eml--universal-binary-operator-evaluator), or [TypeScript SDK eml section](sdk/typescript/README.md#eml--universal-binary-operator-evaluator) for usage details.
 
 ---
 
@@ -362,7 +362,7 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 
 **Three MDR domain corpora shipped** — ICD-10-CM (74,719 clinical codes, H namespace), ISO 20022 (47,835 financial definitions, K namespace), and MITRE ATT&CK Enterprise v18.1 (1,661 entries, S namespace). All three are D:PACK/BLK dict-free binaries resolvable by all three SDKs without network access. See D:PACK section above for sizes and reduction figures.
 
-**R:ESTOP hard exception** — executes immediately on receipt of any single fragment, regardless of loss tolerance policy, fragment completeness, or I:§ authorization state. Asymmetric harm: unnecessary stop is recoverable; failure to stop a physical agent in emergency is not. This is intentional and documented in spec §8.2. Do not modify.
+**R:ESTOP hard exception** — executes immediately on receipt of any single fragment, regardless of loss tolerance policy, fragment completeness, or I:§ authorization state. Asymmetric harm: unnecessary stop is recoverable; failure to stop a physical agent in emergency is not. This is intentional and documented in the Overflow Protocol section of the spec. Do not modify.
 
 **Overflow Protocol** — Tier 1 (single packet, ≤51 bytes at LoRa SF12), Tier 2 (sequential burst), and Tier 3 (DAG decomposition for conditional branches and dependency chains). Three loss tolerance policies: Φ (Fail-Safe), Γ (Graceful Degradation, default), Λ (Atomic -- required for K and H namespace instructions with irreversible consequences). Tier 3 decomposes compound SAL instructions into a directed acyclic graph of executable units with dependency pointers, resolves execution order via topological sort, and applies loss tolerance to the maximal resolvable subgraph under partial receipt. Multi-parent dependencies (diamond joins) use a FLAGS bit 3 extended dependency bitmap. Fragment header stays at 6 bytes across all three tiers.
 
@@ -491,15 +491,11 @@ Wanted: C++ firmware-level encoder/decoder (ESP32/nRF52 sovereign nodes), Kotlin
 
 ---
 
-## Patent Notice
-
-Patent pending. Apache 2.0 includes an express patent grant for implementations of this specification. See [`PATENT-NOTICE.md`](PATENT-NOTICE.md).
-
----
-
 ## License
 
 Apache 2.0 — see [`LICENSE`](LICENSE).
+
+Patent pending. See [PATENT-NOTICE.md](PATENT-NOTICE.md).
 
 ---
 

@@ -1,6 +1,5 @@
 """
 OSMP MCP Server -- Octid Semantic Mesh Protocol
-Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 

@@ -15,7 +15,7 @@
 //
 // Cross-SDK byte-identical to Python osmp.pangram and TypeScript src/pangram.ts.
 //
-// Patent pending. Inventor: Clay Holberg. License: Apache 2.0.
+// License: Apache 2.0.
 
 package osmp
 

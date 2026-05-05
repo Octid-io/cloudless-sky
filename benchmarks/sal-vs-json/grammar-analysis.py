@@ -2,7 +2,6 @@
 """
 OSMP Grammar-Level Structural Analysis
 Octid Semantic Mesh Protocol — Cloudless Sky Project
-Patent pending — inventor Clay Holberg
 License: Apache 2.0
 
 THEORETICAL FRAMEWORK

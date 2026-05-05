@@ -12,7 +12,6 @@ The decode mechanism is encoding-agnostic by design. The described lookup
 cascade operates identically on binary-encoded, mnemonic-encoded, or any
 other token representation.
 
-Patent pending — inventor Clay Holberg
 License: Apache 2.0
 """
 
@@ -223,10 +222,9 @@ def _build_opcode_tables(dict_path: Path | str | None = None) -> tuple[
 # determines a node's SAIL intern table by pure-function construction. Two
 # nodes loading the same ordered basis produce byte-identical intern tables
 # and unlock SAIL with each other; nodes with different bases interoperate in
-# SAL-only mode via FNP capability grading (spec §9.5).
+# SAL-only mode via FNP capability grading.
 #
-# See ADR-004 for the architectural rationale and spec §9.8 for the formal
-# definition.
+# See ADR-004 for the architectural rationale.
 # ─────────────────────────────────────────────────────────────────────────────
 
 @dataclass(frozen=True)
@@ -291,7 +289,7 @@ class DictionaryBasis:
         return hash(self._entries)
 
     def canonical_serialization(self) -> bytes:
-        """Canonical wire form per spec §9.3.
+        """Canonical wire form.
 
         For each entry in basis order, emit:
             corpus_id_length (1 byte) || corpus_id (UTF-8 bytes) || corpus_hash (32 bytes)
@@ -309,7 +307,7 @@ class DictionaryBasis:
         return bytes(out)
 
     def fingerprint(self) -> bytes:
-        """8-byte basis fingerprint per spec §9.3.
+        """8-byte basis fingerprint.
 
         First 8 bytes of SHA-256 over the canonical serialization. Two
         bases with equal fingerprints have byte-identical canonical
@@ -607,7 +605,7 @@ class SAILCodec:
         self._ref_to_str: dict[int, str] = {i: s for i, s in enumerate(self._intern_table)}
 
     def basis_fingerprint(self) -> bytes:
-        """8-byte basis fingerprint for FNP capability negotiation (spec §9.3)."""
+        """8-byte basis fingerprint for FNP capability negotiation."""
         return self.basis.fingerprint()
 
 
@@ -1143,7 +1141,7 @@ class OSMPWireCodec:
         return self.sail.basis
 
     def basis_fingerprint(self) -> bytes:
-        """8-byte basis fingerprint for FNP capability negotiation (spec §9.3)."""
+        """8-byte basis fingerprint for FNP capability negotiation."""
         return self.sail.basis_fingerprint()
 
     def encode(self, sal: str, mode: WireMode = WireMode.MNEMONIC) -> bytes:

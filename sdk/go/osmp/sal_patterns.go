@@ -14,7 +14,6 @@ package osmp
 // `sdk/python/osmp/protocol.py` and the TypeScript constants in
 // `sdk/typescript/src/sal_patterns.ts`.
 //
-// Patent pending -- inventor Clay Holberg
 // License: Apache 2.0
 
 import "regexp"

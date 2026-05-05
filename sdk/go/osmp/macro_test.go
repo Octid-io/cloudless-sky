@@ -5,7 +5,7 @@
 // 1:1 to lock cross-SDK byte-identical behavior for the MacroRegistry,
 // MacroTemplate, and SlotDefinition types.
 //
-// Patent pending | License: Apache 2.0
+// License: Apache 2.0
 package osmp_test
 
 import (

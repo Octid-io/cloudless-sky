@@ -29,7 +29,7 @@ const (
 	// ADR-004: extended-form ADV signaled by msg_type bit 7 (high bit set).
 	// Extended form narrows node_id from 23 to 15 bytes and carries an
 	// 8-byte basis_fingerprint at offset 32. Total ADV size remains 40
-	// bytes in both forms; only the field layout differs. See spec §9.1.
+	// bytes in both forms; only the field layout differs.
 	FNPMsgADVExtended = 0x81
 	FNPADVExtFlag     = 0x80
 )
@@ -253,7 +253,7 @@ func (s *FNPSession) buildADV() []byte {
 
 	if s.IsExtendedForm() {
 		// Extended form: msg_type bit 7 set, node_id narrowed to 15 bytes,
-		// basis_fingerprint at offset 32. Spec §9.1.
+		// basis_fingerprint at offset 32.
 		buf[0] = FNPMsgADVExtended
 		nid := []byte(s.nodeID)
 		if len(nid) > 15 {
@@ -465,7 +465,7 @@ func (s *FNPSession) Receive(data []byte) ([]byte, error) {
 		s.MatchStatus = int(ack.matchStatus)
 		s.NegotiatedCapacity = int(ack.negotiatedCapacity)
 
-		// ACK does not carry remote basis fingerprint per ADR-004 spec §9.2;
+		// ACK does not carry remote basis fingerprint per ADR-004;
 		// initiator learns basis agreement via match_status.
 		s.applyMatchToState(int(ack.matchStatus), nil)
 		return nil, nil

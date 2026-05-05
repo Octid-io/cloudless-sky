@@ -12,7 +12,6 @@ The decode mechanism is encoding-agnostic by design. The described lookup
 cascade operates identically on binary-encoded, mnemonic-encoded, or any
 other token representation.
 
-Patent pending — inventor Clay Holberg
 License: Apache 2.0
 """
 

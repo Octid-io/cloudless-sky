@@ -2,15 +2,11 @@
 
 ## Context
 
-The first build of this repo used `osmp.py` as the source of truth for the ASD basis set and propagated it to TypeScript and Go SDKs. `osmp.py` had drifted from the canonical semantic dictionary v12 — wrong opcode names (`Z:INFER` instead of `Z:INF`, `V:HDNG` instead of `V:HDG`, `V:ROUT` instead of `V:ROUTE`) and 20 missing opcodes including `D:PACK`, `D:UNPACK`, the H Layer 2 accessors, and several T, U, C, S, Y, Z, Q, L, N opcodes. The test suite validated the code against itself, not against the IP.
+The OSMP wire format is dictionary-decoded: a (namespace, opcode) tuple resolves to a definition through a shared lookup table called the ASD (Adaptive Shared Dictionary). For the protocol to round-trip correctly across SDKs, every implementation must hold byte-identical opcode tables. The risk to manage is *drift* — an opcode added or renamed in one SDK but not another silently breaks cross-SDK interop, and tests that validate the SDK against its own table will pass while round-trip fails on the wire.
 
 ## Decision
 
-The canonical semantic dictionary v12 (`protocol/OSMP-semantic-dictionary-v12.csv`) is the single source of truth. `sdk/python/osmp/protocol.py` is built from the dictionary. `sdk/typescript/src/glyphs.ts` is generated from the Python `ASD_BASIS`. `sdk/go/osmp/glyphs.go` is generated from the Python `ASD_BASIS`. No SDK file defines opcodes independently.
-
-The generation command is: `python3 tools/gen_asd.py` (produces `glyphs.ts` and `glyphs.go` from the Python `ASD_BASIS`, which was itself written from the dictionary).
-
-> **Layout note (post-migration):** This ADR was authored when the Python SDK was a single flat file at `sdk/python/src/osmp.py`. The package was subsequently reorganized to `sdk/python/osmp/` with `protocol.py`, `wire.py`, `bridge.py`, etc. The normative source-of-truth relationship is unchanged: the dictionary CSV is the pin, the SDKs are derivations.
+The canonical semantic dictionary CSV (`protocol/OSMP-semantic-dictionary-v15.csv`) is the single source of truth. Every SDK derives its ASD basis from this file. No SDK file defines opcodes independently. Adding a new opcode means adding a row to the CSV; the SDKs are derivations of that pin.
 
 ## Analog
 
@@ -18,8 +14,8 @@ Nix derivation pinning: a version-locked dependency graph resolved at build time
 
 ## Consequences
 
-**Easier:** Any opcode correction made in the dictionary flows to all three SDKs by regenerating the glyphs files. ASD drift between SDKs is structurally impossible — they all source from the same generated table.
+**Easier:** Any opcode correction made in the dictionary flows to all SDKs by regeneration. ASD drift between SDKs is structurally impossible — they all source from the same pinned table.
 
-**Required discipline:** New opcode additions must start in the dictionary, then propagate. Adding an opcode directly to an SDK file creates drift and will be overwritten on the next generation run.
+**Required discipline:** New opcode additions must start in the dictionary, then propagate. Adding an opcode directly to an SDK file creates drift and will be overwritten on the next regeneration.
 
-**Test enforcement:** The test suite includes negative assertions — `Z:INFER`, `V:HDNG`, `V:ROUT` are explicitly tested to return null — confirming the wrong names from the prior build cannot silently re-enter.
+**Test enforcement:** The cross-SDK fingerprint test (a SHA-256 over the canonical-serialized dictionary, truncated to 16 hex characters) gates that all SDKs hold byte-identical tables. A drift between any SDK and the canonical CSV produces a fingerprint mismatch, which fails the test.

@@ -6,7 +6,6 @@ Source of truth: OSMP-semantic-dictionary-v15.csv | OSMP-SPEC-v1.md | SAL-gramma
 All opcode names, definitions, and namespace assignments are drawn directly from the
 canonical semantic dictionary v15.0, not from any prior implementation.
 
-Patent pending — inventor Clay Holberg
 License: Apache 2.0
 """
 
@@ -1603,7 +1602,7 @@ class SALEncoder:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# COMPOSITION VALIDATION (Section 12.5 of OSMP-SPEC-v1)
+# COMPOSITION VALIDATION
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Operators that split compound SAL instructions into frames
@@ -1814,7 +1813,7 @@ def validate_composition(
 ) -> CompositionResult:
     """Validate a composed SAL instruction against eight deterministic rules.
 
-    Rules enforced (Section 12.5 of OSMP-SPEC-v1):
+    Rules enforced:
       1. Hallucination check — every opcode must exist in the ASD
       2. Namespace-as-target — @ must not be followed by NS:OPCODE
       3. R namespace consequence class — mandatory except R:ESTOP
@@ -2234,8 +2233,6 @@ class OverflowProtocol:
 # Overflow Protocol Tier 3: directed acyclic graph fragmentation for
 # instructions with conditional branches and dependency chains.
 # Analog: Kahn's algorithm (1962) applied to lossy radio fragment streams.
-#
-# Spec section 8.1 Tier 3 definition.
 # ─────────────────────────────────────────────────────────────────────────────
 
 @dataclass

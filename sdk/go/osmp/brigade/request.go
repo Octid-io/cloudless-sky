@@ -4,7 +4,7 @@
 // the grammar parser; every station reads from this immutable shared
 // structure to produce its frame proposals.
 //
-// Patent pending. Inventor: Clay Holberg. License: Apache 2.0.
+// License: Apache 2.0.
 package brigade
 
 import "strings"

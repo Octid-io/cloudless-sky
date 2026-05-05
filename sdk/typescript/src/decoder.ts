@@ -1,7 +1,7 @@
 /**
  * OSMP SAL Decoder — inference-free deterministic decode
  * Analog: HPACK static table decode (RFC 7541 §A)
- * Patent pending | License: Apache 2.0
+ * License: Apache 2.0
  */
 import { AdaptiveSharedDictionary } from "./asd.js";
 import { ASD_BASIS, CONSEQUENCE_CLASSES } from "./glyphs.js";

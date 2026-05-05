@@ -5,7 +5,7 @@
  * NL into intent, looks up opcodes in the ASD, assembles using grammar
  * rules, and validates the result.
  *
- * Patent pending | License: Apache 2.0
+ * License: Apache 2.0
  */
 
 import { ASD_BASIS } from "./glyphs.js";

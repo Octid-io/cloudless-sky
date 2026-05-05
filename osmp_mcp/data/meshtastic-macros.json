@@ -1,0 +1,186 @@
+{
+  "corpus_id": "meshtastic-macros-v1",
+  "version": "1.0",
+  "description": "Meshtastic protobuf telemetry to OSMP SAL macro corpus",
+  "source": "meshtastic/protobufs telemetry.proto, mesh.proto, portnums.proto",
+  "asd_version": "v15",
+  "macros": [
+    {
+      "macro_id": "MESH:DEV",
+      "chain_template": "X:STORE[bat:{battery_level}]\u2227X:VOLT[v:{voltage}]\u2227O:BW[ch:{channel_util},tx:{air_util}]\u2227T:NOW[up:{uptime}]",
+      "description": "Meshtastic DeviceMetrics telemetry (portnum 67)",
+      "slots": [
+        {"name": "battery_level", "slot_type": "uint"},
+        {"name": "voltage", "slot_type": "float"},
+        {"name": "channel_util", "slot_type": "float"},
+        {"name": "air_util", "slot_type": "float"},
+        {"name": "uptime", "slot_type": "uint"}
+      ],
+      "triggers": ["device status", "device metrics", "device info", "battery"]
+    },
+    {
+      "macro_id": "MESH:ENV",
+      "chain_template": "E:TH[t:{temperature},h:{humidity}]\u2227E:PU[p:{pressure}]",
+      "description": "Meshtastic EnvironmentMetrics basic (portnum 67)",
+      "slots": [
+        {"name": "temperature", "slot_type": "float"},
+        {"name": "humidity", "slot_type": "float"},
+        {"name": "pressure", "slot_type": "float"}
+      ],
+      "triggers": ["environment", "weather", "conditions", "temperature and humidity"]
+    },
+    {
+      "macro_id": "MESH:AQ",
+      "chain_template": "E:EQ[pm25:{pm25},pm10:{pm10},co2:{co2}]",
+      "description": "Meshtastic AirQualityMetrics (portnum 67)",
+      "slots": [
+        {"name": "pm25", "slot_type": "uint"},
+        {"name": "pm10", "slot_type": "uint"},
+        {"name": "co2", "slot_type": "uint"}
+      ],
+      "triggers": ["air quality", "particulate", "pm2.5", "co2"]
+    },
+    {
+      "macro_id": "MESH:PWR",
+      "chain_template": "X:VOLT[ch1:{ch1_v},ch2:{ch2_v},ch3:{ch3_v}]\u2227X:LOAD[ch1:{ch1_a},ch2:{ch2_a},ch3:{ch3_a}]",
+      "description": "Meshtastic PowerMetrics (portnum 67)",
+      "slots": [
+        {"name": "ch1_v", "slot_type": "float"},
+        {"name": "ch2_v", "slot_type": "float"},
+        {"name": "ch3_v", "slot_type": "float"},
+        {"name": "ch1_a", "slot_type": "float"},
+        {"name": "ch2_a", "slot_type": "float"},
+        {"name": "ch3_a", "slot_type": "float"}
+      ],
+      "triggers": ["power metrics", "power monitoring", "voltage current"]
+    },
+    {
+      "macro_id": "MESH:HLTH",
+      "chain_template": "H:HR[bpm:{heart_bpm}]\u2227H:SPO2[o2:{spO2}]\u2227H:TEMP[t:{temperature}]",
+      "description": "Meshtastic HealthMetrics (portnum 67)",
+      "slots": [
+        {"name": "heart_bpm", "slot_type": "uint"},
+        {"name": "spO2", "slot_type": "uint"},
+        {"name": "temperature", "slot_type": "float"}
+      ],
+      "triggers": ["health", "vitals", "heart rate", "oxygen"]
+    },
+    {
+      "macro_id": "MESH:STAT",
+      "chain_template": "D:STAT[tx:{packets_tx},rx:{packets_rx},bad:{rx_bad}]\u2227N:Q[on:{online_nodes},tot:{total_nodes}]\u2227O:BW[noise:{noise_floor}]",
+      "description": "Meshtastic LocalStats (portnum 67)",
+      "slots": [
+        {"name": "packets_tx", "slot_type": "uint"},
+        {"name": "packets_rx", "slot_type": "uint"},
+        {"name": "rx_bad", "slot_type": "uint"},
+        {"name": "online_nodes", "slot_type": "uint"},
+        {"name": "total_nodes", "slot_type": "uint"},
+        {"name": "noise_floor", "slot_type": "int"}
+      ],
+      "triggers": ["mesh stats", "local stats", "how many nodes", "packet stats", "network stats"]
+    },
+    {
+      "macro_id": "MESH:POS",
+      "chain_template": "E:GPS[lat:{latitude},lon:{longitude},alt:{altitude}]\u2227T:NOW[t:{time}]",
+      "description": "Meshtastic Position (portnum 3)",
+      "slots": [
+        {"name": "latitude", "slot_type": "float"},
+        {"name": "longitude", "slot_type": "float"},
+        {"name": "altitude", "slot_type": "int"},
+        {"name": "time", "slot_type": "uint"}
+      ],
+      "triggers": ["position", "location", "gps", "where", "coordinates"]
+    },
+    {
+      "macro_id": "MESH:NODE",
+      "chain_template": "N:STS[name:{long_name},hw:{hw_model},fw:{firmware}]\u2227O:MODE[role:{role}]\u2227N:INET[wifi:{has_wifi}]",
+      "description": "Meshtastic NodeInfo (portnum 4)",
+      "slots": [
+        {"name": "long_name", "slot_type": "string"},
+        {"name": "hw_model", "slot_type": "string"},
+        {"name": "firmware", "slot_type": "string"},
+        {"name": "role", "slot_type": "string"},
+        {"name": "has_wifi", "slot_type": "bool"}
+      ],
+      "triggers": ["node info", "who are you", "identify", "what node"]
+    },
+    {
+      "macro_id": "MESH:ACK",
+      "chain_template": "A:ACK[msg:{msg_id}]",
+      "description": "Meshtastic message acknowledgment (portnum 1)",
+      "slots": [
+        {"name": "msg_id", "slot_type": "string"}
+      ],
+      "triggers": []
+    },
+    {
+      "macro_id": "MESH:ALRT",
+      "chain_template": "U:ALERT[msg:{alert_text}]\u2227T:NOW[t:{timestamp}]",
+      "description": "Meshtastic Alert (portnum 11)",
+      "slots": [
+        {"name": "alert_text", "slot_type": "string"},
+        {"name": "timestamp", "slot_type": "uint"}
+      ],
+      "triggers": ["alert", "emergency", "urgent"]
+    },
+    {
+      "macro_id": "MESH:TRACE",
+      "chain_template": "N:Q[path:{route_nodes}]\u2227O:LINK[hops:{hop_count}]",
+      "description": "Meshtastic Traceroute (portnum 70)",
+      "slots": [
+        {"name": "route_nodes", "slot_type": "string"},
+        {"name": "hop_count", "slot_type": "uint"}
+      ],
+      "triggers": ["traceroute", "route to", "path to", "how many hops"]
+    },
+    {
+      "macro_id": "MESH:WPT",
+      "chain_template": "G:WPT[lat:{lat},lon:{lon},name:{name}]\u2227T:WIN[exp:{expire}]",
+      "description": "Meshtastic Waypoint (portnum 8)",
+      "slots": [
+        {"name": "lat", "slot_type": "float"},
+        {"name": "lon", "slot_type": "float"},
+        {"name": "name", "slot_type": "string"},
+        {"name": "expire", "slot_type": "uint"}
+      ],
+      "triggers": ["waypoint", "mark location", "pin"]
+    },
+    {
+      "macro_id": "MESH:TALRT",
+      "chain_template": "E:TH>{threshold}\u2192U:ALERT[msg:temp_exceeded]",
+      "description": "Temperature threshold alert rule",
+      "slots": [
+        {"name": "threshold", "slot_type": "float"}
+      ],
+      "triggers": ["alert if temp above", "monitor temp threshold"]
+    },
+    {
+      "macro_id": "MESH:BATLO",
+      "chain_template": "X:STORE<{threshold}\u2192U:ALERT[msg:battery_low]",
+      "description": "Battery low threshold alert rule",
+      "slots": [
+        {"name": "threshold", "slot_type": "uint"}
+      ],
+      "triggers": ["alert if battery below", "low battery warning"]
+    },
+    {
+      "macro_id": "MESH:NOFF",
+      "chain_template": "N:STS[node:{node_id}]\u2192\u00acA:PONG\u2192U:ALERT[msg:node_offline]",
+      "description": "Node offline detection rule",
+      "slots": [
+        {"name": "node_id", "slot_type": "string"}
+      ],
+      "triggers": ["alert if node goes offline", "watch node"]
+    },
+    {
+      "macro_id": "MEDEVAC",
+      "chain_template": "H:ICD[{dx_code}]\u2192H:CASREP\u2227M:EVA@{target}",
+      "description": "Clinical MEDEVAC macro (spec Section 11 embodiment)",
+      "slots": [
+        {"name": "dx_code", "slot_type": "string", "namespace": "H"},
+        {"name": "target", "slot_type": "string"}
+      ],
+      "triggers": ["medevac", "casualty evacuation", "medical evacuation"]
+    }
+  ]
+}

@@ -23,7 +23,7 @@ export const FNP_MSG_NACK = 0x03;
 // ADR-004: extended-form ADV signaled by msg_type bit 7 (high bit set).
 // Extended form narrows node_id from 23 to 15 bytes and carries an 8-byte
 // basis_fingerprint at offset 32. Total ADV size remains 40 bytes in both
-// forms; only the field layout differs. See spec §9.1.
+// forms; only the field layout differs.
 export const FNP_MSG_ADV_EXTENDED = 0x81;
 export const FNP_ADV_EXT_FLAG     = 0x80;  // bit mask for the extended-form flag
 
@@ -195,7 +195,7 @@ export class FNPSession {
 
     if (this.isExtendedForm) {
       // Extended form: msg_type bit 7 set, node_id narrowed to 15 bytes,
-      // basis_fingerprint at offset 32. Spec §9.1.
+      // basis_fingerprint at offset 32.
       buf[0] = FNP_MSG_ADV_EXTENDED;
       const nid = new TextEncoder().encode(this.nodeId).slice(0, 15);
       buf.set(nid, 17);
@@ -368,7 +368,7 @@ export class FNPSession {
       this.commonNamespaces = bitmapToNamespaces(ack.commonBitmap);
       this.matchStatus = ack.matchStatus;
       this.negotiatedCapacity = ack.negotiatedCapacity;
-      // ACK does not carry remote basis fingerprint per ADR-004 spec §9.2;
+      // ACK does not carry remote basis fingerprint per ADR-004;
       // initiator learns basis agreement via match_status.
       this.applyMatchToState(ack.matchStatus, null);
       return null;

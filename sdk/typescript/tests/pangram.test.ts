@@ -143,7 +143,7 @@ describe("Pangram tier 2 (PANGRAM_TINY)", () => {
     expect(PANGRAM_TINY_MACRO_ID).toBe("PANGRAM_TINY");
   });
 
-  it("exercises cluster claim 4 minimum primitives", () => {
+  it("exercises minimum required primitives", () => {
     expect(PANGRAM_TINY_BODY).toContain(":"); // frame structure
     expect(PANGRAM_TINY_BODY).toContain("@"); // target syntax
     expect(PANGRAM_TINY_BODY).toContain(">"); // threshold operator

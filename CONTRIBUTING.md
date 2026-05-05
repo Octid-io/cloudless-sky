@@ -133,11 +133,11 @@ Mobile SDK implementations enabling phones to function as sovereign OSMP nodes. 
 
 ### Tier 3 DAG Fragmentation -- shipped (Python, TypeScript, Go)
 
-Overflow Protocol Tier 3: DAG decomposition for instructions with conditional branches and dependency chains. Spec-defined (§8.1) and patent-covered. All three SDKs implement DAGFragmenter and DAGReassembler. DAGFragmenter decomposes compound SAL into a directed acyclic graph, assigns DEP pointers (self-reference for roots, direct pointer for single-parent, FLAGS bit 3 extended bitmap for multi-parent). DAGReassembler resolves execution order via topological sort under all three loss tolerance policies. R:ESTOP hard exception fires immediately regardless of DAG state. Python: 45 tests. TypeScript: 52 assertions. Go: 12 tests. Fragment header format is byte-identical across all three SDKs.
+Overflow Protocol Tier 3: DAG decomposition for instructions with conditional branches and dependency chains. Spec-defined in the Overflow Protocol section. All three SDKs implement DAGFragmenter and DAGReassembler. DAGFragmenter decomposes compound SAL into a directed acyclic graph, assigns DEP pointers (self-reference for roots, direct pointer for single-parent, FLAGS bit 3 extended bitmap for multi-parent). DAGReassembler resolves execution order via topological sort under all three loss tolerance policies. R:ESTOP hard exception fires immediately regardless of DAG state. Python: 45 tests. TypeScript: 52 assertions. Go: 12 tests. Fragment header format is byte-identical across all three SDKs.
 
 ### FNP Handshake State Machine -- shipped
 
-Two-message capability advertisement + acknowledgment (40B ADV + 38B ACK = 78 bytes). Negotiates dictionary alignment, namespace intersection, and channel capacity. Implemented in all three SDKs (Python, TypeScript, Go) with byte-identical wire format verified against Python reference packets. See spec section 9 for wire format and state machine.
+Two-message capability advertisement + acknowledgment (40B ADV + 38B ACK = 78 bytes). Negotiates dictionary alignment, namespace intersection, and channel capacity. Implemented in all three SDKs (Python, TypeScript, Go) with byte-identical wire format verified against Python reference packets. See the Frame Negotiation Protocol section of the spec for wire format and state machine.
 
 ---
 
@@ -233,3 +233,7 @@ The block table first_code field is 32 bytes. Keys longer than 32 bytes are trun
 ## Questions
 
 Open a GitHub issue. Tag it with the appropriate SDK label.
+
+---
+
+Patent pending. See [PATENT-NOTICE.md](PATENT-NOTICE.md).

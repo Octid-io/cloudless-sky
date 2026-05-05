@@ -5,7 +5,7 @@
  * Mirrors tests/tier1/test_macros.py 1:1 to lock cross-SDK byte-identical
  * behavior for the MacroRegistry, MacroTemplate, and SlotDefinition classes.
  *
- * Patent pending | License: Apache 2.0
+ * License: Apache 2.0
  */
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
@@ -129,7 +129,7 @@ describe("MacroExpansion", () => {
     expect(result).toBe("E:TH[t:22.5,h:65.0]\u2227E:PU[p:1013.25]");
   });
 
-  it("expands the MEDEVAC embodiment (Spec Section 11)", () => {
+  it("expands the MEDEVAC embodiment", () => {
     const reg = new MacroRegistry();
     reg.register(new MacroTemplate(
       "MEDEVAC",
@@ -319,7 +319,7 @@ describe("CorpusLoading", () => {
     expect(result).toContain("H:SPO2[o2:98]");
   });
 
-  it("MEDEVAC matches Spec Section 11 byte-identical (cross-SDK lock)", () => {
+  it("MEDEVAC matches spec byte-identical (cross-SDK lock)", () => {
     const reg = loadCorpus();
     const result = reg.expand("MEDEVAC", { dx_code: "J930", target: "MED1" });
     expect(result).toBe("H:ICD[J930]\u2192H:CASREP\u2227M:EVA@MED1");

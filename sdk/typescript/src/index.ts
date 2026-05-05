@@ -8,7 +8,6 @@
  *     const sal = encode(["H:HR@NODE1>120", "H:CASREP", "M:EVA@*"]);
  *     const text = decode("H:HR@NODE1>120;H:CASREP;M:EVA@*");
  *
- * Patent pending -- inventor Clay Holberg
  * License: Apache 2.0
  */
 

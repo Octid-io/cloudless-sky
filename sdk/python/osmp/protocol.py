@@ -6,7 +6,6 @@ Source of truth: OSMP-semantic-dictionary-v15.csv | OSMP-SPEC-v1.0.2.md | SAL-gr
 All opcode names, definitions, and namespace assignments are drawn directly from the
 canonical semantic dictionary v15.0, not from any prior implementation.
 
-Patent pending — inventor Clay Holberg
 License: Apache 2.0
 """
 
@@ -742,7 +741,7 @@ FNP_MSG_NACK = 0x03
 # ADR-004: extended-form ADV signaled by msg_type bit 7 (high bit set).
 # Extended form narrows node_id from 23 to 15 bytes and carries an 8-byte
 # basis_fingerprint at offset 32. Total ADV size remains 40 bytes in both
-# forms; only the field layout differs. See spec §9.1.
+# forms; only the field layout differs.
 FNP_MSG_ADV_EXTENDED = 0x81
 FNP_ADV_EXT_FLAG     = 0x80  # bit mask for the extended-form flag
 
@@ -838,7 +837,7 @@ class FNPSession:
         node_id : str
             Local node identifier (UTF-8). In base-form ADV the field
             reserves 23 bytes; in extended-form ADV (when basis_fingerprint
-            is set) the field reserves 15 bytes. See spec §9.1.
+            is set) the field reserves 15 bytes.
         asd_version : int
             ASD version, big-endian u16 in the wire format.
         channel_capacity : int
@@ -907,7 +906,7 @@ class FNPSession:
 
         if self.is_extended_form:
             # Extended form: msg_type bit 7 set, node_id narrowed to 15 bytes,
-            # basis_fingerprint at offset 32. Spec §9.1.
+            # basis_fingerprint at offset 32.
             buf[0] = FNP_MSG_ADV_EXTENDED
             nid = self.node_id.encode("utf-8")[:15]
             buf[17 : 17 + len(nid)] = nid
@@ -925,7 +924,7 @@ class FNPSession:
         """Build a 38-byte FNP_ACK packet.
 
         ACK is unchanged in size from v1.0.2: the responder does not carry
-        its own basis fingerprint on the wire (spec §9.2). Basis agreement
+        its own basis fingerprint on the wire. Basis agreement
         is computed locally and reported via match_status.
         """
         buf = bytearray(FNP_ACK_SIZE)
@@ -1077,8 +1076,8 @@ class FNPSession:
             self.match_status = ack["match_status"]
             self.negotiated_capacity = ack["negotiated_capacity"]
             # Note: the ACK does not carry the responder's basis fingerprint
-            # (ADR-004 wire-cost decision in spec §9.2). The initiator
-            # learns basis agreement via match_status, not via comparison.
+            # (ADR-004 wire-cost decision). The initiator learns basis
+            # agreement via match_status, not via comparison.
             self._apply_match_to_state(ack["match_status"], None)
             return None
 
@@ -1774,7 +1773,7 @@ class SALEncoder:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# COMPOSITION VALIDATION (Section 12.5 of OSMP-SPEC-v1)
+# COMPOSITION VALIDATION
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── SAL Regex Building Blocks ────────────────────────────────────────────────
@@ -2002,7 +2001,7 @@ def validate_composition(
 ) -> CompositionResult:
     """Validate a composed SAL instruction against eight deterministic rules.
 
-    Rules enforced (Section 12.5 of OSMP-SPEC-v1):
+    Rules enforced:
       1. Hallucination check — every opcode must exist in the ASD
       2. Namespace-as-target — @ must not be followed by NS:OPCODE
       3. R namespace consequence class — mandatory except R:ESTOP
@@ -2179,7 +2178,7 @@ class SALComposer:
     is provided) is intent extraction -- identifying action words from
     a sentence.
 
-    Patent pending | License: Apache 2.0
+    License: Apache 2.0
     """
 
     # Condition operators mapped from NL to SAL
@@ -3222,7 +3221,7 @@ class SALComposer:
 # step for deterministic workflows: the agent's task is deterministic lookup
 # and slot-fill, not opcode-by-opcode composition.
 #
-# Composition priority hierarchy (spec Section 11):
+# Composition priority hierarchy:
 #   1. Macro invocation (pre-validated, no composition error surface)
 #   2. Individual opcode composition (grammar-constrained)
 #   3. Natural language passthrough (no compression)
@@ -3273,7 +3272,6 @@ class MacroRegistry:
     through the same lookup path, but with template expansion triggered when
     A:MACRO is detected.
 
-    Patent pending
     License: Apache 2.0
     """
 
@@ -3870,8 +3868,6 @@ class OverflowProtocol:
 # Overflow Protocol Tier 3: directed acyclic graph fragmentation for
 # instructions with conditional branches and dependency chains.
 # Analog: Kahn's algorithm (1962) applied to lossy radio fragment streams.
-#
-# Spec section 8.1 Tier 3 definition.
 # ─────────────────────────────────────────────────────────────────────────────
 
 @dataclass

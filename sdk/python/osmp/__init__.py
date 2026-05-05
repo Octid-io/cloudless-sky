@@ -18,7 +18,7 @@ Tier 3 API: Overflow Protocol (DAG fragmentation, wire codec, security envelope)
     from osmp import OverflowProtocol, DAGFragmenter, DAGReassembler
     from osmp import OSMPWireCodec, SecCodec, SAILCodec
 
-Patent pending. Inventor: Clay Holberg. License: Apache 2.0.
+License: Apache 2.0.
 """
 
 from __future__ import annotations

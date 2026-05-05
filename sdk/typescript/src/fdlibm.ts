@@ -10,7 +10,7 @@
  * primitives implemented via DataView bit manipulation — which is
  * platform-independent at the IEEE-754 level.
  *
- * SPDX-License-Identifier: Patent-pending
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 const LN2_HI = 6.93147180369123816490e-01;

@@ -1,8 +1,6 @@
 /**
  * OSMP Composition Validator
- * Validates composed SAL instructions against the seven deterministic rules
- * (Section 12.5 of OSMP-SPEC-v1).
- * Patent pending — inventor Clay Holberg
+ * Validates composed SAL instructions against the seven deterministic rules.
  * License: Apache 2.0
  */
 import { AdaptiveSharedDictionary } from "./asd.js";

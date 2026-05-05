@@ -1,6 +1,6 @@
 /**
  * OSMP BAEL — Bandwidth-Agnostic Efficiency Layer
- * Patent pending | License: Apache 2.0
+ * License: Apache 2.0
  */
 import { BAELMode, BAELResult, FLAG_NL_PASSTHROUGH } from "./types.js";
 

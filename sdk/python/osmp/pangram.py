@@ -14,7 +14,7 @@ nine namespaces. Receivers verify the canonical form by SHA-256 hash compare;
 mismatch causes reversion to pre-acquisition state without applying received
 content.
 
-Patent pending. Inventor: Clay Holberg. License: Apache 2.0.
+License: Apache 2.0.
 """
 
 from __future__ import annotations

@@ -53,7 +53,7 @@ var (
 )
 
 // ValidateComposition validates a composed SAL instruction against eight
-// deterministic rules (Section 12.5 of OSMP-SPEC-v1):
+// deterministic rules:
 //   1. Hallucination check — every opcode must exist in the ASD
 //   2. Namespace-as-target — @ must not be followed by NS:OPCODE
 //   3. R namespace consequence class — mandatory except R:ESTOP

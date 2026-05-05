@@ -13,7 +13,6 @@
  * `osmp/protocol.py` and the Go `nsPattern` / `opcodePattern` constants in
  * `sdk/go/osmp/sal_patterns.go`.
  *
- * Patent pending -- inventor Clay Holberg
  * License: Apache 2.0
  */
 

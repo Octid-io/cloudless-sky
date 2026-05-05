@@ -9,7 +9,7 @@
  * silently break I:§ handling, Tier 2 namespaces, or single-letter
  * opcodes.
  *
- * Patent pending | License: Apache 2.0
+ * License: Apache 2.0
  */
 import { describe, it, expect } from "vitest";
 import {

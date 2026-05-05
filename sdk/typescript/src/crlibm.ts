@@ -22,7 +22,7 @@
  * The commercial precision pack replaces this stub file with a real
  * implementation exposing the same API (exp, log, AVAILABLE = true).
  *
- * SPDX-License-Identifier: Patent-pending (stub: Apache 2.0)
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 export class PrecisionModeNotAvailableError extends Error {

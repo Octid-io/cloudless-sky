@@ -1,7 +1,7 @@
 /**
  * OSMP AdaptiveSharedDictionary
  * Analog: QUIC static table (RFC 9204 §A) | CRDT delta modes (Shapiro et al.)
- * Patent pending | License: Apache 2.0
+ * License: Apache 2.0
  */
 import { createHash } from "crypto";
 import { ASD_BASIS, ASD_FLOOR_VERSION } from "./glyphs.js";

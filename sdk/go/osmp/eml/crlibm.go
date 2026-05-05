@@ -22,7 +22,7 @@
 // implementation exposing the same API (CrlibmExp, CrlibmLog,
 // CrlibmAvailable = true).
 //
-// SPDX-License-Identifier: Patent-pending (stub: Apache 2.0)
+// SPDX-License-Identifier: Apache-2.0
 package eml
 
 import "errors"

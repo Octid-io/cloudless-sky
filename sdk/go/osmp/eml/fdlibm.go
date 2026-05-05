@@ -9,7 +9,7 @@
 // modules. The algorithm uses only IEEE-754-exact basic arithmetic plus
 // Frexp/Ldexp, which are identical across IEEE-754-conformant platforms.
 //
-// SPDX-License-Identifier: Patent-pending
+// SPDX-License-Identifier: Apache-2.0
 package eml
 
 import "math"

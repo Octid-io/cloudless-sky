@@ -13,7 +13,6 @@ For the two-function API, use Tier 1 instead:
 
     from osmp import encode, decode
 
-Patent pending -- inventor Clay Holberg
 License: Apache 2.0
 """
 

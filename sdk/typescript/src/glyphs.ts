@@ -5,7 +5,6 @@
  * DO NOT EDIT — regenerate via: python3 tools/gen_asd.py
  * Edits to this file will be silently overwritten on the next generation run.
  *
- * Patent pending — inventor Clay Holberg
  * License: Apache 2.0
  */
 

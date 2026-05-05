@@ -230,9 +230,9 @@ func buildOpcodeTables(dictPath string) (opcodeIndex, indexOpcode, error) {
 // determines a node's SAIL intern table by pure-function construction. Two
 // nodes loading the same ordered basis produce byte-identical intern tables
 // and unlock SAIL with each other; nodes with different bases interoperate in
-// SAL-only mode via FNP capability grading (spec §9.5).
+// SAL-only mode via FNP capability grading.
 //
-// See ADR-004 and spec §9.8.
+// See ADR-004.
 
 // CorpusEntry is a single entry in a Dictionary Basis.
 type CorpusEntry struct {
@@ -289,7 +289,7 @@ func (b *DictionaryBasis) Len() int { return len(b.entries) }
 // IsBaseOnly returns true if this basis contains only the base ASD (length 1).
 func (b *DictionaryBasis) IsBaseOnly() bool { return len(b.entries) == 1 }
 
-// CanonicalSerialization returns the canonical wire form per spec §9.3.
+// CanonicalSerialization returns the canonical wire form.
 // For each entry in basis order:
 //
 //	corpus_id_length (1 byte) || corpus_id (UTF-8 bytes) || corpus_hash (32 bytes)
@@ -307,7 +307,7 @@ func (b *DictionaryBasis) CanonicalSerialization() []byte {
 	return out
 }
 
-// Fingerprint returns the 8-byte basis fingerprint per spec §9.3.
+// Fingerprint returns the 8-byte basis fingerprint.
 // First 8 bytes of SHA-256 over the canonical serialization.
 func (b *DictionaryBasis) Fingerprint() [8]byte {
 	if !b.fpCached {
@@ -600,7 +600,7 @@ func NewSAILCodecWithBasis(dictPath string, basis *DictionaryBasis) (*SAILCodec,
 }
 
 // BasisFingerprint returns the 8-byte basis fingerprint for FNP capability
-// negotiation (spec §9.3).
+// negotiation.
 func (s *SAILCodec) BasisFingerprint() [8]byte {
 	return s.Basis.Fingerprint()
 }
@@ -1129,7 +1129,7 @@ func (c *OSMPWireCodec) Basis() *DictionaryBasis {
 }
 
 // BasisFingerprint returns the 8-byte basis fingerprint for FNP capability
-// negotiation (spec §9.3).
+// negotiation.
 func (c *OSMPWireCodec) BasisFingerprint() [8]byte {
 	return c.Sail.BasisFingerprint()
 }

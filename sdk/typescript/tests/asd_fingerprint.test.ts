@@ -17,7 +17,7 @@
  * the new canonical value being captured in this test AND in the
  * equivalent Python test at tests/test_asd_no_drift.py.
  *
- * Patent pending | License: Apache 2.0
+ * License: Apache 2.0
  */
 import { describe, it, expect } from "vitest";
 import { AdaptiveSharedDictionary } from "../src/asd.js";
