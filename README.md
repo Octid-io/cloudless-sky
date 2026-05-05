@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/octid-openclaw.png" alt="OSMP — Cloudless Sky" width="100%">
+<img src="assets/Octid%20GIT%20Banner.png" alt="OSMP — Cloudless Sky" width="100%">
 
 # Cloudless Sky
 
