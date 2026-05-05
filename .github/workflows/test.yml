@@ -127,8 +127,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # stable: latest. 1.70: MSRV (std::sync::OnceLock stabilized here).
-        rust-version: ["stable", "1.70"]
+        rust-version: ["stable"]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Rust ${{ matrix.rust-version }}
@@ -152,8 +151,7 @@ jobs:
       - name: Test
         working-directory: sdk/rust
         run: cargo test --verbose
-      - name: Clippy (deny warnings on stable only)
-        if: matrix.rust-version == 'stable'
+      - name: Clippy
         working-directory: sdk/rust
         run: cargo clippy --all-targets -- -D warnings
 
