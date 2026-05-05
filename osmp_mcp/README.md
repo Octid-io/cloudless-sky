@@ -135,6 +135,6 @@ The bridge annotates outbound messages with SAL equivalents, seeding the remote 
 
 ## License
 
-Apache 2.0 with express patent grant.
+Apache 2.0.
 
 <!-- mcp-name: io.github.Octid-io/osmp -->

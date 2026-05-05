@@ -216,7 +216,7 @@ pip install osmp-mcp
 osmp-mcp
 ```
 
-17 tools for AI client integration including `osmp_compose` (NL to SAL), `osmp_macro_list`, and `osmp_macro_invoke`. Connect from Claude Code (`claude mcp add osmp -- osmp-mcp`), Claude Desktop, Cursor, or any MCP-compatible client.
+19 tools for AI client integration including `osmp_compose` (NL to SAL), `osmp_macro_list`, `osmp_macro_invoke`, and the five SALBridge tools for mixed-environment integration. Connect from Claude Code (`claude mcp add osmp -- osmp-mcp`), Claude Desktop, Cursor, or any MCP-compatible client.
 
 ## License
 

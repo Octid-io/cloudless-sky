@@ -113,7 +113,7 @@ text = decode(sal)
 # The agent acts on the decoded instruction.
 ```
 
-The decode is identical across all three SDKs. Python, TypeScript, and Go produce field-for-field identical results from the same SAL input.
+The decode is identical across all four SDKs. Python, TypeScript, Go, and Rust produce field-for-field identical results from the same SAL input.
 
 ### Mixed Environments: The SALBridge
 
@@ -256,7 +256,7 @@ Three lines. Zero setup. Zero dependencies. The SDK handles dictionary initializ
 
 ### Install
 
-Four production paths. All four are real integration options, not tiers.
+Five production paths. All real integration options, not tiers.
 
 **Python SDK** (reference implementation, zero dependencies)
 ```bash
@@ -283,6 +283,19 @@ sal := osmp.Encode([]string{"H:HR@NODE1>120", "H:CASREP", "M:EVA@*"})
 text := osmp.Decode(sal)
 ```
 
+**Rust SDK**
+```toml
+# Cargo.toml
+[dependencies]
+osmp = "0.1"
+```
+```rust
+use osmp::AdaptiveSharedDictionary;
+
+let asd = AdaptiveSharedDictionary::new();
+let definition = asd.lookup("H", "HR"); // Some("heart_rate")
+```
+
 **MCP Server** (Claude Desktop, Cursor, Claude Code, any MCP client)
 ```bash
 pip install osmp-mcp
@@ -290,7 +303,7 @@ osmp-mcp
 ```
 The MCP server is not an evaluation tool. It is a production integration. The agent connects, reads the `osmp://system_prompt` resource, and calls `osmp_compose` to convert NL instructions to SAL. The server stays running as the compose/encode/decode/validate layer underneath. 19 tools (including `osmp_eml_evaluate` and `osmp_eml_corpus_lookup` for on-wire mathematics), three MDR corpora, composition doctrine included. Connect from Claude Code: `claude mcp add osmp -- osmp-mcp`. Listed on the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.Octid-io/osmp`.
 
-The three SDKs are for agents and frameworks that manage their own transport (CrewAI, AutoGen, LangGraph, custom orchestrators, embedded nodes). The MCP server is for agents that already speak MCP. Both approaches run OSMP in production. The difference is who manages the connection.
+The four SDKs are for agents and frameworks that manage their own transport (CrewAI, AutoGen, LangGraph, custom orchestrators, embedded nodes). The MCP server is for agents that already speak MCP. Both approaches run OSMP in production. The difference is who manages the connection.
 
 For platform-specific install notes (Termux, Raspberry Pi, constrained hardware), see [KNOWN-ISSUES.md](KNOWN-ISSUES.md).
 
@@ -300,13 +313,14 @@ For platform-specific install notes (Termux, Raspberry Pi, constrained hardware)
 
 ## SDK Status
 
-All three SDKs are independently verified against the canonical test suite. Wire compatibility is confirmed: Python, TypeScript, and Go produce field-for-field identical decode results across every namespace, every operator, and every edge case documented in the spec. D:PACK/BLK resolve is verified across all 124,215 domain codes (74,719 ICD-10-CM + 47,835 ISO 20022 + 1,661 MITRE ATT&CK) in all three SDKs.
+All four SDKs are independently verified against the canonical test suite. Wire compatibility is confirmed: Python, TypeScript, Go, and Rust produce field-for-field identical decode results across every namespace, every operator, and every edge case documented in the spec. D:PACK/BLK resolve is verified across all 124,215 domain codes (74,719 ICD-10-CM + 47,835 ISO 20022 + 1,661 MITRE ATT&CK) in Python, TypeScript, and Go. The SHA-256 ASD fingerprint (`9ecc507e2c24c4a7`) is byte-identical across all four SDKs and gates cross-SDK drift in CI.
 
 | SDK | Install | API | Notes |
 |---|---|---|---|
 | **Python** | `pip install osmp` | `from osmp import encode, decode` | Reference implementation |
 | **TypeScript** | `npm install osmp-protocol` | `import { encode, decode }` | `fzstd` for D:PACK/BLK |
 | **Go** | `go get .../sdk/go/osmp` | `osmp.Encode()` / `osmp.Decode()` | ASD compiled-in |
+| **Rust** | `cargo add osmp` | `osmp::AdaptiveSharedDictionary` | Pre-1.0; ASD core + v16 + EML; full feature parity in progress |
 | **MCP Server** | `pip install osmp-mcp` | 19 tools via MCP protocol | Wraps Python SDK |
 
 ### Benchmark
@@ -326,7 +340,7 @@ SDK: Python (reference)
   CONFORMANT ✓
 ```
 
-Run it yourself. The numbers are real and independently reproducible across all three SDKs. The measured wire-format comparisons (86.8% vs JSON, 70.5% vs protobuf, 76.0% fewer tokens) use the [29-vector benchmark suite](benchmarks/sal-vs-json/).
+Run it yourself. The numbers are real and independently reproducible across the SDKs. The measured wire-format comparisons (86.8% vs JSON, 70.5% vs protobuf, 76.0% fewer tokens) use the [29-vector benchmark suite](benchmarks/sal-vs-json/).
 
 ---
 
@@ -370,9 +384,9 @@ Everything here is operational from the floor ASD without MDR, cloud access, or 
 
 **SAL/SAIL isomorphic encoding** — every SAL instruction compiles to a SAIL binary representation and every SAIL payload decompiles back to the identical SAL instruction. The mapping is bijective: no information is lost in either direction. A developer composes and debugs in SAL (human-readable), deploys in SAIL (binary, maximum compression), and can always decompile the wire payload back to readable SAL for inspection. The encoding a node transmits and the encoding an operator reads are the same instruction in two forms.
 
-**FNP handshake and SALBridge** — Two-message capability advertisement + acknowledgment (40B + 38B = 78 bytes total). Negotiates dictionary alignment, namespace intersection, and channel capacity in two LoRa packets. Implemented in all three SDKs with byte-identical wire format. Channel capacity negotiation selects the LCD of both nodes, so the mesh scales within the most constrained link. When FNP detects a non-OSMP peer (timeout or invalid response), the session transitions to FALLBACK. The SALBridge then handles boundary translation: outbound SAL is decoded to annotated natural language, inbound messages are scanned for SAL acquisition. Peers that learn SAL through contextual exposure transition to ACQUIRED. Regression detection drops acquired peers back to FALLBACK if they stop producing valid SAL.
+**FNP handshake and SALBridge — propagation by contact.** Two-message capability advertisement + acknowledgment (40B + 38B = 78 bytes total). Negotiates dictionary alignment, namespace intersection, and channel capacity in two LoRa packets. Implemented in Python, TypeScript, Go, and Rust with byte-identical wire format. Channel capacity negotiation selects the LCD of both nodes, so the mesh scales within the most constrained link. When FNP detects a non-OSMP peer (timeout or invalid response), the session transitions to FALLBACK. The SALBridge then handles boundary translation: outbound SAL is decoded to annotated natural language, inbound messages are scanned for SAL acquisition. Peers that learn SAL through contextual exposure transition to ACQUIRED. Regression detection drops acquired peers back to FALLBACK if they stop producing valid SAL. **OSMP does not spread by installation. It spreads by contact.**
 
-**ADP dictionary synchronization** — The ASD Distribution Protocol keeps dictionaries aligned across nodes after initial FNP handshake. Delta-based updates decompose dictionary changes into independently parseable units, each carrying a version pointer and a tripartite resolution flag (additive, superseding replacement with mandatory retransmission, or deprecation). Nodes apply deltas as they arrive and operate in a partially updated but internally consistent state during synchronization. Instructions referencing opcodes whose defining delta has not yet arrived are held in a semantic pending queue and resolved on receipt. MAJOR.MINOR version signaling detects breaking changes. The guaranteed minimum operational vocabulary floor ensures every node can decode baseline instructions regardless of synchronization state. Implemented in the Python SDK with 69 tests passing.
+**ADP dictionary synchronization** — The ASD Distribution Protocol keeps dictionaries aligned across nodes after initial FNP handshake. Delta-based updates decompose dictionary changes into independently parseable units, each carrying a version pointer and a tripartite resolution flag (additive, superseding replacement with mandatory retransmission, or deprecation). Nodes apply deltas as they arrive and operate in a partially updated but internally consistent state during synchronization. Instructions referencing opcodes whose defining delta has not yet arrived are held in a semantic pending queue and resolved on receipt. MAJOR.MINOR version signaling detects breaking changes. The guaranteed minimum operational vocabulary floor ensures every node can decode baseline instructions regardless of synchronization state.
 
 **Sovereign namespace extension** — `Ω:` (U+03A9) allows any implementing party to define proprietary namespace extensions without central approval or registration.
 
@@ -454,15 +468,16 @@ cloudless-sky/
     spec/           <- OSMP-SPEC-v1.0.2.md -- authoritative protocol specification
     grammar/        <- SAL-grammar.ebnf -- formal grammar (EBNF)
     test-vectors/   <- canonical-test-vectors.json -- conformance suite
+    OSMP-semantic-dictionary-v15.csv  <- canonical dictionary (single source of truth)
   sdk/
-    python/
-      osmp/         <- Package: pip install osmp (encode, decode, validate)
-      src/          <- Reference single-file implementation
-    typescript/     <- OpenClaw/web SDK (fzstd for D:PACK/BLK)
-    go/             <- PicoClaw/constrained hardware SDK
-  mcp/
+    python/         <- Reference SDK + tests (pip install osmp)
+    typescript/     <- TS SDK (npm install osmp-protocol; fzstd for D:PACK/BLK)
+    go/             <- Go SDK (go get .../sdk/go/osmp; ASD compiled-in)
+    rust/           <- Rust SDK (cargo add osmp; pre-1.0)
+  osmp_mcp/
     server.py       <- MCP server (pip install osmp-mcp)
     server.json     <- MCP Registry descriptor
+    data/           <- Bundled corpora (Meshtastic macros, etc.)
   mdr/
     icd10cm/        <- CMS FY2026 ICD-10-CM (74,719 codes, 477KB)
     iso20022/       <- ISO 20022 eRepository (47,835 elements, 1.2MB)
@@ -471,12 +486,11 @@ cloudless-sky/
   benchmarks/
     sal-vs-json/    <- 29-vector framework benchmark, four-way comparison, grammar analysis
   docs/
-    SAL-efficiency-analysis.md  <- Whitepaper v2.0: structural efficiency analysis
-    adr/            <- Architecture Decision Records
-  tests/
-    tier1/          <- Unit tests per SDK + D:PACK/BLK resolve tests
-    tier2/          <- Cross-SDK wire compatibility
-    tier3/          <- Tier 3 DAG decomposition tests (Python, TypeScript, Go)
+    SAL-efficiency-analysis.md  <- Whitepaper: structural efficiency analysis
+    SAL-usage-doctrine-v1.md    <- Composition doctrine for LLM system prompts
+    adr/                        <- Architecture Decision Records (1, 2, 3, 4, 5)
+  tools/
+    gen_asd.py      <- Cross-SDK ASD generator (regenerates TS/Go from Python)
 ```
 
 ---
@@ -487,7 +501,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md). The spec is authoritative. All SDK imp
 
 Meshtastic integration via the Python SDK and Meshtastic Python library is operational today with no additional code required. See CONTRIBUTING.md for details.
 
-Wanted: C++ firmware-level encoder/decoder (ESP32/nRF52 sovereign nodes), Kotlin/Swift mobile SDKs.
+Wanted: C++ firmware-level encoder/decoder (ESP32/nRF52 sovereign nodes), Kotlin/Swift mobile SDKs. Rust SDK feature parity (decoder/encoder/bridge/FNP shipped at 0.1.0; MDR resolve, full benchmark, and Pangram handshake to follow).
 
 ---
 

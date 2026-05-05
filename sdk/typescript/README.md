@@ -84,7 +84,7 @@ Three corpora bundled: ICD-10-CM (74,719 codes), ISO 20022 (47,835 codes), MITRE
 
 A companion math-evaluation module. Based on Odrzywołek (2026, [arXiv:2603.21852](https://arxiv.org/abs/2603.21852)): a single binary operator `eml(x, y) = exp(x) − ln(y)`, together with the constant 1, generates the standard calculator function basis — exp, ln, sin, cos, sqrt, arithmetic, and more — as compact expression trees.
 
-Byte-exact evaluation across Python, Go, and TypeScript on every IEEE-754-conformant platform. Full sin(x) or sqrt(x) approximation fits in fewer than 100 bytes on the wire.
+Byte-exact evaluation across Python, TypeScript, Go, and Rust on every IEEE-754-conformant platform. Full sin(x) or sqrt(x) approximation fits in fewer than 100 bytes on the wire.
 
 ```typescript
 import { eml, leaf, varX, branch, evaluateTree } from "osmp-protocol/eml";
@@ -151,14 +151,14 @@ corpusFingerprint();
 // "e9a4a71383f14624472fe0602ca5e0ff1959e00b09725a62d584e1361f842c1b"
 ```
 
-Identical fingerprint across Python, Go, and TypeScript on every IEEE-754-conformant platform.
+Identical fingerprint across Python, TypeScript, Go, and Rust on every IEEE-754-conformant platform.
 
 ### Precision Modes
 
 Two modes toggled via `setPrecisionMode`:
 
 - **`"fast"`** (default) — fdlibm-derived, 1-ULP accurate, ships publicly.
-- **`"precision"`** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license** — contact `ack@octid.io` or see [PATENTS.md](../../PATENT-NOTICE.md).
+- **`"precision"`** — crlibm-derived, correctly-rounded, audit-grade. For regulated industries (medical IEC 62304, aerospace DO-178C, nuclear IEC 61513), audit-grade finance, and cryptographic protocol-frame hash inputs. **Available under commercial license** — contact `ack@octid.io`.
 
 ```typescript
 import { setPrecisionMode, precisionModeAvailable, PrecisionModeNotAvailableError } from "osmp-protocol/eml";
@@ -171,7 +171,7 @@ try {
   if (e instanceof PrecisionModeNotAvailableError) {
     console.log(e.message);
     // "Precision mode requires the commercial precision pack.
-    //  Contact ack@octid.io or see PATENTS.md."
+    //  Contact ack@octid.io."
   }
 }
 ```
