@@ -84,11 +84,13 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn fast_backend_available() {
         assert!(FAST_AVAILABLE);
     }
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn precise_backend_unavailable_in_public_release() {
         assert!(!PRECISE_AVAILABLE);
     }

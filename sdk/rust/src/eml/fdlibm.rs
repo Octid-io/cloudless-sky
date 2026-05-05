@@ -24,6 +24,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn fdlibm_available() {
         assert!(AVAILABLE);
     }

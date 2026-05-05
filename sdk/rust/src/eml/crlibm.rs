@@ -31,6 +31,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn crlibm_unavailable_in_public_release() {
         assert!(!AVAILABLE);
     }
