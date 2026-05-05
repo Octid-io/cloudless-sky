@@ -4,7 +4,7 @@ Rust implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, compo
 
 ## Status
 
-**Pre-1.0** (`0.1.0`). Core encode/decode, ASD dictionary, v16 namespace mapping, SAL grammar, validator, macro registry, SALBridge, FNP, overflow protocol (Tier 1/2/3 DAG), BAEL, D:PACK encode/decode, and the EML universal-binary-operator math layer all ship. MDR corpus resolve, the full benchmark harness, and the Pangram handshake follow at `0.2.0`.
+**Pre-1.0** (`0.2.0`). Core encode/decode, ASD dictionary, v16 namespace mapping, SAL grammar, validator, macro registry, SALBridge, FNP, overflow protocol (Tier 1/2/3 DAG), BAEL, D:PACK encode/decode, the EML universal-binary-operator math layer, and the **89-macro EML MDR registry** all ship at parity with the Python / TypeScript / Go SDKs. The remaining MDR domain-corpus resolve (ICD-10-CM / ISO 20022 / MITRE ATT&CK D:PACK/BLK lookup), the full benchmark harness, and the Pangram handshake follow at `0.3.0`.
 
 The SHA-256 ASD fingerprint is byte-identical with the other three SDKs: `9ecc507e2c24c4a7`. The `fingerprint_cross_sdk_identical` test in CI fails the build if Rust ever diverges.
 
@@ -110,14 +110,17 @@ A companion math-evaluation submodule. Based on Odrzywołek (2026, [arXiv:2603.2
 Byte-exact evaluation across Python, TypeScript, Go, and Rust on every IEEE-754-conformant platform.
 
 ```rust
-use osmp::eml::{self, eml};
+use osmp::{eml, eml_macro_count, eml_mdr_lookup};
 
 // The operator itself
 let v = eml(2.0, 1.0); // exp(2) - ln(1) = 7.389056...
 
-// Lookup a corpus entry by (namespace, opcode)
-if let Some(entry) = eml::eml_corpus_lookup("H", "HR") {
-    println!("eml_x: {}, eml_y: {}", entry.eml_x, entry.eml_y);
+// 89-macro registry (cross-SDK byte-identical with Python / TS / Go)
+assert_eq!(eml_macro_count(), 89);
+
+// Look up a macro by 3-character shorthand ID
+if let Some(m) = eml_mdr_lookup("EXP") {
+    println!("{} ({:?}): {}", m.shorthand_id, m.function_class, m.description);
 }
 ```
 

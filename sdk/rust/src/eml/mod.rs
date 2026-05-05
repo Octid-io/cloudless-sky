@@ -16,7 +16,10 @@ pub mod mdr;
 
 pub use crlibm::{exp as precise_exp, log as precise_log, AVAILABLE as PRECISE_AVAILABLE};
 pub use fdlibm::{exp as fast_exp, log as fast_log, AVAILABLE as FAST_AVAILABLE};
-pub use mdr::{eml_corpus_lookup, EmlMdrEntry};
+pub use mdr::{
+    in_bit_exact_corpus, lookup as mdr_lookup, macro_count, EnvelopeBound, FingerprintMembership,
+    FunctionClass, MacroDefinition, ParametricChain, PrecisionClass, VariantTag, REGISTRY,
+};
 
 /// Errors returned by precision-gated eml entry points.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -96,9 +99,14 @@ mod tests {
     }
 
     #[test]
-    fn corpus_lookup_h_hr_via_reexport() {
-        let entry = eml_corpus_lookup("H", "HR").expect("H:HR must be present");
-        assert_eq!(entry.eml_x, 1.0);
-        assert_eq!(entry.eml_y, 1.0);
+    fn mdr_lookup_exp_via_reexport() {
+        let m = mdr_lookup("EXP").expect("EXP must be present");
+        assert_eq!(m.shorthand_id, "EXP");
+        assert_eq!(m.function_class, FunctionClass::CompoundArithmetic);
+    }
+
+    #[test]
+    fn mdr_macro_count_is_89() {
+        assert_eq!(macro_count(), 89);
     }
 }

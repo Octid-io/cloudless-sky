@@ -46,7 +46,12 @@ pub use dag::{DAGFragmenter, DAGNode, DAGReassembler};
 pub use dpack::{DPackDecoder, DPackEncoder};
 pub use macros::{MacroRegistry, MacroTemplate};
 pub use decoder::{split_compound, DecodeError, Decoder};
-pub use eml::{eml, eml_precise, EmlError};
+pub use eml::{
+    eml, eml_precise, in_bit_exact_corpus as eml_in_bit_exact_corpus,
+    macro_count as eml_macro_count, mdr_lookup as eml_mdr_lookup, EmlError, EnvelopeBound,
+    FingerprintMembership, FunctionClass, MacroDefinition, ParametricChain, PrecisionClass,
+    VariantTag, REGISTRY as EML_REGISTRY,
+};
 pub use encoder::{EncodeError, Encoder};
 pub use fnp::{FNPSession, FNPState, FNP_CAP_UNCONSTRAINED};
 pub use overflow::{unpack_fragment, LossPolicy, OverflowProtocol};
