@@ -1,6 +1,10 @@
 <div align="center">
 
-<img src="assets/Octid%20GIT%20Banner.png" alt="OSMP — Cloudless Sky" width="100%">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/Octid%20GIT%20Banner%20Dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="assets/Octid%20GIT%20Banner%20Light.png">
+  <img src="assets/Octid%20GIT%20Banner%20Light.png" alt="OSMP — Cloudless Sky" width="100%">
+</picture>
 
 # Cloudless Sky
 
