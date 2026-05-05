@@ -135,16 +135,14 @@ jobs:
         with:
           toolchain: ${{ matrix.rust-version }}
           components: clippy
-      - name: Cache cargo registry + target
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            sdk/rust/target
-          key: ${{ runner.os }}-cargo-${{ matrix.rust-version }}-${{ hashFiles('sdk/rust/Cargo.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-${{ matrix.rust-version }}-
+      - name: Toolchain version
+        run: |
+          cargo --version
+          rustc --version
+          which cargo
+      - name: Defensive Cargo.lock cleanup
+        working-directory: sdk/rust
+        run: rm -f Cargo.lock
       - name: Build
         working-directory: sdk/rust
         run: cargo build --verbose
