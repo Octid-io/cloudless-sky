@@ -1,7 +1,7 @@
 name: Cross-SDK Test Suite
 
-# Finding 32: cross-SDK test workflow that runs Python, TypeScript, and
-# Go test suites in parallel and gates merges on cross-SDK ASD drift.
+# Cross-SDK test workflow that runs Python, TypeScript, Go, and Rust
+# test suites in parallel and gates merges on cross-SDK ASD drift.
 #
 # The asd-drift-gate job runs first and acts as a hard precondition:
 # if the on-disk TS or Go glyph files don't match what would be
@@ -119,11 +119,49 @@ jobs:
         working-directory: sdk/go
         run: go test -v ./...
 
+  # ── Rust SDK ──────────────────────────────────────────────────────
+  rust-tests:
+    name: Rust SDK tests
+    runs-on: ubuntu-latest
+    needs: asd-drift-gate
+    strategy:
+      fail-fast: false
+      matrix:
+        # stable: latest. 1.70: MSRV (std::sync::OnceLock stabilized here).
+        rust-version: ["stable", "1.70"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Rust ${{ matrix.rust-version }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust-version }}
+          components: clippy
+      - name: Cache cargo registry + target
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            sdk/rust/target
+          key: ${{ runner.os }}-cargo-${{ matrix.rust-version }}-${{ hashFiles('sdk/rust/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-${{ matrix.rust-version }}-
+      - name: Build
+        working-directory: sdk/rust
+        run: cargo build --verbose
+      - name: Test
+        working-directory: sdk/rust
+        run: cargo test --verbose
+      - name: Clippy (deny warnings on stable only)
+        if: matrix.rust-version == 'stable'
+        working-directory: sdk/rust
+        run: cargo clippy --all-targets -- -D warnings
+
   # ── Aggregated status check ───────────────────────────────────────
   cross-sdk-status:
     name: Cross-SDK test status
     runs-on: ubuntu-latest
-    needs: [asd-drift-gate, python-tests, typescript-tests, go-tests]
+    needs: [asd-drift-gate, python-tests, typescript-tests, go-tests, rust-tests]
     if: always()
     steps:
       - name: Check all jobs
@@ -142,6 +180,10 @@ jobs:
           fi
           if [[ "${{ needs.go-tests.result }}" != "success" ]]; then
             echo "Go tests failed"
+            exit 1
+          fi
+          if [[ "${{ needs.rust-tests.result }}" != "success" ]]; then
+            echo "Rust tests failed"
             exit 1
           fi
           echo "All cross-SDK tests passed."
