@@ -15,6 +15,7 @@
 //! License: Apache-2.0
 
 use std::collections::{BTreeSet, HashMap};
+// HashMap is also used for the SEC seen-sequence map.
 
 use chacha20poly1305::{
     aead::{Aead, KeyInit, Payload},
@@ -660,6 +661,17 @@ pub enum SecError {
     ShortEnvelope,
     /// Unknown wire mode in the envelope mode byte.
     BadMode(u8),
+    /// Envelope's sequence counter is at or below the highest sequence
+    /// already seen from this sender — rejected as a replay.
+    ReplayDetected {
+        /// The sender node identifier whose sequence space the envelope
+        /// targets.
+        node_id: Vec<u8>,
+        /// The sequence counter carried by the rejected envelope.
+        seq_counter: u32,
+        /// The highest sequence counter previously accepted from this sender.
+        last_accepted: u32,
+    },
 }
 
 impl std::fmt::Display for SecError {
@@ -671,6 +683,14 @@ impl std::fmt::Display for SecError {
             SecError::SignatureFailure => write!(f, "Ed25519 signature verification failure"),
             SecError::ShortEnvelope => write!(f, "envelope too short"),
             SecError::BadMode(b) => write!(f, "unknown wire mode 0x{b:02x}"),
+            SecError::ReplayDetected {
+                seq_counter,
+                last_accepted,
+                ..
+            } => write!(
+                f,
+                "replay rejected: seq {seq_counter} <= last accepted {last_accepted}"
+            ),
         }
     }
 }
@@ -700,12 +720,20 @@ pub struct SecEnvelope {
 /// Cross-SDK byte-identical wire format with Python `SecCodec`, Go `SecCodec`,
 /// TypeScript `SecCodec`. Uses canonical `SEC_NONCE_SALT` for deterministic
 /// nonce derivation.
+///
+/// Replay protection: `unpack` enforces strict monotonic sequence ordering
+/// per sender node_id. Any envelope with a sequence counter at or below the
+/// highest already accepted from that sender is rejected with
+/// `SecError::ReplayDetected`. The first envelope from any sender is always
+/// accepted because the per-sender baseline starts at zero and `pack`
+/// increments to 1 before signing the first envelope.
 pub struct SecCodec {
     node_id: Vec<u8>,
     signing_key: SigningKey,
     verify_key: VerifyingKey,
     aead: ChaCha20Poly1305,
     seq_counter: u32,
+    seen_seq: HashMap<Vec<u8>, u32>,
 }
 
 impl SecCodec {
@@ -799,7 +827,16 @@ impl SecCodec {
             verify_key: verify_key_final,
             aead,
             seq_counter: 0,
+            seen_seq: HashMap::new(),
         })
+    }
+
+    /// Reset the per-sender replay-protection state. Use only for tests or
+    /// when intentionally starting a fresh session — production handlers
+    /// should NEVER reset this state because it would re-open the replay
+    /// window.
+    pub fn reset_seen_seq(&mut self) {
+        self.seen_seq.clear();
     }
 
     /// Returns the 32-byte raw Ed25519 public key for distribution to peers.
@@ -885,8 +922,9 @@ impl SecCodec {
         Ok(result)
     }
 
-    /// Unpack a SEC-wrapped envelope. Verifies AEAD tag and Ed25519 signature.
-    pub fn unpack(&self, data: &[u8]) -> Result<SecEnvelope, SecError> {
+    /// Unpack a SEC-wrapped envelope. Verifies AEAD tag, Ed25519 signature,
+    /// and strict monotonic sequence ordering per sender (replay protection).
+    pub fn unpack(&mut self, data: &[u8]) -> Result<SecEnvelope, SecError> {
         if data.len() < 87 {
             return Err(SecError::ShortEnvelope);
         }
@@ -913,6 +951,17 @@ impl SecCodec {
         let auth_tag = &data[payload_end..payload_end + 16];
         let signature_bytes = &data[payload_end + 16..payload_end + 80];
 
+        // Replay check (before AEAD/signature verification — cheap rejection
+        // for already-seen sequences).
+        let last_accepted = self.seen_seq.get(&node_id).copied().unwrap_or(0);
+        if seq_counter <= last_accepted {
+            return Err(SecError::ReplayDetected {
+                node_id: node_id.clone(),
+                seq_counter,
+                last_accepted,
+            });
+        }
+
         // Verify AEAD
         let plaintext = self.open(&header, ciphertext, auth_tag)?;
 
@@ -928,6 +977,11 @@ impl SecCodec {
         self.verify_key
             .verify(&sign_input, &signature)
             .map_err(|_| SecError::SignatureFailure)?;
+
+        // All checks pass — record this sequence as the new high-water mark
+        // for this sender. Done last so a failed AEAD/signature does not
+        // poison the replay window.
+        self.seen_seq.insert(node_id.clone(), seq_counter);
 
         Ok(SecEnvelope {
             mode,
@@ -1006,8 +1060,10 @@ impl OSMPWireCodec {
         }
     }
 
-    /// Decode wire bytes to a SAL string for the given mode.
-    pub fn decode(&self, data: &[u8], mode: WireMode) -> Result<String, WireError> {
+    /// Decode wire bytes to a SAL string for the given mode. Takes `&mut
+    /// self` because the SEC path advances per-sender replay-protection
+    /// state on successful unpack.
+    pub fn decode(&mut self, data: &[u8], mode: WireMode) -> Result<String, WireError> {
         match mode {
             WireMode::Mnemonic => Ok(String::from_utf8_lossy(data).into_owned()),
             WireMode::SAIL => Ok(self.sail.decode(data)),

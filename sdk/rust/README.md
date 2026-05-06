@@ -4,7 +4,13 @@ Rust implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, compo
 
 ## Status
 
-**Pre-1.0** (`0.3.0`). Full wire-format parity with Python / TypeScript / Go: core encode/decode, ASD dictionary, v16 namespace mapping, SAL grammar, validator, macro registry, SALBridge, **FNP packet codec (40-byte ADV / 38-byte ACK with ADR-004 basis-manifest extended-form)**, overflow protocol (Tier 1/2/3 DAG), BAEL bridge-layer mode selector, D:PACK encode/decode, the EML universal-binary-operator math layer, the **89-macro EML MDR registry**, and the **unified wire codec** (`SAILCodec` binary + `SecCodec` ChaCha20-Poly1305 + Ed25519 envelope + `OSMPWireCodec` mode router across {Mnemonic, SAIL, SEC, SAILSEC}) all ship at parity. The remaining MDR domain-corpus resolve (ICD-10-CM / ISO 20022 / MITRE ATT&CK D:PACK/BLK lookup) and the full benchmark harness follow at `0.4.0`.
+**Pre-1.0** (`0.4.0`). Full wire-format parity with Python / TypeScript / Go: core encode/decode, ASD dictionary, v16 namespace mapping, SAL grammar, validator, macro registry, SALBridge, **FNP packet codec (40-byte ADV / 38-byte ACK with ADR-004 basis-manifest extended-form)**, overflow protocol (Tier 1/2/3 DAG), BAEL bridge-layer mode selector, **D:PACK encode (raw blocks) + decode (raw blocks AND zstd-compressed blocks; reads shipped MDR corpora end-to-end)**, **EML fast-mode math (pure-Rust port of Sun fdlibm, byte-identical with the Python / Go / TypeScript fdlibm modules)**, the **89-macro EML MDR registry**, and the **unified wire codec** (`SAILCodec` binary + `SecCodec` ChaCha20-Poly1305 + Ed25519 envelope **with inbound replay protection** + `OSMPWireCodec` mode router across {Mnemonic, SAIL, SEC, SAILSEC}) all ship at parity. EML chain wire codec, parametric-chain evaluator, MDR corpus fingerprint API, and ADP session protocol follow at `0.5.0`.
+
+### Breaking from `0.3.0`
+
+- `SecCodec::unpack` is now `&mut self` (was `&self`). The unpack path advances per-sender replay-protection state on success; replay attempts return `SecError::ReplayDetected { node_id, seq_counter, last_accepted }`.
+- `OSMPWireCodec::decode` is now `&mut self` for the same reason (the `SEC` and `SAILSEC` modes route through `SecCodec::unpack`).
+- `eml::fdlibm::exp` and `eml::fdlibm::log` are no longer wrappers around `f64::exp` / `f64::ln`. They are now a faithful pure-Rust port of Sun fdlibm with the same constants and the same operations as the Python / Go / TypeScript fdlibm modules. Output for ordinary inputs is byte-identical with those SDKs and 1-ULP-accurate against the true mathematical value.
 
 The SHA-256 ASD fingerprint is byte-identical with the other three SDKs: `9ecc507e2c24c4a7`. The `fingerprint_cross_sdk_identical` test in CI fails the build if Rust ever diverges.
 
@@ -12,10 +18,10 @@ The SHA-256 ASD fingerprint is byte-identical with the other three SDKs: `9ecc50
 
 ```toml
 [dependencies]
-osmp = "0.3"
+osmp = "0.4"
 ```
 
-MSRV: Rust 1.70 (uses `std::sync::OnceLock`, stabilized in 1.70). Runtime crypto deps for the SEC envelope (`chacha20poly1305`, `ed25519-dalek`, `rand`) are pulled in transitively when the wire layer is constructed; the SAL text encoder/decoder requires only `sha2`, `serde`, `serde_json`, and `regex`.
+MSRV: Rust 1.70 (uses `std::sync::OnceLock`, stabilized in 1.70). Runtime crypto deps for the SEC envelope (`chacha20poly1305`, `ed25519-dalek`, `rand`) are pulled in when the wire layer is constructed; `ruzstd` (pure-Rust, no C build deps) is pulled in for D:PACK zstd decompression on shipped MDR corpora; the SAL text encoder/decoder requires only `sha2`, `serde`, `serde_json`, and `regex`.
 
 ## Quick Start
 

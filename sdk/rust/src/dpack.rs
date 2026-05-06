@@ -26,11 +26,14 @@
 //!     each block is sorted "key\tvalue\n" lines, raw bytes when bit 1 of
 //!     flags is set.
 //!
-//! Cross-SDK: the Go and TypeScript SDKs read the dictionary-compressed
-//! variant of this same binary layout (flags bit 0 set, blocks zstd
-//! compressed). The Rust encode/decode here uses bit 1 (raw blocks) so the
-//! SDK does not pull in a zstd dependency while still honoring the layout
-//! and the inference-free lookup contract.
+//! Cross-SDK: the Rust decoder reads both the raw-block variant
+//! (flags bit 1 set) and the zstd-compressed variant produced by the
+//! Python / Go / TypeScript SDKs (flags bit 1 clear). zstd decompression
+//! uses the pure-Rust `ruzstd` crate, so the SDK has no C-toolchain build
+//! dependency. Trained-dictionary corpora (flags bit 0 set, dict_size > 0)
+//! are decoded by the other three SDKs only — the shipped MDR corpora
+//! (ICD-10-CM, ISO 20022, MITRE ATT&CK) do not use trained dictionaries.
+//! The Rust encoder writes the raw-block variant.
 //!
 //! License: Apache-2.0
 
@@ -40,6 +43,7 @@ const DBLK_HEADER_SIZE: usize = 24;
 const DBLK_BTABLE_ENTRY_SIZE: usize = 44;
 const DBLK_FIRST_CODE_SIZE: usize = 32;
 const DBLK_DEFAULT_BLOCK_TARGET: usize = 32 * 1024;
+const DBLK_FLAG_DICT: u16 = 0x0001;
 const DBLK_FLAG_RAW: u16 = 0x0002;
 
 /// D:PACK binary writer.
@@ -173,19 +177,20 @@ impl DPackDecoder {
 
     /// Decode a D:PACK binary back to its `key\tvalue\n` corpus.
     ///
-    /// Returns an error if the magic is wrong or the binary uses zstd
-    /// blocks that the Rust SDK does not yet decompress.
+    /// Returns an error if the magic is wrong, the binary uses a trained
+    /// zstd dictionary (not yet supported by the Rust SDK), or zstd
+    /// decompression fails.
     pub fn decode(&self, packed: &[u8]) -> Result<Vec<u8>, String> {
         let hdr = parse_header(packed)?;
-        if hdr.flags & DBLK_FLAG_RAW == 0 {
+        if hdr.flags & DBLK_FLAG_DICT != 0 {
             return Err(
-                "DBLK binary is not raw-block; Rust SDK requires the raw-block flag bit"
+                "DBLK uses trained dictionary; Rust SDK does not yet support this variant"
                     .to_string(),
             );
         }
         let mut out: Vec<u8> = Vec::new();
         for i in 0..hdr.block_count as usize {
-            let block = read_raw_block(packed, &hdr, i)?;
+            let block = read_block(packed, &hdr, i)?;
             if !out.is_empty() {
                 out.push(b'\n');
             }
@@ -202,11 +207,11 @@ impl DPackDecoder {
     /// way — see error path on decode).
     pub fn lookup(&self, packed: &[u8], key: &str) -> Option<String> {
         let hdr = parse_header(packed).ok()?;
-        if hdr.flags & DBLK_FLAG_RAW == 0 {
+        if hdr.flags & DBLK_FLAG_DICT != 0 {
             return None;
         }
         let block_idx = find_block(packed, &hdr, key);
-        let block = read_raw_block(packed, &hdr, block_idx).ok()?;
+        let block = read_block(packed, &hdr, block_idx).ok()?;
         if let Some(v) = scan_block(&block, key) {
             return Some(v);
         }
@@ -214,7 +219,7 @@ impl DPackDecoder {
         // binary search (key longer than 32 bytes whose suffix sorts low),
         // check the previous block.
         if block_idx > 0 {
-            let prev = read_raw_block(packed, &hdr, block_idx - 1).ok()?;
+            let prev = read_block(packed, &hdr, block_idx - 1).ok()?;
             if let Some(v) = scan_block(&prev, key) {
                 return Some(v);
             }
@@ -268,6 +273,9 @@ fn parse_corpus(corpus: &[u8]) -> Vec<(String, String)> {
     entries
 }
 
+/// Read the raw on-disk bytes for a block (whether those bytes are an
+/// uncompressed corpus payload or a zstd-compressed payload depends on
+/// `hdr.flags`). Use `read_block` to get the decompressed corpus bytes.
 fn read_raw_block(data: &[u8], hdr: &DblkHeader, block_idx: usize) -> Result<Vec<u8>, String> {
     let entry_off = DBLK_HEADER_SIZE + block_idx * DBLK_BTABLE_ENTRY_SIZE;
     if entry_off + DBLK_BTABLE_ENTRY_SIZE > data.len() {
@@ -288,6 +296,30 @@ fn read_raw_block(data: &[u8], hdr: &DblkHeader, block_idx: usize) -> Result<Vec
         return Err("block payload out of range".to_string());
     }
     Ok(data[start..end].to_vec())
+}
+
+/// Read a block and return its decompressed corpus payload bytes. Routes to
+/// `read_raw_block` when `flags & DBLK_FLAG_RAW != 0`, otherwise decompresses
+/// the block via the pure-Rust `ruzstd` decoder.
+fn read_block(data: &[u8], hdr: &DblkHeader, block_idx: usize) -> Result<Vec<u8>, String> {
+    let bytes = read_raw_block(data, hdr, block_idx)?;
+    if hdr.flags & DBLK_FLAG_RAW != 0 {
+        Ok(bytes)
+    } else {
+        decompress_zstd(&bytes)
+    }
+}
+
+fn decompress_zstd(compressed: &[u8]) -> Result<Vec<u8>, String> {
+    use std::io::{Cursor, Read};
+    let cursor = Cursor::new(compressed);
+    let mut decoder = ruzstd::StreamingDecoder::new(cursor)
+        .map_err(|e| format!("zstd decoder init: {e}"))?;
+    let mut out: Vec<u8> = Vec::new();
+    decoder
+        .read_to_end(&mut out)
+        .map_err(|e| format!("zstd decode: {e}"))?;
+    Ok(out)
 }
 
 fn find_block(data: &[u8], hdr: &DblkHeader, key: &str) -> usize {
@@ -345,6 +377,54 @@ mod tests {
     }
 
     #[test]
+    fn decode_shipped_mitre_attack_corpus() {
+        // The shipped MDR corpus is zstd-compressed (flags = 0x0000). This
+        // test exercises the ruzstd decompression path end-to-end on a real
+        // wire artifact.
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../mdr/mitre-attack/MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack");
+        let bytes = match std::fs::read(&path) {
+            Ok(b) => b,
+            Err(_) => return, // skip when running against a partial workspace
+        };
+        let dec = DPackDecoder::new();
+        let corpus = dec.decode(&bytes).expect("decode shipped MITRE corpus");
+        assert!(corpus.len() > 1000, "decoded corpus should be substantial");
+        let text = std::str::from_utf8(&corpus).expect("corpus is UTF-8");
+        assert!(
+            text.contains('\t'),
+            "corpus should have tab-separated key/value entries",
+        );
+    }
+
+    #[test]
+    fn lookup_against_shipped_mitre_corpus() {
+        // Round-trip a single-key lookup against the shipped compressed
+        // corpus. Verifies the zstd path through `read_block` plus the
+        // binary-search lookup path together.
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../mdr/mitre-attack/MDR-MITRE-ATTACK-ENT-v18.1-blk.dpack");
+        let bytes = match std::fs::read(&path) {
+            Ok(b) => b,
+            Err(_) => return,
+        };
+        let dec = DPackDecoder::new();
+        let corpus = dec.decode(&bytes).expect("decode shipped MITRE corpus");
+        let text = std::str::from_utf8(&corpus).expect("UTF-8");
+        // Find the first real key in the corpus and verify lookup returns
+        // the same value as we'd extract from the bulk decode.
+        let first_line = text.lines().next().expect("at least one entry");
+        let (key, value) = first_line
+            .split_once('\t')
+            .expect("first line has tab separator");
+        assert_eq!(
+            dec.lookup(&bytes, key),
+            Some(value.to_string()),
+            "lookup() and decode() must agree on the first key",
+        );
+    }
+
+    #[test]
     fn lookup_finds_existing_key() {
         let enc = DPackEncoder::new();
         let dec = DPackDecoder::new();
@@ -384,12 +464,14 @@ mod tests {
     }
 
     #[test]
-    fn decode_rejects_non_raw_binary() {
-        // Hand-craft a tiny DBLK with flags=0 (no raw bit) — decode should reject.
+    fn decode_rejects_trained_dictionary_binary() {
+        // Hand-craft a tiny DBLK with the trained-dict flag set — Rust SDK
+        // does not yet support trained-dictionary decompression and must
+        // reject rather than silently produce wrong output.
         let mut buf: Vec<u8> = Vec::new();
         buf.extend_from_slice(&DBLK_MAGIC.to_be_bytes());
         buf.extend_from_slice(&DBLK_VERSION.to_be_bytes());
-        buf.extend_from_slice(&0u16.to_be_bytes()); // flags = 0
+        buf.extend_from_slice(&DBLK_FLAG_DICT.to_be_bytes()); // flags = 0x0001 (trained dict)
         buf.extend_from_slice(&0u32.to_be_bytes()); // block_count
         buf.extend_from_slice(&(DBLK_HEADER_SIZE as u32).to_be_bytes());
         buf.extend_from_slice(&0u32.to_be_bytes()); // dict_size

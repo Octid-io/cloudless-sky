@@ -919,6 +919,104 @@ mod smoke {
         assert_eq!(SEC_NONCE_SALT, b"OSMP-SEC-v1\x00");
     }
 
+    #[test]
+    fn sec_replay_attempt_rejected() {
+        // Pack one envelope, unpack it once (succeeds), unpack again
+        // (rejected as replay).
+        let seed = [0xCDu8; 32];
+        let sym = [0xCEu8; 32];
+        let mut codec =
+            wire::SecCodec::new(&[0x00, 0x10], Some(&seed), Some(&sym)).expect("construct");
+        let envelope = codec.pack(b"alpha", WireMode::SEC).expect("pack");
+        let _ = codec.unpack(&envelope).expect("first unpack succeeds");
+        let result = codec.unpack(&envelope);
+        match result {
+            Err(SecError::ReplayDetected {
+                seq_counter,
+                last_accepted,
+                ..
+            }) => {
+                assert_eq!(seq_counter, 1);
+                assert_eq!(last_accepted, 1);
+            }
+            other => panic!("expected ReplayDetected, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn sec_out_of_order_sequence_rejected() {
+        // Pack two envelopes (seq=1 then seq=2), unpack the LATER one first.
+        // The earlier one is then rejected because its seq is below the
+        // newly recorded high-water mark.
+        let seed = [0xDEu8; 32];
+        let sym = [0xDFu8; 32];
+        let mut codec =
+            wire::SecCodec::new(&[0x00, 0x11], Some(&seed), Some(&sym)).expect("construct");
+        let e1 = codec.pack(b"first", WireMode::SEC).expect("pack 1");
+        let e2 = codec.pack(b"second", WireMode::SEC).expect("pack 2");
+        let u2 = codec.unpack(&e2).expect("unpack newer first");
+        assert_eq!(u2.seq_counter, 2);
+        let result = codec.unpack(&e1);
+        match result {
+            Err(SecError::ReplayDetected {
+                seq_counter,
+                last_accepted,
+                ..
+            }) => {
+                assert_eq!(seq_counter, 1);
+                assert_eq!(last_accepted, 2);
+            }
+            other => panic!("expected ReplayDetected, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn sec_replay_per_sender_independent() {
+        // The seen-sequence map is keyed by sender node_id. An envelope from
+        // a sender with node_id A and seq=1 must NOT poison the replay
+        // window for a different sender B with seq=1.
+        //
+        // This test simulates that by constructing two codecs (different
+        // node_ids) with the SAME symmetric and signing keys, packing one
+        // envelope from each, and verifying the third codec accepts both.
+        let sym = [0xEAu8; 32];
+        let seed = [0xEBu8; 32];
+        let mut sender_a =
+            wire::SecCodec::new(&[0xAA, 0xAA], Some(&seed), Some(&sym)).expect("A");
+        let mut sender_b =
+            wire::SecCodec::new(&[0xBB, 0xBB], Some(&seed), Some(&sym)).expect("B");
+        let mut receiver =
+            wire::SecCodec::new(&[0xCC, 0xCC], Some(&seed), Some(&sym)).expect("R");
+
+        let env_a = sender_a.pack(b"from-a", WireMode::SEC).unwrap();
+        let env_b = sender_b.pack(b"from-b", WireMode::SEC).unwrap();
+        // Both envelopes carry seq=1 but different node_ids.
+        let r_a = receiver.unpack(&env_a).expect("receive A");
+        assert_eq!(r_a.node_id, vec![0xAA, 0xAA]);
+        assert_eq!(r_a.seq_counter, 1);
+        let r_b = receiver.unpack(&env_b).expect("receive B");
+        assert_eq!(r_b.node_id, vec![0xBB, 0xBB]);
+        assert_eq!(r_b.seq_counter, 1);
+    }
+
+    #[test]
+    fn sec_reset_seen_seq_clears_replay_state() {
+        // reset_seen_seq is for tests / fresh-session restarts. After reset
+        // a previously-seen envelope is accepted again.
+        let seed = [0xFAu8; 32];
+        let sym = [0xFBu8; 32];
+        let mut codec =
+            wire::SecCodec::new(&[0x00, 0x12], Some(&seed), Some(&sym)).expect("construct");
+        let envelope = codec.pack(b"hello", WireMode::SEC).expect("pack");
+        let _ = codec.unpack(&envelope).expect("first unpack");
+        assert!(matches!(
+            codec.unpack(&envelope),
+            Err(SecError::ReplayDetected { .. })
+        ));
+        codec.reset_seen_seq();
+        let _ = codec.unpack(&envelope).expect("after reset, accepted again");
+    }
+
     // ── Unified wire codec ────────────────────────────────────────────────
 
     #[test]
