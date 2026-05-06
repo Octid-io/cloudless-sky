@@ -461,12 +461,12 @@ def grammar_complexity():
 
 
 # ============================================================================
-# SECTION 5: PROSECUTION — COUNTERARGUMENTS AND LIMITATIONS
+# SECTION 5: COUNTERARGUMENTS — COUNTERARGUMENTS AND LIMITATIONS
 # ============================================================================
 
-PROSECUTION = """
+COUNTERARGUMENTS = """
 ===============================================================================
-PROSECUTION: COUNTERARGUMENTS AND LIMITATIONS
+COUNTERARGUMENTS: COUNTERARGUMENTS AND LIMITATIONS
 ===============================================================================
 
 This section deliberately attacks the methodology and conclusions of this
@@ -815,9 +815,9 @@ def print_grammar_complexity() -> None:
         print(f"    Per-msg envelope:      {props['per_instruction_envelope']}")
 
 
-def print_prosecution() -> None:
-    """Print the prosecution section."""
-    print(PROSECUTION)
+def print_counterarguments() -> None:
+    """Print the counterarguments section."""
+    print(COUNTERARGUMENTS)
 
 
 # ---- Main -------------------------------------------------------------------
@@ -844,7 +844,7 @@ if __name__ == "__main__":
     print_grammar_complexity()
 
     # Prosecution
-    print_prosecution()
+    print_counterarguments()
 
     # Export
     import json as json_mod

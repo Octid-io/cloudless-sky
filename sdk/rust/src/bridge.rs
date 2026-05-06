@@ -12,9 +12,9 @@
 //!      agent starts producing valid SAL (few-shot acquisition), transitions
 //!      to ACQUIRED state and begins sending pure SAL.
 //!
-//! This is Bridge α (sliding-window acquisition) plus a macro-bypass
-//! attachment hook. β (TENTATIVE_SAL state machine), γ (probe scheduler),
-//! and δ-B (preamble handler) are not in this baseline.
+//! This baseline implements sliding-window acquisition plus a macro-bypass
+//! attachment hook. The TENTATIVE_SAL state machine, probe scheduler, and
+//! preamble handler variants are not in this baseline.
 //!
 //! Cross-SDK byte-identical with Python `SALBridge`, Go `SALBridge`,
 //! TypeScript `SALBridge`. Acquisition thresholds (5/3), event names,

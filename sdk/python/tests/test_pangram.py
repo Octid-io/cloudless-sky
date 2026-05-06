@@ -183,7 +183,7 @@ def test_verify_for_tier_truncated_per_tier():
 
 
 def test_pangram_tiny_exercises_minimum_primitives():
-    """Cluster claim 4 minimum: frame, target, threshold, sequence, conjunction, CC."""
+    """Minimum primitive coverage: frame, target, threshold, sequence, conjunction, CC."""
     from osmp.pangram import PANGRAM_TINY_BODY
     sal = PANGRAM_TINY_BODY
     assert ":" in sal  # frame structure

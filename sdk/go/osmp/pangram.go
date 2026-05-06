@@ -234,7 +234,7 @@ type PangramMetadata struct {
 }
 
 // PangramMetadataInfo returns a metadata struct summarizing the pangram
-// registration, useful for prosecution exhibits and cross-SDK parity tests.
+// registration, useful for engineering documentation fixtures and cross-SDK parity tests.
 func PangramMetadataInfo() PangramMetadata {
 	return PangramMetadata{
 		MacroID:           PangramMacroID,

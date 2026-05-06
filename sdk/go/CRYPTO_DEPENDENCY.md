@@ -147,13 +147,12 @@ No additional dependencies are added at runtime. No native code
 extensions. No dynamic library loading. The Go SDK builds to a single
 static binary on every supported platform.
 
-## Why this matters for patent and audit review
+## Why this matters for security and audit review
 
-Reviewers examining the OSMP Go SDK for the patent prosecution and the
-YC application will see exactly two non-stdlib imports. Both are
-necessary, both are well-established, and both have clear architectural
-justifications documented above. The Go SDK is otherwise self-contained
-in the standard library.
+Reviewers examining the OSMP Go SDK will see exactly two non-stdlib
+imports. Both are necessary, both are well-established, and both have
+clear architectural justifications documented above. The Go SDK is
+otherwise self-contained in the standard library.
 
 This is the smallest possible cryptographic surface area for a
 production-grade authenticated mesh protocol implementation in Go.

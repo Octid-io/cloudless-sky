@@ -264,8 +264,8 @@ def macro_invocation() -> str:
 def metadata() -> dict:
     """Return a dict summarizing the pangram registration.
 
-    Useful for prosecution exhibits, MCP `osmp://pangram` resource population,
-    and cross-SDK parity test reporting.
+    Useful for engineering documentation fixtures, MCP `osmp://pangram`
+    resource population, and cross-SDK parity test reporting.
     """
     return {
         "macro_id": PANGRAM_MACRO_ID,
