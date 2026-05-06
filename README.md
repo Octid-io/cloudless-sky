@@ -203,6 +203,89 @@ The macro architecture is open. Build your own corpus with the same `(shorthand_
 
 ---
 
+## MDR — Managed Dictionary Registry
+
+Where macros encode *what to do*, MDR encodes *what to look up*. Domain-specific controlled-vocabulary corpora are packaged as **D:PACK/BLK** binaries — block-level zstd-compressed dictionaries that resolve a code to its definition without network access, on a microcontroller with 38 KB of SRAM, in single-digit milliseconds.
+
+The wire instruction stays compact (`H:ICD[J93.0]`) while the receiver still recovers the full official text (`"Spontaneous tension pneumothorax"`). The dictionary travels with the device, not the message.
+
+### Three corpora ship today
+
+| Corpus | Source | Entries | Raw size | D:PACK/BLK | Reduction |
+|---|---|---|---|---|---|
+| **ICD-10-CM** | CMS FY2026 | 74,719 clinical codes | 5.4 MB | 477 KB | **91.4%** |
+| **ISO 20022** | eRepository 2025-04-24 | 47,835 financial definitions | 8.7 MB | 1.2 MB | **86.5%** |
+| **MITRE ATT&CK** | Enterprise v18.1 | 1,661 techniques / malware / threat groups | 82 KB | 20 KB | **75.3%** |
+
+All three D:PACK/BLK binaries fit in ESP32 flash. The `H` namespace (clinical), `K` namespace (financial), and `S` namespace (security) gain edge-local Layer 2 accessor resolution as a result. Verified across all 124,215 codes in Python, TypeScript, and Go.
+
+### Use it
+
+**From an MCP-connected agent:**
+
+```
+osmp_resolve(code="J93.0", corpus="icd10cm")
+→ "Spontaneous tension pneumothorax"
+
+osmp_resolve(code="pacs.008.001.13", corpus="iso_msg")
+→ "FIToFICustomerCreditTransferV13: ..."
+
+osmp_discover(code_prefix="T1059", corpus="mitre_attack")
+→ [{"id": "T1059", "name": "Command and Scripting Interpreter"}, ...]
+
+osmp_batch_resolve(codes=["J93.0", "R00.1", "I25.10"], corpus="icd10cm")
+→ {"J93.0": "...", "R00.1": "...", "I25.10": "..."}
+```
+
+**From the Python SDK:**
+
+```python
+from osmp.protocol import BlockCompressor
+
+bc = BlockCompressor()
+bc.load("mdr/icd10cm/MDR-ICD10CM-FY2026-blk.dpack")
+result = bc.resolve("J93.0")
+# "Spontaneous tension pneumothorax"
+```
+
+**From TypeScript:**
+
+```typescript
+import { resolveBlk } from "osmp-protocol";
+
+const result = resolveBlk("mdr/icd10cm/MDR-ICD10CM-FY2026-blk.dpack", "J93.0");
+```
+
+**From Go:**
+
+```go
+bc := osmp.NewBlockCompressor()
+bc.Load("mdr/icd10cm/MDR-ICD10CM-FY2026-blk.dpack")
+result, _ := bc.Resolve("J93.0")
+```
+
+### Layer 2 accessor pattern
+
+MDR pairs with the spec's Layer 2 accessor pattern: bracket-enclosed slot values from external open-ended registries. `H:ICD[R00.1]`, `H:SNOMED[concept_id]`, `H:CPT[99213]`, `K:ISO[MessageDefinitionIdentifier]`, `S:ATTCK[T1059]`. The bracket value is exempt from the single-character encoding rule — native code values pass through verbatim. MDR makes those native values resolvable at the receiver without network access; the wire instruction stays the same shape whether MDR is loaded or not.
+
+### Cross-basis compatibility
+
+Per [ADR-004](docs/adr/ADR-004-dictionary-basis-manifest.md), the FNP handshake exchanges a **basis fingerprint** that includes the MDR composition. Two nodes with equal basis fingerprints have byte-identical intern tables and unlock SAIL binary mode for that corpus's content. Two nodes with different bases fall back to SAL — semantic round-trip is preserved; only the SAIL compression bonus on MDR-covered content is gated.
+
+### Roadmap
+
+Future MDR namespaces under consideration:
+
+- **SNOMED CT** (clinical concept ontology)
+- **RxNorm** (clinical drug nomenclature)
+- **LOINC** (laboratory observation identifiers)
+- **OpenAPI schemas** (web API contracts as a domain corpus)
+- **CPC / Cooperative Patent Classification** (patent taxonomy)
+
+The MDR architecture is open. Operators can pack their own domain corpora into D:PACK/BLK using the published format and ship them alongside the base ASD. Per-corpus fingerprints flow through the FNP handshake automatically.
+
+---
+
 ## Performance
 
 <table>
