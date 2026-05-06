@@ -14,10 +14,15 @@ pub mod chain;
 pub mod crlibm;
 pub mod fdlibm;
 pub mod mdr;
+pub mod tree;
 
 pub use chain::{
     decode_chain_restricted, decode_chain_wide, encode_chain_restricted, encode_chain_wide,
     Chain, ChainLevel, ChainVariant,
+};
+pub use tree::{
+    branch, decode_tree, encode_tree, leaf, one, var_x, EMLNode, TAG_BRANCH, TAG_LEAF_F32,
+    TAG_LEAF_F64, TAG_VAR_X,
 };
 
 pub use crlibm::{exp as precise_exp, log as precise_log, AVAILABLE as PRECISE_AVAILABLE};

@@ -56,11 +56,14 @@ pub use dpack::{DPackDecoder, DPackEncoder};
 pub use macros::{MacroRegistry, MacroTemplate};
 pub use decoder::{split_compound, DecodeError, Decoder};
 pub use eml::{
+    branch as eml_branch,
     corpus_fingerprint_envelope_bounded as eml_corpus_fingerprint_envelope_bounded,
     corpus_fingerprint_mdr as eml_corpus_fingerprint_mdr, decode_chain_restricted,
-    decode_chain_wide, encode_chain_restricted, encode_chain_wide, eml, eml_precise,
-    in_bit_exact_corpus as eml_in_bit_exact_corpus, macro_count as eml_macro_count,
-    mdr_lookup as eml_mdr_lookup, Chain, ChainLevel, ChainVariant, EmlError, EnvelopeBound,
+    decode_chain_wide, decode_tree as eml_decode_tree, encode_chain_restricted,
+    encode_chain_wide, encode_tree as eml_encode_tree, eml, eml_precise,
+    in_bit_exact_corpus as eml_in_bit_exact_corpus, leaf as eml_leaf,
+    macro_count as eml_macro_count, mdr_lookup as eml_mdr_lookup, one as eml_one,
+    var_x as eml_var_x, Chain, ChainLevel, ChainVariant, EMLNode, EmlError, EnvelopeBound,
     FingerprintMembership, FunctionClass, MacroDefinition, ParametricChain, PrecisionClass,
     VariantTag, CANONICAL_INPUTS_MDR as EML_CANONICAL_INPUTS_MDR, REGISTRY as EML_REGISTRY,
 };
