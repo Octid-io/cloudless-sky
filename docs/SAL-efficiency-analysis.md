@@ -2,7 +2,7 @@
 
 ## A Multi-Layer Comparison of SAL, JSON-RPC, and Binary Serialization Formats Across Wire, Token, and Grammar Dimensions
 
-**Version 2.2 | March 2026**
+**Version 2.3 | May 2026**
 **Octid Semantic Mesh Protocol (OSMP) v1.0 | Cloudless Sky Project**
 **Contact: ack@octid.io | octid.io**
 **Repository: github.com/octid-io/cloudless-sky**
@@ -406,11 +406,11 @@ CrewAI and AutoGen show the largest SAL-vs-protobuf gap because their payloads c
 
 ---
 
-## 9. Four-Mode Communication Architecture
+## 9. Four Communication Topologies
 
-OSMP operates across four communication modes. The encoding format does not change between modes; the binding constraint and the economic argument differ.
+This section organizes the economic argument by deployment topology — who is sending instructions to whom — and identifies the binding constraint that dominates each topology. Wire format selection per message is governed separately by the protocol specification (Section 8.5), which picks among four wire modes (SAL, SAIL, SAL+SEC, SAIL+SEC) based on channel capacity and consequence class. The two analyses are orthogonal: this section asks where OSMP's economic case is strongest and why; the specification asks which bytes belong on the wire for a given message. They co-vary in textbook deployments — Edge-to-Edge usually runs over constrained channels, Cloud-to-Cloud usually over unconstrained — but the alignment is convergent rather than fundamental. A satellite-backhaul Cloud-to-Cloud session falls under Section 9.3's economic framing while taking the specification's constrained-channel wire mode; a HAZARDOUS Edge-to-Edge instruction over hospital WiFi falls under Section 9.1 while taking SAL+SEC. The encoding format does not change between topologies — the binding constraint and the economic argument do.
 
-### 9.1 Mode 1: Edge-to-Edge (Binding Constraint: Physics)
+### 9.1 Edge-to-Edge (Binding Constraint: Physics)
 
 **The LoRa Layer Stack.** LoRa is a physical radio modulation technique (chirp spread spectrum, Semtech). Two protocol ecosystems sit on top of it:
 
@@ -468,19 +468,19 @@ The complete sense-decide-act loop (sensor reading, threshold evaluation, alert 
 
 The protocol-level tradeoff is a 42-byte numeric tax per vitals panel in exchange for a unified encoding surface across the sense-decide-act loop.
 
-### 9.2 Mode 2: Edge-to-Cloud (Binding Constraint: Asymmetric Encoding)
+### 9.2 Edge-to-Cloud (Binding Constraint: Asymmetric Encoding)
 
 The edge node encodes in SAL and transmits via LoRaWAN gateway, Meshtastic mesh relay, cellular, or satellite. The cloud node decodes by ASD lookup. A triage classification with ICD-10 diagnosis, GPS coordinates, and MEDEVAC request encodes in approximately 38 bytes, transmissible at any LoRaWAN data rate or over Meshtastic.
 
 The H namespace contains 16 clinical opcodes. The ICD-10-CM MDR corpus contains 74,719 codes resolvable at the edge deterministically. Decode is deterministic: `H:ICD[J939]` resolves to "Pneumothorax, unspecified" by dictionary lookup. Deterministic decode is not the same as semantic adequacy: if the opcode inventory lacks a needed clinical concept, the decode is exact but incomplete. The ASD covers the ICD-10-CM code set; concepts outside that set require Frame Negotiation Protocol extension.
 
-### 9.3 Mode 3: Cloud-to-Cloud (Binding Constraint: Token Economics)
+### 9.3 Cloud-to-Cloud (Binding Constraint: Token Economics)
 
 Bandwidth is free. Gzip handles wire compression. But the LLM reads full uncompressed text as tokens. An agent encountering OSMP via the MCP server discovers eight tools and six resources, learns the grammar through tool use, and produces instructions at 76.0% fewer tokens (measured, Section 5.2).
 
 The tradeoff: SAL instructions are not self-describing. A developer debugging a multi-agent system must consult the ASD to read `H:TRIAGE?I` where JSON shows `"triage_category":"immediate"` directly. For deployments where API cost at scale is the binding constraint, this tradeoff is favorable. For prototyping where cost is immaterial and debuggability is paramount, JSON's self-description has higher immediate value.
 
-### 9.4 Mode 4: Enterprise Compliance (Binding Constraint: Regulatory Interoperability)
+### 9.4 Enterprise Compliance (Binding Constraint: Regulatory Interoperability)
 
 Instructions carrying regulatory code references (ICD-10, CFR, NFPA, ISO 20022) must be machine-readable and unambiguous across organizational boundaries. SAL's domain code accessor pattern (`H:ICD[J939]`, `K:PAY[ISO20022:MsgId]`) enables compliance logging where the instruction constitutes an auditable record. Any party with the ASD decodes to full regulatory meaning without proprietary tooling.
 
