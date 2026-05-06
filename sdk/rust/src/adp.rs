@@ -13,6 +13,7 @@ use std::collections::BTreeMap;
 use std::time::SystemTime;
 
 use crate::asd::AdaptiveSharedDictionary;
+use crate::types::FLAG_CRITICAL;
 
 // ── Version mapping: u16 wire as u8.u8 (MAJOR.MINOR) ──────────────────
 
@@ -138,6 +139,31 @@ impl ADPDelta {
             self.to_version,
             ops.join(":")
         )
+    }
+
+    /// Returns the OVERFLOW fragment flags this delta MUST be transmitted
+    /// with, per spec §6 / §7 of `OSMP-SPEC-v1.0.2.md`. REPLACE deltas
+    /// require `FLAG_CRITICAL` (criticality override) — graceful degradation
+    /// on packet loss is not permitted because a lost REPLACE leaves the
+    /// receiving node with a stale dictionary entry, a semantic correctness
+    /// violation. Non-REPLACE deltas (additive, deprecate) return `0` and
+    /// may be transmitted under the node's standing loss-tolerance policy.
+    ///
+    /// Callers that fragment delta SAL through `OverflowProtocol` MUST OR
+    /// this byte into the fragment header `flags` field. The most direct
+    /// integration:
+    ///
+    /// ```ignore
+    /// let sal = delta.to_sal();
+    /// let critical = (delta.required_overflow_flags() & FLAG_CRITICAL) != 0;
+    /// let fragments = overflow.fragment_message(&sal, /* critical = */ critical);
+    /// ```
+    pub fn required_overflow_flags(&self) -> u8 {
+        if self.has_breaking() {
+            FLAG_CRITICAL
+        } else {
+            0
+        }
     }
 }
 
@@ -355,6 +381,57 @@ pub fn acknowledge_def() -> &'static str {
     "A:ACK[ASD:DEF]"
 }
 
+// ── Spec-mandated criticality validator ───────────────────────────────
+
+/// Reasons a received delta can be rejected at the ADP layer per the spec.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DeltaValidationError {
+    /// The wire form contains the REPLACE glyph (`\u{2190}`) but the
+    /// fragment carrying it does not have `FLAG_CRITICAL` set. Per spec
+    /// §6 / §7 this is a protocol violation — REPLACE deltas must always
+    /// carry the criticality flag because graceful degradation on REPLACE
+    /// loss leaves the receiver with a silently stale dictionary entry.
+    ReplaceWithoutCriticality,
+}
+
+impl std::fmt::Display for DeltaValidationError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DeltaValidationError::ReplaceWithoutCriticality => write!(
+                f,
+                "REPLACE delta received without FLAG_CRITICAL — spec violation"
+            ),
+        }
+    }
+}
+
+impl std::error::Error for DeltaValidationError {}
+
+/// Validate a received delta SAL string against the fragment-flag context it
+/// arrived in. Rejects REPLACE deltas that did not arrive with
+/// `FLAG_CRITICAL` set. Pass the OR-of-fragment-flags (e.g.
+/// `fragment.flags`) as `received_flags`.
+///
+/// `sal` is the reassembled SAL string (post-OVERFLOW reassembly). The
+/// validator is conservative: it inspects the literal REPLACE glyph
+/// (`\u{2190}`) inside the `A:ASD:DELTA[...]` payload — a syntactic check
+/// that does not require parsing the full SAL grammar.
+pub fn validate_received_delta(
+    sal: &str,
+    received_flags: u8,
+) -> Result<(), DeltaValidationError> {
+    if !sal.starts_with("A:ASD:DELTA[") {
+        return Ok(());
+    }
+    if !sal.contains('\u{2190}') {
+        return Ok(());
+    }
+    if received_flags & FLAG_CRITICAL == 0 {
+        return Err(DeltaValidationError::ReplaceWithoutCriticality);
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -567,5 +644,104 @@ mod tests {
         assert_eq!(acknowledge_version("15.1"), "A:ACK[ASD:15.1]");
         assert_eq!(acknowledge_hash(), "A:ACK[ASD:HASH]");
         assert_eq!(acknowledge_def(), "A:ACK[ASD:DEF]");
+    }
+
+    // ── Criticality wiring (spec §6 / §7: REPLACE → FLAGS[C] mandatory) ──
+
+    #[test]
+    fn additive_delta_required_flags_is_zero() {
+        let d = ADPDelta {
+            from_version: "15.0".to_string(),
+            to_version: "15.1".to_string(),
+            operations: vec![ADPDeltaOp {
+                namespace: "H".to_string(),
+                mode: "+".to_string(),
+                opcode: "LACTATE".to_string(),
+                definition: "lactate".to_string(),
+            }],
+        };
+        assert_eq!(d.required_overflow_flags(), 0);
+    }
+
+    #[test]
+    fn deprecate_delta_required_flags_is_zero() {
+        let d = ADPDelta {
+            from_version: "15.0".to_string(),
+            to_version: "15.1".to_string(),
+            operations: vec![ADPDeltaOp {
+                namespace: "M".to_string(),
+                mode: "\u{2020}".to_string(),
+                opcode: "OLDOP".to_string(),
+                definition: String::new(),
+            }],
+        };
+        assert_eq!(d.required_overflow_flags(), 0);
+    }
+
+    #[test]
+    fn replace_delta_required_flags_is_critical() {
+        let d = ADPDelta {
+            from_version: "15.0".to_string(),
+            to_version: "15.1".to_string(),
+            operations: vec![ADPDeltaOp {
+                namespace: "H".to_string(),
+                mode: "\u{2190}".to_string(),
+                opcode: "HR".to_string(),
+                definition: "heart_rate_v2".to_string(),
+            }],
+        };
+        assert_eq!(d.required_overflow_flags(), FLAG_CRITICAL);
+    }
+
+    #[test]
+    fn mixed_delta_with_any_replace_is_critical() {
+        let d = ADPDelta {
+            from_version: "15.0".to_string(),
+            to_version: "15.1".to_string(),
+            operations: vec![
+                ADPDeltaOp {
+                    namespace: "H".to_string(),
+                    mode: "+".to_string(),
+                    opcode: "LACTATE".to_string(),
+                    definition: "lactate".to_string(),
+                },
+                ADPDeltaOp {
+                    namespace: "H".to_string(),
+                    mode: "\u{2190}".to_string(),
+                    opcode: "HR".to_string(),
+                    definition: "heart_rate_v2".to_string(),
+                },
+            ],
+        };
+        assert_eq!(d.required_overflow_flags(), FLAG_CRITICAL);
+    }
+
+    #[test]
+    fn validate_received_replace_without_critical_rejects() {
+        let sal = "A:ASD:DELTA[15.0\u{2192}15.1:H\u{2190}[HR]]";
+        let result = validate_received_delta(sal, 0);
+        assert_eq!(result, Err(DeltaValidationError::ReplaceWithoutCriticality));
+    }
+
+    #[test]
+    fn validate_received_replace_with_critical_accepts() {
+        let sal = "A:ASD:DELTA[15.0\u{2192}15.1:H\u{2190}[HR]]";
+        let result = validate_received_delta(sal, FLAG_CRITICAL);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn validate_received_additive_without_critical_accepts() {
+        // Non-REPLACE deltas may be transmitted under the node's standing policy.
+        let sal = "A:ASD:DELTA[15.0\u{2192}15.1:H+[LACTATE]]";
+        let result = validate_received_delta(sal, 0);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn validate_non_delta_sal_is_passthrough() {
+        // Non-A:ASD:DELTA traffic is out of ADP scope; validator is a no-op.
+        assert!(validate_received_delta("H:HR@NODE1", 0).is_ok());
+        assert!(validate_received_delta("A:ASD[15.1]", 0).is_ok());
     }
 }

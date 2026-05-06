@@ -34,9 +34,9 @@ pub mod wire;
 pub use adp::{
     acknowledge_def, acknowledge_hash, acknowledge_version, asd_version_is_breaking,
     asd_version_pack, asd_version_parse, asd_version_str, asd_version_unpack,
-    classify_priority, mdr_identity, mdr_request, ADPDelta, ADPDeltaOp, ADPSession,
-    PendingInstruction, ADP_PRIORITY_DELTA, ADP_PRIORITY_MICRO, ADP_PRIORITY_MISSION,
-    ADP_PRIORITY_TRICKLE,
+    classify_priority, mdr_identity, mdr_request, validate_received_delta, ADPDelta,
+    ADPDeltaOp, ADPSession, DeltaValidationError, PendingInstruction, ADP_PRIORITY_DELTA,
+    ADP_PRIORITY_MICRO, ADP_PRIORITY_MISSION, ADP_PRIORITY_TRICKLE,
 };
 pub use asd::{
     AdaptiveSharedDictionary, DeltaLogEntry, DictUpdateMode, ASD_FLOOR_VERSION,
