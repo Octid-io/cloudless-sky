@@ -1,6 +1,6 @@
 [package]
 name = "osmp"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 description = "OSMP — Octid Semantic Mesh Protocol. Bandwidth-agnostic semantic instruction encoding."
 license = "Apache-2.0"

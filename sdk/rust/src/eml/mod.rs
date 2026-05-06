@@ -10,15 +10,23 @@
 //! Cross-SDK byte-identical with the Python, Go, and TypeScript SDKs at
 //! common inputs.
 
+pub mod chain;
 pub mod crlibm;
 pub mod fdlibm;
 pub mod mdr;
 
+pub use chain::{
+    decode_chain_restricted, decode_chain_wide, encode_chain_restricted, encode_chain_wide,
+    Chain, ChainLevel, ChainVariant,
+};
+
 pub use crlibm::{exp as precise_exp, log as precise_log, AVAILABLE as PRECISE_AVAILABLE};
 pub use fdlibm::{exp as fast_exp, log as fast_log, AVAILABLE as FAST_AVAILABLE};
 pub use mdr::{
-    in_bit_exact_corpus, lookup as mdr_lookup, macro_count, EnvelopeBound, FingerprintMembership,
-    FunctionClass, MacroDefinition, ParametricChain, PrecisionClass, VariantTag, REGISTRY,
+    corpus_fingerprint_envelope_bounded, corpus_fingerprint_mdr, in_bit_exact_corpus,
+    lookup as mdr_lookup, macro_count, EnvelopeBound, FingerprintMembership, FunctionClass,
+    MacroDefinition, ParametricChain, PrecisionClass, VariantTag, CANONICAL_INPUTS_MDR,
+    REGISTRY,
 };
 
 /// Errors returned by precision-gated eml entry points.

@@ -4,7 +4,11 @@ Rust implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, compo
 
 ## Status
 
-**Pre-1.0** (`0.4.0`). Full wire-format parity with Python / TypeScript / Go: core encode/decode, ASD dictionary, v16 namespace mapping, SAL grammar, validator, macro registry, SALBridge, **FNP packet codec (40-byte ADV / 38-byte ACK with ADR-004 basis-manifest extended-form)**, overflow protocol (Tier 1/2/3 DAG), BAEL bridge-layer mode selector, **D:PACK encode (raw blocks) + decode (raw blocks AND zstd-compressed blocks; reads shipped MDR corpora end-to-end)**, **EML fast-mode math (pure-Rust port of Sun fdlibm, byte-identical with the Python / Go / TypeScript fdlibm modules)**, the **89-macro EML MDR registry**, and the **unified wire codec** (`SAILCodec` binary + `SecCodec` ChaCha20-Poly1305 + Ed25519 envelope **with inbound replay protection** + `OSMPWireCodec` mode router across {Mnemonic, SAIL, SEC, SAILSEC}) all ship at parity. EML chain wire codec, parametric-chain evaluator, MDR corpus fingerprint API, and ADP session protocol follow at `0.5.0`.
+**Pre-1.0** (`0.5.0`). Full feature parity with Python / TypeScript / Go: core encode/decode, ASD dictionary, v16 namespace mapping, SAL grammar, validator, macro registry, SALBridge, **FNP packet codec (40-byte ADV / 38-byte ACK with ADR-004 basis-manifest extended-form)**, overflow protocol (Tier 1/2/3 DAG), BAEL bridge-layer mode selector, **ADP session protocol (`A:ASD` version identity / query / alert / REQ / DELTA / DEF / HASH plus `A:MDR` corpus version family with priority classification and pending-queue resolution)**, **D:PACK encode (raw blocks) + decode (raw blocks AND zstd-compressed blocks; reads shipped MDR corpora end-to-end)**, **EML fast-mode math (pure-Rust port of Sun fdlibm, byte-identical with the Python / Go / TypeScript fdlibm modules)**, the **89-macro EML MDR registry with `ParametricChain::evaluate`, restricted/wide chain wire codec (`encode_chain_restricted/wide` + `decode_chain_restricted/wide`), and SHA-256 corpus fingerprint (`corpus_fingerprint_mdr` + `corpus_fingerprint_envelope_bounded`)**, and the **unified wire codec** (`SAILCodec` binary + `SecCodec` ChaCha20-Poly1305 + Ed25519 envelope **with inbound replay protection** + `OSMPWireCodec` mode router across {Mnemonic, SAIL, SEC, SAILSEC}) all ship at parity.
+
+### Notes from `0.4.0`
+
+`0.4.0` introduced the breaking signature changes documented below. `0.5.0` is purely additive over `0.4.0`: ADP session protocol, EML chain wire codec, `ParametricChain::evaluate`, and corpus-fingerprint API are all new public surfaces; nothing already shipped in `0.4.0` changes shape.
 
 ### Breaking from `0.3.0`
 
@@ -18,7 +22,7 @@ The SHA-256 ASD fingerprint is byte-identical with the other three SDKs: `9ecc50
 
 ```toml
 [dependencies]
-osmp = "0.4"
+osmp = "0.5"
 ```
 
 MSRV: Rust 1.70 (uses `std::sync::OnceLock`, stabilized in 1.70). Runtime crypto deps for the SEC envelope (`chacha20poly1305`, `ed25519-dalek`, `rand`) are pulled in when the wire layer is constructed; `ruzstd` (pure-Rust, no C build deps) is pulled in for D:PACK zstd decompression on shipped MDR corpora; the SAL text encoder/decoder requires only `sha2`, `serde`, `serde_json`, and `regex`.

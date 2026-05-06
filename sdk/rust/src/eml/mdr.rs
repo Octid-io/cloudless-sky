@@ -1905,6 +1905,163 @@ pub fn lookup(shorthand_id: &str) -> Option<&'static MacroDefinition> {
     REGISTRY.iter().find(|m| m.shorthand_id == shorthand_id)
 }
 
+impl ParametricChain {
+    /// Evaluate the chain at `values` (positional, one entry per named
+    /// variable). Mirrors Python `Chain.evaluate` and Go `Chain.Evaluate` —
+    /// `"1"` is the constant 1.0, named variables are looked up by name,
+    /// `"f"` references the previous level's output, and `"fN"` references
+    /// the output of level `N` (1-indexed).
+    pub fn evaluate(&self, values: &[f64]) -> Result<f64, String> {
+        if values.len() != self.variables.len() {
+            return Err(format!(
+                "got {} values, expected {} for ParametricChain with variables {:?}",
+                values.len(),
+                self.variables.len(),
+                self.variables,
+            ));
+        }
+        let mut var_map: std::collections::HashMap<&str, f64> =
+            std::collections::HashMap::new();
+        var_map.insert("1", 1.0);
+        for (i, &name) in self.variables.iter().enumerate() {
+            var_map.insert(name, values[i]);
+        }
+        let mut f: Vec<f64> = Vec::with_capacity(self.levels.len());
+        for (k0, (left, right)) in self.levels.iter().enumerate() {
+            let k = k0 + 1;
+            let a = resolve_pc_operand(left, &var_map, &f, k)?;
+            let b = resolve_pc_operand(right, &var_map, &f, k)?;
+            f.push(super::eml(a, b));
+        }
+        Ok(f.last().copied().unwrap_or(0.0))
+    }
+}
+
+fn resolve_pc_operand(
+    op: &str,
+    var_map: &std::collections::HashMap<&str, f64>,
+    f: &[f64],
+    k: usize,
+) -> Result<f64, String> {
+    if op == "1" {
+        return Ok(1.0);
+    }
+    if op == "f" {
+        if k < 2 {
+            return Err("'f' operand referenced at L1".to_string());
+        }
+        return Ok(f[k - 2]);
+    }
+    if op.len() > 1 && op.starts_with('f') {
+        if let Ok(idx) = op[1..].parse::<usize>() {
+            if idx >= 1 && idx < k {
+                return Ok(f[idx - 1]);
+            }
+            return Err(format!("f{idx} out of range at L{k}"));
+        }
+    }
+    if let Some(&v) = var_map.get(op) {
+        return Ok(v);
+    }
+    Err(format!("unknown operand {op:?}"))
+}
+
+// ── Corpus fingerprint ────────────────────────────────────────────────
+
+/// Canonical inputs for the cross-SDK MDR corpus fingerprint. Mirrors
+/// Python `CANONICAL_INPUTS` and Go `canonicalInputsForMDR`.
+pub const CANONICAL_INPUTS_MDR: [f64; 10] = [
+    0.5,
+    1.0,
+    1.5,
+    2.0,
+    std::f64::consts::E,
+    std::f64::consts::PI,
+    3.0,
+    5.0,
+    7.0,
+    10.0,
+];
+
+/// SHA-256 fingerprint over the bit-exact-corpus macros, evaluated at the
+/// canonical inputs. Cross-SDK byte-identical with Python
+/// `corpus_fingerprint_mdr` and Go `CorpusFingerprintMDR`.
+///
+/// Hash format (per macro, in static `REGISTRY` order, filtered to
+/// `InBitExactCorpus`):
+///
+/// ```text
+/// shorthand_id ":"
+///   for each chain_template (with index i):
+///     "/" str(i) ":"
+///       for each x in CANONICAL_INPUTS_MDR:
+///         pack_double_le(chain.evaluate(values=[x; n_vars]))
+/// ```
+pub fn corpus_fingerprint_mdr() -> String {
+    use sha2::{Digest, Sha256};
+    let mut hasher = Sha256::new();
+    for m in in_bit_exact_corpus() {
+        hasher.update(m.shorthand_id.as_bytes());
+        hasher.update(b":");
+        for (comp_idx, pchain) in m.chain_templates.iter().enumerate() {
+            hasher.update(b"/");
+            hasher.update(format!("{comp_idx}").as_bytes());
+            hasher.update(b":");
+            let n_vars = pchain.variables.len();
+            for &x in &CANONICAL_INPUTS_MDR {
+                let values = vec![x; n_vars];
+                let y = pchain.evaluate(&values).unwrap_or_else(|err| {
+                    panic!(
+                        "corpus_fingerprint_mdr: {} component {} failed: {}",
+                        m.shorthand_id, comp_idx, err
+                    )
+                });
+                hasher.update(y.to_le_bytes());
+            }
+        }
+    }
+    let digest = hasher.finalize();
+    let mut out = String::with_capacity(digest.len() * 2);
+    for b in digest {
+        out.push_str(&format!("{b:02x}"));
+    }
+    out
+}
+
+/// SHA-256 fingerprint over the envelope-bounded corpus, evaluated at the
+/// canonical inputs. Separate from the bit-exact corpus by design — the
+/// envelope-bounded macros aren't bit-exact within their own evaluator.
+/// Cross-SDK byte-identical with Python and Go counterparts.
+pub fn corpus_fingerprint_envelope_bounded() -> String {
+    use sha2::{Digest, Sha256};
+    let mut hasher = Sha256::new();
+    let envelope_macros = REGISTRY
+        .iter()
+        .filter(|m| m.fingerprint_membership == FingerprintMembership::SeparateEnvelopeCorpus);
+    for m in envelope_macros {
+        hasher.update(m.shorthand_id.as_bytes());
+        hasher.update(b":");
+        for (comp_idx, pchain) in m.chain_templates.iter().enumerate() {
+            hasher.update(b"/");
+            hasher.update(format!("{comp_idx}").as_bytes());
+            hasher.update(b":");
+            let n_vars = pchain.variables.len();
+            for &x in &CANONICAL_INPUTS_MDR {
+                let values = vec![x; n_vars];
+                if let Ok(y) = pchain.evaluate(&values) {
+                    hasher.update(y.to_le_bytes());
+                }
+            }
+        }
+    }
+    let digest = hasher.finalize();
+    let mut out = String::with_capacity(digest.len() * 2);
+    for b in digest {
+        out.push_str(&format!("{b:02x}"));
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1945,5 +2102,52 @@ mod tests {
         let n = seen.len();
         seen.dedup();
         assert_eq!(seen.len(), n, "duplicate shorthand_id detected");
+    }
+
+    #[test]
+    fn evaluate_exp_macro_at_zero() {
+        // EXP: variables=["x"], levels=[("x","1")] → eml(x,1) = exp(x) - ln(1) = exp(x)
+        let m = lookup("EXP").expect("EXP present");
+        let y = m.chain_templates[0].evaluate(&[0.0]).expect("evaluate");
+        assert!((y - 1.0).abs() < 1e-15);
+    }
+
+    #[test]
+    fn evaluate_exp_macro_at_one() {
+        let m = lookup("EXP").expect("EXP present");
+        let y = m.chain_templates[0].evaluate(&[1.0]).expect("evaluate");
+        assert!((y - std::f64::consts::E).abs() < 1e-12);
+    }
+
+    #[test]
+    fn evaluate_rejects_value_count_mismatch() {
+        let m = lookup("EXP").expect("EXP present");
+        assert!(m.chain_templates[0].evaluate(&[1.0, 2.0]).is_err());
+        assert!(m.chain_templates[0].evaluate(&[]).is_err());
+    }
+
+    #[test]
+    fn corpus_fingerprint_mdr_is_deterministic() {
+        let fp1 = corpus_fingerprint_mdr();
+        let fp2 = corpus_fingerprint_mdr();
+        assert_eq!(fp1, fp2, "fingerprint must be deterministic");
+        assert_eq!(fp1.len(), 64, "SHA-256 hex is 64 characters");
+        assert!(
+            fp1.chars().all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase()),
+            "fingerprint must be lowercase hex: {fp1}",
+        );
+    }
+
+    #[test]
+    fn corpus_fingerprint_envelope_bounded_is_deterministic() {
+        let fp1 = corpus_fingerprint_envelope_bounded();
+        let fp2 = corpus_fingerprint_envelope_bounded();
+        assert_eq!(fp1, fp2);
+        assert_eq!(fp1.len(), 64);
+    }
+
+    #[test]
+    fn canonical_inputs_count() {
+        assert_eq!(CANONICAL_INPUTS_MDR.len(), 10);
     }
 }

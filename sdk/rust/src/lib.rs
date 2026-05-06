@@ -10,6 +10,7 @@
 #![warn(rust_2018_idioms)]
 #![warn(missing_docs)]
 
+pub mod adp;
 pub mod asd;
 pub mod asd_v16;
 pub mod bael;
@@ -30,6 +31,13 @@ pub mod types;
 pub mod validate;
 pub mod wire;
 
+pub use adp::{
+    acknowledge_def, acknowledge_hash, acknowledge_version, asd_version_is_breaking,
+    asd_version_pack, asd_version_parse, asd_version_str, asd_version_unpack,
+    classify_priority, mdr_identity, mdr_request, ADPDelta, ADPDeltaOp, ADPSession,
+    PendingInstruction, ADP_PRIORITY_DELTA, ADP_PRIORITY_MICRO, ADP_PRIORITY_MISSION,
+    ADP_PRIORITY_TRICKLE,
+};
 pub use asd::{
     AdaptiveSharedDictionary, DeltaLogEntry, DictUpdateMode, ASD_FLOOR_VERSION,
 };
@@ -48,10 +56,13 @@ pub use dpack::{DPackDecoder, DPackEncoder};
 pub use macros::{MacroRegistry, MacroTemplate};
 pub use decoder::{split_compound, DecodeError, Decoder};
 pub use eml::{
-    eml, eml_precise, in_bit_exact_corpus as eml_in_bit_exact_corpus,
-    macro_count as eml_macro_count, mdr_lookup as eml_mdr_lookup, EmlError, EnvelopeBound,
+    corpus_fingerprint_envelope_bounded as eml_corpus_fingerprint_envelope_bounded,
+    corpus_fingerprint_mdr as eml_corpus_fingerprint_mdr, decode_chain_restricted,
+    decode_chain_wide, encode_chain_restricted, encode_chain_wide, eml, eml_precise,
+    in_bit_exact_corpus as eml_in_bit_exact_corpus, macro_count as eml_macro_count,
+    mdr_lookup as eml_mdr_lookup, Chain, ChainLevel, ChainVariant, EmlError, EnvelopeBound,
     FingerprintMembership, FunctionClass, MacroDefinition, ParametricChain, PrecisionClass,
-    VariantTag, REGISTRY as EML_REGISTRY,
+    VariantTag, CANONICAL_INPUTS_MDR as EML_CANONICAL_INPUTS_MDR, REGISTRY as EML_REGISTRY,
 };
 pub use encoder::{EncodeError, Encoder};
 pub use fnp::{
