@@ -749,8 +749,10 @@ mod smoke {
     #[test]
     fn fnp_extended_form_sets_high_bit_and_carries_basis_fp() {
         let asd = AdaptiveSharedDictionary::new();
-        let mut opts = FNPSessionOptions::default();
-        opts.basis_fingerprint = Some(vec![0xAA; 8]);
+        let opts = FNPSessionOptions {
+            basis_fingerprint: Some(vec![0xAA; 8]),
+            ..Default::default()
+        };
         let mut session =
             FNPSession::new_with_options(&asd, "NODE_A", 1, FNP_CAP_FLOOR, opts).unwrap();
         let adv = session.initiate().expect("initiate");
@@ -764,8 +766,10 @@ mod smoke {
     #[test]
     fn fnp_basis_fingerprint_must_be_eight_bytes() {
         let asd = AdaptiveSharedDictionary::new();
-        let mut opts = FNPSessionOptions::default();
-        opts.basis_fingerprint = Some(vec![0xAA; 7]);
+        let opts = FNPSessionOptions {
+            basis_fingerprint: Some(vec![0xAA; 7]),
+            ..Default::default()
+        };
         let result = FNPSession::new_with_options(&asd, "NODE_A", 1, FNP_CAP_FLOOR, opts);
         assert_eq!(result.err(), Some(FnpError::InvalidBasisFingerprint));
     }
@@ -780,8 +784,8 @@ mod smoke {
         bad_ack[0] = FNP_MSG_ACK;
         bad_ack[1] = FNP_MATCH_EXACT as u8;
         // Wrong echo fingerprint at offset [2..10]:
-        for i in 2..10 {
-            bad_ack[i] = 0xFF;
+        for byte in &mut bad_ack[2..10] {
+            *byte = 0xFF;
         }
         let result = a.receive(&bad_ack);
         assert_eq!(result.err(), Some(FnpError::EchoMismatch));

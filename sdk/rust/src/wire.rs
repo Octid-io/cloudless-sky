@@ -280,7 +280,7 @@ fn build_opcode_tables() -> (OpToIdx, IdxToOp) {
 fn build_intern_table() -> Vec<String> {
     let basis = asd_basis();
     let mut str_set: BTreeSet<String> = BTreeSet::new();
-    for (_ns, ops) in basis {
+    for ops in basis.values() {
         for op in ops.keys() {
             str_set.insert((*op).to_string());
         }
@@ -471,14 +471,11 @@ impl SAILCodec {
     }
 
     fn try_ns_op(&self, runes: &[char], pos: usize, n: usize) -> Option<(Vec<u8>, usize)> {
-        let mut colon_pos: Option<usize> = None;
-        for i in pos..(pos + 3).min(n) {
-            if runes[i] == ':' {
-                colon_pos = Some(i);
-                break;
-            }
-        }
-        let colon = colon_pos?;
+        let end = (pos + 3).min(n);
+        let colon = runes[pos..end]
+            .iter()
+            .position(|&c| c == ':')
+            .map(|p| pos + p)?;
         if colon <= pos || colon - pos > 2 {
             return None;
         }
