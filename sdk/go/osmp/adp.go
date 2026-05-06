@@ -112,6 +112,50 @@ func (d *ADPDelta) ToSAL() string {
 		d.FromVersion, d.ToVersion, strings.Join(ops, ":"))
 }
 
+// RequiredOverflowFlags returns the OVERFLOW fragment flags this delta MUST
+// be transmitted with, per spec \u00a76 / \u00a77 of OSMP-SPEC-v1.0.2. REPLACE deltas
+// require FlagCritical (criticality override) \u2014 graceful degradation on
+// packet loss is not permitted because a lost REPLACE leaves the receiving
+// node with a stale dictionary entry, a semantic correctness violation.
+// Non-REPLACE deltas (additive, deprecate) return 0.
+//
+// Callers fragmenting delta SAL through OverflowProtocol MUST OR this byte
+// into the fragment header flags field.
+func (d *ADPDelta) RequiredOverflowFlags() byte {
+	if d.HasBreaking() {
+		return FlagCritical
+	}
+	return 0
+}
+
+// DeltaValidationError is returned by ValidateReceivedDelta when a received
+// delta violates the spec's criticality requirements.
+type DeltaValidationError struct {
+	Reason string
+}
+
+func (e *DeltaValidationError) Error() string { return e.Reason }
+
+// ValidateReceivedDelta inspects a received A:ASD:DELTA SAL string against
+// the fragment-flag context it arrived in. Rejects REPLACE deltas that did
+// not arrive with FlagCritical set (spec \u00a76 / \u00a77 violation). Pass the
+// OR-of-fragment-flags as receivedFlags. Returns nil for non-DELTA SAL or
+// non-REPLACE deltas.
+func ValidateReceivedDelta(sal string, receivedFlags byte) error {
+	if !strings.HasPrefix(sal, "A:ASD:DELTA[") {
+		return nil
+	}
+	if !strings.ContainsRune(sal, '\u2190') {
+		return nil
+	}
+	if receivedFlags&FlagCritical == 0 {
+		return &DeltaValidationError{
+			Reason: "REPLACE delta received without FlagCritical \u2014 spec violation",
+		}
+	}
+	return nil
+}
+
 // ── Pending instruction ────────────────────────────────────────────────────
 
 // PendingInstruction is held in the semantic pending queue.

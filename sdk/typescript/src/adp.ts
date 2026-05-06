@@ -9,7 +9,7 @@
  */
 
 import { AdaptiveSharedDictionary } from "./asd.js";
-import { DictUpdateMode } from "./types.js";
+import { DictUpdateMode, FLAG_CRITICAL } from "./types.js";
 
 // ── Version mapping: u16 wire as u8.u8 (MAJOR.MINOR) ──────────────────────
 
@@ -81,6 +81,49 @@ export function deltaToSal(d: ADPDelta): string {
 
 export function deltaHasBreaking(d: ADPDelta): boolean {
   return d.operations.some(deltaOpIsBreaking);
+}
+
+/**
+ * OVERFLOW fragment flags this delta MUST be transmitted with, per
+ * OSMP-SPEC-v1.0.2 §6 / §7. REPLACE deltas require FLAG_CRITICAL
+ * (criticality override) — graceful degradation on packet loss is not
+ * permitted because a lost REPLACE leaves the receiving node with a stale
+ * dictionary entry, a semantic correctness violation. Non-REPLACE deltas
+ * (additive, deprecate) return 0.
+ *
+ * Callers fragmenting delta SAL through the OVERFLOW protocol MUST OR this
+ * byte into the fragment header flags field.
+ */
+export function deltaRequiredOverflowFlags(d: ADPDelta): number {
+  return deltaHasBreaking(d) ? FLAG_CRITICAL : 0;
+}
+
+/** Raised by `validateReceivedDelta` on REPLACE-without-criticality. */
+export class DeltaValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DeltaValidationError";
+  }
+}
+
+/**
+ * Validate a received delta SAL string against the fragment-flag context it
+ * arrived in. Throws `DeltaValidationError` if an A:ASD:DELTA payload
+ * containing the REPLACE glyph (←) arrived without FLAG_CRITICAL set
+ * (spec §6 / §7 violation). Pass the OR-of-fragment-flags as
+ * `receivedFlags`.
+ *
+ * Non-DELTA SAL and non-REPLACE deltas are pass-through (no enforcement, by
+ * design — only REPLACE has the criticality requirement).
+ */
+export function validateReceivedDelta(sal: string, receivedFlags: number): void {
+  if (!sal.startsWith("A:ASD:DELTA[")) return;
+  if (!sal.includes("←")) return;
+  if ((receivedFlags & FLAG_CRITICAL) === 0) {
+    throw new DeltaValidationError(
+      "REPLACE delta received without FLAG_CRITICAL — spec violation",
+    );
+  }
 }
 
 // ── Pending instruction ────────────────────────────────────────────────────

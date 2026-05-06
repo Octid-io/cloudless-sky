@@ -182,8 +182,10 @@ from osmp.protocol import (
     # ADP — Adaptive Dictionary Protocol
     ADPDeltaOp,
     ADPDelta,
+    DeltaValidationError,
     PendingInstruction,
     ADPSession,
+    validate_received_delta,
     ADP_PRIORITY_MISSION,
     ADP_PRIORITY_MICRO,
     ADP_PRIORITY_DELTA,
@@ -276,7 +278,8 @@ __all__ = [
     "FNP_ADV_SIZE", "FNP_ACK_SIZE", "FNP_PROTOCOL_VERSION",
 
     # ADP
-    "ADPDeltaOp", "ADPDelta", "PendingInstruction", "ADPSession",
+    "ADPDeltaOp", "ADPDelta", "DeltaValidationError", "PendingInstruction",
+    "ADPSession", "validate_received_delta",
     "ADP_PRIORITY_MISSION", "ADP_PRIORITY_MICRO",
     "ADP_PRIORITY_DELTA", "ADP_PRIORITY_TRICKLE",
     "asd_version_pack", "asd_version_unpack", "asd_version_str",

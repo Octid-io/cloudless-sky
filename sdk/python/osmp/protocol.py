@@ -1300,6 +1300,53 @@ class ADPDelta:
         ops = ":".join(op.to_sal() for op in self.operations)
         return f"A:ASD:DELTA[{self.from_version}\u2192{self.to_version}:{ops}]"
 
+    @property
+    def required_overflow_flags(self) -> int:
+        """OVERFLOW fragment flags this delta MUST be transmitted with.
+
+        Per OSMP-SPEC-v1.0.2 \u00a76 / \u00a77, REPLACE deltas require FLAG_CRITICAL
+        (criticality override) \u2014 graceful degradation on packet loss is not
+        permitted because a lost REPLACE leaves the receiving node with a
+        stale dictionary entry, a semantic correctness violation. Non-REPLACE
+        deltas (additive, deprecate) return 0.
+
+        Callers fragmenting delta SAL through the OVERFLOW protocol MUST OR
+        this byte into the fragment header flags field.
+        """
+        return FLAG_CRITICAL if self.has_breaking else 0
+
+
+class DeltaValidationError(Exception):
+    """Raised by `validate_received_delta` when a received delta violates
+    the spec's criticality requirements."""
+
+    pass
+
+
+def validate_received_delta(sal: str, received_flags: int) -> None:
+    """Validate a received delta against the fragment-flag context it
+    arrived in.
+
+    Rejects A:ASD:DELTA payloads containing the REPLACE glyph (\\u2190)
+    that did not arrive with FLAG_CRITICAL set (spec \u00a76 / \u00a77 violation).
+    Pass the OR of the carrying fragment(s) flags as ``received_flags``.
+
+    Non-DELTA SAL and non-REPLACE deltas are pass-through (no enforcement,
+    by design \u2014 only REPLACE has the criticality requirement).
+
+    Raises:
+        DeltaValidationError: if the delta is REPLACE-bearing and the
+            received flag set does not include FLAG_CRITICAL.
+    """
+    if not sal.startswith("A:ASD:DELTA["):
+        return
+    if "\u2190" not in sal:
+        return
+    if received_flags & FLAG_CRITICAL == 0:
+        raise DeltaValidationError(
+            "REPLACE delta received without FLAG_CRITICAL \u2014 spec violation"
+        )
+
 
 @dataclass
 class PendingInstruction:
