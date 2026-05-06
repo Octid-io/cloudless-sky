@@ -151,7 +151,7 @@ Pre-validated SAL templates for [Meshtastic](https://meshtastic.org/) protobuf t
 | `MESH:TALRT` | Temperature threshold alert rule |
 | `MESH:BATLO` | Battery low threshold alert rule |
 | `MESH:NOFF` | Node offline detection rule |
-| `MEDEVAC` | Clinical MEDEVAC macro (spec Section 11 embodiment) |
+| `MEDEVAC` | Clinical MEDEVAC chain template — heart-rate threshold → casualty report → broadcast evacuation |
 
 ### EML — 89 macros, math on the wire
 
@@ -195,7 +195,7 @@ let m = eml_mdr_lookup("EXP").unwrap();
 
 </details>
 
-86 macros are in the bit-exact fingerprint corpus; 3 are envelope-bounded (`BRN`, `HAD`, `RLC`) and verified separately. Full schema (chain templates, preprocessing rules, precision classes, envelope bounds) ships in each SDK's `eml_mdr` module.
+86 macros are in the bit-exact fingerprint corpus; 3 are envelope-bounded and verified separately against documented tolerance bounds. Full schema (chain templates, preprocessing rules, precision classes, envelope bounds) ships in each SDK's `eml_mdr` module. See [docs/macros.md](docs/macros.md) for the full per-macro catalog.
 
 ### Custom registries
 
@@ -272,17 +272,9 @@ MDR pairs with the spec's Layer 2 accessor pattern: bracket-enclosed slot values
 
 Per [ADR-004](docs/adr/ADR-004-dictionary-basis-manifest.md), the FNP handshake exchanges a **basis fingerprint** that includes the MDR composition. Two nodes with equal basis fingerprints have byte-identical intern tables and unlock SAIL binary mode for that corpus's content. Two nodes with different bases fall back to SAL — semantic round-trip is preserved; only the SAIL compression bonus on MDR-covered content is gated.
 
-### Roadmap
+### Custom corpora
 
-Future MDR namespaces under consideration:
-
-- **SNOMED CT** (clinical concept ontology)
-- **RxNorm** (clinical drug nomenclature)
-- **LOINC** (laboratory observation identifiers)
-- **OpenAPI schemas** (web API contracts as a domain corpus)
-- **CPC / Cooperative Patent Classification** (patent taxonomy)
-
-The MDR architecture is open. Operators can pack their own domain corpora into D:PACK/BLK using the published format and ship them alongside the base ASD. Per-corpus fingerprints flow through the FNP handshake automatically.
+The MDR architecture is open. Operators can pack their own domain corpora into D:PACK/BLK using the published format and ship them alongside the base ASD. Per-corpus fingerprints flow through the FNP handshake automatically — peers gate SAIL binary mode on basis agreement and fall back to SAL when bases differ.
 
 ---
 

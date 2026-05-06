@@ -536,7 +536,7 @@ Decode errors occur when a conformant SAL instruction fails to round-trip throug
 **Mechanism:** The LLM composes the R namespace opcode and target but omits the mandatory consequence class.
 **Example:** "Move the robot to waypoint 1" -> `R:MOV@WPT1` (missing consequence class)
 **Correct:** `R:↺MOV@WPT1` (reversible movement) or `I:§→R:⚠MOV@WPT1` (hazardous movement with human authorization)
-**Severity:** High. The instruction is malformed and non-executable per spec Section 5.
+**Severity:** High. The instruction is malformed and non-executable per the consequence-class rules.
 **Prevention:** PROHIBIT-06. Every R namespace instruction (except R:ESTOP) requires a consequence class.
 **Detection:** R namespace audit: verify every R:OPCODE carries a consequence class glyph.
 

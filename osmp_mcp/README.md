@@ -44,6 +44,17 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
+## Macros — pre-validated chain templates
+
+A macro is a pre-validated multi-opcode SAL chain template invoked by name (`A:MACRO[name]`) with typed slot-fill at composition time. The receiver expands the macro deterministically by dictionary lookup — no inference, no per-message composition cost, zero hallucination surface.
+
+The MCP server exposes two corpora out of the box:
+
+- **Meshtastic (16 macros)** bundled at `osmp_mcp/data/meshtastic-macros.json` — telemetry chains for `MESH:DEV`, `MESH:ENV`, `MESH:POS`, `MESH:ALRT`, plus 12 more covering air quality, power, health, threshold rules, and a MEDEVAC clinical chain.
+- **EML (89 macros)** registered in the SDK — pre-built `eml(x, y) = exp(x) − ln(y)` chain templates for math/scientific/ML/linalg functions. Covered by `osmp_eml_evaluate` and `osmp_eml_corpus_lookup`; full catalog at [docs/macros.md](https://github.com/Octid-io/cloudless-sky/blob/main/docs/macros.md).
+
+Use `osmp_macro_list` to enumerate, `osmp_macro_invoke` to fire by ID with slot values. Custom registries can ship their own corpus with the same `(shorthand_id, chain_template, function_class)` shape; per-corpus fingerprints surface in the FNP handshake so peers gate compatibility automatically.
+
 ## Tools (19)
 
 ### Composition (3) -- start here

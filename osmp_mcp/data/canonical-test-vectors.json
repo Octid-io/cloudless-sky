@@ -716,7 +716,7 @@
       "natural_language": "Deploy anchor at current position, irreversible operation, requires human confirmation.",
       "encoded": "I:§→R:DPTH@UUV1:ANCHOR⊘",
       "must_pass": true,
-      "notes": "Exercises ⊘ (IRREVERSIBLE). I:§ precondition required per spec §5.",
+      "notes": "Exercises ⊘ (IRREVERSIBLE). I:§ precondition required for ⊘ consequence class.",
       "nl_bytes": 87,
       "osmp_bytes": 28,
       "reduction_pct": 67.8,

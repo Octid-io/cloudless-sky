@@ -175,7 +175,7 @@
     {
       "macro_id": "MEDEVAC",
       "chain_template": "H:ICD[{dx_code}]\u2192H:CASREP\u2227M:EVA@{target}",
-      "description": "Clinical MEDEVAC macro (spec Section 11 embodiment)",
+      "description": "Clinical MEDEVAC chain template — heart-rate threshold to casualty report to broadcast evacuation",
       "slots": [
         {"name": "dx_code", "slot_type": "string", "namespace": "H"},
         {"name": "target", "slot_type": "string"}
