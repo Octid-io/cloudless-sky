@@ -126,6 +126,83 @@ The bridge annotates outbound messages with SAL, seeding the remote agent's cont
 
 ---
 
+## Macros
+
+A registered macro is a pre-validated multi-opcode SAL chain template invoked via `A:MACRO[name]`. The receiver expands the macro deterministically by dictionary lookup — no inference, no ambiguity, no per-message composition cost. Two macro corpora ship today.
+
+### Meshtastic — 16 macros, telemetry at the radio edge
+
+Pre-validated SAL templates for [Meshtastic](https://meshtastic.org/) protobuf telemetry over LoRa. Bundled with `osmp-mcp`. Resolvable via `osmp_macro_invoke` from any MCP-connected agent.
+
+| Macro | Purpose |
+|---|---|
+| `MESH:DEV` | DeviceMetrics telemetry (portnum 67) |
+| `MESH:ENV` | EnvironmentMetrics basic (portnum 67) |
+| `MESH:AQ` | AirQualityMetrics (portnum 67) |
+| `MESH:PWR` | PowerMetrics (portnum 67) |
+| `MESH:HLTH` | HealthMetrics (portnum 67) |
+| `MESH:STAT` | LocalStats (portnum 67) |
+| `MESH:POS` | Position (portnum 3) |
+| `MESH:NODE` | NodeInfo (portnum 4) |
+| `MESH:ACK` | Message acknowledgment (portnum 1) |
+| `MESH:ALRT` | Alert (portnum 11) |
+| `MESH:TRACE` | Traceroute (portnum 70) |
+| `MESH:WPT` | Waypoint (portnum 8) |
+| `MESH:TALRT` | Temperature threshold alert rule |
+| `MESH:BATLO` | Battery low threshold alert rule |
+| `MESH:NOFF` | Node offline detection rule |
+| `MEDEVAC` | Clinical MEDEVAC macro (spec Section 11 embodiment) |
+
+### EML — 89 macros, math on the wire
+
+Pre-built `eml(x, y) = exp(x) − ln(y)` chain templates for 89 specific (namespace, opcode) pairs. Each entry has a 3-character shorthand ID, a function-class taxonomy, and a precision class. Cross-SDK byte-identical across Python, TypeScript, Go, and Rust. The MDR fingerprint (`e88350b1...`) and envelope-bounded fingerprint (`8aa47bd5...`) gate cross-SDK drift in CI.
+
+```python
+from osmp.eml_mdr import REGISTRY, macro_count, lookup
+
+assert macro_count() == 89
+m = lookup("EXP")
+print(m.shorthand_id, m.description)   # "EXP" "exp(x) = eml(x, 1)"
+```
+
+```rust
+use osmp::{eml_macro_count, eml_mdr_lookup};
+
+assert_eq!(eml_macro_count(), 89);
+let m = eml_mdr_lookup("EXP").unwrap();
+```
+
+<details>
+<summary><b>89 macros by function class — click to expand</b></summary>
+
+**compound_arithmetic (35)** — `ABS` `ADD` `CBT` `CSH` `CUB` `DIV` `EE2` `EE3` `EE4` `EE5` `EEM` `EEX` `ELN` `EM1` `EME` `EMX` `EOX` `ESX` `EXP` `IDN` `LIN` `LL2` `LL3` `LOG` `MUL` `MXY` `NEG` `OML` `POW` `SNH` `SQR` `SQT` `SUB` `TNH` `ZER`
+
+**scientific (19)** — `BES` (Bose-Einstein) · `BOL` (Boltzmann factor) · `BRN` (Bernoulli pressure) · `BWR` (Breit-Wigner resonance) · `CDP` (classical Doppler) · `CLB` (Coulomb force) · `DOP` (relativistic Doppler) · `FDR` (Fermi-Dirac) · `FRD` (Friedmann H²(z)) · `HAD` (Hadamard quantum gate) · `LRZ` (Lorentz gamma) · `MXB` (Maxwell-Boltzmann speed) · `ORV` (orbital velocity) · `PLK` (Planck blackbody) · `RCC` (RC charging) · `REN` (relativistic energy) · `RLC` (RLC resonance) · `SHR` (Sharpe ratio) · `STB` (Stefan-Boltzmann)
+
+**nn_activation (10)** — `ELU` · `GLU` (GELU approx) · `LRL` (Leaky ReLU) · `LSX` (log-softmax3) · `MSH` (Mish) · `RLU` (ReLU) · `SIG` (sigmoid) · `SPL` (softplus) · `SWS` (Swish/SiLU) · `SX3` (softmax3)
+
+**linalg (8)** — `CMP` (2×2 char poly) · `CP3` (3D cross product) · `DT2` (2×2 det) · `INV` (2×2 inv) · `MMG` (3×3 matmul) · `MMP` (2×2 matmul) · `QML` (quaternion mul) · `TR3` (3×3 trace)
+
+**trigonometric (5)** — `ATA` (atan Taylor) · `COS` (cos Taylor) · `RRT` (range-reduced sin) · `SCH` (sin Chebyshev) · `SIN` (sin Taylor)
+
+**complex_arithmetic (4)** — `CAB` (magnitude) · `CIM` (mul Im) · `CMU` (mul (Re,Im) pair) · `CRE` (mul Re)
+
+**nn_layer (4)** — `ATM` (attention 2-head) · `ATN` (attention score) · `DEN` (dense forward) · `LST` (LSTM cell)
+
+**numerical_method (3)** — `LRP` (linear interp) · `NEW` (Newton-Raphson step) · `SIM` (Simpson quadrature)
+
+**special_function (1)** — `ERF` (Taylor)
+
+</details>
+
+86 macros are in the bit-exact fingerprint corpus; 3 are envelope-bounded (`BRN`, `HAD`, `RLC`) and verified separately. Full schema (chain templates, preprocessing rules, precision classes, envelope bounds) ships in each SDK's `eml_mdr` module.
+
+### Custom registries
+
+The macro architecture is open. Build your own corpus with the same `(shorthand_id, chain_template, function_class, precision_class)` shape and register it at runtime via the SDK's `MacroRegistry`. Per-corpus fingerprints surface in the FNP handshake so peers gate compatibility before exchanging macro-bound traffic.
+
+---
+
 ## Performance
 
 <table>
@@ -186,6 +263,8 @@ compound_linear_calibration().evaluate([2.0, 3.0, 1.0])  # a·x + b = 7.0
 ```
 
 A constrained-channel instruction can carry its own math: a 51-byte LoRa frame can ship an OSMP instruction *and* the calibration polynomial, exponential decay curve, or sensor coefficient needed to interpret it — on any receiver, without firmware updates.
+
+**89 pre-built EML functions ship today** — exp, ln, sin, cos, sqrt, sigmoid, GELU, attention scores, Lorentz gamma, Boltzmann factor, Sharpe ratio, and 79 more across 9 function classes. See the [Macros](#macros) section for the full list.
 
 **Two modes:**
 - **Fast** (default) — fdlibm-derived, 1-ULP accurate. Correct for LoRa/BLE/edge-ML, drone swarm coordination, general scientific computation. **Ships publicly.**
