@@ -4,7 +4,7 @@ Rust implementation of the Octid Semantic Mesh Protocol. Encodes, decodes, compo
 
 ## Status
 
-**Pre-1.0** (`0.2.0`). Core encode/decode, ASD dictionary, v16 namespace mapping, SAL grammar, validator, macro registry, SALBridge, FNP, overflow protocol (Tier 1/2/3 DAG), BAEL, D:PACK encode/decode, the EML universal-binary-operator math layer, and the **89-macro EML MDR registry** all ship at parity with the Python / TypeScript / Go SDKs. The remaining MDR domain-corpus resolve (ICD-10-CM / ISO 20022 / MITRE ATT&CK D:PACK/BLK lookup), the full benchmark harness, and the Pangram handshake follow at `0.3.0`.
+**Pre-1.0** (`0.3.0`). Full wire-format parity with Python / TypeScript / Go: core encode/decode, ASD dictionary, v16 namespace mapping, SAL grammar, validator, macro registry, SALBridge, **FNP packet codec (40-byte ADV / 38-byte ACK with ADR-004 basis-manifest extended-form)**, overflow protocol (Tier 1/2/3 DAG), BAEL bridge-layer mode selector, D:PACK encode/decode, the EML universal-binary-operator math layer, the **89-macro EML MDR registry**, and the **unified wire codec** (`SAILCodec` binary + `SecCodec` ChaCha20-Poly1305 + Ed25519 envelope + `OSMPWireCodec` mode router across {Mnemonic, SAIL, SEC, SAILSEC}) all ship at parity. The remaining MDR domain-corpus resolve (ICD-10-CM / ISO 20022 / MITRE ATT&CK D:PACK/BLK lookup) and the full benchmark harness follow at `0.4.0`.
 
 The SHA-256 ASD fingerprint is byte-identical with the other three SDKs: `9ecc507e2c24c4a7`. The `fingerprint_cross_sdk_identical` test in CI fails the build if Rust ever diverges.
 
@@ -12,10 +12,10 @@ The SHA-256 ASD fingerprint is byte-identical with the other three SDKs: `9ecc50
 
 ```toml
 [dependencies]
-osmp = "0.1"
+osmp = "0.3"
 ```
 
-MSRV: Rust 1.70 (uses `std::sync::OnceLock`, stabilized in 1.70). One runtime dependency (`sha2` for the fingerprint hash); `serde` and `regex` are pulled by submodules.
+MSRV: Rust 1.70 (uses `std::sync::OnceLock`, stabilized in 1.70). Runtime crypto deps for the SEC envelope (`chacha20poly1305`, `ed25519-dalek`, `rand`) are pulled in transitively when the wire layer is constructed; the SAL text encoder/decoder requires only `sha2`, `serde`, `serde_json`, and `regex`.
 
 ## Quick Start
 
@@ -141,6 +141,64 @@ match eml_precise(2.0, 1.0) {
     }
 }
 ```
+
+## Wire Codec — Four Modes
+
+Four wire modes selectable per message via `WireMode`:
+
+| Mode | Byte | Description |
+|---|---|---|
+| `Mnemonic` | `0x00` | UTF-8 SAL text (human-readable) |
+| `SAIL` | `0x01` | Binary SAIL (single-byte tokens + intern table) |
+| `SEC` | `0x02` | SAL text + ChaCha20-Poly1305 + Ed25519 envelope |
+| `SAILSEC` | `0x03` | Binary SAIL + ChaCha20-Poly1305 + Ed25519 envelope |
+
+`OSMPWireCodec` routes per-mode encode and decode. Cross-SDK byte-identical with Python `wire.py`, Go `wire.go`, and TypeScript `osmp_wire.ts`.
+
+```rust
+use osmp::{OSMPWireCodec, WireMode};
+
+// Loopback codec — fresh keys generated; pass Some(&seed)/Some(&key) for fixed identity.
+let mut codec = OSMPWireCodec::new(&[0x00, 0x01], None, None).expect("construct");
+
+// Mnemonic — pass-through UTF-8.
+let m = codec.encode("H:HR@NODE1", WireMode::Mnemonic).unwrap();
+
+// SAIL — binary SAL, one-byte tokens + intern table built from the v15 ASD basis.
+let s = codec.encode("H:HR@NODE1\u{2192}H:CASREP", WireMode::SAIL).unwrap();
+let back = codec.decode(&s, WireMode::SAIL).unwrap();
+assert_eq!(back, "H:HR@NODE1\u{2192}H:CASREP");
+
+// SEC — 87 bytes overhead for 2-byte node_id (89 for 4-byte).
+let envelope = codec.encode("H:HR@NODE1", WireMode::SEC).unwrap();
+let plain = codec.decode(&envelope, WireMode::SEC).unwrap();
+
+// SAILSEC — binary + envelope; minimal wire form for HAZARDOUS payloads.
+let sec_sail = codec.encode("R:MOV@BOT1\u{26A0}", WireMode::SAILSEC).unwrap();
+```
+
+The SEC envelope derives its 12-byte ChaCha20-Poly1305 nonce from the envelope header padded with the canonical salt `b"OSMP-SEC-v1\x00"` (byte-identical across all four SDKs). Ed25519 signs `header || ciphertext || auth_tag`.
+
+## FNP — Frame Negotiation Protocol
+
+Two-message handshake completing in 78 bytes total (40-byte ADV + 38-byte ACK), designed for the LoRa SF12 51-byte payload floor. ADR-004 extended-form ADV (msg_type `0x81`) carries an 8-byte basis fingerprint at offset 32 for `EstablishedSAIL` capability grading.
+
+```rust
+use osmp::{AdaptiveSharedDictionary, FNPSession, FNPState, FNP_CAP_FLOOR};
+
+let asd = AdaptiveSharedDictionary::new();
+let mut a = FNPSession::new_with_version(&asd, "NODE_A", 1, FNP_CAP_FLOOR);
+let mut b = FNPSession::new_with_version(&asd, "NODE_B", 1, FNP_CAP_FLOOR);
+
+let adv = a.initiate().expect("A initiates");           // 40 bytes
+let ack = b.receive(&adv).unwrap().expect("B replies"); // 38 bytes
+assert_eq!(b.state, FNPState::EstablishedSAIL);
+
+a.receive(&ack).unwrap();
+assert_eq!(a.state, FNPState::EstablishedSAIL);
+```
+
+ADR-004 basis-manifest mode is enabled by passing `FNPSessionOptions { basis_fingerprint: Some(vec![..; 8]), .. }` to `FNPSession::new_with_options`.
 
 ## Test
 

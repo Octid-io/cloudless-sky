@@ -28,6 +28,7 @@ pub mod sal_composer;
 pub mod sal_patterns;
 pub mod types;
 pub mod validate;
+pub mod wire;
 
 pub use asd::{
     AdaptiveSharedDictionary, DeltaLogEntry, DictUpdateMode, ASD_FLOOR_VERSION,
@@ -53,7 +54,17 @@ pub use eml::{
     VariantTag, REGISTRY as EML_REGISTRY,
 };
 pub use encoder::{EncodeError, Encoder};
-pub use fnp::{FNPSession, FNPState, FNP_CAP_UNCONSTRAINED};
+pub use fnp::{
+    fnp_cap_bytes, DegradationEvent, FNPSession, FNPSessionOptions, FNPState, FnpError,
+    FNP_ADV_EXT_FLAG, FNP_CAP_BLE, FNP_CAP_FLOOR, FNP_CAP_STANDARD, FNP_CAP_UNCONSTRAINED,
+    FNP_MATCH_BASIS_EXT_VS_BASE, FNP_MATCH_BASIS_MISMATCH, FNP_MATCH_EXACT,
+    FNP_MATCH_FINGERPRINT, FNP_MATCH_VERSION, FNP_MSG_ACK, FNP_MSG_ADV, FNP_MSG_ADV_EXTENDED,
+    FNP_MSG_NACK,
+};
+pub use wire::{
+    OSMPWireCodec, SAILCodec, SecCodec, SecEnvelope, SecError, WireError, WireMode,
+    SEC_NONCE_SALT, TOK_AND, TOK_END, TOK_FRAME, TOK_NEGINT, TOK_REF, TOK_THEN, TOK_VARINT,
+};
 pub use overflow::{unpack_fragment, LossPolicy, OverflowProtocol};
 pub use glyphs::{
     asd_basis, compound_operators, consequence_classes, glyph_operators,
@@ -436,7 +447,7 @@ mod smoke {
     fn fnp_new_session_starts_in_initial_state() {
         let asd = AdaptiveSharedDictionary::new();
         let session = FNPSession::new(&asd, "NODE_A", 1, FNP_CAP_UNCONSTRAINED);
-        assert_eq!(session.state, FNPState::Initial);
+        assert_eq!(session.state, FNPState::Idle);
         assert_eq!(session.local_node_id, "NODE_A");
         assert_eq!(session.remote_node_id, "");
         assert_eq!(session.match_status, -1);
@@ -458,7 +469,7 @@ mod smoke {
         let mut session = FNPSession::new(&asd, "NODE_A", 1, FNP_CAP_UNCONSTRAINED);
         // Cannot acquire from Initial.
         session.acquire();
-        assert_eq!(session.state, FNPState::Initial);
+        assert_eq!(session.state, FNPState::Idle);
         // Fallback -> Acquired.
         session.fallback("PEER_X");
         session.acquire();
@@ -502,8 +513,8 @@ mod smoke {
     fn bridge_register_peer_with_fnp_starts_initial() {
         let mut bridge = SALBridge::new("NODE_LOCAL", None, true);
         let state = bridge.register_peer("GPT_AGENT_2", true);
-        assert_eq!(state, FNPState::Initial);
-        assert_eq!(bridge.peer_state("GPT_AGENT_2"), Some(FNPState::Initial));
+        assert_eq!(state, FNPState::Idle);
+        assert_eq!(bridge.peer_state("GPT_AGENT_2"), Some(FNPState::Idle));
     }
 
     #[test]
@@ -691,5 +702,278 @@ mod smoke {
             (score - 1.0).abs() < 1e-9,
             "acquisition_score must cap at 1.0, got {score}",
         );
+    }
+
+    // ── FNP packet codec ─────────────────────────────────────────────────
+
+    #[test]
+    fn fnp_initiate_produces_40_byte_adv() {
+        let asd = AdaptiveSharedDictionary::new();
+        let mut session = FNPSession::new_with_version(&asd, "NODE_A", 1, FNP_CAP_FLOOR);
+        let adv = session.initiate().expect("initiate must succeed");
+        assert_eq!(adv.len(), 40, "FNP ADV packet must be 40 bytes");
+        assert_eq!(adv[0], FNP_MSG_ADV, "first byte must be FNP_MSG_ADV");
+        assert_eq!(session.state, FNPState::AdvSent);
+    }
+
+    #[test]
+    fn fnp_initiate_only_from_idle() {
+        let asd = AdaptiveSharedDictionary::new();
+        let mut session = FNPSession::new_with_version(&asd, "NODE_A", 1, FNP_CAP_FLOOR);
+        session.fallback("PEER");
+        let result = session.initiate();
+        assert!(matches!(result, Err(FnpError::InvalidState(_))));
+    }
+
+    #[test]
+    fn fnp_handshake_round_trip_idle_to_established_sail() {
+        // Two sessions with identical ASD basis should reach EstablishedSAIL on
+        // exact match. ADV: A -> B, ACK: B -> A.
+        let asd = AdaptiveSharedDictionary::new();
+        let mut a = FNPSession::new_with_version(&asd, "NODE_A", 1, FNP_CAP_FLOOR);
+        let mut b = FNPSession::new_with_version(&asd, "NODE_B", 1, FNP_CAP_FLOOR);
+        let adv = a.initiate().expect("A initiates");
+        let ack = b
+            .receive(&adv)
+            .expect("B receives ADV")
+            .expect("B returns ACK bytes");
+        assert_eq!(ack.len(), 38, "FNP ACK packet must be 38 bytes");
+        assert_eq!(ack[0], FNP_MSG_ACK, "ACK msg_type on exact match");
+        assert_eq!(b.state, FNPState::EstablishedSAIL);
+        let _ = a.receive(&ack).expect("A receives ACK");
+        assert_eq!(a.state, FNPState::EstablishedSAIL);
+        assert_eq!(a.match_status, FNP_MATCH_EXACT);
+        assert_eq!(b.match_status, FNP_MATCH_EXACT);
+    }
+
+    #[test]
+    fn fnp_extended_form_sets_high_bit_and_carries_basis_fp() {
+        let asd = AdaptiveSharedDictionary::new();
+        let mut opts = FNPSessionOptions::default();
+        opts.basis_fingerprint = Some(vec![0xAA; 8]);
+        let mut session =
+            FNPSession::new_with_options(&asd, "NODE_A", 1, FNP_CAP_FLOOR, opts).unwrap();
+        let adv = session.initiate().expect("initiate");
+        assert_eq!(adv.len(), 40);
+        assert_eq!(adv[0], FNP_MSG_ADV_EXTENDED);
+        assert_eq!(adv[0] & FNP_ADV_EXT_FLAG, FNP_ADV_EXT_FLAG);
+        assert_eq!(&adv[32..40], &[0xAA; 8]);
+        assert!(session.is_extended_form());
+    }
+
+    #[test]
+    fn fnp_basis_fingerprint_must_be_eight_bytes() {
+        let asd = AdaptiveSharedDictionary::new();
+        let mut opts = FNPSessionOptions::default();
+        opts.basis_fingerprint = Some(vec![0xAA; 7]);
+        let result = FNPSession::new_with_options(&asd, "NODE_A", 1, FNP_CAP_FLOOR, opts);
+        assert_eq!(result.err(), Some(FnpError::InvalidBasisFingerprint));
+    }
+
+    #[test]
+    fn fnp_echo_mismatch_rejected() {
+        // Forge an ACK with a tampered echo fingerprint; receive must reject.
+        let asd = AdaptiveSharedDictionary::new();
+        let mut a = FNPSession::new_with_version(&asd, "NODE_A", 1, FNP_CAP_FLOOR);
+        let _ = a.initiate().expect("initiate");
+        let mut bad_ack = vec![0u8; 38];
+        bad_ack[0] = FNP_MSG_ACK;
+        bad_ack[1] = FNP_MATCH_EXACT as u8;
+        // Wrong echo fingerprint at offset [2..10]:
+        for i in 2..10 {
+            bad_ack[i] = 0xFF;
+        }
+        let result = a.receive(&bad_ack);
+        assert_eq!(result.err(), Some(FnpError::EchoMismatch));
+    }
+
+    #[test]
+    fn fnp_timeout_resets_to_idle() {
+        let asd = AdaptiveSharedDictionary::new();
+        let mut session = FNPSession::new_with_version(&asd, "NODE_A", 1, FNP_CAP_FLOOR);
+        let _ = session.initiate().expect("initiate");
+        session.timeout();
+        assert_eq!(session.state, FNPState::Idle);
+        assert_eq!(session.match_status, -1);
+    }
+
+    // ── SAIL codec ────────────────────────────────────────────────────────
+
+    #[test]
+    fn sail_encode_h_hr_uses_tok_frame() {
+        let codec = wire::SAILCodec::new();
+        let bytes = codec.encode("H:HR");
+        // First byte must be TOK_FRAME, last must be TOK_END.
+        assert!(!bytes.is_empty());
+        assert_eq!(bytes[0], TOK_FRAME);
+        assert_eq!(*bytes.last().unwrap(), TOK_END);
+        // ns_index for H = 'H' - 'A' = 7.
+        assert_eq!(bytes[1], 7);
+    }
+
+    #[test]
+    fn sail_encode_decode_roundtrip_h_hr() {
+        let codec = wire::SAILCodec::new();
+        let original = "H:HR";
+        let bytes = codec.encode(original);
+        let decoded = codec.decode(&bytes);
+        assert_eq!(decoded, original);
+    }
+
+    #[test]
+    fn sail_encode_compound_chain_with_then_glyph() {
+        let codec = wire::SAILCodec::new();
+        let original = "H:HR\u{2192}H:CASREP";
+        let bytes = codec.encode(original);
+        // Find the THEN glyph token in the bytes.
+        assert!(bytes.contains(&TOK_THEN));
+        let decoded = codec.decode(&bytes);
+        assert_eq!(decoded, original);
+    }
+
+    #[test]
+    fn sail_encode_numeric_uses_varint() {
+        let codec = wire::SAILCodec::new();
+        let bytes = codec.encode("H:HR@NODE1");
+        // Must contain TOK_FRAME for H:HR.
+        assert!(bytes.contains(&TOK_FRAME));
+    }
+
+    // ── SEC codec ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn sec_pack_unpack_roundtrip_self_verify() {
+        let seed = [0x11u8; 32];
+        let sym = [0x22u8; 32];
+        let mut codec =
+            wire::SecCodec::new(&[0x00, 0x01], Some(&seed), Some(&sym)).expect("construct");
+        let payload = b"H:HR@NODE1\xe2\x86\xbaH:CASREP";
+        let envelope = codec.pack(payload, WireMode::SEC).expect("pack");
+        // Overhead: 87 bytes for 2-byte node_id (1 mode + 2 nid + 4 seq + payload + 16 tag + 64 sig).
+        assert_eq!(envelope.len(), payload.len() + 87);
+        let unpacked = codec.unpack(&envelope).expect("unpack");
+        assert_eq!(unpacked.payload, payload);
+        assert_eq!(unpacked.mode, WireMode::SEC);
+        assert_eq!(unpacked.node_id, vec![0x00, 0x01]);
+        assert_eq!(unpacked.seq_counter, 1);
+    }
+
+    #[test]
+    fn sec_pack_unpack_4byte_node_id() {
+        let seed = [0x33u8; 32];
+        let sym = [0x44u8; 32];
+        let mut codec = wire::SecCodec::new(&[0xDE, 0xAD, 0xBE, 0xEF], Some(&seed), Some(&sym))
+            .expect("construct");
+        let payload = b"hello";
+        let envelope = codec.pack(payload, WireMode::SAILSEC).expect("pack");
+        // Overhead: 89 bytes for 4-byte node_id.
+        assert_eq!(envelope.len(), payload.len() + 89);
+        let unpacked = codec.unpack(&envelope).expect("unpack");
+        assert_eq!(unpacked.node_id, vec![0xDE, 0xAD, 0xBE, 0xEF]);
+        assert_eq!(unpacked.mode, WireMode::SAILSEC);
+    }
+
+    #[test]
+    fn sec_seq_counter_monotonic() {
+        let seed = [0x55u8; 32];
+        let sym = [0x66u8; 32];
+        let mut codec =
+            wire::SecCodec::new(&[0x00, 0x02], Some(&seed), Some(&sym)).expect("construct");
+        let e1 = codec.pack(b"first", WireMode::SEC).unwrap();
+        let e2 = codec.pack(b"second", WireMode::SEC).unwrap();
+        let u1 = codec.unpack(&e1).unwrap();
+        let u2 = codec.unpack(&e2).unwrap();
+        assert_eq!(u1.seq_counter, 1);
+        assert_eq!(u2.seq_counter, 2);
+    }
+
+    #[test]
+    fn sec_invalid_node_id_rejected() {
+        let result = wire::SecCodec::new(&[0x00], None, None);
+        assert_eq!(result.err(), Some(SecError::InvalidNodeId));
+    }
+
+    #[test]
+    fn sec_tampered_signature_rejected() {
+        let seed = [0x77u8; 32];
+        let sym = [0x88u8; 32];
+        let mut codec =
+            wire::SecCodec::new(&[0x00, 0x03], Some(&seed), Some(&sym)).expect("construct");
+        let mut envelope = codec.pack(b"payload", WireMode::SEC).unwrap();
+        // Flip the last byte (within the signature region).
+        let last = envelope.len() - 1;
+        envelope[last] ^= 0x01;
+        let result = codec.unpack(&envelope);
+        assert!(matches!(
+            result,
+            Err(SecError::SignatureFailure) | Err(SecError::AuthFailure)
+        ));
+    }
+
+    #[test]
+    fn sec_nonce_salt_canonical_value() {
+        assert_eq!(SEC_NONCE_SALT, b"OSMP-SEC-v1\x00");
+    }
+
+    // ── Unified wire codec ────────────────────────────────────────────────
+
+    #[test]
+    fn wire_mode_byte_values_match_spec() {
+        assert_eq!(WireMode::Mnemonic as u8, 0x00);
+        assert_eq!(WireMode::SAIL as u8, 0x01);
+        assert_eq!(WireMode::SEC as u8, 0x02);
+        assert_eq!(WireMode::SAILSEC as u8, 0x03);
+    }
+
+    #[test]
+    fn wire_mode_labels() {
+        assert_eq!(WireMode::Mnemonic.label(), "OSMP");
+        assert_eq!(WireMode::SAIL.label(), "OSMP-SAIL");
+        assert_eq!(WireMode::SEC.label(), "OSMP-SEC");
+        assert_eq!(WireMode::SAILSEC.label(), "OSMP-SAIL-SEC");
+    }
+
+    #[test]
+    fn osmp_wire_codec_mnemonic_roundtrip() {
+        let mut codec = OSMPWireCodec::new(&[0x00, 0x04], None, None).expect("construct");
+        let original = "H:HR@NODE1";
+        let bytes = codec.encode(original, WireMode::Mnemonic).unwrap();
+        assert_eq!(bytes, original.as_bytes());
+        let decoded = codec.decode(&bytes, WireMode::Mnemonic).unwrap();
+        assert_eq!(decoded, original);
+    }
+
+    #[test]
+    fn osmp_wire_codec_sail_roundtrip() {
+        let mut codec = OSMPWireCodec::new(&[0x00, 0x05], None, None).expect("construct");
+        let original = "H:HR@NODE1\u{2192}H:CASREP";
+        let bytes = codec.encode(original, WireMode::SAIL).unwrap();
+        // SAIL bytes will be shorter than UTF-8 for the THEN glyph (1 byte token vs 3 bytes UTF-8).
+        let decoded = codec.decode(&bytes, WireMode::SAIL).unwrap();
+        assert_eq!(decoded, original);
+    }
+
+    #[test]
+    fn osmp_wire_codec_sec_roundtrip() {
+        let seed = [0x99u8; 32];
+        let sym = [0xAAu8; 32];
+        let mut codec =
+            OSMPWireCodec::new(&[0x00, 0x06], Some(&seed), Some(&sym)).expect("construct");
+        let original = "H:HR@NODE1";
+        let bytes = codec.encode(original, WireMode::SEC).unwrap();
+        let decoded = codec.decode(&bytes, WireMode::SEC).unwrap();
+        assert_eq!(decoded, original);
+    }
+
+    #[test]
+    fn osmp_wire_codec_sailsec_roundtrip() {
+        let seed = [0xBBu8; 32];
+        let sym = [0xCCu8; 32];
+        let mut codec =
+            OSMPWireCodec::new(&[0x00, 0x07], Some(&seed), Some(&sym)).expect("construct");
+        let original = "H:HR@NODE1\u{2192}H:CASREP";
+        let bytes = codec.encode(original, WireMode::SAILSEC).unwrap();
+        let decoded = codec.decode(&bytes, WireMode::SAILSEC).unwrap();
+        assert_eq!(decoded, original);
     }
 }
