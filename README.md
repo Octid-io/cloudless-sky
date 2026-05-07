@@ -314,7 +314,7 @@ All four SDKs are independently verified against the canonical test suite. The S
 | **Python** | `pip install osmp` | [sdk/python/](sdk/python/) — reference implementation |
 | **TypeScript** | `npm install osmp-protocol` | [sdk/typescript/](sdk/typescript/) — `fzstd` for D:PACK/BLK |
 | **Go** | `go get .../sdk/go/osmp` | [sdk/go/](sdk/go/) — ASD compiled-in |
-| **Rust** | `cargo add osmp` | [sdk/rust/](sdk/rust/) — pre-1.0 (0.5.0); full feature parity (FNP packet codec, SAIL binary, SEC envelope with replay protection, ADP session protocol, EML chain wire codec + ParametricChain evaluator + corpus fingerprint), pure-Rust fdlibm port for cross-device byte-identical math, D:PACK zstd resolve on shipped corpora, ASD core + v16 + EML + 89-macro registry |
+| **Rust** | `cargo add osmp` | [sdk/rust/](sdk/rust/) — pre-1.0 (0.5.2); full feature parity (FNP packet codec, SAIL binary, SEC envelope with replay protection, ADP session protocol, EML chain wire codec + ParametricChain evaluator + corpus fingerprint), pure-Rust fdlibm port for cross-device byte-identical math, D:PACK zstd resolve on shipped corpora, ASD core + v16 + EML + 89-macro registry |
 | **MCP Server** | `pip install osmp-mcp` | [osmp_mcp/](osmp_mcp/) — 19 tools, wraps Python SDK |
 
 D:PACK/BLK resolve is verified across all 124,215 domain codes (74,719 ICD-10-CM + 47,835 ISO 20022 + 1,661 MITRE ATT&CK) in Python, TypeScript, and Go.
