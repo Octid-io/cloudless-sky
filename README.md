@@ -21,7 +21,7 @@
 
 ---
 
-OSMP (Octid Semantic Mesh Protocol) is an open encoding standard for agentic AI instruction exchange. It works across any channel — from a 51-byte LoRa radio packet to a high-throughput cloud inference pipeline — using the same grammar, the same dictionary, and the same decode logic.
+OSMP (Octid Semantic Mesh Protocol) is an open encoding standard for agentic AI instruction and computation exchange. It works across any channel — from a 51-byte LoRa radio packet to a high-throughput cloud inference pipeline — using the same grammar, the same dictionary, and the same decode logic.
 
 **No cloud required. No inference at the decode layer. No central authority.**
 
